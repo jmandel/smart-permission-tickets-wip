@@ -1,0 +1,28 @@
+id: smart.permission-tickets
+canonical: http://smarthealthit.org/ig/permission-tickets
+name: SmartPermissionTickets
+title: "SMART Permission Tickets"
+status: draft
+version: 0.1.0
+fhirVersion: 4.0.1
+copyrightYear: 2024+
+releaseLabel: ci-build
+
+pages:
+  index.md:
+    title: Executive Summary
+  problem.md:
+    title: The Problem Space
+  solution.md:
+    title: The Solution
+  specification.md:
+    title: Technical Specification
+  use-cases.md:
+    title: Catalog of Use Cases
+  downloads.md:
+    title: Downloads
+
+menu:
+  IG Home: index.html
+  Downloads: downloads.html
+  Artifacts: artifacts.html

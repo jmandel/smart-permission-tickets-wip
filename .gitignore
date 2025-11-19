@@ -1,0 +1,23 @@
+# FHIR IG Publisher outputs
+output/
+temp/
+template/
+txCache/
+publisher.jar
+fhir-ig-publisher.jar
+
+# Node modules
+node_modules/
+scripts/node_modules/
+
+# Build artifacts
+*.log
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*~

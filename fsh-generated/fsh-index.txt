@@ -1,0 +1,2 @@
+Output File                                Name              Type     FSH File              Lines
+StructureDefinition-PermissionTicket.json  PermissionTicket  Logical  PermissionTicket.fsh  2 - 38

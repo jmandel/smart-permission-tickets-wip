@@ -1,0 +1,10 @@
+[
+  {
+    "outputFile": "StructureDefinition-PermissionTicket.json",
+    "fshName": "PermissionTicket",
+    "fshType": "Logical",
+    "fshFile": "PermissionTicket.fsh",
+    "startLine": 2,
+    "endLine": 38
+  }
+]

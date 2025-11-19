@@ -1,0 +1,180 @@
+<div class="artifact-viewer" id="{{include.id}}">
+    <style>
+        .artifact-viewer {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin: 20px 0;
+            background: #f9f9f9;
+            font-family: sans-serif;
+        }
+
+        .artifact-header {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #e0e0e0;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .artifact-content {
+            padding: 15px;
+        }
+
+        .artifact-section {
+            margin-bottom: 20px;
+        }
+
+        .artifact-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            padding: 2px 8px;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #eee;
+            border-color: #bbb;
+            color: #333;
+        }
+
+        .copy-btn:active {
+            background: #ddd;
+        }
+
+        .json-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            overflow-x: auto;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 13px;
+            color: #333;
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        .raw-jwt {
+            word-break: break-all;
+            white-space: pre-wrap;
+            /* Allow wrapping for long tokens */
+            color: #555;
+            font-size: 12px;
+            background: #f4f4f4;
+        }
+    </style>
+
+    <div class="artifact-header">
+        <span>Permission Ticket Artifact</span>
+    </div>
+
+    <div class="artifact-content">
+        <!-- Header Section -->
+        <div class="artifact-section">
+            <div class="section-title">
+                <span>Header</span>
+                <button class="copy-btn" onclick="copyToClipboard('{{include.id}}-header')">Copy</button>
+            </div>
+            <div class="json-box" id="{{include.id}}-header">Loading...</div>
+        </div>
+
+        <!-- Payload Section -->
+        <div class="artifact-section">
+            <div class="section-title">
+                <span>Payload (Claims)</span>
+                <button class="copy-btn" onclick="copyToClipboard('{{include.id}}-payload')">Copy</button>
+            </div>
+            <div class="json-box" id="{{include.id}}-payload">Loading...</div>
+        </div>
+
+        <!-- Raw Token Section -->
+        <div class="artifact-section">
+            <div class="section-title">
+                <span>Raw Signed JWT</span>
+                <button class="copy-btn" onclick="copyToClipboard('{{include.id}}-raw')">Copy</button>
+            </div>
+            <div class="json-box raw-jwt" id="{{include.id}}-raw">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const containerId = "{{include.id}}";
+            const jwtFile = "{{include.file}}";
+
+            // Helper to decode base64url
+            function b64Decode(str) {
+                const base64Url = str;
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            }
+
+            // Global copy function (if not already defined)
+            if (!window.copyToClipboard) {
+                window.copyToClipboard = function (elementId) {
+                    const text = document.getElementById(elementId).textContent;
+                    navigator.clipboard.writeText(text).then(function () {
+                        // Optional: Show feedback
+                        console.log('Copied!');
+                    }, function (err) {
+                        console.error('Could not copy text: ', err);
+                    });
+                };
+            }
+
+            fetch(jwtFile)
+                .then(response => {
+                    if (!response.ok) throw new Error("HTTP " + response.status);
+                    return response.text();
+                })
+                .then(jwt => {
+                    jwt = jwt.trim();
+                    const parts = jwt.split('.');
+
+                    if (parts.length !== 3) {
+                        throw new Error("Invalid JWT format (not 3 parts)");
+                    }
+
+                    try {
+                        const header = b64Decode(parts[0]);
+                        const payload = b64Decode(parts[1]);
+
+                        document.getElementById(containerId + "-header").textContent = JSON.stringify(header, null, 2);
+                        document.getElementById(containerId + "-payload").textContent = JSON.stringify(payload, null, 2);
+                        document.getElementById(containerId + "-raw").textContent = jwt;
+                    } catch (e) {
+                        throw new Error("Failed to decode JWT parts: " + e.message);
+                    }
+                })
+                .catch(err => {
+                    const errorMsg = "Error loading example: " + err.message;
+                    document.getElementById(containerId + "-header").textContent = "Error";
+                    document.getElementById(containerId + "-payload").textContent = errorMsg;
+                    document.getElementById(containerId + "-raw").textContent = "Error";
+                });
+        })();
+    </script>
+</div>

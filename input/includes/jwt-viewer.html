@@ -1,0 +1,50 @@
+<div class="jwt-viewer" id="jwt-viewer-{{include.id}}">
+  <style>
+    .jwt-viewer { font-family: monospace; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; }
+    .jwt-part { word-break: break-all; cursor: pointer; }
+    .jwt-header { color: #fb015b; }
+    .jwt-payload { color: #d63aff; }
+    .jwt-signature { color: #00b9f1; }
+    .jwt-decoded { margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; display: none; }
+    .jwt-decoded pre { background: #fff; padding: 5px; }
+  </style>
+
+  <div class="jwt-encoded">
+    <strong>Encoded (Click to Decode):</strong><br>
+    <span class="jwt-part jwt-header" onclick="toggleDecode('{{include.id}}')">eyJhbGci...</span>.<span class="jwt-part jwt-payload" onclick="toggleDecode('{{include.id}}')">eyJ...</span>.<span class="jwt-part jwt-signature" onclick="toggleDecode('{{include.id}}')">...</span>
+  </div>
+
+  <div class="jwt-decoded" id="decoded-{{include.id}}">
+    <strong>Header:</strong>
+    <pre id="header-{{include.id}}"></pre>
+    <strong>Payload:</strong>
+    <pre id="payload-{{include.id}}"></pre>
+  </div>
+
+  <script>
+    (function() {
+      const jwt = "{{include.jwt}}";
+      const parts = jwt.split('.');
+      if (parts.length === 3) {
+        const container = document.getElementById('jwt-viewer-{{include.id}}');
+        container.querySelector('.jwt-header').textContent = parts[0];
+        container.querySelector('.jwt-payload').textContent = parts[1];
+        container.querySelector('.jwt-signature').textContent = parts[2];
+
+        try {
+            const header = JSON.parse(atob(parts[0]));
+            const payload = JSON.parse(atob(parts[1]));
+            document.getElementById('header-{{include.id}}').textContent = JSON.stringify(header, null, 2);
+            document.getElementById('payload-{{include.id}}').textContent = JSON.stringify(payload, null, 2);
+        } catch (e) {
+            console.error("Failed to decode JWT", e);
+        }
+      }
+    })();
+
+    function toggleDecode(id) {
+      const el = document.getElementById('decoded-' + id);
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+  </script>
+</div>

@@ -1,0 +1,72 @@
+{
+  "resourceType": "ImplementationGuide",
+  "id": "smart.permission-tickets",
+  "url": "http://smarthealthit.org/ig/permission-tickets/ImplementationGuide/smart.permission-tickets",
+  "version": "0.1.0",
+  "name": "SmartPermissionTickets",
+  "title": "SMART Permission Tickets",
+  "status": "draft",
+  "packageId": "smart.permission-tickets",
+  "fhirVersion": [
+    "4.0.1"
+  ],
+  "definition": {
+    "resource": [
+      {
+        "reference": {
+          "reference": "StructureDefinition/PermissionTicket"
+        },
+        "name": "Permission Ticket (JWT Payload)",
+        "description": "The full payload of a Permission Ticket, including standard JWT claims and the custom permission object.",
+        "exampleBoolean": false
+      }
+    ],
+    "page": {
+      "nameUrl": "toc.html",
+      "title": "Table of Contents",
+      "generation": "html",
+      "page": [
+        {
+          "nameUrl": "index.html",
+          "title": "Executive Summary",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "problem.html",
+          "title": "The Problem Space",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "solution.html",
+          "title": "The Solution",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "specification.html",
+          "title": "Technical Specification",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "use-cases.html",
+          "title": "Catalog of Use Cases",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "downloads.html",
+          "title": "Downloads",
+          "generation": "markdown"
+        }
+      ]
+    },
+    "parameter": [
+      {
+        "code": "copyrightyear",
+        "value": "2024+"
+      },
+      {
+        "code": "releaselabel",
+        "value": "ci-build"
+      }
+    ]
+  }
+}
