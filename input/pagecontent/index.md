@@ -1,7 +1,7 @@
 # The Permission Ticket Architecture
 **Enabling Granular, Context-Aware Authorization in Health Networks**
 
-## 1. Executive Summary
+## Executive Summary
 
 Current interoperability standards (SMART on FHIR, TEFCA) face a "granularity gap." Authorization flows effectively force a choice between two extremes:
 1.  **User-Centric friction:** Relying on patients to manually log in to **N** different portals to authorize a single app.
@@ -13,17 +13,17 @@ A Permission Ticket is a portable, cryptographically signed artifact. It uses st
 
 ---
 
-## 2. The Problem Space
+## Problem Space
 
-### A. The "N Portals" Bottleneck (Consumer Access)
+### "N Portals" Bottleneck (Consumer Access)
 In standard SMART flows, if a patient wants to aggregate their data from five different hospitals into a personal health app, they must locate five different portals, remember five usernames/passwords, and click "Approve" five times. This friction destroys adoption. Furthermore, the scopes are coarse; a user can usually only say "Yes" to everything or "No" to everything.
 
-### B. The "All-or-Nothing" Network (Backend Services)
+### "All-or-Nothing" Network (Backend Services)
 In B2B flows (like TEFCA Treatment or Payer exchange), Client Apps authenticate via certificates. Because it is too hard to configure specific permissions for every patient and every external partner, Data Holders often default to binary trust: if the partner is a "Trusted Node," they get access to the firehose. This is unacceptable for sensitive use cases like Research, Public Health, or Social Care.
 
 ---
 
-## 3. The Solution: Permission Tickets
+## Solution: Permission Tickets
 
 A **Permission Ticket** is a JWT minted by a Trusted Issuer. It acts as a self-contained authorization grant.
 
@@ -65,9 +65,9 @@ sequenceDiagram
 
 ---
 
-## 4. Technical Specification
+## Technical Specification
 
-### A. Transport: SMART Backend Services Profile
+### Transport: SMART Backend Services Profile
 This architecture is a strict profile of **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** (which itself profiles **RFC 7523**).
 
 The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** as an extension claim.
@@ -93,7 +93,7 @@ Here is what the `client_assertion` looks like when decoded. Note the `trust_cha
 
 {% include signed-tickets/example-client-assertion.html %}
 
-### B. The Artifact: Ticket Structure
+### Artifact: Ticket Structure
 The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticket_context` claim.
 
 ```javascript
@@ -145,7 +145,7 @@ The Data Holder must perform a two-layer validation:
 
 ---
 
-## 5. Developer Documentation
+## Developer Documentation
 
 This section provides technical details for developers implementing the Permission Ticket Architecture, including strict schema definitions, signing algorithms, and validation logic.
 
@@ -258,7 +258,7 @@ When a Data Holder receives a token request with a `client_assertion`, it must p
 
 ---
 
-## 6. Catalog of Use Cases
+## Catalog of Use Cases
 
 Here are seven scenarios demonstrating how FHIR resources are used to model diverse authorization needs.
 
