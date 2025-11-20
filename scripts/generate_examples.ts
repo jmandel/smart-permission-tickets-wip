@@ -30,9 +30,13 @@ async function signTicket(payload: PermissionTicket, key: jose.KeyLike & { kid?:
         .sign(key);
 }
 
-async function signClientAssertion(payload: ClientAssertion, key: jose.KeyLike & { kid?: string }) {
+async function signClientAssertion(payload: ClientAssertion, key: jose.KeyLike & { kid?: string }, trust_chain?: string[]) {
     return new jose.SignJWT(payload as any)
-        .setProtectedHeader({ alg: 'ES256', kid: key.kid })
+        .setProtectedHeader({
+            alg: 'ES256',
+            kid: key.kid,
+            trust_chain
+        })
         .setIssuedAt()
         .setExpirationTime('5m')
         .sign(key);
@@ -265,16 +269,17 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
         sub: "https://app.client.id",
         aud: "https://network.org/token",
         jti: "assertion-jti-123",
-        "https://smarthealthit.org/extension_tickets": [signedTicket],
-        trust_chain: [
-            "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Client)",
-            "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Intermediate)",
-            "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Trust Anchor)"
-        ]
+        "https://smarthealthit.org/extension_tickets": [signedTicket]
     };
 
+    const trust_chain = [
+        "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Client)",
+        "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Intermediate)",
+        "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Trust Anchor)"
+    ];
+
     // Sign with a client key (using issuer key here for simplicity as it's just an example)
-    const signedAssertion = await signClientAssertion(assertionPayload, issuerKey);
+    const signedAssertion = await signClientAssertion(assertionPayload, issuerKey, trust_chain);
     fs.writeFileSync(path.join(OUTPUT_DIR, 'example-client-assertion.jwt'), signedAssertion);
     console.log(`Generated example-client-assertion.jwt`);
 }

@@ -62,5 +62,4 @@ export interface ClientAssertion {
     jti: string;
     exp?: number;
     "https://smarthealthit.org/extension_tickets": string[]; // Array of Signed Ticket Strings
-    trust_chain?: string[]; // OpenID Federation 1.0 Trust Chain
 }

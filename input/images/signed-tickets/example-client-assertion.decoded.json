@@ -1,7 +1,12 @@
 {
   "header": {
     "alg": "ES256",
-    "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+    "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8",
+    "trust_chain": [
+      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Client)",
+      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Intermediate)",
+      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Trust Anchor)"
+    ]
   },
   "payload": {
     "iss": "https://app.client.id",
@@ -9,15 +14,10 @@
     "aud": "https://network.org/token",
     "jti": "assertion-jti-123",
     "https://smarthealthit.org/extension_tickets": [
-      "eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWQiOiIxMjMifSwiY2FwYWJpbGl0eSI6eyJtb2RlIjpbInJlYWQiXX19LCJpYXQiOjE3NjM2MTE0MzUsImV4cCI6MTc2MzYxNTAzNX0.m1eztnNTefWrJvqZ-S3YGyGLUB-ECPNVFvXGicvYuUhWvHGwMTFYQC5yNFccbQD2MRpaJfY-k1tD6KniyYh5jg"
+      "eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWQiOiIxMjMifSwiY2FwYWJpbGl0eSI6eyJtb2RlIjpbInJlYWQiXX19LCJpYXQiOjE3NjM2MTE3MTMsImV4cCI6MTc2MzYxNTMxM30.PoBLBvc1H45uR2vnwb63tCpb7pk3MD3c4EV2-toahfdTUkijofJ9dfEeHcgNgdAZawHrR8BmWsa_vqmdlMoLhA"
     ],
-    "trust_chain": [
-      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Client)",
-      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Intermediate)",
-      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Trust Anchor)"
-    ],
-    "iat": 1763611435,
-    "exp": 1763611735
+    "iat": 1763611713,
+    "exp": 1763612013
   },
-  "signature": "zJ-nmnZEhDdUAAFswLV9H0MgruTidmvMUKDEk0ocQFdMSaU5bYaJpCrhIWZ2OsunQh93WySpjWqiojfarQq91A"
+  "signature": "pe7nNfFmRgDdompf8Jrcx29-lfJgq27dzwYXle_j5Fx2XxVjEWjBJQ11uZvTEiKbeVzhfJIrKQPJEmgW68Xcaw"
 }

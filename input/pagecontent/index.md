@@ -72,8 +72,7 @@ This architecture is a strict profile of **[SMART Backend Services](https://buil
 
 The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** as an extension claim.
 
-#### Trust Establishment: OpenID Federation 1.0
-We **RECOMMEND** using **[OpenID Federation 1.0](https://openid.net/specs/openid-federation-1_0.html)** for trust establishment.
+#### Trust*   **Automatic Registration**: Clients can be automatically registered using [OpenID Federation 1.0](https://openid.net/specs/openid-federation-1_0.html). The client includes a `trust_chain` in the **header** of its `client_assertion`, allowing the Authorization Server to verify the client's metadata and trust status dynamically.
 *   **Client IDs** MUST be **URL Entity Identifiers** (e.g., `https://app.example.com`).
 *   Clients SHOULD include a `trust_chain` in their assertion. This allows Data Holders to verify the client's legitimacy via a common Trust Anchor without requiring manual pre-registration of every client.
 
@@ -210,15 +209,15 @@ export interface PermissionTicket {
 }
 
 export interface ClientAssertion {
-    iss: string;          // Client ID
-    sub: string;          // Client ID
-    aud: string;          // Token Endpoint URL
-    jti: string;          // Unique Assertion ID
-    exp?: number;         // Expiration Timestamp
-    "https://smarthealthit.org/extension_tickets": string[]; // Array of Signed Ticket Strings
-    trust_chain?: string[]; // OpenID Federation 1.0 Trust Chain
+  iss: string; // Client ID (URL)
+  sub: string; // Client ID (URL)
+  aud: string; // Token Endpoint URL
+  jti: string; // Unique ID
+  exp: number; // Expiration
+  
+  // The Permission Ticket(s)
+  "https://smarthealthit.org/extension_tickets": string[];
 }
-```
 
 ### Signing and Validation
 
