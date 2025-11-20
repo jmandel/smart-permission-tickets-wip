@@ -105,7 +105,7 @@ const uc3_payload: PermissionTicket = {
             type: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/organization-type", code: "govt" }] }]
         },
         context: {
-            type: { system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "PHREPORT", display: "Public Health Reporting" },
+            type: { system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "PUBHLTH", display: "Public Health" },
             focus: { system: "http://snomed.info/sct", code: "56717001", display: "Tuberculosis" }
         },
         capability: {

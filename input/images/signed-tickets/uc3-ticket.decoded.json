@@ -35,8 +35,8 @@
       "context": {
         "type": {
           "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-          "code": "PHREPORT",
-          "display": "Public Health Reporting"
+          "code": "PUBHLTH",
+          "display": "Public Health"
         },
         "focus": {
           "system": "http://snomed.info/sct",
@@ -56,8 +56,8 @@
         ]
       }
     },
-    "iat": 1763659864,
-    "exp": 1763663464
+    "iat": 1763660001,
+    "exp": 1763663601
   },
-  "signature": "GX-YOnYniXHdHi25SIVmuqc1OAX_1BQMDePPtH4-ECid_Hq-Y0zfGm-yKxO6iUydNSae6FldL05EU7hl9PVIYw"
+  "signature": "jlRr_jO4jXxbhS_KMHABw5IHTnjZmubIB8BXsaEJ-H8wOG7bo6r6S8PTrOLvVGgcijgW4MZFTrGQZvCzm26f4Q"
 }

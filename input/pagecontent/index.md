@@ -290,8 +290,8 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 #### Ticket Schema
 *   **Subject:** `Patient` (Matched by Hospital ID).
 *   **Actor:** `Organization` (Name, Identifier, Type).
-*   **Context:** `type` = `case_report`, `identifier` = Case ID.
-*   **Capability:** `mode` = `read`, `temporal_window` (Start Date).
+*   **Context:** `type` = `PUBHLTH` (Public Health), `focus` = `Tuberculosis` (SCT 56717001).
+*   **Capability:** `scopes` = `patient/*.read`, `periods` (Start Date).
 
 {% include signed-tickets/uc3-ticket.html %}
 
@@ -301,8 +301,8 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 #### Ticket Schema
 *   **Subject:** `Patient` (Reference).
 *   **Actor:** `PractitionerRole` (Contained `Practitioner` + `Organization`).
-*   **Context:** `type` = `referral`, `identifier` = Referral ID.
-*   **Capability:** `mode` = `read`, `update`, `resources` = `ServiceRequest`, `Task`.
+*   **Context:** `type` = `REFER` (Referral), `focus` = `Food insecurity` (SCT 733423003).
+*   **Capability:** `scopes` = `patient/ServiceRequest.read`, `patient/ServiceRequest.write`, `patient/Task.read`, `patient/Task.write`.
 
 {% include signed-tickets/uc4-ticket.html %}
 
@@ -312,8 +312,8 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 #### Ticket Schema
 *   **Subject:** `Patient` (Reference).
 *   **Actor:** `Organization` (Payer NPI).
-*   **Context:** `type` = `claim`, `identifier` = Claim ID.
-*   **Capability:** `resources` = `DocumentReference`, `Procedure`.
+*   **Context:** `type` = `CLMATTCH` (Claim Attachment), `focus` = `Appendectomy` (SCT 80146002).
+*   **Capability:** `scopes` = `patient/DocumentReference.read`, `patient/Procedure.read`.
 
 {% include signed-tickets/uc5-ticket.html %}
 
@@ -323,8 +323,8 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 #### Ticket Schema
 *   **Subject:** `Patient` (MRN).
 *   **Actor:** `Organization` (Research Institute ID).
-*   **Context:** `type` = `research_study`, `identifier` = Study ID, `evidence` = Consent Link.
-*   **Capability:** `temporal_window` (Start/End Date).
+*   **Context:** `type` = `RESCH` (Biomedical Research), `focus` = `Malignant tumor of lung` (SCT 363358000).
+*   **Capability:** `scopes` = `patient/*.read`, `periods` (Start/End Date).
 
 {% include signed-tickets/uc6-ticket.html %}
 
@@ -334,7 +334,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 #### Ticket Schema
 *   **Subject:** `Patient` (Reference).
 *   **Actor:** `Practitioner` (NPI).
-*   **Context:** `type` = `referral`, `identifier` = Referral Request ID.
-*   **Capability:** `mode` = `read`.
+*   **Context:** `type` = `REFER` (Referral), `focus` = `Atrial fibrillation` (SCT 49436004).
+*   **Capability:** `scopes` = `patient/*.read`.
 
 {% include signed-tickets/uc7-ticket.html %}
