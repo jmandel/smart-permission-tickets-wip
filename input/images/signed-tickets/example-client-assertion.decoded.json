@@ -9,15 +9,15 @@
     "aud": "https://network.org/token",
     "jti": "assertion-jti-123",
     "https://smarthealthit.org/extension_tickets": [
-      "eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWQiOiIxMjMifSwiY2FwYWJpbGl0eSI6eyJtb2RlIjpbInJlYWQiXX19LCJpYXQiOjE3NjM2MTA5MjMsImV4cCI6MTc2MzYxNDUyM30.f7bgGSFqfkPT7swT-qIQ_itsK9063bLlOgr0HC1yEnSpsH5-Bn1tMkeZAxJsgZMvrO7S9zXsen2tkHQIGEg-LQ"
+      "eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWQiOiIxMjMifSwiY2FwYWJpbGl0eSI6eyJtb2RlIjpbInJlYWQiXX19LCJpYXQiOjE3NjM2MTE0MzUsImV4cCI6MTc2MzYxNTAzNX0.m1eztnNTefWrJvqZ-S3YGyGLUB-ECPNVFvXGicvYuUhWvHGwMTFYQC5yNFccbQD2MRpaJfY-k1tD6KniyYh5jg"
     ],
     "trust_chain": [
       "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Client)",
       "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Intermediate)",
       "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Trust Anchor)"
     ],
-    "iat": 1763610923,
-    "exp": 1763611223
+    "iat": 1763611435,
+    "exp": 1763611735
   },
-  "signature": "ph64XAx76chZ2T4M9cuMxdhLxfeRKmBWEKRaJus5A7g7h379X4uv_95C4j5wEIRzxkBTHS_lpqWAT651yj82KQ"
+  "signature": "zJ-nmnZEhDdUAAFswLV9H0MgruTidmvMUKDEk0ocQFdMSaU5bYaJpCrhIWZ2OsunQh93WySpjWqiojfarQq91A"
 }

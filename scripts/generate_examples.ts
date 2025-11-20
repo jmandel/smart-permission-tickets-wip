@@ -237,11 +237,11 @@ async function generate() {
         const jwtPath = path.join(OUTPUT_DIR, t.name);
         fs.writeFileSync(jwtPath, jwt);
         console.log(`Generated ${t.name}`);
-        await saveDecodedJWT(jwtPath);
+        await saveDecodedJWT(jwtPath, "Permission Ticket Artifact");
     }
 
     await generateClientAssertionExample(ISSUER_KEY);
-    await saveDecodedJWT(path.join(OUTPUT_DIR, 'example-client-assertion.jwt'));
+    await saveDecodedJWT(path.join(OUTPUT_DIR, 'example-client-assertion.jwt'), "Client Assertion");
 }
 
 async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: string }) {
@@ -279,7 +279,7 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
     console.log(`Generated example-client-assertion.jwt`);
 }
 
-async function saveDecodedJWT(jwtPath: string) {
+async function saveDecodedJWT(jwtPath: string, title: string) {
     const jwt = fs.readFileSync(jwtPath, 'utf-8');
     const parts = jwt.split('.');
 
@@ -304,6 +304,7 @@ async function saveDecodedJWT(jwtPath: string) {
     // Also generate static HTML viewer
     const template = fs.readFileSync(path.join(__dirname, '../input/includes/static-jwt-viewer.html'), 'utf-8');
     const html = template
+        .replace('{{title}}', title)
         .replace('{{header-json}}', JSON.stringify(header, null, 2))
         .replace('{{payload-json}}', JSON.stringify(payload, null, 2))
         .replace('{{raw-jwt}}', jwt);
