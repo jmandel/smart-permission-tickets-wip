@@ -33,24 +33,31 @@
         ]
       },
       "context": {
-        "type": "case_report",
-        "identifier": {
-          "system": "urn:oid:1.2.3.4",
-          "value": "ECR-REPORT-999"
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+          "code": "PHREPORT",
+          "display": "Public Health Reporting"
+        },
+        "focus": {
+          "system": "http://snomed.info/sct",
+          "code": "56717001",
+          "display": "Tuberculosis"
         }
       },
       "capability": {
         "scopes": [
           "patient/*.read"
         ],
-        "temporal_window": {
-          "type": "service_date",
-          "start": "2024-01-01"
-        }
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2026-01-01"
+          }
+        ]
       }
     },
-    "iat": 1763612591,
-    "exp": 1763616191
+    "iat": 1763659864,
+    "exp": 1763663464
   },
-  "signature": "J7uLLxdOw7jMdluXVdYFTBsnCq9DgkVAg40QhYnSnKrtskfvNUOK09oZVtHBJ2c-EksKtRJH80QVp5K03d4MbQ"
+  "signature": "GX-YOnYniXHdHi25SIVmuqc1OAX_1BQMDePPtH4-ECid_Hq-Y0zfGm-yKxO6iUydNSae6FldL05EU7hl9PVIYw"
 }

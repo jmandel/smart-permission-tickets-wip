@@ -105,8 +105,8 @@ const uc3_payload: PermissionTicket = {
             type: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/organization-type", code: "govt" }] }]
         },
         context: {
-            type: "case_report",
-            identifier: { system: "urn:oid:1.2.3.4", value: "ECR-REPORT-999" }
+            type: { system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "PHREPORT", display: "Public Health Reporting" },
+            focus: { system: "http://snomed.info/sct", code: "56717001", display: "Tuberculosis" }
         },
         capability: {
             scopes: ["patient/*.read"],
@@ -144,8 +144,8 @@ const uc4_payload: PermissionTicket = {
             organization: { reference: "#o1" }
         },
         context: {
-            type: "referral",
-            identifier: { system: "https://referrals.org", value: "ref-789" }
+            type: { system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "REFER", display: "Referral" },
+            focus: { system: "http://snomed.info/sct", code: "733423003", display: "Food insecurity" }
         },
         capability: {
             scopes: ["patient/ServiceRequest.read", "patient/ServiceRequest.write", "patient/Task.read", "patient/Task.write"]
@@ -166,8 +166,8 @@ const uc5_payload: PermissionTicket = {
             name: "Blue Payer Inc"
         },
         context: {
-            type: "claim",
-            identifier: { system: "http://provider.com/claims", value: "CLAIM-2024-XYZ" }
+            type: { system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "CLMATTCH", display: "Claim Attachment" },
+            focus: { system: "http://snomed.info/sct", code: "80146002", display: "Appendectomy" }
         },
         capability: {
             scopes: ["patient/DocumentReference.read", "patient/Procedure.read"]
@@ -188,20 +188,15 @@ const uc6_payload: PermissionTicket = {
             identifier: [{ value: "research-org-id" }]
         },
         context: {
-            type: "research_study",
-            identifier: { value: "STUDY-PROTO-22" },
-            evidence: {
-                reference: "https://consent-service.org/fhir/Consent/signed-form-888"
-            }
+            type: { system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "RESCH", display: "Biomedical Research" },
+            focus: { system: "http://snomed.info/sct", code: "363358000", display: "Malignant tumor of lung" }
         },
         capability: {
-            capability: {
-                scopes: ["patient/*.read"],
-                periods: [{
-                    start: "2020-01-01",
-                    end: "2025-01-01"
-                }]
-            }
+            scopes: ["patient/*.read"],
+            periods: [{
+                start: "2020-01-01",
+                end: "2025-01-01"
+            }]
         }
     }
 };
@@ -219,8 +214,8 @@ const uc7_payload: PermissionTicket = {
             name: [{ family: "Heart", given: ["A."] }]
         },
         context: {
-            type: "referral",
-            identifier: { value: "ref-req-111" }
+            type: { system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "REFER", display: "Referral" },
+            focus: { system: "http://snomed.info/sct", code: "49436004", display: "Atrial fibrillation" }
         },
         capability: {
             scopes: ["patient/*.read"]

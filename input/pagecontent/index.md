@@ -112,7 +112,10 @@ The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticke
     "actor": { "resourceType": "PractitionerRole", ... },
 
     // WHY is this allowed? (Trigger Context)
-    "context": { "type": "referral", "identifier": { ... } },
+    "context": { 
+      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "REFER" },
+      "focus": { "system": "http://snomed.info/sct", "code": "49436004", "display": "Atrial fibrillation" }
+    },
 
     // WHAT data is allowed?
     "capability": { "resources": [] }
@@ -186,13 +189,15 @@ export interface PermissionTicket {
             [key: string]: any; 
         };
         context?: {
-            type: "case_report" | "referral" | "research_study" | "claim";
-            identifier: {
+            type: {
                 system?: string;
-                value: string;
+                code?: string;
+                display?: string;
             };
-            evidence?: {
-                reference: string;
+            focus?: {
+                system?: string;
+                code?: string;
+                display?: string;
             };
         };
         capability: {

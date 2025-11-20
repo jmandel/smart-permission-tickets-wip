@@ -47,10 +47,15 @@
         }
       },
       "context": {
-        "type": "referral",
-        "identifier": {
-          "system": "https://referrals.org",
-          "value": "ref-789"
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+          "code": "REFER",
+          "display": "Referral"
+        },
+        "focus": {
+          "system": "http://snomed.info/sct",
+          "code": "733423003",
+          "display": "Food insecurity"
         }
       },
       "capability": {
@@ -62,8 +67,8 @@
         ]
       }
     },
-    "iat": 1763612591,
-    "exp": 1763616191
+    "iat": 1763659864,
+    "exp": 1763663464
   },
-  "signature": "Ni1QNHNZ6TNkuFdNu65Isv8XKzo0wfdN6HkhDE7tGl5z_x1fK31Dzcp0bx9dgLfwJDQoc8oT5cK2Y_AINbWCRQ"
+  "signature": "kT5n4WOexs-XTUOiRsmjZvwfpDog3XuelRWAH5bl5lQP4DS3NGP6j8lFGtGfdY3SKqFLtqjz_5GQ3eU5QkBB0g"
 }

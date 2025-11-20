@@ -34,10 +34,15 @@
       "name": "Blue Payer Inc"
     },
     "context": {
-      "type": "claim",
-      "identifier": {
-        "system": "http://provider.com/claims",
-        "value": "CLAIM-2024-XYZ"
+      "type": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "CLMATTCH",
+        "display": "Claim Attachment"
+      },
+      "focus": {
+        "system": "http://snomed.info/sct",
+        "code": "80146002",
+        "display": "Appendectomy"
       }
     },
     "capability": {
@@ -47,14 +52,14 @@
       ]
     }
   },
-  "iat": 1763612591,
-  "exp": 1763616191
+  "iat": 1763659864,
+  "exp": 1763663464
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3Byb3ZpZGVyLmNvbSIsInN1YiI6InBheWVyLWFwcCIsImF1ZCI6Imh0dHBzOi8vcHJvdmlkZXIuY29tIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwicmVmZXJlbmNlIjoiUGF0aWVudC80NTYifSwiYWN0b3IiOnsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoiaHR0cDovL2hsNy5vcmcvZmhpci9zaWQvdXMtbnBpIiwidmFsdWUiOiI5ODc2NTQzMjEwIn1dLCJuYW1lIjoiQmx1ZSBQYXllciBJbmMifSwiY29udGV4dCI6eyJ0eXBlIjoiY2xhaW0iLCJpZGVudGlmaWVyIjp7InN5c3RlbSI6Imh0dHA6Ly9wcm92aWRlci5jb20vY2xhaW1zIiwidmFsdWUiOiJDTEFJTS0yMDI0LVhZWiJ9fSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC9Eb2N1bWVudFJlZmVyZW5jZS5yZWFkIiwicGF0aWVudC9Qcm9jZWR1cmUucmVhZCJdfX0sImlhdCI6MTc2MzYxMjU5MSwiZXhwIjoxNzYzNjE2MTkxfQ.U00-JVyRgQIyGzpsRPQfATyrINxIClqynnethd222FHQAKxoRJBNNNyBXMMtYlN3Fn-KnaiKr1j8iQHZnoxI5A</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3Byb3ZpZGVyLmNvbSIsInN1YiI6InBheWVyLWFwcCIsImF1ZCI6Imh0dHBzOi8vcHJvdmlkZXIuY29tIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwicmVmZXJlbmNlIjoiUGF0aWVudC80NTYifSwiYWN0b3IiOnsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoiaHR0cDovL2hsNy5vcmcvZmhpci9zaWQvdXMtbnBpIiwidmFsdWUiOiI5ODc2NTQzMjEwIn1dLCJuYW1lIjoiQmx1ZSBQYXllciBJbmMifSwiY29udGV4dCI6eyJ0eXBlIjp7InN5c3RlbSI6Imh0dHA6Ly90ZXJtaW5vbG9neS5obDcub3JnL0NvZGVTeXN0ZW0vdjMtQWN0UmVhc29uIiwiY29kZSI6IkNMTUFUVENIIiwiZGlzcGxheSI6IkNsYWltIEF0dGFjaG1lbnQifSwiZm9jdXMiOnsic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiI4MDE0NjAwMiIsImRpc3BsYXkiOiJBcHBlbmRlY3RvbXkifX0sImNhcGFiaWxpdHkiOnsic2NvcGVzIjpbInBhdGllbnQvRG9jdW1lbnRSZWZlcmVuY2UucmVhZCIsInBhdGllbnQvUHJvY2VkdXJlLnJlYWQiXX19LCJpYXQiOjE3NjM2NTk4NjQsImV4cCI6MTc2MzY2MzQ2NH0.BgdNOLwQ9CCLLiu5zCb2z5G3i00v756G4tRTonzePfyRzJB3xBSGbiRHBwTMj2438OY-TqXkz33QgfxspeU03Q</code></pre>
         </details>
     </div>
 </div>

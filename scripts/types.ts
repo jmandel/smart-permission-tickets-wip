@@ -33,13 +33,15 @@ export interface PermissionTicket {
             [key: string]: any; // Allow other FHIR properties
         };
         context?: {
-            type: "case_report" | "referral" | "research_study" | "claim";
-            identifier: {
+            type: {
                 system?: string;
-                value: string;
+                code?: string;
+                display?: string;
             };
-            evidence?: {
-                reference: string;
+            focus?: {
+                system?: string;
+                code?: string;
+                display?: string;
             };
         };
         capability: {
