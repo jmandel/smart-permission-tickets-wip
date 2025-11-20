@@ -197,11 +197,10 @@ export interface PermissionTicket {
         };
         capability: {
             scopes?: string[];
-            temporal_window?: {
+            periods?: {
                 start?: string;
                 end?: string;
-                type: "service_date";
-            };
+            }[];
             locations?: any[]; // FHIR Address
             organizations?: any[]; // FHIR Organization
         };

@@ -110,10 +110,10 @@ const uc3_payload: PermissionTicket = {
         },
         capability: {
             scopes: ["patient/*.read"],
-            temporal_window: {
-                type: "service_date",
-                start: "2024-01-01"
-            }
+            periods: [{
+                start: "2025-01-01",
+                end: "2026-01-01"
+            }]
         }
     }
 };
@@ -195,7 +195,13 @@ const uc6_payload: PermissionTicket = {
             }
         },
         capability: {
-            temporal_window: { start: "2020-01-01", end: "2025-01-01", type: "service_date" }
+            capability: {
+                scopes: ["patient/*.read"],
+                periods: [{
+                    start: "2020-01-01",
+                    end: "2025-01-01"
+                }]
+            }
         }
     }
 };
