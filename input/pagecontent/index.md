@@ -202,11 +202,8 @@ export interface PermissionTicket {
                 end?: string;
                 type: "service_date";
             };
-            location?: {
-                resourceType?: "Organization";
-                address?: any; // FHIR Address
-                reference?: string; // Reference to Organization
-            }[];
+            locations?: any[]; // FHIR Address
+            organizations?: any[]; // FHIR Organization
         };
     };
 }
