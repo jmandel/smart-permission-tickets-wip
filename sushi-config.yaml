@@ -10,7 +10,7 @@ releaseLabel: ci-build
 
 pages:
   index.md:
-    title: Executive Summary
+    title: Permission Ticket Architecture
   problem.md:
     title: The Problem Space
   solution.md:

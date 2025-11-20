@@ -296,52 +296,26 @@
       {
         "id": "PermissionTicket.ticket_context.context.type",
         "path": "PermissionTicket.ticket_context.context.type",
-        "short": "Type of context (referral, case_report, etc.)",
-        "definition": "Type of context (referral, case_report, etc.)",
+        "short": "Type of context (e.g. ActReason)",
+        "definition": "Type of context (e.g. ActReason)",
         "min": 1,
         "max": "1",
         "type": [
           {
-            "code": "code"
+            "code": "Coding"
           }
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.context.identifier",
-        "path": "PermissionTicket.ticket_context.context.identifier",
-        "short": "Context ID",
-        "definition": "Context ID",
+        "id": "PermissionTicket.ticket_context.context.focus",
+        "path": "PermissionTicket.ticket_context.context.focus",
+        "short": "Clinical Focus (e.g. Condition)",
+        "definition": "Clinical Focus (e.g. Condition)",
         "min": 0,
         "max": "1",
         "type": [
           {
-            "code": "Identifier"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.context.evidence",
-        "path": "PermissionTicket.ticket_context.context.evidence",
-        "short": "Supporting evidence",
-        "definition": "Supporting evidence",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "BackboneElement"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.context.evidence.reference",
-        "path": "PermissionTicket.ticket_context.context.evidence.reference",
-        "short": "Link to evidence resource",
-        "definition": "Link to evidence resource",
-        "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "string"
+            "code": "Coding"
           }
         ]
       },
@@ -359,23 +333,10 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.capability.mode",
-        "path": "PermissionTicket.ticket_context.capability.mode",
-        "short": "Access mode (read, search, etc.)",
-        "definition": "Access mode (read, search, etc.)",
-        "min": 0,
-        "max": "*",
-        "type": [
-          {
-            "code": "code"
-          }
-        ]
-      },
-      {
         "id": "PermissionTicket.ticket_context.capability.scopes",
         "path": "PermissionTicket.ticket_context.capability.scopes",
-        "short": "SMART Scopes (e.g. patient/Immunization.rs)",
-        "definition": "SMART Scopes (e.g. patient/Immunization.rs)",
+        "short": "SMART Scopes (e.g. patient/Immunization.read)",
+        "definition": "SMART Scopes (e.g. patient/Immunization.read)",
         "min": 0,
         "max": "*",
         "type": [
@@ -385,80 +346,41 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.capability.resources",
-        "path": "PermissionTicket.ticket_context.capability.resources",
-        "short": "Restricted Resources",
-        "definition": "Restricted Resources",
+        "id": "PermissionTicket.ticket_context.capability.periods",
+        "path": "PermissionTicket.ticket_context.capability.periods",
+        "short": "Time restrictions (Service Date)",
+        "definition": "Time restrictions (Service Date)",
         "min": 0,
         "max": "*",
         "type": [
           {
-            "code": "BackboneElement"
+            "code": "Period"
           }
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.capability.resources.resourceType",
-        "path": "PermissionTicket.ticket_context.capability.resources.resourceType",
-        "short": "Resource Type",
-        "definition": "Resource Type",
-        "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "string"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.capability.temporal_window",
-        "path": "PermissionTicket.ticket_context.capability.temporal_window",
-        "short": "Time restrictions",
-        "definition": "Time restrictions",
+        "id": "PermissionTicket.ticket_context.capability.locations",
+        "path": "PermissionTicket.ticket_context.capability.locations",
+        "short": "Allowed Locations (Jurisdictions)",
+        "definition": "Allowed Locations (Jurisdictions)",
         "min": 0,
-        "max": "1",
+        "max": "*",
         "type": [
           {
-            "code": "BackboneElement"
+            "code": "Address"
           }
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.capability.temporal_window.start",
-        "path": "PermissionTicket.ticket_context.capability.temporal_window.start",
-        "short": "Start date",
-        "definition": "Start date",
+        "id": "PermissionTicket.ticket_context.capability.organizations",
+        "path": "PermissionTicket.ticket_context.capability.organizations",
+        "short": "Allowed Organizations",
+        "definition": "Allowed Organizations",
         "min": 0,
-        "max": "1",
+        "max": "*",
         "type": [
           {
-            "code": "string"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.capability.temporal_window.end",
-        "path": "PermissionTicket.ticket_context.capability.temporal_window.end",
-        "short": "End date",
-        "definition": "End date",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "string"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.capability.temporal_window.type",
-        "path": "PermissionTicket.ticket_context.capability.temporal_window.type",
-        "short": "Type of window (service_date)",
-        "definition": "Type of window (service_date)",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "code"
+            "code": "Organization"
           }
         ]
       }
