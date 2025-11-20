@@ -5,7 +5,7 @@
   },
   "payload": {
     "iss": "https://trust-broker.org",
-    "sub": "client-app-456",
+    "sub": "https://client-app.example.com/456",
     "aud": "https://network.org",
     "ticket_context": {
       "subject": {
@@ -52,8 +52,8 @@
         ]
       }
     },
-    "iat": 1763678087,
-    "exp": 1763681687
+    "iat": 1763678603,
+    "exp": 1763682203
   },
-  "signature": "OpWPg97bmvC78o_ByMrQlol7iZY6HYi6_avpQKW55T3E5sByTb3sTAfHaexAoYz7zCa0uD0Qko4sj5LIzyPJVg"
+  "signature": "zsQvKRCp6R9GX17nGjPLwVMQa0vCxEHAohoiKg2zni_PhVLWc6he9Eymj2BPk941JZZAY7arSbAGwsMo1l4sRg"
 }

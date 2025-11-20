@@ -16,7 +16,7 @@
         <pre
             style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
   "iss": "https://trust-broker.org",
-  "sub": "client-app-456",
+  "sub": "https://client-app.example.com/456",
   "aud": "https://network.org",
   "ticket_context": {
     "subject": {
@@ -63,14 +63,14 @@
       ]
     }
   },
-  "iat": 1763678087,
-  "exp": 1763681687
+  "iat": 1763678603,
+  "exp": 1763682203
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJjbGllbnQtYXBwLTQ1NiIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJ0aWNrZXRfY29udGV4dCI6eyJzdWJqZWN0Ijp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwczovL25hdGlvbmFsLW1waS5uZXQiLCJ2YWx1ZSI6InB0LTU1NSJ9XX0sImFjdG9yIjp7InJlc291cmNlVHlwZSI6IlJlbGF0ZWRQZXJzb24iLCJuYW1lIjpbeyJmYW1pbHkiOiJEb2UiLCJnaXZlbiI6WyJKYW5lIl19XSwidGVsZWNvbSI6W3sic3lzdGVtIjoiZW1haWwiLCJ2YWx1ZSI6ImphbmUuZG9lQGV4YW1wbGUuY29tIn1dLCJyZWxhdGlvbnNoaXAiOlt7ImNvZGluZyI6W3sic3lzdGVtIjoiaHR0cDovL3Rlcm1pbm9sb2d5LmhsNy5vcmcvQ29kZVN5c3RlbS92My1Sb2xlQ29kZSIsImNvZGUiOiJEQVUiLCJkaXNwbGF5IjoiRGF1Z2h0ZXIifV19XX0sImNhcGFiaWxpdHkiOnsic2NvcGVzIjpbInBhdGllbnQvKi5yZWFkIiwicGF0aWVudC8qLnNlYXJjaCJdfX0sImlhdCI6MTc2MzY3ODA4NywiZXhwIjoxNzYzNjgxNjg3fQ.OpWPg97bmvC78o_ByMrQlol7iZY6HYi6_avpQKW55T3E5sByTb3sTAfHaexAoYz7zCa0uD0Qko4sj5LIzyPJVg</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2NsaWVudC1hcHAuZXhhbXBsZS5jb20vNDU2IiwiYXVkIjoiaHR0cHM6Ly9uZXR3b3JrLm9yZyIsInRpY2tldF9jb250ZXh0Ijp7InN1YmplY3QiOnsicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHBzOi8vbmF0aW9uYWwtbXBpLm5ldCIsInZhbHVlIjoicHQtNTU1In1dfSwiYWN0b3IiOnsicmVzb3VyY2VUeXBlIjoiUmVsYXRlZFBlcnNvbiIsIm5hbWUiOlt7ImZhbWlseSI6IkRvZSIsImdpdmVuIjpbIkphbmUiXX1dLCJ0ZWxlY29tIjpbeyJzeXN0ZW0iOiJlbWFpbCIsInZhbHVlIjoiamFuZS5kb2VAZXhhbXBsZS5jb20ifV0sInJlbGF0aW9uc2hpcCI6W3siY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vdGVybWlub2xvZ3kuaGw3Lm9yZy9Db2RlU3lzdGVtL3YzLVJvbGVDb2RlIiwiY29kZSI6IkRBVSIsImRpc3BsYXkiOiJEYXVnaHRlciJ9XX1dfSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJlYWQiLCJwYXRpZW50Lyouc2VhcmNoIl19fSwiaWF0IjoxNzYzNjc4NjAzLCJleHAiOjE3NjM2ODIyMDN9.zsQvKRCp6R9GX17nGjPLwVMQa0vCxEHAohoiKg2zni_PhVLWc6he9Eymj2BPk941JZZAY7arSbAGwsMo1l4sRg</code></pre>
         </details>
     </div>
 </div>

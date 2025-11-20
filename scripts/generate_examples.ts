@@ -67,7 +67,7 @@ async function signClientAssertion(payload: ClientAssertion, key: jose.KeyLike &
 // Use Case 1: Network Patient Access
 const uc1_payload: PermissionTicket = {
     iss: "https://trust-broker.org",
-    sub: "client-app-123",
+    sub: "https://client-app.example.com/123",
     aud: "https://network.org",
     ticket_context: {
         subject: {
@@ -87,7 +87,7 @@ const uc1_payload: PermissionTicket = {
 // Use Case 2: Authorized Representative
 const uc2_payload: PermissionTicket = {
     iss: "https://trust-broker.org",
-    sub: "client-app-456",
+    sub: "https://client-app.example.com/456",
     aud: "https://network.org",
     ticket_context: {
         subject: {
@@ -115,7 +115,7 @@ const uc2_payload: PermissionTicket = {
 // Use Case 3: Public Health Investigation
 const uc3_payload: PermissionTicket = {
     iss: "https://hospital-a.com",
-    sub: "pha-app-client-id",
+    sub: "https://pha.gov/apps/report-client",
     aud: "https://hospital-a.com",
     ticket_context: {
         subject: {
@@ -146,7 +146,7 @@ const uc3_payload: PermissionTicket = {
 // Use Case 4: Social Care (CBO) Referral
 const uc4_payload: PermissionTicket = {
     iss: "https://referring-ehr.org",
-    sub: "food-bank-app",
+    sub: "https://foodbank.org/apps/intake",
     aud: "https://referring-ehr.org",
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/123" },
@@ -181,7 +181,7 @@ const uc4_payload: PermissionTicket = {
 // Use Case 5: Payer Claims Adjudication
 const uc5_payload: PermissionTicket = {
     iss: "https://provider.com",
-    sub: "payer-app",
+    sub: "https://payer.com/apps/claims-processor",
     aud: "https://provider.com",
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/456" },
@@ -203,7 +203,7 @@ const uc5_payload: PermissionTicket = {
 // Use Case 6: Research Study
 const uc6_payload: PermissionTicket = {
     iss: "https://consent-platform.org",
-    sub: "research-app",
+    sub: "https://research.org/studies/lung-cancer/app",
     aud: "https://hospital.com",
     ticket_context: {
         subject: { resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
@@ -229,7 +229,7 @@ const uc6_payload: PermissionTicket = {
 // Use Case 7: Provider-to-Provider Consult
 const uc7_payload: PermissionTicket = {
     iss: "https://referring-ehr.org",
-    sub: "specialist-app",
+    sub: "https://specialist-clinic.org/apps/referral-viewer",
     aud: "https://referring-ehr.org",
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/999" },

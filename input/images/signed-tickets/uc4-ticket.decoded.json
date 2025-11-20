@@ -5,7 +5,7 @@
   },
   "payload": {
     "iss": "https://referring-ehr.org",
-    "sub": "food-bank-app",
+    "sub": "https://foodbank.org/apps/intake",
     "aud": "https://referring-ehr.org",
     "ticket_context": {
       "subject": {
@@ -67,8 +67,8 @@
         ]
       }
     },
-    "iat": 1763678087,
-    "exp": 1763681687
+    "iat": 1763678603,
+    "exp": 1763682203
   },
-  "signature": "P1x4Ha81HZWN-dFRkkKozfT_t1sFuz958eHILs3CL7rPXwu5lW37rVCarpWdrRLToC2w3LqjiXLMzVaQd6o7Cg"
+  "signature": "g0f5v-UQOHCC_D0ll_CIFWDypfnXzFfPEtoXIKqKiKkhSqaIovLIGdIDybtwfWMD_xtiicOdrTs1KDQ69GH5eg"
 }

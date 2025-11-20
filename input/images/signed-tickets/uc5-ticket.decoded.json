@@ -5,7 +5,7 @@
   },
   "payload": {
     "iss": "https://provider.com",
-    "sub": "payer-app",
+    "sub": "https://payer.com/apps/claims-processor",
     "aud": "https://provider.com",
     "ticket_context": {
       "subject": {
@@ -41,8 +41,8 @@
         ]
       }
     },
-    "iat": 1763678087,
-    "exp": 1763681687
+    "iat": 1763678603,
+    "exp": 1763682203
   },
-  "signature": "fi9HuASmlKrkEkle1aea-_7zsFJcVcsLbGqvt8YEXUwbHqS47Kqr7hOtIn8_xZDgxgVBSSX5uuBD3vLyb3WSzw"
+  "signature": "z4CKKjc9kcZ2U7_Pa61P-Gxl8jDb9SlmGkvUkwVzwRw0pwted6drdNnfige4cpwA9wxi677s3MznbF0R4mp5_Q"
 }

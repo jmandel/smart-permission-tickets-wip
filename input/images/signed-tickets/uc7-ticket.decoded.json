@@ -5,7 +5,7 @@
   },
   "payload": {
     "iss": "https://referring-ehr.org",
-    "sub": "specialist-app",
+    "sub": "https://specialist-clinic.org/apps/referral-viewer",
     "aud": "https://referring-ehr.org",
     "ticket_context": {
       "subject": {
@@ -47,8 +47,8 @@
         ]
       }
     },
-    "iat": 1763678087,
-    "exp": 1763681687
+    "iat": 1763678603,
+    "exp": 1763682203
   },
-  "signature": "FRy3hSqU3o3vC-aqTlj3B1ke7iEpE-utxKCnGCUG6NLVF6AXvuzih2UMIlttL3GG3UWl8UHW7_PZfR0bbxu7XQ"
+  "signature": "ssl44LHzYhSjB2YSxPgPzMtFMJcwGdnH4fGWmuejRyDLrSX4llGOEeNnFFBAirDcixd3bC7tDzysDxtuSaOwfQ"
 }

@@ -5,7 +5,7 @@
   },
   "payload": {
     "iss": "https://consent-platform.org",
-    "sub": "research-app",
+    "sub": "https://research.org/studies/lung-cancer/app",
     "aud": "https://hospital.com",
     "ticket_context": {
       "subject": {
@@ -49,8 +49,8 @@
         ]
       }
     },
-    "iat": 1763678087,
-    "exp": 1763681687
+    "iat": 1763678603,
+    "exp": 1763682203
   },
-  "signature": "4wMZbMqQxrcoOBSjAWnj8P0s7KMku5BQ4JK7mkqciML2bYCk5VmkjzD3WdimTybQvStHnEDbPoCjY6p480IT_w"
+  "signature": "UW4NRKvcy-OwMRmyA9FmrleVbGke3DnPiEbYZ_yQBjB7HrQUBXkW_iWcV_DBQmlSpF1x_U4UaCTlM7DA-J6RSA"
 }
