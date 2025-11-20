@@ -25,6 +25,7 @@ Description: "The full payload of a Permission Ticket, including standard JWT cl
   * context 0..1 BackboneElement "The Trigger Event"
     * type 1..1 Coding "Type of context (e.g. ActReason)"
     * focus 0..1 Coding "Clinical Focus (e.g. Condition)"
+    * identifier 0..* Identifier "Issuer-specific identifiers (Case ID, etc)"
   * capability 1..1 BackboneElement "Access Capabilities"
     * scopes 0..* string "SMART Scopes (e.g. patient/Immunization.read)"
     * periods 0..* Period "Time restrictions (Service Date)"

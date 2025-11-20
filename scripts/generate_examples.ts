@@ -106,7 +106,8 @@ const uc3_payload: PermissionTicket = {
         },
         context: {
             type: { system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "PUBHLTH", display: "Public Health" },
-            focus: { system: "http://snomed.info/sct", code: "56717001", display: "Tuberculosis" }
+            focus: { system: "http://snomed.info/sct", code: "56717001", display: "Tuberculosis" },
+            identifier: [{ system: "https://doh.wa.gov/cases", value: "CASE-2024-999" }]
         },
         capability: {
             scopes: ["patient/*.read"],

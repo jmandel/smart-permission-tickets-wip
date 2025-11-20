@@ -42,7 +42,13 @@
           "system": "http://snomed.info/sct",
           "code": "56717001",
           "display": "Tuberculosis"
-        }
+        },
+        "identifier": [
+          {
+            "system": "https://doh.wa.gov/cases",
+            "value": "CASE-2024-999"
+          }
+        ]
       },
       "capability": {
         "scopes": [
@@ -56,8 +62,8 @@
         ]
       }
     },
-    "iat": 1763660001,
-    "exp": 1763663601
+    "iat": 1763662289,
+    "exp": 1763665889
   },
-  "signature": "jlRr_jO4jXxbhS_KMHABw5IHTnjZmubIB8BXsaEJ-H8wOG7bo6r6S8PTrOLvVGgcijgW4MZFTrGQZvCzm26f4Q"
+  "signature": "XAJFuGmaQFEM4Hj5WQz81lmQK3P9OmhxrGkURQ9ZSnfXM_5zYWxWFW3M6jBFjIE5llyqzA2dI6Rg9M54ALeO5w"
 }

@@ -43,6 +43,7 @@ export interface PermissionTicket {
                 code?: string;
                 display?: string;
             };
+            identifier?: any[]; // Issuer-specific identifiers (Case ID, etc)
         };
         capability: {
             scopes?: string[];

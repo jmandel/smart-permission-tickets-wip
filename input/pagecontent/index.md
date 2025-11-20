@@ -113,7 +113,13 @@ The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticke
     // WHY is this allowed? (Trigger Context)
     "context": { 
       "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "REFER" },
-      "focus": { "system": "http://snomed.info/sct", "code": "49436004", "display": "Atrial fibrillation" }
+      "focus": { "system": "http://snomed.info/sct", "code": "49436004", "display": "Atrial fibrillation" },
+      
+      // Optional: Issuer-specific identifiers (e.g., Case ID, Referral ID)
+      // Can be used for internal tracking or opaque tokens for the issuing server.
+      "identifier": [
+        { "system": "https://issuer.org/cases", "value": "CASE-123" }
+      ]
     },
 
     // WHAT data is allowed?
@@ -198,6 +204,7 @@ export interface PermissionTicket {
                 code?: string;
                 display?: string;
             };
+            identifier?: any[];
         };
         capability: {
             scopes?: string[];
@@ -289,7 +296,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 ##### Ticket Schema
 *   **Subject:** `Patient` (Matched by Hospital ID).
 *   **Actor:** `Organization` (Name, Identifier, Type).
-*   **Context:** `type` = `PUBHLTH` (Public Health), `focus` = `Tuberculosis` (SCT 56717001).
+*   **Context:** `type` = `PUBHLTH` (Public Health), `focus` = `Tuberculosis` (SCT 56717001), `identifier` = Case ID.
 *   **Capability:** `scopes` = `patient/*.read`, `periods` (Start Date).
 
 {% include signed-tickets/uc3-ticket.html %}

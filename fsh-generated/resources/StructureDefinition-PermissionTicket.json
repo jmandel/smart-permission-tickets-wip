@@ -320,6 +320,19 @@
         ]
       },
       {
+        "id": "PermissionTicket.ticket_context.context.identifier",
+        "path": "PermissionTicket.ticket_context.context.identifier",
+        "short": "Issuer-specific identifiers (Case ID, etc)",
+        "definition": "Issuer-specific identifiers (Case ID, etc)",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier"
+          }
+        ]
+      },
+      {
         "id": "PermissionTicket.ticket_context.capability",
         "path": "PermissionTicket.ticket_context.capability",
         "short": "Access Capabilities",
