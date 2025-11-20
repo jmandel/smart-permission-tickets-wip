@@ -62,5 +62,5 @@ export interface ClientAssertion {
     jti: string;
     iat?: number;
     exp?: number;
-    "https://smarthealthit.org/extension_tickets": string[]; // Array of Signed Ticket Strings
+    "https://smarthealthit.org/permission_tickets": string[]; // Array of Signed Ticket Strings
 }

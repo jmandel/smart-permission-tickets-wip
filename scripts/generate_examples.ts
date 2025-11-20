@@ -284,7 +284,7 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
         jti: "assertion-jti-123",
         iat: now,
         exp: now + 300,
-        "https://smarthealthit.org/extension_tickets": [signedTicket]
+        "https://smarthealthit.org/permission_tickets": [signedTicket]
     };
 
     const trust_chain = [

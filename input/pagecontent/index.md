@@ -217,7 +217,7 @@ export interface ClientAssertion {
   exp: number; // Expiration
   
   // The Permission Ticket(s)
-  "https://smarthealthit.org/extension_tickets": string[];
+  "https://smarthealthit.org/permission_tickets": string[];
 }
 
 ### Signing and Validation
