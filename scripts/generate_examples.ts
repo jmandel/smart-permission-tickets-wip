@@ -2,9 +2,66 @@ import * as jose from 'jose';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PermissionTicket, ClientAssertion } from './types';
+import Ajv from 'ajv';
+
+const ajv = new Ajv();
+
+const TICKET_SCHEMA = {
+    type: "object",
+    properties: {
+        iss: { type: "string" },
+        sub: { type: "string" },
+        aud: { type: "string" },
+        ticket_context: {
+            type: "object",
+            properties: {
+                context: {
+                    type: "object",
+                    properties: {
+                        type: {
+                            type: "object",
+                            properties: { system: { type: "string" }, code: { type: "string" }, display: { type: "string" } },
+                            required: ["code"]
+                        },
+                        focus: {
+                            type: "object",
+                            properties: { system: { type: "string" }, code: { type: "string" }, display: { type: "string" } }
+                        },
+                        identifier: { type: "array" }
+                    },
+                    required: ["type"],
+                    additionalProperties: false // Strict check for context
+                },
+                capability: {
+                    type: "object",
+                    properties: {
+                        scopes: { type: "array", items: { type: "string" } },
+                        periods: { type: "array" },
+                        locations: { type: "array" },
+                        organizations: { type: "array" }
+                    },
+                    additionalProperties: false // Strict check for capability
+                }
+            },
+            required: ["capability"]
+        }
+    },
+    required: ["iss", "sub", "aud", "ticket_context"]
+};
+
+const validate = ajv.compile(TICKET_SCHEMA);
 
 const OUTPUT_DIR = path.join(__dirname, '../input/images/signed-tickets');
+const INCLUDES_DIR = path.join(__dirname, '../input/includes/signed-tickets');
 const KEYS_DIR = path.join(__dirname, 'keys');
+
+// Ensure output directories exist
+if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+}
+if (!fs.existsSync(INCLUDES_DIR)) {
+    fs.mkdirSync(INCLUDES_DIR, { recursive: true });
+}
 
 // Ensure output directory exists
 if (!fs.existsSync(OUTPUT_DIR)) {
@@ -241,6 +298,10 @@ async function generate() {
     ];
 
     for (const t of tickets) {
+        if (!validate(t.payload)) {
+            console.error(`Validation failed for ${t.name}:`, validate.errors);
+            throw new Error(`Schema validation failed for ${t.name}`);
+        }
         const jwt = await signTicket(t.payload, ISSUER_KEY);
         const jwtPath = path.join(OUTPUT_DIR, t.name);
         fs.writeFileSync(jwtPath, jwt);
@@ -337,7 +398,7 @@ async function saveDecodedJWT(jwtPath: string, title: string) {
         .replace('{{payload-json}}', JSON.stringify(payload, null, 2))
         .replace('{{raw-jwt}}', jwt);
 
-    const htmlPath = jwtPath.replace('.jwt', '.html');
+    const htmlPath = path.join(INCLUDES_DIR, path.basename(jwtPath).replace('.jwt', '.html'));
     fs.writeFileSync(htmlPath, html);
     console.log(`Saved static HTML: ${path.basename(htmlPath)}`);
 }

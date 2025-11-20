@@ -13,11 +13,11 @@
     "sub": "https://app.client.id",
     "aud": "https://network.org/token",
     "jti": "assertion-jti-123",
-    "iat": 1763662289,
-    "exp": 1763662589,
+    "iat": 1763667646,
+    "exp": 1763667946,
     "https://smarthealthit.org/permission_tickets": [
-      "eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWQiOiIxMjMifSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJlYWQiXX19LCJpYXQiOjE3NjM2NjIyODksImV4cCI6MTc2MzY2NTg4OX0.tKTOJAPVOUMMfplGj0wmVH9-KcLEPxjq8dwCY1jbkjnfD_CzhFG30Ng09SP0-Ue0ob9On-xNG2In2g1F51LKrw"
+      "eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWQiOiIxMjMifSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJlYWQiXX19LCJpYXQiOjE3NjM2Njc2NDYsImV4cCI6MTc2MzY3MTI0Nn0.DVouLpvgdakclRaoQs3cclvhvATiTj3WVPN_kfxMuKVEDNv7T74-AWfbr5toasMXNAPF1RBOVUt2XyHKiV-hyQ"
     ]
   },
-  "signature": "tJPM8YlDN2WqX-X-2zFXK4m_tJcBa7Xbtft71Jy0q65jmv6uAuGSnHPQZ1WrUyjMMz0B6oKjdCzOS1ZRmmMOKg"
+  "signature": "nQsuK-EtI3QqKGWRk9mXIOfP5pLZQ4z7gxSBoJ2wuzi58e5Y8jkonGeghWnuPoi3x0RbqzaqaFm-Nz_aNi9Vng"
 }

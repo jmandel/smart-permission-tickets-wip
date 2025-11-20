@@ -18,7 +18,6 @@ export interface PermissionTicket {
                 [key: string]: any;
             };
             reference?: string;
-            [key: string]: any; // Allow other FHIR Patient properties
         };
         actor?: {
             resourceType: "PractitionerRole" | "RelatedPerson" | "Organization" | "Practitioner";
@@ -30,7 +29,6 @@ export interface PermissionTicket {
             contained?: any[];
             practitioner?: { reference: string };
             organization?: { reference: string };
-            [key: string]: any; // Allow other FHIR properties
         };
         context?: {
             type: {

@@ -158,6 +158,7 @@ This section provides technical details for developers implementing the Permissi
 
 The following TypeScript interfaces define the structure of the Permission Ticket and the Client Assertion. These can be used for strict type checking in your implementation.
 
+
 ```typescript
 export interface PermissionTicket {
     iss: string;          // Issuer URL (Trust Broker)
