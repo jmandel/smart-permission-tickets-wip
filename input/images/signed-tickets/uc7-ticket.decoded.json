@@ -1,0 +1,48 @@
+{
+  "header": {
+    "alg": "ES256",
+    "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+  },
+  "payload": {
+    "iss": "https://referring-ehr.org",
+    "sub": "specialist-app",
+    "aud": "https://referring-ehr.org",
+    "ticket_context": {
+      "subject": {
+        "resourceType": "Patient",
+        "reference": "Patient/999"
+      },
+      "actor": {
+        "resourceType": "Practitioner",
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "1112223333"
+          }
+        ],
+        "name": [
+          {
+            "family": "Heart",
+            "given": [
+              "A."
+            ]
+          }
+        ]
+      },
+      "context": {
+        "type": "referral",
+        "identifier": {
+          "value": "ref-req-111"
+        }
+      },
+      "capability": {
+        "mode": [
+          "read"
+        ]
+      }
+    },
+    "iat": 1763610321,
+    "exp": 1763613921
+  },
+  "signature": "H23foZkhoUJVkUcP6JDBtnwifXtDC5KM9SyZXpLa-BOnRGyBr7lH34K7Dvqr-1ct8c0dNbo3EPTq8LREgXyaUw"
+}

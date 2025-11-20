@@ -92,7 +92,7 @@ grant_type=client_credentials
 #### Full Client Assertion Example
 Here is what the `client_assertion` looks like when decoded. Note the `trust_chain` for automatic registration and the embedded `ticket_context`.
 
-{% include artifact-viewer.html id="assertion" file="signed-tickets/example-client-assertion.jwt" %}
+{% include signed-tickets/example-client-assertion.html %}
 
 ### B. The Artifact: Ticket Structure
 The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `permission` claim.
@@ -267,7 +267,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** None.
 *   **Capability:** `mode` = `read`, `resources` = `Immunization`, `AllergyIntolerance`.
 
-{% include artifact-viewer.html id="uc1" file="signed-tickets/uc1-ticket.jwt" %}
+{% include signed-tickets/uc1-ticket.html %}
 
 ### Use Case 2: Authorized Representative (Proxy)
 *An adult daughter accesses her elderly mother's records. The relationship is verified by a Trust Broker, not the Hospital.*
@@ -278,7 +278,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** None.
 *   **Capability:** `mode` = `read`, `search` (Full Access).
 
-{% include artifact-viewer.html id="uc2" file="signed-tickets/uc2-ticket.jwt" %}
+{% include signed-tickets/uc2-ticket.html %}
 
 ### Use Case 3: Public Health Investigation
 *A Hospital creates a Case Report. The Public Health Agency (PHA) uses the report as a ticket to query for follow-up data.*
@@ -289,7 +289,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `case_report`, `identifier` = Case ID.
 *   **Capability:** `mode` = `read`, `temporal_window` (Start Date).
 
-{% include artifact-viewer.html id="uc3" file="signed-tickets/uc3-ticket.jwt" %}
+{% include signed-tickets/uc3-ticket.html %}
 
 ### Use Case 4: Social Care (CBO) Referral
 *A transactional/ad-hoc user. A Food Bank volunteer needs to update a referral status. She does not have an NPI or a user account.*
@@ -300,7 +300,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `referral`, `identifier` = Referral ID.
 *   **Capability:** `mode` = `read`, `update`, `resources` = `ServiceRequest`, `Task`.
 
-{% include artifact-viewer.html id="uc4" file="signed-tickets/uc4-ticket.jwt" %}
+{% include signed-tickets/uc4-ticket.html %}
 
 ### Use Case 5: Payer Claims Adjudication
 *A Payer requests clinical documents to support a specific claim.*
@@ -311,7 +311,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `claim`, `identifier` = Claim ID.
 *   **Capability:** `resources` = `DocumentReference`, `Procedure`.
 
-{% include artifact-viewer.html id="uc5" file="signed-tickets/uc5-ticket.jwt" %}
+{% include signed-tickets/uc5-ticket.html %}
 
 ### Use Case 6: Research Study
 *A patient consents to a study. The ticket proves consent exists without requiring the researcher to be a "user" at the hospital.*
@@ -322,7 +322,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `research_study`, `identifier` = Study ID, `evidence` = Consent Link.
 *   **Capability:** `temporal_window` (Start/End Date).
 
-{% include artifact-viewer.html id="uc6" file="signed-tickets/uc6-ticket.jwt" %}
+{% include signed-tickets/uc6-ticket.html %}
 
 ### Use Case 7: Provider-to-Provider Consult
 *A Specialist (Practitioner) requests data from a Referring Provider.*
@@ -333,4 +333,4 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `referral`, `identifier` = Referral Request ID.
 *   **Capability:** `mode` = `read`.
 
-{% include artifact-viewer.html id="uc7" file="signed-tickets/uc7-ticket.jwt" %}
+{% include signed-tickets/uc7-ticket.html %}

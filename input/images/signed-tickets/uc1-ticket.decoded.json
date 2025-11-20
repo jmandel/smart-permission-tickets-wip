@@ -1,0 +1,47 @@
+{
+  "header": {
+    "alg": "ES256",
+    "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+  },
+  "payload": {
+    "iss": "https://trust-broker.org",
+    "sub": "client-app-123",
+    "aud": "https://network.org",
+    "ticket_context": {
+      "subject": {
+        "resourceType": "Patient",
+        "name": [
+          {
+            "family": "Smith",
+            "given": [
+              "John"
+            ]
+          }
+        ],
+        "birthDate": "1980-01-01",
+        "identifier": [
+          {
+            "system": "urn:oid:2.16.840.1.113883.4.1",
+            "value": "000-00-0000"
+          }
+        ]
+      },
+      "capability": {
+        "mode": [
+          "read"
+        ],
+        "resources": [
+          {
+            "resourceType": "Immunization"
+          },
+          {
+            "resourceType": "AllergyIntolerance"
+          }
+        ]
+      }
+    },
+    "iat": 1763610321,
+    "exp": 1763613921
+  },
+  "signature": "zcnm-WTu4TcmQQRgkDidq_vzr6W3WFCHH5Vlv-Qs5NlOxXyJkGm6SIg9YxHs5Km42z58au4PeiNv7yc099RQtw"
+}

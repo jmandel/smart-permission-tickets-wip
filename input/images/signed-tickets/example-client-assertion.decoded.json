@@ -1,0 +1,23 @@
+{
+  "header": {
+    "alg": "ES256",
+    "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+  },
+  "payload": {
+    "iss": "https://app.client.id",
+    "sub": "https://app.client.id",
+    "aud": "https://network.org/token",
+    "jti": "assertion-jti-123",
+    "https://smarthealthit.org/extension_tickets": [
+      "eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWQiOiIxMjMifSwiY2FwYWJpbGl0eSI6eyJtb2RlIjpbInJlYWQiXX19LCJpYXQiOjE3NjM2MTAzMjEsImV4cCI6MTc2MzYxMzkyMX0.RU-kICir8USJBTl1tTeIR0XaqyXIjad7vcBD3Qgl7ZW-_YhCWt6qTr7VzhtgnwbNSmyYEoALfVzSJLoY2CcfsA"
+    ],
+    "trust_chain": [
+      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Client)",
+      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Intermediate)",
+      "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Trust Anchor)"
+    ],
+    "iat": 1763610321,
+    "exp": 1763610621
+  },
+  "signature": "oj4AshfQzuyprlGrgnBzYyTTmZm1cK9AK3G_A0rC2NM9G7bK4CqxSHgTusB5uDNyge93GWOw2aXc12vs7T6B1A"
+}

@@ -1,0 +1,59 @@
+{
+  "header": {
+    "alg": "ES256",
+    "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+  },
+  "payload": {
+    "iss": "https://trust-broker.org",
+    "sub": "client-app-456",
+    "aud": "https://network.org",
+    "ticket_context": {
+      "subject": {
+        "resourceType": "Patient",
+        "identifier": [
+          {
+            "system": "https://national-mpi.net",
+            "value": "pt-555"
+          }
+        ]
+      },
+      "actor": {
+        "resourceType": "RelatedPerson",
+        "name": [
+          {
+            "family": "Doe",
+            "given": [
+              "Jane"
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "email",
+            "value": "jane.doe@example.com"
+          }
+        ],
+        "relationship": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                "code": "DAU",
+                "display": "Daughter"
+              }
+            ]
+          }
+        ]
+      },
+      "capability": {
+        "mode": [
+          "read",
+          "search"
+        ]
+      }
+    },
+    "iat": 1763610321,
+    "exp": 1763613921
+  },
+  "signature": "HiC2don34fcbxAc7y_U2IOmVQ5u_T36tQ5blKEHQ4t-Pj2lXqwaqRS6-8xcN6FibP7ViPw0odTQtarc68agCqQ"
+}

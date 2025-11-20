@@ -1,0 +1,49 @@
+{
+  "header": {
+    "alg": "ES256",
+    "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+  },
+  "payload": {
+    "iss": "https://consent-platform.org",
+    "sub": "research-app",
+    "aud": "https://hospital.com",
+    "ticket_context": {
+      "subject": {
+        "resourceType": "Patient",
+        "identifier": [
+          {
+            "value": "MRN-123"
+          }
+        ]
+      },
+      "actor": {
+        "resourceType": "Organization",
+        "name": "Oncology Research Institute",
+        "identifier": [
+          {
+            "value": "research-org-id"
+          }
+        ]
+      },
+      "context": {
+        "type": "research_study",
+        "identifier": {
+          "value": "STUDY-PROTO-22"
+        },
+        "evidence": {
+          "reference": "https://consent-service.org/fhir/Consent/signed-form-888"
+        }
+      },
+      "capability": {
+        "temporal_window": {
+          "start": "2020-01-01",
+          "end": "2025-01-01",
+          "type": "service_date"
+        }
+      }
+    },
+    "iat": 1763610321,
+    "exp": 1763613921
+  },
+  "signature": "CAl75kzmDxnb_XO3AdLmLsvmY3P0DFRXDSA9g6_6R7ueapcEppFIB31hoCCJaXkxNkMq7eExAUEb6qKETahDVg"
+}

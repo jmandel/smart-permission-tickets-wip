@@ -1,0 +1,75 @@
+<!-- Static JWT Viewer - No JavaScript -->
+<div class="jwt-artifact" style="margin: 20px 0; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
+    <h4 style="margin: 0; padding: 12px; background: #e8e8e8; border-bottom: 1px solid #ddd;">Permission Ticket Artifact
+    </h4>
+
+    <div style="padding: 15px;">
+        <h5 style="margin-top: 0;">Header</h5>
+        <pre
+            style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
+  "alg": "ES256",
+  "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+}</code></pre>
+
+        <h5>Payload (Claims)</h5>
+        <pre
+            style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
+  "iss": "https://trust-broker.org",
+  "sub": "client-app-456",
+  "aud": "https://network.org",
+  "ticket_context": {
+    "subject": {
+      "resourceType": "Patient",
+      "identifier": [
+        {
+          "system": "https://national-mpi.net",
+          "value": "pt-555"
+        }
+      ]
+    },
+    "actor": {
+      "resourceType": "RelatedPerson",
+      "name": [
+        {
+          "family": "Doe",
+          "given": [
+            "Jane"
+          ]
+        }
+      ],
+      "telecom": [
+        {
+          "system": "email",
+          "value": "jane.doe@example.com"
+        }
+      ],
+      "relationship": [
+        {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+              "code": "DAU",
+              "display": "Daughter"
+            }
+          ]
+        }
+      ]
+    },
+    "capability": {
+      "mode": [
+        "read",
+        "search"
+      ]
+    }
+  },
+  "iat": 1763610321,
+  "exp": 1763613921
+}</code></pre>
+
+        <details style="margin-top: 15px;">
+            <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
+            <pre
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJjbGllbnQtYXBwLTQ1NiIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJ0aWNrZXRfY29udGV4dCI6eyJzdWJqZWN0Ijp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwczovL25hdGlvbmFsLW1waS5uZXQiLCJ2YWx1ZSI6InB0LTU1NSJ9XX0sImFjdG9yIjp7InJlc291cmNlVHlwZSI6IlJlbGF0ZWRQZXJzb24iLCJuYW1lIjpbeyJmYW1pbHkiOiJEb2UiLCJnaXZlbiI6WyJKYW5lIl19XSwidGVsZWNvbSI6W3sic3lzdGVtIjoiZW1haWwiLCJ2YWx1ZSI6ImphbmUuZG9lQGV4YW1wbGUuY29tIn1dLCJyZWxhdGlvbnNoaXAiOlt7ImNvZGluZyI6W3sic3lzdGVtIjoiaHR0cDovL3Rlcm1pbm9sb2d5LmhsNy5vcmcvQ29kZVN5c3RlbS92My1Sb2xlQ29kZSIsImNvZGUiOiJEQVUiLCJkaXNwbGF5IjoiRGF1Z2h0ZXIifV19XX0sImNhcGFiaWxpdHkiOnsibW9kZSI6WyJyZWFkIiwic2VhcmNoIl19fSwiaWF0IjoxNzYzNjEwMzIxLCJleHAiOjE3NjM2MTM5MjF9.HiC2don34fcbxAc7y_U2IOmVQ5u_T36tQ5blKEHQ4t-Pj2lXqwaqRS6-8xcN6FibP7ViPw0odTQtarc68agCqQ</code></pre>
+        </details>
+    </div>
+</div>

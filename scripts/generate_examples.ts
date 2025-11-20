@@ -234,11 +234,14 @@ async function generate() {
 
     for (const t of tickets) {
         const jwt = await signTicket(t.payload, ISSUER_KEY);
-        fs.writeFileSync(path.join(OUTPUT_DIR, t.name), jwt);
+        const jwtPath = path.join(OUTPUT_DIR, t.name);
+        fs.writeFileSync(jwtPath, jwt);
         console.log(`Generated ${t.name}`);
+        await saveDecodedJWT(jwtPath);
     }
 
     await generateClientAssertionExample(ISSUER_KEY);
+    await saveDecodedJWT(path.join(OUTPUT_DIR, 'example-client-assertion.jwt'));
 }
 
 async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: string }) {
@@ -274,6 +277,40 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
     const signedAssertion = await signClientAssertion(assertionPayload, issuerKey);
     fs.writeFileSync(path.join(OUTPUT_DIR, 'example-client-assertion.jwt'), signedAssertion);
     console.log(`Generated example-client-assertion.jwt`);
+}
+
+async function saveDecodedJWT(jwtPath: string) {
+    const jwt = fs.readFileSync(jwtPath, 'utf-8');
+    const parts = jwt.split('.');
+
+    if (parts.length !== 3) {
+        console.error(`Invalid JWT format: ${jwtPath}`);
+        return;
+    }
+
+    const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString());
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+
+    const decoded = {
+        header,
+        payload,
+        signature: parts[2]
+    };
+
+    const jsonPath = jwtPath.replace('.jwt', '.decoded.json');
+    fs.writeFileSync(jsonPath, JSON.stringify(decoded, null, 2));
+    console.log(`Saved decoded JSON: ${path.basename(jsonPath)}`);
+
+    // Also generate static HTML viewer
+    const template = fs.readFileSync(path.join(__dirname, '../input/includes/static-jwt-viewer.html'), 'utf-8');
+    const html = template
+        .replace('{{header-json}}', JSON.stringify(header, null, 2))
+        .replace('{{payload-json}}', JSON.stringify(payload, null, 2))
+        .replace('{{raw-jwt}}', jwt);
+
+    const htmlPath = jwtPath.replace('.jwt', '.html');
+    fs.writeFileSync(htmlPath, html);
+    console.log(`Saved static HTML: ${path.basename(htmlPath)}`);
 }
 
 generate().catch(console.error);

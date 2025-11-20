@@ -1,0 +1,47 @@
+{
+  "header": {
+    "alg": "ES256",
+    "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+  },
+  "payload": {
+    "iss": "https://provider.com",
+    "sub": "payer-app",
+    "aud": "https://provider.com",
+    "ticket_context": {
+      "subject": {
+        "resourceType": "Patient",
+        "reference": "Patient/456"
+      },
+      "actor": {
+        "resourceType": "Organization",
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "9876543210"
+          }
+        ],
+        "name": "Blue Payer Inc"
+      },
+      "context": {
+        "type": "claim",
+        "identifier": {
+          "system": "http://provider.com/claims",
+          "value": "CLAIM-2024-XYZ"
+        }
+      },
+      "capability": {
+        "resources": [
+          {
+            "resourceType": "DocumentReference"
+          },
+          {
+            "resourceType": "Procedure"
+          }
+        ]
+      }
+    },
+    "iat": 1763610321,
+    "exp": 1763613921
+  },
+  "signature": "TFZgQR9DkP5HFEF0cChVWi3R4-nXEPoQ1LiQzvzcz6hfmpK4Cx71XSYI6McHCfRrP70LgGV_dO3ge2JAR2OynQ"
+}
