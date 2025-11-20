@@ -40,17 +40,17 @@
         }
       },
       "capability": {
-        "mode": [
-          "read"
+        "scopes": [
+          "patient/*.read"
         ],
         "temporal_window": {
-          "start": "2023-09-01",
-          "type": "service_date"
+          "type": "service_date",
+          "start": "2024-01-01"
         }
       }
     },
-    "iat": 1763612103,
-    "exp": 1763615703
+    "iat": 1763612489,
+    "exp": 1763616089
   },
-  "signature": "QTFdbxOppuLft2vR-3d34nbzOcju4fysOWOW2uH1f2YmybhMBumAx1gM3T_026ef5GOLZ1pfEuj5OpWgkasSyw"
+  "signature": "8P196uZDCe4UMTpd0ER1FJFmGAdSozWL7bAXl_1KSe0lp3h9T8qmtqQsIxT8fh7UQ4X1haxynwx2VWof4oWJVw"
 }

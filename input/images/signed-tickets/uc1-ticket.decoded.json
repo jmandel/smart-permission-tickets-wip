@@ -9,39 +9,29 @@
     "aud": "https://network.org",
     "ticket_context": {
       "subject": {
-        "resourceType": "Patient",
-        "name": [
-          {
-            "family": "Smith",
-            "given": [
-              "John"
-            ]
-          }
-        ],
-        "birthDate": "1980-01-01",
-        "identifier": [
-          {
-            "system": "urn:oid:2.16.840.1.113883.4.1",
-            "value": "000-00-0000"
-          }
-        ]
+        "type": "match",
+        "traits": {
+          "resourceType": "Patient",
+          "name": [
+            {
+              "family": "Smith",
+              "given": [
+                "John"
+              ]
+            }
+          ],
+          "birthDate": "1980-01-01"
+        }
       },
       "capability": {
-        "mode": [
-          "read"
-        ],
-        "resources": [
-          {
-            "resourceType": "Immunization"
-          },
-          {
-            "resourceType": "AllergyIntolerance"
-          }
+        "scopes": [
+          "patient/Immunization.read",
+          "patient/AllergyIntolerance.read"
         ]
       }
     },
-    "iat": 1763612103,
-    "exp": 1763615703
+    "iat": 1763612489,
+    "exp": 1763616089
   },
-  "signature": "yuitjw6l95c5TfsNSv_y3YBf_vqUJIbs7kyFlx8UikTiRHXlkwmB5F6cBcwu2kClQGkGLq5XoTE7yklYP76ySw"
+  "signature": "3kHNxsQjiS1bTghwW9MBQEcrbMbah1QdVQG_TQDFOE-IgopO3QbUre1brPFdVvN2VcwzB3A5mI2EfBDVaoA-4w"
 }

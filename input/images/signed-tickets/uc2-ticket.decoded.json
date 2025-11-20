@@ -46,14 +46,14 @@
         ]
       },
       "capability": {
-        "mode": [
-          "read",
-          "search"
+        "scopes": [
+          "patient/*.read",
+          "patient/*.search"
         ]
       }
     },
-    "iat": 1763612103,
-    "exp": 1763615703
+    "iat": 1763612489,
+    "exp": 1763616089
   },
-  "signature": "nPSdSVcsD2h2Z-_kh-9fUec5679DjIQzPLGzMk8Jnsr1LuWnOLnpBeXNZ-cJr882Kn3D9MtfviCE5PNCH7leMg"
+  "signature": "EjZcsImc4WxNaaJbZApGZ2LEnt-dpBErnyNpI9jp0xbZ62RPf_fYcO91VU_NvYxv1zdvo4L1wMK0GyJ92s8Aow"
 }

@@ -49,26 +49,21 @@
       "context": {
         "type": "referral",
         "identifier": {
-          "value": "ref-555"
+          "system": "https://referrals.org",
+          "value": "ref-789"
         }
       },
       "capability": {
-        "mode": [
-          "read",
-          "update"
-        ],
-        "resources": [
-          {
-            "resourceType": "ServiceRequest"
-          },
-          {
-            "resourceType": "Task"
-          }
+        "scopes": [
+          "patient/ServiceRequest.read",
+          "patient/ServiceRequest.write",
+          "patient/Task.read",
+          "patient/Task.write"
         ]
       }
     },
-    "iat": 1763612103,
-    "exp": 1763615703
+    "iat": 1763612489,
+    "exp": 1763616089
   },
-  "signature": "GYFN1DqgtZLaAi8Uu0a0YpRmSuV3hqjUadEweI9xWQniDznNa2Mrm1NyViuOAvLoO0QENd6Kz3nBCqM9QeoRNA"
+  "signature": "q1vqm5EQidKwgB-c9UHbcWwipAUY4RH2t8DAGyComPC-42OoySgzbjNz_mn53b2T3hE5Xk4oFze75BSfg9ilUw"
 }

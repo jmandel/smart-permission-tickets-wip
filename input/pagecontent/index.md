@@ -196,14 +196,17 @@ export interface PermissionTicket {
             };
         };
         capability: {
-            mode?: string[];
             scopes?: string[];
-            resources?: { resourceType: string }[];
             temporal_window?: {
                 start?: string;
                 end?: string;
                 type: "service_date";
             };
+            location?: {
+                resourceType?: "Organization";
+                address?: any; // FHIR Address
+                reference?: string; // Reference to Organization
+            }[];
         };
     };
 }

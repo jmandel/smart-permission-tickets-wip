@@ -47,17 +47,15 @@ const uc1_payload: PermissionTicket = {
     aud: "https://network.org",
     ticket_context: {
         subject: {
-            resourceType: "Patient",
-            name: [{ family: "Smith", given: ["John"] }],
-            birthDate: "1980-01-01",
-            identifier: [{
-                system: "urn:oid:2.16.840.1.113883.4.1",
-                value: "000-00-0000"
-            }]
+            type: "match",
+            traits: {
+                resourceType: "Patient",
+                name: [{ family: "Smith", given: ["John"] }],
+                birthDate: "1980-01-01"
+            }
         },
         capability: {
-            mode: ["read"],
-            resources: [{ resourceType: "Immunization" }, { resourceType: "AllergyIntolerance" }]
+            scopes: ["patient/Immunization.read", "patient/AllergyIntolerance.read"]
         }
     }
 };
@@ -84,7 +82,9 @@ const uc2_payload: PermissionTicket = {
                 }]
             }]
         },
-        capability: { mode: ["read", "search"] }
+        capability: {
+            scopes: ["patient/*.read", "patient/*.search"]
+        }
     }
 };
 
@@ -109,8 +109,11 @@ const uc3_payload: PermissionTicket = {
             identifier: { system: "urn:oid:1.2.3.4", value: "ECR-REPORT-999" }
         },
         capability: {
-            mode: ["read"],
-            temporal_window: { start: "2023-09-01", type: "service_date" }
+            scopes: ["patient/*.read"],
+            temporal_window: {
+                type: "service_date",
+                start: "2024-01-01"
+            }
         }
     }
 };
@@ -142,11 +145,10 @@ const uc4_payload: PermissionTicket = {
         },
         context: {
             type: "referral",
-            identifier: { value: "ref-555" }
+            identifier: { system: "https://referrals.org", value: "ref-789" }
         },
         capability: {
-            mode: ["read", "update"],
-            resources: [{ resourceType: "ServiceRequest" }, { resourceType: "Task" }]
+            scopes: ["patient/ServiceRequest.read", "patient/ServiceRequest.write", "patient/Task.read", "patient/Task.write"]
         }
     }
 };
@@ -168,7 +170,7 @@ const uc5_payload: PermissionTicket = {
             identifier: { system: "http://provider.com/claims", value: "CLAIM-2024-XYZ" }
         },
         capability: {
-            resources: [{ resourceType: "DocumentReference" }, { resourceType: "Procedure" }]
+            scopes: ["patient/DocumentReference.read", "patient/Procedure.read"]
         }
     }
 };
@@ -214,7 +216,9 @@ const uc7_payload: PermissionTicket = {
             type: "referral",
             identifier: { value: "ref-req-111" }
         },
-        capability: { mode: ["read"] }
+        capability: {
+            scopes: ["patient/*.read"]
+        }
     }
 };
 
@@ -256,7 +260,9 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
         aud: "https://network.org",
         ticket_context: {
             subject: { resourceType: "Patient", id: "123" },
-            capability: { mode: ["read"] }
+            capability: {
+                scopes: ["patient/*.read"]
+            }
         }
     };
     const signedTicket = await signTicket(ticketPayload, issuerKey);

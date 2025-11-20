@@ -30,18 +30,14 @@
         }
       },
       "capability": {
-        "resources": [
-          {
-            "resourceType": "DocumentReference"
-          },
-          {
-            "resourceType": "Procedure"
-          }
+        "scopes": [
+          "patient/DocumentReference.read",
+          "patient/Procedure.read"
         ]
       }
     },
-    "iat": 1763612103,
-    "exp": 1763615703
+    "iat": 1763612489,
+    "exp": 1763616089
   },
-  "signature": "xGkXVAMrDkTpLtaU2qHXN9i2T7GlRQZsE27mrfzA3uoHTEVCmDvPR86P87P9pOAWOlArZdZreAhcCWCcE6g4SQ"
+  "signature": "HiHlGEJLY6sAWQlKYZzK5QGUY7HS9zfYULWlQWWkbbdNLlMUU6Eq1QJ3yGcIT3zueBz_FzcgB9FF7qTGKaWytA"
 }
