@@ -60,6 +60,7 @@ export interface ClientAssertion {
     sub: string;
     aud: string;
     jti: string;
+    iat?: number;
     exp?: number;
     "https://smarthealthit.org/extension_tickets": string[]; // Array of Signed Ticket Strings
 }

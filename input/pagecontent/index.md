@@ -213,6 +213,7 @@ export interface ClientAssertion {
   sub: string; // Client ID (URL)
   aud: string; // Token Endpoint URL
   jti: string; // Unique ID
+  iat: number; // Issued At
   exp: number; // Expiration
   
   // The Permission Ticket(s)

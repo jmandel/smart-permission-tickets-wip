@@ -37,8 +37,6 @@ async function signClientAssertion(payload: ClientAssertion, key: jose.KeyLike &
             kid: key.kid,
             trust_chain
         })
-        .setIssuedAt()
-        .setExpirationTime('5m')
         .sign(key);
 }
 
@@ -264,11 +262,28 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
     const signedTicket = await signTicket(ticketPayload, issuerKey);
 
     // Create the client assertion
+    // Create the client assertion
+    // Note: The order of properties here determines the order in the generated JSON.
+    // We want standard claims (iss, sub, aud, jti) first, then iat/exp (added by sign), then the extension.
+    // However, jose.SignJWT adds iat/exp at the end by default. 
+    // To force the order, we'll rely on the fact that we can't easily control iat/exp position added by the library 
+    // unless we add them manually. But the user just wants extension_tickets LAST.
+    // Actually, jose library might respect the order if we pass them in.
+    // Let's try adding iat/exp manually to control order, or just put the extension last in our object 
+    // and hope the library appends iat/exp before it? No, library usually appends.
+    // The user wants: iss, sub, aud, jti, iat, exp, extension_tickets.
+
+    // To achieve this specific order with jose, we might need to construct the payload fully manually 
+    // including iat/exp, and then sign it.
+
+    const now = Math.floor(Date.now() / 1000);
     const assertionPayload: ClientAssertion = {
         iss: "https://app.client.id",
         sub: "https://app.client.id",
         aud: "https://network.org/token",
         jti: "assertion-jti-123",
+        iat: now,
+        exp: now + 300,
         "https://smarthealthit.org/extension_tickets": [signedTicket]
     };
 
