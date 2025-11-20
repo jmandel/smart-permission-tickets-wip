@@ -13,7 +13,7 @@ export interface PermissionTicket {
     aud: string;          // Audience (Network/Data Holder)
     exp?: number;         // Expiration Timestamp
     jti?: string;         // Unique Ticket ID
-    permission: {
+    ticket_context: {
         subject: {
             type?: "match" | "reference"; 
             resourceType?: string; 
@@ -27,7 +27,6 @@ export interface PermissionTicket {
                 [key: string]: any;
             };
             reference?: string;
-            [key: string]: any; 
         };
         actor?: {
             resourceType: "PractitionerRole" | "RelatedPerson" | "Organization" | "Practitioner";
@@ -39,29 +38,54 @@ export interface PermissionTicket {
             contained?: any[];
             practitioner?: { reference: string };
             organization?: { reference: string };
-            [key: string]: any; 
         };
         context?: {
-            type: "case_report" | "referral" | "research_study" | "claim";
-            identifier: {
+            type: {
+                system?: string;
+                code?: string;
+                display?: string;
+            };
+            focus?: {
+                system?: string;
+                code?: string;
+                display?: string;
+            };
+            identifier?: {
                 system?: string;
                 value: string;
-            };
-            evidence?: {
-                reference: string;
-            };
+            }[];
         };
         capability: {
-            mode?: string[];
             scopes?: string[];
-            resources?: { resourceType: string }[];
-            temporal_window?: {
+            periods?: {
                 start?: string;
                 end?: string;
-                type: "service_date";
-            };
+            }[];
+            locations?: FHIRAddress[];
+            organizations?: FHIROrganization[];
         };
     };
+}
+
+export interface FHIRAddress {
+    use?: string;
+    type?: string;
+    text?: string;
+    line?: string[];
+    city?: string;
+    district?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    period?: { start?: string; end?: string };
+    [key: string]: any;
+}
+
+export interface FHIROrganization {
+    resourceType: "Organization";
+    identifier?: any[];
+    name?: string;
+    [key: string]: any;
 }
 
 export interface ClientAssertion {
@@ -69,8 +93,9 @@ export interface ClientAssertion {
     sub: string;          // Client ID
     aud: string;          // Token Endpoint URL
     jti: string;          // Unique Assertion ID
+    iat?: number;         // Issued-at Timestamp
     exp?: number;         // Expiration Timestamp
-    "https://smarthealthit.org/extension_tickets": string[]; // Array of Signed Ticket Strings
+    "https://smarthealthit.org/permission_tickets": string[]; // Array of Signed Ticket Strings
 }
 ```
 

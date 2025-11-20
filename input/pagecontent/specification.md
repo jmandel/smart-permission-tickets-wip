@@ -44,7 +44,7 @@ The ticket payload wraps standard FHIR JSON objects.
   "aud": "https://network.org",       // Where is it valid?
   "exp": 1710000000,
   
-  "permission": {
+  "ticket_context": {
     // WHO is the data about? (Uses FHIR Patient shape)
     "subject": { "resourceType": "Patient", ... },
 
@@ -53,10 +53,16 @@ The ticket payload wraps standard FHIR JSON objects.
     "actor": { "resourceType": "PractitionerRole", ... },
 
     // WHY is this allowed? (Trigger Context)
-    "context": { "type": "referral", "identifier": { ... } },
+    "context": { 
+      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "REFER" },
+      "focus": { "system": "http://snomed.info/sct", "code": "49436004", "display": "Atrial fibrillation" },
+      "identifier": [
+        { "system": "https://issuer.org/cases", "value": "CASE-123" }
+      ]
+    },
 
     // WHAT data is allowed?
-    "capability": { "resources": ["Immunization", "Condition"] }
+    "capability": { "scopes": ["patient/Immunization.read", "patient/Condition.read"] }
   }
 }
 ```

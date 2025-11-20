@@ -6,50 +6,17 @@ import Ajv from 'ajv';
 
 const ajv = new Ajv();
 
-const TICKET_SCHEMA = {
-    type: "object",
-    properties: {
-        iss: { type: "string" },
-        sub: { type: "string" },
-        aud: { type: "string" },
-        ticket_context: {
-            type: "object",
-            properties: {
-                context: {
-                    type: "object",
-                    properties: {
-                        type: {
-                            type: "object",
-                            properties: { system: { type: "string" }, code: { type: "string" }, display: { type: "string" } },
-                            required: ["code"]
-                        },
-                        focus: {
-                            type: "object",
-                            properties: { system: { type: "string" }, code: { type: "string" }, display: { type: "string" } }
-                        },
-                        identifier: { type: "array" }
-                    },
-                    required: ["type"],
-                    additionalProperties: false // Strict check for context
-                },
-                capability: {
-                    type: "object",
-                    properties: {
-                        scopes: { type: "array", items: { type: "string" } },
-                        periods: { type: "array" },
-                        locations: { type: "array" },
-                        organizations: { type: "array" }
-                    },
-                    additionalProperties: false // Strict check for capability
-                }
-            },
-            required: ["capability"]
-        }
-    },
-    required: ["iss", "sub", "aud", "ticket_context"]
+import * as TJS from "ts-json-schema-generator";
+
+// Generate schema from TypeScript types
+const config: TJS.Config = {
+    path: path.join(__dirname, "types.ts"),
+    tsconfig: path.join(__dirname, "tsconfig.json"),
+    type: "PermissionTicket",
 };
 
-const validate = ajv.compile(TICKET_SCHEMA);
+const schema = TJS.createGenerator(config).createSchema(config.type);
+const validate = ajv.compile(schema);
 
 const OUTPUT_DIR = path.join(__dirname, '../input/images/signed-tickets');
 const INCLUDES_DIR = path.join(__dirname, '../input/includes/signed-tickets');
