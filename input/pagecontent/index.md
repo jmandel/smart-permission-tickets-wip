@@ -2,7 +2,7 @@
 
 ### Executive Summary
 
-Current interoperability standards (SMART on FHIR, TEFCA) face a "granularity gap." Authorization flows effectively force a choice between two extremes:
+Current interoperability standards and frameworks (SMART on FHIR, TEFCA) face a "granularity gap." Authorization flows effectively force a choice between two extremes:
 1.  **User-Centric friction:** Relying on patients to manually log in to **N** different portals to authorize a single app.
 2.  **System-Centric rigidity:** Relying on backend configurations where trusted nodes get broad, "super-user" access because defining granular rules per-patient is administratively impossible.
 
