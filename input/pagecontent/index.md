@@ -94,7 +94,7 @@ Here is what the `client_assertion` looks like when decoded. Note the `trust_cha
 {% include signed-tickets/example-client-assertion.html %}
 
 ### B. The Artifact: Ticket Structure
-The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `permission` claim.
+The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticket_context` claim.
 
 ```javascript
 {
