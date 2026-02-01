@@ -232,6 +232,7 @@ export interface ClientAssertion {
   // The Permission Ticket(s)
   "https://smarthealthit.org/permission_tickets": string[];
 }
+```
 
 #### Signing and Validation
 
