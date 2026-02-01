@@ -52,6 +52,16 @@
           "generation": "markdown"
         },
         {
+          "nameUrl": "lifecycle.html",
+          "title": "Ticket Lifecycle",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "conformance.html",
+          "title": "Conformance",
+          "generation": "markdown"
+        },
+        {
           "nameUrl": "developer.html",
           "title": "Developer Documentation",
           "generation": "markdown"
