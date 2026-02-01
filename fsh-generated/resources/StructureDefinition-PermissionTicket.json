@@ -5,7 +5,7 @@
   "name": "PermissionTicket",
   "title": "Permission Ticket (JWT Payload)",
   "status": "draft",
-  "description": "The full payload of a Permission Ticket, including standard JWT claims and the custom permission object.",
+  "description": "The full payload of a Permission Ticket, including standard JWT claims and the custom ticket_context object.",
   "fhirVersion": "4.0.1",
   "kind": "logical",
   "abstract": false,
@@ -18,7 +18,7 @@
         "id": "PermissionTicket",
         "path": "PermissionTicket",
         "short": "Permission Ticket (JWT Payload)",
-        "definition": "The full payload of a Permission Ticket, including standard JWT claims and the custom permission object."
+        "definition": "The full payload of a Permission Ticket, including standard JWT claims and the custom ticket_context object."
       },
       {
         "id": "PermissionTicket.iss",

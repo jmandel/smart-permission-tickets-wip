@@ -17,7 +17,7 @@
           "reference": "StructureDefinition/PermissionTicket"
         },
         "name": "Permission Ticket (JWT Payload)",
-        "description": "The full payload of a Permission Ticket, including standard JWT claims and the custom permission object.",
+        "description": "The full payload of a Permission Ticket, including standard JWT claims and the custom ticket_context object.",
         "exampleBoolean": false
       }
     ],
@@ -49,6 +49,11 @@
         {
           "nameUrl": "use-cases.html",
           "title": "Catalog of Use Cases",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "developer.html",
+          "title": "Developer Documentation",
           "generation": "markdown"
         },
         {
