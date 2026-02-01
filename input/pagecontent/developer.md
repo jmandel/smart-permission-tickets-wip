@@ -117,7 +117,7 @@ When a Data Holder receives a token request with a `client_assertion`, it must p
     *   Check `exp` is in the future.
 
 2.  **Extract Tickets:**
-    *   Parse the `https://smarthealthit.org/extension_tickets` array.
+    *   Parse the `https://smarthealthit.org/permission_tickets` array.
 
 3.  **Validate Each Ticket:**
     *   **Signature:** Verify the signature using the Issuer's public key (fetched from `iss` JWKS).
@@ -126,6 +126,6 @@ When a Data Holder receives a token request with a `client_assertion`, it must p
     *   **Expiration:** Check `exp` is in the future.
 
 4.  **Enforce Permissions:**
-    *   Map `permission.capability` to OAuth Scopes.
-    *   Log `permission.actor` and `permission.context` for audit purposes.
+    *   Map `ticket_context.capability` to OAuth Scopes.
+    *   Log `ticket_context.actor` and `ticket_context.context` for audit purposes.
     *   Issue an Access Token with the calculated scopes.

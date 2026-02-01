@@ -1,7 +1,7 @@
 // Logical Model for the Permission Ticket
 Logical: PermissionTicket
 Title: "Permission Ticket (JWT Payload)"
-Description: "The full payload of a Permission Ticket, including standard JWT claims and the custom permission object."
+Description: "The full payload of a Permission Ticket, including standard JWT claims and the custom ticket_context object."
 * iss 1..1 string "Issuer (Trust Broker URL)"
 * sub 1..1 string "Subject (Client ID)"
 * aud 1..1 string "Audience (Network/Data Holder)"

@@ -3,7 +3,7 @@
 ### A. Transport: SMART Backend Services Profile
 This architecture is a strict profile of **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** (which itself profiles **RFC 7523**).
 
-The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** as an extension claim.
+The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** in a dedicated `https://smarthealthit.org/permission_tickets` claim.
 
 **The Request:**
 ```http
@@ -25,12 +25,12 @@ The Data Holder must perform a two-layer validation:
     *   Ensure the client is registered and active.
 
 2.  **Layer 2: Ticket Validation (Permission Ticket Specific)**
-    *   Extract the `https://smarthealthit.org/extension_tickets` array from the assertion.
+    *   Extract the `https://smarthealthit.org/permission_tickets` array from the assertion.
     *   For each ticket:
         *   **Verify Signature:** Use the `iss` (Trust Broker) public key.
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
         *   **Verify Binding:** Does `ticket.sub` match `assertion.sub` (Client ID)?
-    *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `capability` rules.
+    *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `ticket_context.capability` rules.
 
 For detailed algorithms and TypeScript definitions, see the [Developer Documentation](developer.html).
 
@@ -67,4 +67,4 @@ The ticket payload wraps standard FHIR JSON objects.
 }
 ```
 
-See the [Logical Model](StructureDefinition-permission-ticket.html) for formal definitions.
+See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal definitions.

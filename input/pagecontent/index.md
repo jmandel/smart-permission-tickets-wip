@@ -69,9 +69,11 @@ sequenceDiagram
 #### Transport: SMART Backend Services Profile
 This architecture is a strict profile of **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** (which itself profiles **RFC 7523**).
 
-The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** as an extension claim.
+The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** in a dedicated `https://smarthealthit.org/permission_tickets` claim.
 
-##### Trust*   **Automatic Registration**: Clients can be automatically registered using [OpenID Federation 1.0](https://openid.net/specs/openid-federation-1_0.html). The client includes a `trust_chain` in the **header** of its `client_assertion`, allowing the Authorization Server to verify the client's metadata and trust status dynamically.
+##### Trust
+
+*   **Automatic Registration**: Clients can be automatically registered using [OpenID Federation 1.0](https://openid.net/specs/openid-federation-1_0.html). The client includes a `trust_chain` in the **header** of its `client_assertion`, allowing the Authorization Server to verify the client's metadata and trust status dynamically.
 *   **Client IDs** MUST be **URL Entity Identifiers** (e.g., `https://app.example.com`).
 *   Clients SHOULD include a `trust_chain` in their assertion. This allows Data Holders to verify the client's legitimacy via a common Trust Anchor without requiring manual pre-registration of every client.
 
@@ -123,7 +125,7 @@ The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticke
     },
 
     // WHAT data is allowed?
-    "capability": { "resources": [] }
+    "capability": { "scopes": ["patient/*.read"] }
   }
 }
 ```
@@ -131,7 +133,7 @@ The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticke
 ### Downloads
 *   **[Full Specification (PDF)](full-ig.pdf)**
 *   **[Source Code & Examples (ZIP)](source-code.zip)**: Includes TypeScript scripts for key generation, ticket signing, and example generation.
-*   **[Permission Ticket Logical Model](StructureDefinition-permission-ticket.html)** for formal definitions.
+*   **[Permission Ticket Logical Model](StructureDefinition-PermissionTicket.html)** for formal definitions.
 
 #### Server-Side Validation
 The Data Holder must perform a two-layer validation:
@@ -141,12 +143,12 @@ The Data Holder must perform a two-layer validation:
     *   Ensure the client is registered and active.
 
 2.  **Layer 2: Ticket Validation (Permission Ticket Specific)**
-    *   Extract the `https://smarthealthit.org/extension_tickets` array from the assertion.
+    *   Extract the `https://smarthealthit.org/permission_tickets` array from the assertion.
     *   For each ticket:
         *   **Verify Signature:** Use the `iss` (Trust Broker) public key.
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
         *   **Verify Binding:** Does `ticket.sub` match `assertion.sub` (Client ID)?
-    *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `capability` rules.
+    *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `ticket_context.capability` rules.
 
 ---
 
@@ -250,7 +252,7 @@ When a Data Holder receives a token request with a `client_assertion`, it must p
     *   Check `exp` is in the future.
 
 2.  **Extract Tickets:**
-    *   Parse the `https://smarthealthit.org/extension_tickets` array.
+    *   Parse the `https://smarthealthit.org/permission_tickets` array.
 
 3.  **Validate Each Ticket:**
     *   **Signature:** Verify the signature using the Issuer's public key (fetched from `iss` JWKS).

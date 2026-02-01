@@ -300,14 +300,14 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
     // Create the client assertion
     // Create the client assertion
     // Note: The order of properties here determines the order in the generated JSON.
-    // We want standard claims (iss, sub, aud, jti) first, then iat/exp (added by sign), then the extension.
+    // We want standard claims (iss, sub, aud, jti) first, then iat/exp (added by sign), then the tickets claim.
     // However, jose.SignJWT adds iat/exp at the end by default. 
     // To force the order, we'll rely on the fact that we can't easily control iat/exp position added by the library 
-    // unless we add them manually. But the user just wants extension_tickets LAST.
+    // unless we add them manually. But the user just wants permission_tickets LAST.
     // Actually, jose library might respect the order if we pass them in.
-    // Let's try adding iat/exp manually to control order, or just put the extension last in our object 
+    // Let's try adding iat/exp manually to control order, or just put the tickets claim last in our object 
     // and hope the library appends iat/exp before it? No, library usually appends.
-    // The user wants: iss, sub, aud, jti, iat, exp, extension_tickets.
+    // The user wants: iss, sub, aud, jti, iat, exp, permission_tickets.
 
     // To achieve this specific order with jose, we might need to construct the payload fully manually 
     // including iat/exp, and then sign it.

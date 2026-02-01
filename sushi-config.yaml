@@ -19,6 +19,8 @@ pages:
     title: Technical Specification
   use-cases.md:
     title: Catalog of Use Cases
+  developer.md:
+    title: Developer Documentation
   downloads.md:
     title: Downloads
 
