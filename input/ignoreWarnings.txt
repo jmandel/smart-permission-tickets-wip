@@ -1,0 +1,8 @@
+== Suppressed Messages ==
+
+# Element naming warnings - these are JWT claim names which use underscores by convention
+# The logical model represents JWT payload structure, not FHIR resource paths
+%eld-20: 'Element names should be simple alphanumerics%
+
+# Template-generated HTML files don't have the publish box
+%The html source does not contain the publish box%

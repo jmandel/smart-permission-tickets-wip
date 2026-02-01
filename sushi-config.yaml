@@ -19,6 +19,10 @@ pages:
     title: Technical Specification
   use-cases.md:
     title: Catalog of Use Cases
+  lifecycle.md:
+    title: Ticket Lifecycle
+  conformance.md:
+    title: Conformance
   developer.md:
     title: Developer Documentation
   downloads.md:

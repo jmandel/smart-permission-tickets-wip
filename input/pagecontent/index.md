@@ -131,9 +131,9 @@ The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticke
 ```
 
 ### Downloads
-*   **[Full Specification (PDF)](full-ig.pdf)**
 *   **[Source Code & Examples (ZIP)](source-code.zip)**: Includes TypeScript scripts for key generation, ticket signing, and example generation.
 *   **[Permission Ticket Logical Model](StructureDefinition-PermissionTicket.html)** for formal definitions.
+*   **[Downloads Page](downloads.html)** for additional artifacts.
 
 #### Server-Side Validation
 The Data Holder must perform a two-layer validation:

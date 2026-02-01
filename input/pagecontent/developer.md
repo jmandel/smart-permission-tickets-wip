@@ -129,3 +129,34 @@ When a Data Holder receives a token request with a `client_assertion`, it must p
     *   Map `ticket_context.capability` to OAuth Scopes.
     *   Log `ticket_context.actor` and `ticket_context.context` for audit purposes.
     *   Issue an Access Token with the calculated scopes.
+
+## Error Responses
+
+When ticket validation fails, the Data Holder MUST return an OAuth 2.0 error response per RFC 6749.
+
+| Scenario | `error` | `error_description` |
+|----------|---------|---------------------|
+| No tickets in assertion | `invalid_request` | "No permission tickets provided" |
+| Malformed ticket (not valid JWT) | `invalid_grant` | "Malformed permission ticket" |
+| Ticket signature invalid | `invalid_grant` | "Ticket signature verification failed" |
+| Issuer not trusted | `invalid_grant` | "Ticket issuer not trusted: {iss}" |
+| Issuer JWKS unavailable | `invalid_grant` | "Unable to retrieve issuer keys" |
+| Ticket expired | `invalid_grant` | "Ticket expired" |
+| `sub` mismatch | `invalid_grant` | "Ticket not bound to this client" |
+| `aud` mismatch | `invalid_grant` | "Ticket not valid for this server" |
+| Subject not resolvable | `invalid_grant` | "Unable to resolve ticket subject" |
+| Ticket revoked | `invalid_grant` | "Ticket has been revoked" |
+| Unsupported constraint | `invalid_grant` | "Unsupported capability constraint: {field}" |
+| No valid scopes after intersection | `invalid_scope` | "No authorized scopes" |
+| Multi-ticket profile violation | `invalid_grant` | "Tickets do not satisfy use case profile" |
+
+**Response Format:**
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": "invalid_grant",
+  "error_description": "Ticket issuer not trusted: https://unknown.example.com"
+}
+```
