@@ -130,10 +130,7 @@ The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticke
 }
 ```
 
-### Downloads
-*   **[Source Code & Examples (ZIP)](source-code.zip)**: Includes TypeScript scripts for key generation, ticket signing, and example generation.
-*   **[Permission Ticket Logical Model](StructureDefinition-PermissionTicket.html)** for formal definitions.
-*   **[Downloads Page](downloads.html)** for additional artifacts.
+See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal definitions.
 
 #### Server-Side Validation
 The Data Holder must perform a two-layer validation:
@@ -152,119 +149,268 @@ The Data Holder must perform a two-layer validation:
 
 ---
 
-### Developer Documentation
+### Access Calculation
 
-This section provides technical details for developers implementing the Permission Ticket Architecture, including strict schema definitions, signing algorithms, and validation logic.
+The Data Holder calculates granted access through the **intersection** of:
 
-#### TypeScript Interfaces
+1. **Requested Scopes**: The `scope` parameter in the token request
+2. **Ticket Capability**: Constraints from `ticket_context.capability`
+3. **Client Registration**: Scopes the client is permitted to request
 
-The following TypeScript interfaces define the structure of the Permission Ticket and the Client Assertion. These can be used for strict type checking in your implementation.
+If the intersection yields no valid access, return `invalid_scope` error.
 
+#### Capability Constraints
 
-```typescript
-export interface PermissionTicket {
-    iss: string;          // Issuer URL (Trust Broker)
-    sub: string;          // Client ID (App)
-    aud: string;          // Audience (Network/Data Holder)
-    exp?: number;         // Expiration Timestamp
-    jti?: string;         // Unique Ticket ID
-    ticket_context: {
-        subject: {
-            type?: "match" | "reference"; 
-            resourceType?: string; 
-            id?: string; 
-            identifier?: any[]; 
-            traits?: {
-                resourceType: "Patient";
-                name?: { family?: string; given?: string[] }[];
-                birthDate?: string;
-                identifier?: any[];
-                [key: string]: any;
-            };
-            reference?: string;
-            [key: string]: any; 
-        };
-        actor?: {
-            resourceType: "PractitionerRole" | "RelatedPerson" | "Organization" | "Practitioner";
-            name?: any;
-            identifier?: any[];
-            telecom?: any[];
-            type?: any[];
-            relationship?: any[];
-            contained?: any[];
-            practitioner?: { reference: string };
-            organization?: { reference: string };
-            [key: string]: any; 
-        };
-        context?: {
-            type: {
-                system?: string;
-                code?: string;
-                display?: string;
-            };
-            focus?: {
-                system?: string;
-                code?: string;
-                display?: string;
-            };
-            identifier?: any[];
-        };
-        capability: {
-            scopes?: string[];
-            periods?: {
-                start?: string;
-                end?: string;
-            }[];
-            locations?: any[]; // FHIR Address
-            organizations?: any[]; // FHIR Organization
-        };
-    };
+The `capability` object defines what access the ticket authorizes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `scopes` | string[] | SMART scopes (e.g., `patient/*.read`). Wildcard scopes expand to match specific requests. |
+| `periods` | Period[] | Time restrictions. Data Holder SHOULD filter results to resources with relevant dates within these periods. |
+| `locations` | Address[] | Jurisdictional restrictions at **state granularity**. If present, Data Holder SHOULD limit results to data from matching jurisdictions. |
+| `organizations` | Organization[] | Source restrictions. If present, Data Holder SHOULD limit results to data from matching organizations (by identifier or name). |
+
+**Constraint Semantics:**
+- All present constraints are **conjunctive** (AND): data must satisfy all constraints
+- Empty or absent constraint means "no restriction" for that dimension
+- Data Holders that cannot enforce a constraint MUST reject the ticket with `invalid_grant` and `error_description` indicating the unsupported constraint
+
+**Example Capability:**
+```json
+{
+  "capability": {
+    "scopes": ["patient/Condition.read", "patient/Procedure.read"],
+    "periods": [{ "start": "2023-01-01", "end": "2024-12-31" }],
+    "locations": [{ "state": "CA" }, { "state": "NY" }],
+    "organizations": [{ "identifier": [{ "system": "http://hl7.org/fhir/sid/us-npi", "value": "1234567890" }] }]
+  }
+}
+```
+This ticket authorizes read access to Conditions and Procedures, but only for data:
+- With dates in 2023-2024
+- From California or New York
+- From the organization with NPI 1234567890
+
+---
+
+### Multiple Tickets
+
+A client MAY present multiple tickets in the `permission_tickets` array to compose authorization from multiple sources.
+
+#### Use Case Profiles
+
+Multi-ticket scenarios are defined by **use case profiles**. Each profile specifies:
+- The expected set of tickets (by issuer type or purpose)
+- How tickets are evaluated jointly
+- Which ticket provides which claims (subject, actor, capability, etc.)
+
+This specification does not define generic combination semantics. Instead, trust frameworks and implementation guides define specific profiles for their use cases.
+
+#### Example Profiles
+
+**Profile: Identity + Designated Representative**
+
+Two tickets are required:
+1. **Identity Ticket** (from Identity Provider): Contains verified `actor` identity
+2. **Authorization Ticket** (from Trust Broker): Contains `subject`, `capability`, and a reference linking to the actor
+
+```
+Ticket 1 (Identity Provider - e.g., Clear):
+{
+  "iss": "https://clear.me",
+  "sub": "https://health-app.example.com",
+  "ticket_context": {
+    "actor": {
+      "resourceType": "RelatedPerson",
+      "identifier": [{ "system": "https://clear.me/id", "value": "CLR-789" }],
+      "name": [{ "family": "Smith", "given": ["Jane"] }]
+    }
+  }
 }
 
-export interface ClientAssertion {
-  iss: string; // Client ID (URL)
-  sub: string; // Client ID (URL)
-  aud: string; // Token Endpoint URL
-  jti: string; // Unique ID
-  iat: number; // Issued At
-  exp: number; // Expiration
-  
-  // The Permission Ticket(s)
-  "https://smarthealthit.org/permission_tickets": string[];
+Ticket 2 (Trust Broker):
+{
+  "iss": "https://trust-broker.org",
+  "sub": "https://health-app.example.com",
+  "ticket_context": {
+    "subject": { "type": "match", "traits": { ... } },
+    "context": {
+      "type": { "code": "DPOA" },
+      "actor_reference": "https://clear.me/id|CLR-789"
+    },
+    "capability": { "scopes": ["patient/*.read"] }
+  }
 }
 ```
 
-#### Signing and Validation
+The Data Holder, implementing this profile:
+1. Validates both tickets independently
+2. Confirms the `actor_reference` in Ticket 2 matches the `actor.identifier` in Ticket 1
+3. Uses actor from Ticket 1, subject and capability from Ticket 2
 
-##### Signing Algorithm
-*   **Algorithm:** ES256 (ECDSA using P-256 and SHA-256) is RECOMMENDED. RS256 is also supported.
-*   **Header:** Must include `alg` and `kid` (Key ID) to facilitate key rotation.
-*   **Keys:**
-    *   **Issuer:** Signs the `PermissionTicket`. Public keys must be exposed via a JWK Set URL (e.g., `https://trust-broker.org/.well-known/jwks.json`).
-    *   **Client:** Signs the `ClientAssertion`. Public keys must be registered with the Data Holder or exposed via JWKS.
+**Profile: Base + Sensitive Category**
 
-##### Server-Side Validation Steps
-When a Data Holder receives a token request with a `client_assertion`, it must perform the following checks:
+A network-level ticket provides baseline access; an additional ticket from a specialized authority grants access to sensitive categories (e.g., behavioral health, substance use).
 
-1.  **Validate Client Assertion:**
-    *   Verify the signature using the Client's public key.
-    *   Check `iss` == `sub` == Client ID.
-    *   Check `aud` matches the Token Endpoint URL.
-    *   Check `exp` is in the future.
+#### Common Rules
 
-2.  **Extract Tickets:**
-    *   Parse the `https://smarthealthit.org/permission_tickets` array.
+Regardless of profile, these rules always apply:
+- All tickets MUST have identical `sub` (bound to the same client)
+- All tickets MUST be valid for the Data Holder (per audience rules)
+- All issuers MUST be trusted by the Data Holder
 
-3.  **Validate Each Ticket:**
-    *   **Signature:** Verify the signature using the Issuer's public key (fetched from `iss` JWKS).
-    *   **Trust:** Verify the `iss` is a trusted Trust Broker.
-    *   **Binding:** Verify `sub` matches the Client ID from the Client Assertion.
-    *   **Expiration:** Check `exp` is in the future.
+---
 
-4.  **Enforce Permissions:**
-    *   Map `ticket_context.capability` to OAuth Scopes.
-    *   Log `ticket_context.actor` and `ticket_context.context` for audit purposes.
-    *   Issue an Access Token with the calculated scopes.
+### Audience (`aud`) Validation
+
+The `aud` claim specifies where the ticket is valid. Two modes are supported:
+
+#### Mode 1: Enumerated Recipients
+
+The `aud` is a specific URL or array of URLs:
+
+```json
+{ "aud": "https://fhir.hospital.com" }
+// or
+{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"] }
+```
+
+**Validation:** The Data Holder's base URL MUST exactly match one of the enumerated values.
+
+#### Mode 2: Trust Framework
+
+The `aud` references a trust framework identifier:
+
+```json
+{ "aud": "https://tefca.hhs.gov" }
+```
+
+**Validation:** The Data Holder MUST be a verified participant in the referenced trust framework. Verification mechanisms are trust-framework-specific (e.g., the Data Holder's Entity ID appears in the framework's federation).
+
+#### Recommendations
+
+| Scenario | Recommended `aud` |
+|----------|-------------------|
+| Ticket for known single recipient | Specific Data Holder URL |
+| Ticket valid across a network | Trust framework identifier |
+| Ticket for multiple known recipients | Array of Data Holder URLs |
+
+Data Holders MUST reject tickets where `aud` validation fails with error `invalid_grant` and `error_description`: "Ticket audience mismatch".
+
+---
+
+### Ticket Lifecycle
+
+#### Validity Period
+
+- Tickets MUST include an `exp` (expiration) claim
+- Data Holders MUST reject expired tickets
+- Recommended validity periods:
+
+| Use Case | Recommended `exp` |
+|----------|-------------------|
+| Interactive/real-time | 1-4 hours |
+| Batch processing | 24 hours |
+| Standing authorization | Up to 1 year (with revocation) |
+
+#### Long-Lived Access
+
+For scenarios requiring access beyond a single session (e.g., ongoing care relationships, research studies), two approaches are supported:
+
+**Approach 1: Refresh via Issuer**
+
+The client periodically obtains fresh tickets from the issuer. Suitable when:
+- Issuer interaction is low-friction (automated, no user involvement)
+- Access should be re-validated regularly
+
+**Approach 2: Long-Lived Tickets with Revocation**
+
+The issuer mints a ticket with extended validity (weeks to months) and supports revocation. Suitable when:
+- Issuer interaction is high-friction (e.g., in-person identity verification via Clear, notarized documents)
+- Access may need to be terminated before natural expiration
+- The cost of re-issuance (user time, verification fees) is prohibitive
+
+#### Revocation
+
+Issuers MAY support revocation of individual tickets before expiration.
+
+**Revocation Identifier**
+
+Tickets supporting revocation include a `revocation` claim:
+
+```json
+{
+  "iss": "https://trust-broker.org",
+  "sub": "https://app.example.com",
+  "exp": 1735689600,
+  "jti": "ticket-unique-id",
+  "revocation": {
+    "url": "https://trust-broker.org/.well-known/crl/patient-access.json",
+    "rid": "abc123xyz"
+  },
+  "ticket_context": { ... }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `revocation.url` | URL of the issuer's Credential Revocation List (CRL) for this category of tickets |
+| `revocation.rid` | Revocation identifier for this ticket. MUST be opaque (not contain PII). |
+
+**Generating `rid`:** Issuers SHOULD use a one-way transformation to prevent correlation:
+```
+rid = base64url(hmac-sha-256(issuer_secret || kid, ticket_jti)[0:8])
+```
+
+**Revocation List Format**
+
+The CRL is a JSON file served at the URL specified in the ticket:
+
+```json
+{
+  "kid": "issuer-signing-key-id",
+  "method": "rid",
+  "ctr": 42,
+  "rids": [
+    "abc123xyz",
+    "def456uvw.1710460800"
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `kid` | Key ID used to sign tickets covered by this CRL |
+| `method` | Revocation method identifier. Value `"rid"` indicates the method defined in this specification. |
+| `ctr` | Monotonic counter incremented on each update. Verifiers use this to detect changes. |
+| `rids` | Array of revoked `rid` values. Optional `.timestamp` suffix (Unix seconds) revokes only tickets issued before that time. |
+
+**Timestamp Suffix Example:**
+
+The entry `"def456uvw.1710460800"` revokes tickets with `rid` = `def456uvw` that were issued (`iat`) before March 15, 2024 00:00:00 UTC. Tickets with that `rid` issued after this timestamp remain valid.
+
+**Revocation Checking**
+
+*Issuers:*
+- MUST publish CRL at the URL specified in tickets
+- MUST serve CRL over HTTPS
+- MUST increment `ctr` on every update
+
+*Data Holders:*
+- If `revocation` is present in ticket, SHOULD check the CRL
+- MAY cache CRL responses respecting HTTP cache headers
+- MUST reject tickets whose `rid` appears in the CRL (respecting timestamp suffix if present)
+- If CRL is unavailable, MAY accept ticket (fail-open) or reject (fail-closed) per local policy
+
+**Grouping for Privacy**
+
+Issuers MAY use multiple CRL URLs to group tickets by category, preventing correlation across ticket types when checking revocation.
+
+#### Reusability
+
+- Tickets are **reusable** until expiration (or revocation)
+- Data Holders are NOT REQUIRED to enforce single-use semantics
+- If single-use is required for a use case, the issuer should use very short expiration times
 
 ---
 
@@ -279,7 +425,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (Matched by Demographics: Name, DOB, Identifier).
 *   **Actor:** None (Implicitly the App/Patient).
 *   **Context:** None.
-*   **Capability:** `mode` = `read`, `resources` = `Immunization`, `AllergyIntolerance`.
+*   **Capability:** `scopes` = `patient/Immunization.read`, `patient/AllergyIntolerance.read`.
 
 {% include signed-tickets/uc1-ticket.html %}
 
@@ -290,7 +436,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (Matched by Identifier).
 *   **Actor:** `RelatedPerson` (Name, Telecom, Relationship Code).
 *   **Context:** None.
-*   **Capability:** `mode` = `read`, `search` (Full Access).
+*   **Capability:** `scopes` = `patient/*.read`.
 
 {% include signed-tickets/uc2-ticket.html %}
 
@@ -348,3 +494,157 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Capability:** `scopes` = `patient/*.read`.
 
 {% include signed-tickets/uc7-ticket.html %}
+
+---
+
+### Developer Reference
+
+#### TypeScript Interfaces
+
+The following TypeScript interfaces define the structure of the Permission Ticket and the Client Assertion.
+
+```typescript
+export interface PermissionTicket {
+    iss: string;          // Issuer URL (Trust Broker)
+    sub: string;          // Client ID (App)
+    aud: string;          // Audience (Network/Data Holder)
+    exp?: number;         // Expiration Timestamp
+    jti?: string;         // Unique Ticket ID
+    revocation?: {
+        url: string;      // CRL URL
+        rid: string;      // Revocation ID
+    };
+    ticket_context: {
+        subject: {
+            type?: "match" | "reference"; 
+            resourceType?: string; 
+            id?: string; 
+            identifier?: any[]; 
+            traits?: {
+                resourceType: "Patient";
+                name?: { family?: string; given?: string[] }[];
+                birthDate?: string;
+                identifier?: any[];
+            };
+            reference?: string;
+        };
+        actor?: {
+            resourceType: "PractitionerRole" | "RelatedPerson" | "Organization" | "Practitioner";
+            name?: any;
+            identifier?: any[];
+            telecom?: any[];
+            type?: any[];
+            relationship?: any[];
+            contained?: any[];
+            practitioner?: { reference: string };
+            organization?: { reference: string };
+        };
+        context?: {
+            type: { system?: string; code?: string; display?: string; };
+            focus?: { system?: string; code?: string; display?: string; };
+            identifier?: { system?: string; value: string; }[];
+        };
+        capability: {
+            scopes?: string[];
+            periods?: { start?: string; end?: string; }[];
+            locations?: { state?: string; country?: string; }[];
+            organizations?: { identifier?: any[]; name?: string; }[];
+        };
+    };
+}
+
+export interface ClientAssertion {
+    iss: string;          // Client ID
+    sub: string;          // Client ID
+    aud: string;          // Token Endpoint URL
+    jti: string;          // Unique Assertion ID
+    iat?: number;         // Issued-at Timestamp
+    exp?: number;         // Expiration Timestamp
+    "https://smarthealthit.org/permission_tickets": string[];
+}
+```
+
+#### Signing Algorithm
+*   **Algorithm:** ES256 (ECDSA using P-256 and SHA-256) is RECOMMENDED. RS256 is also supported.
+*   **Header:** Must include `alg` and `kid` (Key ID) to facilitate key rotation.
+*   **Keys:**
+    *   **Issuer:** Signs the `PermissionTicket`. Public keys must be exposed via a JWK Set URL (e.g., `https://trust-broker.org/.well-known/jwks.json`).
+    *   **Client:** Signs the `ClientAssertion`. Public keys must be registered with the Data Holder or exposed via JWKS.
+
+#### Error Responses
+
+When ticket validation fails, the Data Holder MUST return an OAuth 2.0 error response per RFC 6749.
+
+| Scenario | `error` | `error_description` |
+|----------|---------|---------------------|
+| No tickets in assertion | `invalid_request` | "No permission tickets provided" |
+| Malformed ticket (not valid JWT) | `invalid_grant` | "Malformed permission ticket" |
+| Ticket signature invalid | `invalid_grant` | "Ticket signature verification failed" |
+| Issuer not trusted | `invalid_grant` | "Ticket issuer not trusted: {iss}" |
+| Issuer JWKS unavailable | `invalid_grant` | "Unable to retrieve issuer keys" |
+| Ticket expired | `invalid_grant` | "Ticket expired" |
+| `sub` mismatch | `invalid_grant` | "Ticket not bound to this client" |
+| `aud` mismatch | `invalid_grant` | "Ticket not valid for this server" |
+| Subject not resolvable | `invalid_grant` | "Unable to resolve ticket subject" |
+| Ticket revoked | `invalid_grant` | "Ticket has been revoked" |
+| Unsupported constraint | `invalid_grant` | "Unsupported capability constraint: {field}" |
+| No valid scopes after intersection | `invalid_scope` | "No authorized scopes" |
+
+---
+
+### Conformance
+
+This section defines requirements using RFC 2119 keywords (MUST, SHOULD, MAY).
+
+#### Data Holder Requirements
+
+**MUST:**
+- Accept `https://smarthealthit.org/permission_tickets` claim in client assertions
+- Validate client assertion per SMART Backend Services
+- For each ticket: verify signature, `sub` binding, `aud`, and `exp`
+- Calculate granted scopes as intersection of requested, ticket capability, and client registration
+- Return appropriate error codes on validation failure
+
+**SHOULD:**
+- Cache issuer JWKS with appropriate TTL
+- Log `ticket_context.actor` and `ticket_context.context` for audit trail
+- Enforce `capability.periods`, `capability.locations`, `capability.organizations`
+- Check revocation lists when `revocation` is present
+
+**MAY:**
+- Support trust framework audience validation
+- Support multiple tickets per use case profile
+
+#### Client Requirements
+
+**MUST:**
+- Include tickets as an array in `https://smarthealthit.org/permission_tickets` claim
+- Sign client assertion with registered or federated key
+- Use identical value for `iss` and `sub` in client assertion (the Client ID URL)
+
+**SHOULD:**
+- Request only scopes authorized by held tickets
+- Include `jti` in client assertion for replay protection
+- Refresh tickets before expiration for continued access
+
+#### Issuer Requirements
+
+**MUST:**
+- Sign tickets with keys published at `{iss}/.well-known/jwks.json`
+- Include claims: `iss`, `sub`, `aud`, `exp`, `ticket_context`
+- Bind each ticket to a specific client via `sub`
+- If supporting revocation: publish CRL at the URL specified in tickets
+
+**SHOULD:**
+- Include `jti` for unique ticket identification
+- Verify client identity and authorization before minting tickets
+- Use short expiration for interactive use cases (1-4 hours)
+- Support revocation for long-lived tickets
+- Use opaque `rid` values that do not leak PII
+
+---
+
+### Downloads
+
+*   **[Source Code & Examples (ZIP)](source-code.zip)**: Includes TypeScript scripts for key generation, ticket signing, and example generation.
+*   **[Permission Ticket Logical Model](StructureDefinition-PermissionTicket.html)** for formal definitions.

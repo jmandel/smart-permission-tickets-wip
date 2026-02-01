@@ -11,20 +11,6 @@ releaseLabel: ci-build
 pages:
   index.md:
     title: Permission Ticket Architecture
-  problem.md:
-    title: The Problem Space
-  solution.md:
-    title: The Solution
-  specification.md:
-    title: Technical Specification
-  use-cases.md:
-    title: Catalog of Use Cases
-  lifecycle.md:
-    title: Ticket Lifecycle
-  conformance.md:
-    title: Conformance
-  developer.md:
-    title: Developer Documentation
   downloads.md:
     title: Downloads
 

@@ -32,41 +32,6 @@
           "generation": "markdown"
         },
         {
-          "nameUrl": "problem.html",
-          "title": "The Problem Space",
-          "generation": "markdown"
-        },
-        {
-          "nameUrl": "solution.html",
-          "title": "The Solution",
-          "generation": "markdown"
-        },
-        {
-          "nameUrl": "specification.html",
-          "title": "Technical Specification",
-          "generation": "markdown"
-        },
-        {
-          "nameUrl": "use-cases.html",
-          "title": "Catalog of Use Cases",
-          "generation": "markdown"
-        },
-        {
-          "nameUrl": "lifecycle.html",
-          "title": "Ticket Lifecycle",
-          "generation": "markdown"
-        },
-        {
-          "nameUrl": "conformance.html",
-          "title": "Conformance",
-          "generation": "markdown"
-        },
-        {
-          "nameUrl": "developer.html",
-          "title": "Developer Documentation",
-          "generation": "markdown"
-        },
-        {
           "nameUrl": "downloads.html",
           "title": "Downloads",
           "generation": "markdown"
