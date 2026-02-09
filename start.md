@@ -61,9 +61,6 @@ The ticket payload wraps standard FHIR JSON objects.
 ## 5. Detailed Use Case Catalog
 
 Here are seven scenarios demonstrating how FHIR resources are used to model diverse authorization needs.
-Each use case has a 1:1 profile mapping in this catalog:
-
-{% include generated/spec-snippets/start/use-case-profile-map.md %}
 
 ### Use Case 1: Network-Mediated Patient Access
 *A patient uses a high-assurance Digital ID wallet to authorize an app to fetch their data from multiple hospitals.*

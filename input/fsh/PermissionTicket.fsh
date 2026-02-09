@@ -8,7 +8,7 @@ Description: "The full payload of a Permission Ticket, including standard JWT cl
 * exp 1..1 integer "Expiration Timestamp"
 * iat 0..1 integer "Issued-At Timestamp"
 * jti 0..1 string "Unique Ticket ID"
-* ticket_type 1..1 uri "Ticket type URI identifying the ticket schema/semantics"
+* ticket_type 0..1 uri "Ticket type URI identifying the ticket schema/semantics (required for multi-ticket profiles; optional for single-ticket profiles)"
 * client_binding 1..1 BackboneElement "Client key-set binding"
   * jwks_uri 0..1 url "HTTPS JWKS URI for authorized client key set"
   * jwks 0..1 string "Embedded JWKS JSON for authorized client key set"

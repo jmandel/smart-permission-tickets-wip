@@ -2,6 +2,7 @@ import * as jose from 'jose';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PermissionTicket, ClientAssertion } from './types';
+import { USE_CASE_BY_ID } from './use_case_catalog';
 import Ajv from 'ajv';
 
 const ajv = new Ajv();
@@ -72,7 +73,7 @@ const uc1_payload: PermissionTicket = {
     sub: "https://client-app.example.com/123",
     aud: "https://network.org",
     exp: DEFAULT_EXP,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+    ticket_type: USE_CASE_BY_ID.uc1.ticketTypeUri,
     client_binding: {
         jwks_uri: "https://client-app.example.com/jwks.json"
     },
@@ -97,7 +98,7 @@ const uc2_payload: PermissionTicket = {
     sub: "https://client-app.example.com/456",
     aud: "https://network.org",
     exp: DEFAULT_EXP,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/authorized-representative-v1",
+    ticket_type: USE_CASE_BY_ID.uc2.ticketTypeUri,
     client_binding: {
         jwks_uri: "https://client-app.example.com/jwks.json"
     },
@@ -130,7 +131,7 @@ const uc3_payload: PermissionTicket = {
     sub: "https://pha.gov/apps/report-client",
     aud: "https://hospital-a.com",
     exp: DEFAULT_EXP,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1",
+    ticket_type: USE_CASE_BY_ID.uc3.ticketTypeUri,
     client_binding: {
         jwks_uri: "https://pha.gov/jwks.json"
     },
@@ -166,7 +167,7 @@ const uc4_payload: PermissionTicket = {
     sub: "https://foodbank.org/apps/intake",
     aud: "https://referring-ehr.org",
     exp: DEFAULT_EXP,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/social-care-referral-v1",
+    ticket_type: USE_CASE_BY_ID.uc4.ticketTypeUri,
     client_binding: {
         jwks_uri: "https://foodbank.org/jwks.json"
     },
@@ -206,7 +207,7 @@ const uc5_payload: PermissionTicket = {
     sub: "https://payer.com/apps/claims-processor",
     aud: "https://provider.com",
     exp: DEFAULT_EXP,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1",
+    ticket_type: USE_CASE_BY_ID.uc5.ticketTypeUri,
     client_binding: {
         jwks_uri: "https://payer.com/jwks.json"
     },
@@ -233,7 +234,7 @@ const uc6_payload: PermissionTicket = {
     sub: "https://research.org/studies/lung-cancer/app",
     aud: "https://hospital.com",
     exp: DEFAULT_EXP,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/research-study-v1",
+    ticket_type: USE_CASE_BY_ID.uc6.ticketTypeUri,
     client_binding: {
         jwks_uri: "https://research.org/jwks.json"
     },
@@ -264,7 +265,7 @@ const uc7_payload: PermissionTicket = {
     sub: "https://specialist-clinic.org/apps/referral-viewer",
     aud: "https://referring-ehr.org",
     exp: DEFAULT_EXP,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
+    ticket_type: USE_CASE_BY_ID.uc7.ticketTypeUri,
     client_binding: {
         jwks_uri: "https://specialist-clinic.org/jwks.json"
     },
@@ -326,7 +327,7 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
         sub: "https://app.client.id",
         aud: "https://network.org",
         exp: DEFAULT_EXP,
-        ticket_type: "https://smarthealthit.org/permission-ticket-type/example-v1",
+        ticket_type: USE_CASE_BY_ID.uc1.ticketTypeUri,
         client_binding: {
             jwks_uri: "https://app.client.id/jwks.json"
         },
@@ -362,7 +363,7 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
         jti: "assertion-jti-123",
         iat: now,
         exp: now + 300,
-        "https://smarthealthit.org/permission_ticket_profile": "https://smarthealthit.org/permission-ticket-profile/single-patient-v1",
+        "https://smarthealthit.org/permission_ticket_profile": USE_CASE_BY_ID.uc1.profileUri,
         "https://smarthealthit.org/permission_tickets": [signedTicket]
     };
 

@@ -101,9 +101,9 @@
       {
         "id": "PermissionTicket.ticket_type",
         "path": "PermissionTicket.ticket_type",
-        "short": "Ticket type URI identifying the ticket schema/semantics",
-        "definition": "Ticket type URI identifying the ticket schema/semantics",
-        "min": 1,
+        "short": "Ticket type URI identifying the ticket schema/semantics (required for multi-ticket profiles; optional for single-ticket profiles)",
+        "definition": "Ticket type URI identifying the ticket schema/semantics (required for multi-ticket profiles; optional for single-ticket profiles)",
+        "min": 0,
         "max": "1",
         "type": [
           {

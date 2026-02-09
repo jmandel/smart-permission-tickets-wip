@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { USE_CASE_CATALOG } from "./use_case_catalog";
 
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
 type JsonObject = { [key: string]: JsonValue };
@@ -7,60 +8,6 @@ type JsonArray = JsonValue[];
 
 const ROOT = path.join(__dirname, "..");
 const INCLUDE_ROOT = path.join(ROOT, "input/includes/generated/spec-snippets");
-
-type UseCaseProfileRow = {
-  useCase: string;
-  profile: string;
-  ticketType: string;
-};
-
-const USE_CASE_PROFILE_ROWS: UseCaseProfileRow[] = [
-  {
-    useCase: "Use Case 1: Network-Mediated Patient Access",
-    profile:
-      "https://smarthealthit.org/permission-ticket-profile/network-patient-access-v1",
-    ticketType:
-      "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1"
-  },
-  {
-    useCase: "Use Case 2: Authorized Representative (Proxy)",
-    profile:
-      "https://smarthealthit.org/permission-ticket-profile/authorized-representative-v1",
-    ticketType:
-      "https://smarthealthit.org/permission-ticket-type/authorized-representative-v1"
-  },
-  {
-    useCase: "Use Case 3: Public Health Investigation",
-    profile:
-      "https://smarthealthit.org/permission-ticket-profile/public-health-investigation-v1",
-    ticketType:
-      "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1"
-  },
-  {
-    useCase: "Use Case 4: Social Care (CBO) Referral",
-    profile:
-      "https://smarthealthit.org/permission-ticket-profile/social-care-referral-v1",
-    ticketType:
-      "https://smarthealthit.org/permission-ticket-type/social-care-referral-v1"
-  },
-  {
-    useCase: "Use Case 5: Payer Claims Adjudication",
-    profile:
-      "https://smarthealthit.org/permission-ticket-profile/payer-claims-adjudication-v1",
-    ticketType:
-      "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1"
-  },
-  {
-    useCase: "Use Case 6: Research Study",
-    profile: "https://smarthealthit.org/permission-ticket-profile/research-study-v1",
-    ticketType: "https://smarthealthit.org/permission-ticket-type/research-study-v1"
-  },
-  {
-    useCase: "Use Case 7: Provider-to-Provider Consult",
-    profile: "https://smarthealthit.org/permission-ticket-profile/provider-consult-v1",
-    ticketType: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1"
-  }
-];
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
@@ -90,15 +37,21 @@ function renderProfileTicketsBlock(ticket1: JsonValue, ticket2: JsonValue): stri
   ].join("\n");
 }
 
-function renderUseCaseProfileTable(rows: UseCaseProfileRow[]): string {
-  const header = [
-    "| Use Case | Profile URI | Required `ticket_type` URI |",
-    "|---|---|---|"
-  ];
-  const body = rows.map(
-    (row) => `| ${row.useCase} | \`${row.profile}\` | \`${row.ticketType}\` |`
-  );
-  return [...header, ...body].join("\n");
+function renderUseCaseProfileRegistryTable(): string {
+  const rows = USE_CASE_CATALOG.map(
+    (entry) =>
+      `  <tr><td>${entry.label}</td><td><code>${entry.profileUri}</code></td><td><code>${entry.ticketTypeUri}</code></td></tr>`
+  ).join("\n");
+  return [
+    "<table>",
+    "  <thead>",
+    "    <tr><th>Use Case</th><th>Profile URI</th><th>Canonical <code>ticket_type</code> URI</th></tr>",
+    "  </thead>",
+    "  <tbody>",
+    rows,
+    "  </tbody>",
+    "</table>"
+  ].join("\n");
 }
 
 function buildIndexSnippets(): void {
@@ -220,7 +173,7 @@ function buildIndexSnippets(): void {
   writeInclude("index/aud-framework.json.md", `\`\`\`json\n{ "aud": "https://tefca.hhs.gov" }\n\`\`\``);
   writeInclude("index/revocation-ticket.json.md", renderJsonFence(revocationTicketExample));
   writeInclude("index/revocation-list.json.md", renderJsonFence(revocationListExample));
-  writeInclude("index/use-case-profile-map.md", renderUseCaseProfileTable(USE_CASE_PROFILE_ROWS));
+  writeInclude("index/use-case-profile-map.md", renderUseCaseProfileRegistryTable());
 }
 
 function buildStartSnippets(): void {
@@ -442,7 +395,6 @@ function buildStartSnippets(): void {
   writeInclude("start/uc5-ticket.json.md", renderJsonFence(uc5));
   writeInclude("start/uc6-ticket.json.md", renderJsonFence(uc6));
   writeInclude("start/uc7-ticket.json.md", renderJsonFence(uc7));
-  writeInclude("start/use-case-profile-map.md", renderUseCaseProfileTable(USE_CASE_PROFILE_ROWS));
 }
 
 function main(): void {

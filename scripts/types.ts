@@ -3,7 +3,7 @@ export interface PermissionTicket {
     sub: string;          // Issuer-defined ticket subject (profile-specific)
     aud: string;          // Network / trust framework audience
     exp: number;          // Expiration Timestamp
-    ticket_type: string;  // Ticket type URI
+    ticket_type?: string;  // Ticket type URI (required for multi-ticket profiles; optional for single-ticket profiles)
     client_binding: {
         jwks_uri?: string; // Exactly one of jwks_uri or jwks
         jwks?: { keys: any[] };
@@ -89,6 +89,6 @@ export interface ClientAssertion {
     jti: string;
     iat?: number;
     exp?: number;
-    "https://smarthealthit.org/permission_ticket_profile": string;
+    "https://smarthealthit.org/permission_ticket_profile": string; // Primary processing selector
     "https://smarthealthit.org/permission_tickets": string[]; // Array of Signed Ticket Strings
 }

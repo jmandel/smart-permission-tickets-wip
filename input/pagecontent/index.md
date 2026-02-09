@@ -121,10 +121,11 @@ The Data Holder SHALL perform a two-layer validation:
 
 2.  **Layer 2: Ticket Validation (Permission Ticket Specific)**
     *   Extract the `https://smarthealthit.org/permission_tickets` array from the assertion.
+    *   Read `https://smarthealthit.org/permission_ticket_profile` from the assertion and select profile processing rules.
     *   For each ticket:
         *   **Verify Signature:** Use the `iss` (Trust Broker) public key.
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
-        *   **Verify Type:** `ticket_type` is recognized in the declared profile.
+        *   **Verify Type Rules:** For multi-ticket profiles, `ticket_type` SHALL be present and recognized in the declared profile. For single-ticket profiles, `ticket_type` MAY be omitted; if present, it SHALL match the profile's required type.
         *   **Verify Binding:** Does the `client_assertion` signing key match the ticket `client_binding` key set?
     *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `ticket_context.capability` rules.
 
@@ -185,7 +186,11 @@ The client SHALL assert the profile in the `client_assertion` claim:
 
 {% include generated/spec-snippets/index/profile-claim.json.md %}
 
-Each ticket SHALL assert its own type via `ticket_type` (a URI). The Data Holder SHALL process tickets only according to the declared profile. Unknown profile, unknown ticket type, or profile/type mismatch SHALL be rejected with `invalid_grant`. For the 1:1 catalog profiles above, exactly one ticket is expected and its `ticket_type` SHALL match the mapped URI.
+`https://smarthealthit.org/permission_ticket_profile` is the primary processing selector. It is URI-scoped because it is a custom top-level claim in `client_assertion`.
+
+`ticket_type` is a field inside each Permission Ticket artifact. For single-ticket profiles, `ticket_type` MAY be omitted; if present, it SHALL match the profile's required type. For multi-ticket profiles, each ticket SHALL include `ticket_type` and it SHALL match one of the profile's allowed ticket types.
+
+Unknown profile, unknown ticket type (when required), or profile/type mismatch SHALL be rejected with `invalid_grant`.
 
 #### Example Profiles
 
@@ -438,7 +443,7 @@ export interface PermissionTicket {
     sub: string;          // Issuer-defined subject (profile-specific)
     aud: string;          // Audience (Network/Data Holder set)
     exp: number;          // Expiration Timestamp
-    ticket_type: string;  // Ticket type URI
+    ticket_type?: string; // Required for multi-ticket profiles; optional for single-ticket profiles
     client_binding: {
         jwks_uri?: string; // Exactly one of jwks_uri or jwks
         jwks?: { keys: any[] };
@@ -495,7 +500,7 @@ export interface ClientAssertion {
     jti: string;          // Unique Assertion ID
     iat?: number;         // Issued-at Timestamp
     exp?: number;         // Expiration Timestamp
-    "https://smarthealthit.org/permission_ticket_profile": string;
+    "https://smarthealthit.org/permission_ticket_profile": string; // Primary processing selector
     "https://smarthealthit.org/permission_tickets": string[];
 }
 ```
@@ -541,7 +546,10 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Accept `https://smarthealthit.org/permission_tickets` claim in client assertions
 - Accept `https://smarthealthit.org/permission_ticket_profile` claim in client assertions
 - Validate client assertion per SMART Backend Services
-- For each ticket: verify signature, `ticket_type`, `client_binding`, `aud`, and `exp`
+- For each ticket: verify signature, `client_binding`, `aud`, and `exp`
+- Enforce profile/type rules:
+  For multi-ticket profiles, require `ticket_type` and validate against profile
+  For single-ticket profiles, allow omitted `ticket_type`; if present, validate against profile
 - Calculate granted scopes as intersection of requested, ticket capability, and client registration
 - Enforce all presented `capability` constraints (`scopes`, `periods`, `locations`, `organizations`) or reject with `invalid_grant`
 - If `revocation` is present, perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request
@@ -574,7 +582,8 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 
 **SHALL:**
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
-- Include claims: `iss`, `sub`, `aud`, `exp`, `ticket_type`, `client_binding`, `ticket_context`
+- Include claims: `iss`, `sub`, `aud`, `exp`, `client_binding`, `ticket_context`
+- For multi-ticket profiles, include `ticket_type`; for single-ticket profiles, `ticket_type` is optional
 - Bind each ticket to a specific client key set via `client_binding` (`jwks_uri` or `jwks`)
 - If `revocation` is present, publish CRL at the URL specified in tickets
 
