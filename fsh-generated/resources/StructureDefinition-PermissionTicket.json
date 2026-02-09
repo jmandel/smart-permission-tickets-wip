@@ -36,8 +36,8 @@
       {
         "id": "PermissionTicket.sub",
         "path": "PermissionTicket.sub",
-        "short": "Subject (Client ID)",
-        "definition": "Subject (Client ID)",
+        "short": "Issuer-defined ticket subject (profile-specific)",
+        "definition": "Issuer-defined ticket subject (profile-specific)",
         "min": 1,
         "max": "1",
         "type": [
@@ -49,8 +49,8 @@
       {
         "id": "PermissionTicket.aud",
         "path": "PermissionTicket.aud",
-        "short": "Audience (Network/Data Holder)",
-        "definition": "Audience (Network/Data Holder)",
+        "short": "Audience (Network / Trust Framework / Recipient Set)",
+        "definition": "Audience (Network / Trust Framework / Recipient Set)",
         "min": 1,
         "max": "1",
         "type": [
@@ -64,7 +64,7 @@
         "path": "PermissionTicket.exp",
         "short": "Expiration Timestamp",
         "definition": "Expiration Timestamp",
-        "min": 0,
+        "min": 1,
         "max": "1",
         "type": [
           {
@@ -90,6 +90,58 @@
         "path": "PermissionTicket.jti",
         "short": "Unique Ticket ID",
         "definition": "Unique Ticket ID",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.ticket_type",
+        "path": "PermissionTicket.ticket_type",
+        "short": "Ticket type URI identifying the ticket schema/semantics",
+        "definition": "Ticket type URI identifying the ticket schema/semantics",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "uri"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.client_binding",
+        "path": "PermissionTicket.client_binding",
+        "short": "Client key-set binding",
+        "definition": "Client key-set binding",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.client_binding.jwks_uri",
+        "path": "PermissionTicket.client_binding.jwks_uri",
+        "short": "HTTPS JWKS URI for authorized client key set",
+        "definition": "HTTPS JWKS URI for authorized client key set",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "url"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.client_binding.jwks",
+        "path": "PermissionTicket.client_binding.jwks",
+        "short": "Embedded JWKS JSON for authorized client key set",
+        "definition": "Embedded JWKS JSON for authorized client key set",
         "min": 0,
         "max": "1",
         "type": [
@@ -400,8 +452,8 @@
       {
         "id": "PermissionTicket.ticket_context.capability.scopes",
         "path": "PermissionTicket.ticket_context.capability.scopes",
-        "short": "SMART Scopes (e.g. patient/Immunization.read)",
-        "definition": "SMART Scopes (e.g. patient/Immunization.read)",
+        "short": "SMART Scopes (e.g. patient/Immunization.rs)",
+        "definition": "SMART Scopes (e.g. patient/Immunization.rs)",
         "min": 0,
         "max": "*",
         "type": [

@@ -4,6 +4,7 @@
   "description": "Generates signed Permission Ticket examples",
   "main": "generate_examples.ts",
   "scripts": {
+    "sync-spec-snippets": "ts-node sync_spec_snippets.ts",
     "generate": "ts-node generate_examples.ts"
   },
   "dependencies": {

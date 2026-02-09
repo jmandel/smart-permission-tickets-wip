@@ -18,6 +18,11 @@
   "iss": "https://referring-ehr.org",
   "sub": "https://foodbank.org/apps/intake",
   "aud": "https://referring-ehr.org",
+  "exp": 1770661634,
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/social-care-referral-v1",
+  "client_binding": {
+    "jwks_uri": "https://foodbank.org/jwks.json"
+  },
   "ticket_context": {
     "subject": {
       "resourceType": "Patient",
@@ -71,21 +76,18 @@
     },
     "capability": {
       "scopes": [
-        "patient/ServiceRequest.read",
-        "patient/ServiceRequest.write",
-        "patient/Task.read",
-        "patient/Task.write"
+        "patient/ServiceRequest.rsu",
+        "patient/Task.rsu"
       ]
     }
   },
-  "iat": 1763678603,
-  "exp": 1763682203
+  "iat": 1770658034
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3JlZmVycmluZy1laHIub3JnIiwic3ViIjoiaHR0cHM6Ly9mb29kYmFuay5vcmcvYXBwcy9pbnRha2UiLCJhdWQiOiJodHRwczovL3JlZmVycmluZy1laHIub3JnIiwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwicmVmZXJlbmNlIjoiUGF0aWVudC8xMjMifSwiYWN0b3IiOnsicmVzb3VyY2VUeXBlIjoiUHJhY3RpdGlvbmVyUm9sZSIsImNvbnRhaW5lZCI6W3sicmVzb3VyY2VUeXBlIjoiUHJhY3RpdGlvbmVyIiwiaWQiOiJwMSIsIm5hbWUiOlt7ImZhbWlseSI6IlZvbHVudGVlciIsImdpdmVuIjpbIkFsaWNlIl19XSwidGVsZWNvbSI6W3sic3lzdGVtIjoiZW1haWwiLCJ2YWx1ZSI6ImFsaWNlQGZvb2RiYW5rLm9yZyJ9XX0seyJyZXNvdXJjZVR5cGUiOiJPcmdhbml6YXRpb24iLCJpZCI6Im8xIiwibmFtZSI6IkRvd250b3duIEZvb2QgQmFuayJ9XSwicHJhY3RpdGlvbmVyIjp7InJlZmVyZW5jZSI6IiNwMSJ9LCJvcmdhbml6YXRpb24iOnsicmVmZXJlbmNlIjoiI28xIn19LCJjb250ZXh0Ijp7InR5cGUiOnsic3lzdGVtIjoiaHR0cDovL3Rlcm1pbm9sb2d5LmhsNy5vcmcvQ29kZVN5c3RlbS92My1BY3RSZWFzb24iLCJjb2RlIjoiUkVGRVIiLCJkaXNwbGF5IjoiUmVmZXJyYWwifSwiZm9jdXMiOnsic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiI3MzM0MjMwMDMiLCJkaXNwbGF5IjoiRm9vZCBpbnNlY3VyaXR5In19LCJjYXBhYmlsaXR5Ijp7InNjb3BlcyI6WyJwYXRpZW50L1NlcnZpY2VSZXF1ZXN0LnJlYWQiLCJwYXRpZW50L1NlcnZpY2VSZXF1ZXN0LndyaXRlIiwicGF0aWVudC9UYXNrLnJlYWQiLCJwYXRpZW50L1Rhc2sud3JpdGUiXX19LCJpYXQiOjE3NjM2Nzg2MDMsImV4cCI6MTc2MzY4MjIwM30.g0f5v-UQOHCC_D0ll_CIFWDypfnXzFfPEtoXIKqKiKkhSqaIovLIGdIDybtwfWMD_xtiicOdrTs1KDQ69GH5eg</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3JlZmVycmluZy1laHIub3JnIiwic3ViIjoiaHR0cHM6Ly9mb29kYmFuay5vcmcvYXBwcy9pbnRha2UiLCJhdWQiOiJodHRwczovL3JlZmVycmluZy1laHIub3JnIiwiZXhwIjoxNzcwNjYxNjM0LCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9zb2NpYWwtY2FyZS1yZWZlcnJhbC12MSIsImNsaWVudF9iaW5kaW5nIjp7Imp3a3NfdXJpIjoiaHR0cHM6Ly9mb29kYmFuay5vcmcvandrcy5qc29uIn0sInRpY2tldF9jb250ZXh0Ijp7InN1YmplY3QiOnsicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsInJlZmVyZW5jZSI6IlBhdGllbnQvMTIzIn0sImFjdG9yIjp7InJlc291cmNlVHlwZSI6IlByYWN0aXRpb25lclJvbGUiLCJjb250YWluZWQiOlt7InJlc291cmNlVHlwZSI6IlByYWN0aXRpb25lciIsImlkIjoicDEiLCJuYW1lIjpbeyJmYW1pbHkiOiJWb2x1bnRlZXIiLCJnaXZlbiI6WyJBbGljZSJdfV0sInRlbGVjb20iOlt7InN5c3RlbSI6ImVtYWlsIiwidmFsdWUiOiJhbGljZUBmb29kYmFuay5vcmcifV19LHsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwiaWQiOiJvMSIsIm5hbWUiOiJEb3dudG93biBGb29kIEJhbmsifV0sInByYWN0aXRpb25lciI6eyJyZWZlcmVuY2UiOiIjcDEifSwib3JnYW5pemF0aW9uIjp7InJlZmVyZW5jZSI6IiNvMSJ9fSwiY29udGV4dCI6eyJ0eXBlIjp7InN5c3RlbSI6Imh0dHA6Ly90ZXJtaW5vbG9neS5obDcub3JnL0NvZGVTeXN0ZW0vdjMtQWN0UmVhc29uIiwiY29kZSI6IlJFRkVSIiwiZGlzcGxheSI6IlJlZmVycmFsIn0sImZvY3VzIjp7InN5c3RlbSI6Imh0dHA6Ly9zbm9tZWQuaW5mby9zY3QiLCJjb2RlIjoiNzMzNDIzMDAzIiwiZGlzcGxheSI6IkZvb2QgaW5zZWN1cml0eSJ9fSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC9TZXJ2aWNlUmVxdWVzdC5yc3UiLCJwYXRpZW50L1Rhc2sucnN1Il19fSwiaWF0IjoxNzcwNjU4MDM0fQ.fsoEj_bd2yO4ENb5rhPl7oed0Fon_bBhgjxnZbGi5iblPLqxGjZ7LMG8B07AyoX0tF0bOhspWQyvzXMojDe5vQ</code></pre>
         </details>
     </div>
 </div>

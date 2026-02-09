@@ -18,6 +18,11 @@
   "iss": "https://trust-broker.org",
   "sub": "https://client-app.example.com/123",
   "aud": "https://network.org",
+  "exp": 1770661634,
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+  "client_binding": {
+    "jwks_uri": "https://client-app.example.com/jwks.json"
+  },
   "ticket_context": {
     "subject": {
       "type": "match",
@@ -36,19 +41,18 @@
     },
     "capability": {
       "scopes": [
-        "patient/Immunization.read",
-        "patient/AllergyIntolerance.read"
+        "patient/Immunization.rs",
+        "patient/AllergyIntolerance.rs"
       ]
     }
   },
-  "iat": 1763678603,
-  "exp": 1763682203
+  "iat": 1770658034
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2NsaWVudC1hcHAuZXhhbXBsZS5jb20vMTIzIiwiYXVkIjoiaHR0cHM6Ly9uZXR3b3JrLm9yZyIsInRpY2tldF9jb250ZXh0Ijp7InN1YmplY3QiOnsidHlwZSI6Im1hdGNoIiwidHJhaXRzIjp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJuYW1lIjpbeyJmYW1pbHkiOiJTbWl0aCIsImdpdmVuIjpbIkpvaG4iXX1dLCJiaXJ0aERhdGUiOiIxOTgwLTAxLTAxIn19LCJjYXBhYmlsaXR5Ijp7InNjb3BlcyI6WyJwYXRpZW50L0ltbXVuaXphdGlvbi5yZWFkIiwicGF0aWVudC9BbGxlcmd5SW50b2xlcmFuY2UucmVhZCJdfX0sImlhdCI6MTc2MzY3ODYwMywiZXhwIjoxNzYzNjgyMjAzfQ.8UPIGoxYMufSgzcHArSou3ZCIAU2SWrPVgitbzKqA8Qv50F18C4VB81_lCVcHn23XgxPSa0IRr5vL2qyppFGOQ</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2NsaWVudC1hcHAuZXhhbXBsZS5jb20vMTIzIiwiYXVkIjoiaHR0cHM6Ly9uZXR3b3JrLm9yZyIsImV4cCI6MTc3MDY2MTYzNCwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvbmV0d29yay1wYXRpZW50LWFjY2Vzcy12MSIsImNsaWVudF9iaW5kaW5nIjp7Imp3a3NfdXJpIjoiaHR0cHM6Ly9jbGllbnQtYXBwLmV4YW1wbGUuY29tL2p3a3MuanNvbiJ9LCJ0aWNrZXRfY29udGV4dCI6eyJzdWJqZWN0Ijp7InR5cGUiOiJtYXRjaCIsInRyYWl0cyI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwibmFtZSI6W3siZmFtaWx5IjoiU21pdGgiLCJnaXZlbiI6WyJKb2huIl19XSwiYmlydGhEYXRlIjoiMTk4MC0wMS0wMSJ9fSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC9JbW11bml6YXRpb24ucnMiLCJwYXRpZW50L0FsbGVyZ3lJbnRvbGVyYW5jZS5ycyJdfX0sImlhdCI6MTc3MDY1ODAzNH0.qHkHptZBnpv5Y_UV9UnaZvw6HFiY2D2cTdqTOvlDirm4f7YUx_7PworWPuHPPTgMvze3KffriheyGh2SKm4tKA</code></pre>
         </details>
     </div>
 </div>

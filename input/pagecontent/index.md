@@ -69,13 +69,14 @@ sequenceDiagram
 #### Transport: SMART Backend Services Profile
 This architecture is a strict profile of **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** (which itself profiles **RFC 7523**).
 
-The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** in a dedicated `https://smarthealthit.org/permission_tickets` claim.
+The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** in a dedicated `https://smarthealthit.org/permission_tickets` claim. Permission Tickets extend authorization context only; they do not alter SMART Backend Services client authentication requirements.
 
 ##### Trust
 
 *   **Automatic Registration**: Clients can be automatically registered using [OpenID Federation 1.0](https://openid.net/specs/openid-federation-1_0.html). The client includes a `trust_chain` in the **header** of its `client_assertion`, allowing the Authorization Server to verify the client's metadata and trust status dynamically.
-*   **Client IDs** MUST be **URL Entity Identifiers** (e.g., `https://app.example.com`).
+*   **Client IDs** SHALL be **URL Entity Identifiers** (e.g., `https://app.example.com`).
 *   Clients SHOULD include a `trust_chain` in their assertion. This allows Data Holders to verify the client's legitimacy via a common Trust Anchor without requiring manual pre-registration of every client.
+*   Client-to-Issuer issuance protocol details are out of scope for this specification; profile-specific guides may define them.
 
 **The Request:**
 ```http
@@ -86,7 +87,7 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=client_credentials
 &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
 &client_assertion=eyJhbGciOiJ... (Signed JWT containing tickets and trust_chain)
-&scope=system/Patient.r
+&scope=patient/Observation.rs
 ```
 
 ##### Full Client Assertion Example
@@ -97,43 +98,63 @@ Here is what the `client_assertion` looks like when decoded. Note the `trust_cha
 #### Artifact: Ticket Structure
 The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticket_context` claim.
 
-```javascript
+```json
 {
-  "iss": "https://trust-broker.org",  // Who vouches for this?
-  "sub": "https://app.client.id",     // Which App can use this?
-  "aud": "https://network.org",       // Where is it valid?
-  "exp": 1710000000,
-  
+  "iss": "https://trust-broker.org",
+  "sub": "issuer-defined-subject",
+  "aud": "https://network.org",
+  "exp": 1735689600,
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/proxy-v1",
+  "client_binding": {
+    "jwks_uri": "https://app.client.id/jwks.json"
+  },
   "ticket_context": {
-    // WHO is the data about? (Uses FHIR Patient shape)
-    "subject": { "resourceType": "Patient", ... },
-
-    // WHO is requesting it? (Uses FHIR Practitioner/Role/Org shapes)
-    // Optional: If missing, implies the App Client is the sole actor.
-    "actor": { "resourceType": "PractitionerRole", ... },
-
-    // WHY is this allowed? (Trigger Context)
-    "context": { 
-      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "REFER" },
-      "focus": { "system": "http://snomed.info/sct", "code": "49436004", "display": "Atrial fibrillation" },
-      
-      // Optional: Issuer-specific identifiers (e.g., Case ID, Referral ID)
-      // Can be used for internal tracking or opaque tokens for the issuing server.
+    "subject": {
+      "resourceType": "Patient"
+    },
+    "actor": {
+      "resourceType": "PractitionerRole"
+    },
+    "context": {
+      "type": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "REFER"
+      },
+      "focus": {
+        "system": "http://snomed.info/sct",
+        "code": "49436004",
+        "display": "Atrial fibrillation"
+      },
       "identifier": [
-        { "system": "https://issuer.org/cases", "value": "CASE-123" }
+        {
+          "system": "https://issuer.org/cases",
+          "value": "CASE-123"
+        }
       ]
     },
-
-    // WHAT data is allowed?
-    "capability": { "scopes": ["patient/*.read"] }
+    "capability": {
+      "scopes": [
+        "patient/*.rs"
+      ]
+    }
   }
 }
 ```
 
 See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal definitions.
 
+#### Ticket Client-Key Binding
+Each Permission Ticket SHALL bind redemption to a client key set using `client_binding`:
+
+- `client_binding.jwks_uri`: HTTPS JWKS URL
+- `client_binding.jwks`: embedded JWK Set
+
+Exactly one of `jwks_uri` or `jwks` SHALL be present.
+
+At token processing time, the Data Holder SHALL validate that the JWK used to verify the `client_assertion` signature is a member of the ticket-bound key set. If `jku` is present in the `client_assertion` header and `client_binding.jwks_uri` is present in the ticket, the two values SHALL be identical.
+
 #### Server-Side Validation
-The Data Holder must perform a two-layer validation:
+The Data Holder SHALL perform a two-layer validation:
 
 1.  **Layer 1: Client Authentication (Standard SMART)**
     *   Verify the `client_assertion` signature using the Client's registered public key (JWK).
@@ -144,7 +165,8 @@ The Data Holder must perform a two-layer validation:
     *   For each ticket:
         *   **Verify Signature:** Use the `iss` (Trust Broker) public key.
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
-        *   **Verify Binding:** Does `ticket.sub` match `assertion.sub` (Client ID)?
+        *   **Verify Type:** `ticket_type` is recognized in the declared profile.
+        *   **Verify Binding:** Does the `client_assertion` signing key match the ticket `client_binding` key set?
     *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `ticket_context.capability` rules.
 
 ---
@@ -158,6 +180,7 @@ The Data Holder calculates granted access through the **intersection** of:
 3. **Client Registration**: Scopes the client is permitted to request
 
 If the intersection yields no valid access, return `invalid_scope` error.
+Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on profile. For single-patient Permission Ticket profiles, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
 
 #### Capability Constraints
 
@@ -165,24 +188,48 @@ The `capability` object defines what access the ticket authorizes:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `scopes` | string[] | SMART scopes (e.g., `patient/*.read`). Wildcard scopes expand to match specific requests. |
-| `periods` | Period[] | Time restrictions. Data Holder SHOULD filter results to resources with relevant dates within these periods. |
-| `locations` | Address[] | Jurisdictional restrictions at **state granularity**. If present, Data Holder SHOULD limit results to data from matching jurisdictions. |
-| `organizations` | Organization[] | Source restrictions. If present, Data Holder SHOULD limit results to data from matching organizations (by identifier or name). |
+| `scopes` | string[] | SMART scopes (e.g., `patient/*.rs`). Wildcard scopes expand to match specific requests. |
+| `periods` | Period[] | Time restrictions. Data Holder SHALL filter results to resources with relevant dates within these periods. |
+| `locations` | Address[] | Jurisdictional restrictions at **state granularity**. If present, Data Holder SHALL limit results to data from matching jurisdictions. |
+| `organizations` | Organization[] | Source restrictions. If present, Data Holder SHALL limit results to data from matching organizations (by identifier or name). |
 
 **Constraint Semantics:**
 - All present constraints are **conjunctive** (AND): data must satisfy all constraints
 - Empty or absent constraint means "no restriction" for that dimension
-- Data Holders that cannot enforce a constraint MUST reject the ticket with `invalid_grant` and `error_description` indicating the unsupported constraint
+- Data Holders that cannot enforce a presented constraint SHALL reject the ticket with `invalid_grant` and `error_description` indicating the unsupported constraint
 
 **Example Capability:**
 ```json
 {
   "capability": {
-    "scopes": ["patient/Condition.read", "patient/Procedure.read"],
-    "periods": [{ "start": "2023-01-01", "end": "2024-12-31" }],
-    "locations": [{ "state": "CA" }, { "state": "NY" }],
-    "organizations": [{ "identifier": [{ "system": "http://hl7.org/fhir/sid/us-npi", "value": "1234567890" }] }]
+    "scopes": [
+      "patient/Condition.rs",
+      "patient/Procedure.rs"
+    ],
+    "periods": [
+      {
+        "start": "2023-01-01",
+        "end": "2024-12-31"
+      }
+    ],
+    "locations": [
+      {
+        "state": "CA"
+      },
+      {
+        "state": "NY"
+      }
+    ],
+    "organizations": [
+      {
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "1234567890"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -200,11 +247,20 @@ A client MAY present multiple tickets in the `permission_tickets` array to compo
 #### Use Case Profiles
 
 Multi-ticket scenarios are defined by **use case profiles**. Each profile specifies:
-- The expected set of tickets (by issuer type or purpose)
-- How tickets are evaluated jointly
-- Which ticket provides which claims (subject, actor, capability, etc.)
+- Required ticket types
+- Required issuer trust requirements per type
+- Claim source mapping (which ticket contributes subject, actor, capability, etc.)
+- Combination logic and validation order
 
-This specification does not define generic combination semantics. Instead, trust frameworks and implementation guides define specific profiles for their use cases.
+The client SHALL assert the profile in the `client_assertion` claim:
+
+```json
+{
+  "https://smarthealthit.org/permission_ticket_profile": "https://smarthealthit.org/permission-ticket-profile/proxy-v1"
+}
+```
+
+Each ticket SHALL assert its own type via `ticket_type` (a URI). The Data Holder SHALL process tickets only according to the declared profile. Unknown profile, unknown ticket type, or profile/type mismatch SHALL be rejected with `invalid_grant`.
 
 #### Example Profiles
 
@@ -218,12 +274,30 @@ Two tickets are required:
 Ticket 1 (Identity Provider - e.g., Clear):
 {
   "iss": "https://clear.me",
-  "sub": "https://health-app.example.com",
+  "sub": "clear-subject-789",
+  "aud": "https://tefca.hhs.gov",
+  "exp": 1735689600,
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/identity-v1",
+  "client_binding": {
+    "jwks_uri": "https://health-app.example.com/jwks.json"
+  },
   "ticket_context": {
     "actor": {
       "resourceType": "RelatedPerson",
-      "identifier": [{ "system": "https://clear.me/id", "value": "CLR-789" }],
-      "name": [{ "family": "Smith", "given": ["Jane"] }]
+      "identifier": [
+        {
+          "system": "https://clear.me/id",
+          "value": "CLR-789"
+        }
+      ],
+      "name": [
+        {
+          "family": "Smith",
+          "given": [
+            "Jane"
+          ]
+        }
+      ]
     }
   }
 }
@@ -231,14 +305,31 @@ Ticket 1 (Identity Provider - e.g., Clear):
 Ticket 2 (Trust Broker):
 {
   "iss": "https://trust-broker.org",
-  "sub": "https://health-app.example.com",
+  "sub": "trust-subject-456",
+  "aud": "https://tefca.hhs.gov",
+  "exp": 1735689600,
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/authorization-v1",
+  "client_binding": {
+    "jwks_uri": "https://health-app.example.com/jwks.json"
+  },
   "ticket_context": {
-    "subject": { "type": "match", "traits": { ... } },
+    "subject": {
+      "type": "match",
+      "traits": {
+        "resourceType": "Patient"
+      }
+    },
     "context": {
-      "type": { "code": "DPOA" },
+      "type": {
+        "code": "DPOA"
+      },
       "actor_reference": "https://clear.me/id|CLR-789"
     },
-    "capability": { "scopes": ["patient/*.read"] }
+    "capability": {
+      "scopes": [
+        "patient/*.rs"
+      ]
+    }
   }
 }
 ```
@@ -255,15 +346,17 @@ A network-level ticket provides baseline access; an additional ticket from a spe
 #### Common Rules
 
 Regardless of profile, these rules always apply:
-- All tickets MUST have identical `sub` (bound to the same client)
-- All tickets MUST be valid for the Data Holder (per audience rules)
-- All issuers MUST be trusted by the Data Holder
+- All tickets SHALL be valid for the Data Holder (per audience rules)
+- All issuers SHALL be trusted by the Data Holder
+- The authenticated `client_assertion` signing key SHALL satisfy each ticket `client_binding`
+- All tickets SHALL match the declared `permission_ticket_profile` rules
 
 ---
 
 ### Audience (`aud`) Validation
 
 The `aud` claim specifies where the ticket is valid. Two modes are supported:
+`aud` for Permission Tickets is intentionally broader than `aud` in `client_assertion` (which remains the token endpoint per SMART Backend Services).
 
 #### Mode 1: Enumerated Recipients
 
@@ -275,7 +368,7 @@ The `aud` is a specific URL or array of URLs:
 { "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"] }
 ```
 
-**Validation:** The Data Holder's base URL MUST exactly match one of the enumerated values.
+**Validation:** The Data Holder's base URL SHALL exactly match one of the enumerated values.
 
 #### Mode 2: Trust Framework
 
@@ -285,7 +378,7 @@ The `aud` references a trust framework identifier:
 { "aud": "https://tefca.hhs.gov" }
 ```
 
-**Validation:** The Data Holder MUST be a verified participant in the referenced trust framework. Verification mechanisms are trust-framework-specific (e.g., the Data Holder's Entity ID appears in the framework's federation).
+**Validation:** The Data Holder SHALL be a verified participant in the referenced trust framework. Verification mechanisms are trust-framework-specific (e.g., the Data Holder's Entity ID appears in the framework's federation).
 
 #### Recommendations
 
@@ -295,7 +388,7 @@ The `aud` references a trust framework identifier:
 | Ticket valid across a network | Trust framework identifier |
 | Ticket for multiple known recipients | Array of Data Holder URLs |
 
-Data Holders MUST reject tickets where `aud` validation fails with error `invalid_grant` and `error_description`: "Ticket audience mismatch".
+Data Holders SHALL reject tickets where `aud` validation fails with error `invalid_grant` and `error_description`: "Ticket audience mismatch".
 
 ---
 
@@ -303,8 +396,8 @@ Data Holders MUST reject tickets where `aud` validation fails with error `invali
 
 #### Validity Period
 
-- Tickets MUST include an `exp` (expiration) claim
-- Data Holders MUST reject expired tickets
+- Tickets SHALL include an `exp` (expiration) claim
+- Data Holders SHALL reject expired tickets
 - Recommended validity periods:
 
 | Use Case | Recommended `exp` |
@@ -341,21 +434,35 @@ Tickets supporting revocation include a `revocation` claim:
 ```json
 {
   "iss": "https://trust-broker.org",
-  "sub": "https://app.example.com",
+  "sub": "issuer-defined-subject",
+  "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/proxy-v1",
+  "client_binding": {
+    "jwks_uri": "https://app.example.com/jwks.json"
+  },
   "jti": "ticket-unique-id",
   "revocation": {
     "url": "https://trust-broker.org/.well-known/crl/patient-access.json",
     "rid": "abc123xyz"
   },
-  "ticket_context": { ... }
+  "ticket_context": {
+    "subject": {
+      "resourceType": "Patient"
+    },
+    "capability": {
+      "scopes": [
+        "patient/*.rs"
+      ]
+    }
+  }
 }
 ```
 
 | Field | Description |
 |-------|-------------|
 | `revocation.url` | URL of the issuer's Credential Revocation List (CRL) for this category of tickets |
-| `revocation.rid` | Revocation identifier for this ticket. MUST be opaque (not contain PII). |
+| `revocation.rid` | Revocation identifier for this ticket. SHALL be opaque (not contain PII). |
 
 **Generating `rid`:** Issuers SHOULD use a one-way transformation to prevent correlation:
 ```
@@ -392,15 +499,16 @@ The entry `"def456uvw.1710460800"` revokes tickets with `rid` = `def456uvw` that
 **Revocation Checking**
 
 *Issuers:*
-- MUST publish CRL at the URL specified in tickets
-- MUST serve CRL over HTTPS
-- MUST increment `ctr` on every update
+- SHALL publish CRL at the URL specified in tickets
+- SHALL serve CRL over HTTPS
+- SHALL increment `ctr` on every update
+- SHOULD provide an integrity-protected CRL representation (for example, signed JSON/JWS)
 
 *Data Holders:*
-- If `revocation` is present in ticket, SHOULD check the CRL
+- If `revocation` is present in ticket, SHALL check the CRL
 - MAY cache CRL responses respecting HTTP cache headers
-- MUST reject tickets whose `rid` appears in the CRL (respecting timestamp suffix if present)
-- If CRL is unavailable, MAY accept ticket (fail-open) or reject (fail-closed) per local policy
+- SHALL reject tickets whose `rid` appears in the CRL (respecting timestamp suffix if present)
+- If CRL status cannot be determined (no valid cache and retrieval failure), SHALL reject the request (fail-closed)
 
 **Grouping for Privacy**
 
@@ -425,7 +533,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (Matched by Demographics: Name, DOB, Identifier).
 *   **Actor:** None (Implicitly the App/Patient).
 *   **Context:** None.
-*   **Capability:** `scopes` = `patient/Immunization.read`, `patient/AllergyIntolerance.read`.
+*   **Capability:** `scopes` = `patient/Immunization.rs`, `patient/AllergyIntolerance.rs`.
 
 {% include signed-tickets/uc1-ticket.html %}
 
@@ -436,7 +544,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (Matched by Identifier).
 *   **Actor:** `RelatedPerson` (Name, Telecom, Relationship Code).
 *   **Context:** None.
-*   **Capability:** `scopes` = `patient/*.read`.
+*   **Capability:** `scopes` = `patient/*.rs`.
 
 {% include signed-tickets/uc2-ticket.html %}
 
@@ -447,7 +555,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (Matched by Hospital ID).
 *   **Actor:** `Organization` (Name, Identifier, Type).
 *   **Context:** `type` = `PUBHLTH` (Public Health), `focus` = `Tuberculosis` (SCT 56717001), `identifier` = Case ID.
-*   **Capability:** `scopes` = `patient/*.read`, `periods` (Start Date).
+*   **Capability:** `scopes` = `patient/*.rs`, `periods` (Start Date).
 
 {% include signed-tickets/uc3-ticket.html %}
 
@@ -458,7 +566,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (Reference).
 *   **Actor:** `PractitionerRole` (Contained `Practitioner` + `Organization`).
 *   **Context:** `type` = `REFER` (Referral), `focus` = `Food insecurity` (SCT 733423003).
-*   **Capability:** `scopes` = `patient/ServiceRequest.read`, `patient/ServiceRequest.write`, `patient/Task.read`, `patient/Task.write`.
+*   **Capability:** `scopes` = `patient/ServiceRequest.rsu`, `patient/Task.rsu`.
 
 {% include signed-tickets/uc4-ticket.html %}
 
@@ -469,7 +577,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (Reference).
 *   **Actor:** `Organization` (Payer NPI).
 *   **Context:** `type` = `CLMATTCH` (Claim Attachment), `focus` = `Appendectomy` (SCT 80146002).
-*   **Capability:** `scopes` = `patient/DocumentReference.read`, `patient/Procedure.read`.
+*   **Capability:** `scopes` = `patient/DocumentReference.rs`, `patient/Procedure.rs`.
 
 {% include signed-tickets/uc5-ticket.html %}
 
@@ -480,7 +588,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (MRN).
 *   **Actor:** `Organization` (Research Institute ID).
 *   **Context:** `type` = `RESCH` (Biomedical Research), `focus` = `Malignant tumor of lung` (SCT 363358000).
-*   **Capability:** `scopes` = `patient/*.read`, `periods` (Start/End Date).
+*   **Capability:** `scopes` = `patient/*.rs`, `periods` (Start/End Date).
 
 {% include signed-tickets/uc6-ticket.html %}
 
@@ -491,7 +599,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** `Patient` (Reference).
 *   **Actor:** `Practitioner` (NPI).
 *   **Context:** `type` = `REFER` (Referral), `focus` = `Atrial fibrillation` (SCT 49436004).
-*   **Capability:** `scopes` = `patient/*.read`.
+*   **Capability:** `scopes` = `patient/*.rs`.
 
 {% include signed-tickets/uc7-ticket.html %}
 
@@ -506,9 +614,15 @@ The following TypeScript interfaces define the structure of the Permission Ticke
 ```typescript
 export interface PermissionTicket {
     iss: string;          // Issuer URL (Trust Broker)
-    sub: string;          // Client ID (App)
-    aud: string;          // Audience (Network/Data Holder)
-    exp?: number;         // Expiration Timestamp
+    sub: string;          // Issuer-defined subject (profile-specific)
+    aud: string;          // Audience (Network/Data Holder set)
+    exp: number;          // Expiration Timestamp
+    ticket_type: string;  // Ticket type URI
+    client_binding: {
+        jwks_uri?: string; // Exactly one of jwks_uri or jwks
+        jwks?: { keys: any[] };
+    };
+    iat?: number;         // Issued-at timestamp
     jti?: string;         // Unique Ticket ID
     revocation?: {
         url: string;      // CRL URL
@@ -560,20 +674,22 @@ export interface ClientAssertion {
     jti: string;          // Unique Assertion ID
     iat?: number;         // Issued-at Timestamp
     exp?: number;         // Expiration Timestamp
+    "https://smarthealthit.org/permission_ticket_profile": string;
     "https://smarthealthit.org/permission_tickets": string[];
 }
 ```
 
 #### Signing Algorithm
 *   **Algorithm:** ES256 (ECDSA using P-256 and SHA-256) is RECOMMENDED. RS256 is also supported.
-*   **Header:** Must include `alg` and `kid` (Key ID) to facilitate key rotation.
+*   **Header:** SHALL include `alg` and `kid` (Key ID) to facilitate key rotation.
 *   **Keys:**
-    *   **Issuer:** Signs the `PermissionTicket`. Public keys must be exposed via a JWK Set URL (e.g., `https://trust-broker.org/.well-known/jwks.json`).
-    *   **Client:** Signs the `ClientAssertion`. Public keys must be registered with the Data Holder or exposed via JWKS.
+    *   **Issuer:** Signs the `PermissionTicket`. Public keys SHALL be exposed via a JWK Set URL (e.g., `https://trust-broker.org/.well-known/jwks.json`).
+    *   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
+*   **Binding:** `PermissionTicket.client_binding` binds redemption to a client key set (`jwks_uri` or embedded `jwks`). Data Holders verify that the `client_assertion` signing key is in that set.
 
 #### Error Responses
 
-When ticket validation fails, the Data Holder MUST return an OAuth 2.0 error response per RFC 6749.
+When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error response per RFC 6749.
 
 | Scenario | `error` | `error_description` |
 |----------|---------|---------------------|
@@ -583,8 +699,10 @@ When ticket validation fails, the Data Holder MUST return an OAuth 2.0 error res
 | Issuer not trusted | `invalid_grant` | "Ticket issuer not trusted: {iss}" |
 | Issuer JWKS unavailable | `invalid_grant` | "Unable to retrieve issuer keys" |
 | Ticket expired | `invalid_grant` | "Ticket expired" |
-| `sub` mismatch | `invalid_grant` | "Ticket not bound to this client" |
+| Client key binding mismatch | `invalid_grant` | "Ticket not bound to client key" |
 | `aud` mismatch | `invalid_grant` | "Ticket not valid for this server" |
+| Unknown profile | `invalid_grant` | "Unsupported permission ticket profile" |
+| Profile/ticket type mismatch | `invalid_grant` | "Ticket type not valid for profile" |
 | Subject not resolvable | `invalid_grant` | "Unable to resolve ticket subject" |
 | Ticket revoked | `invalid_grant` | "Ticket has been revoked" |
 | Unsupported constraint | `invalid_grant` | "Unsupported capability constraint: {field}" |
@@ -594,22 +712,24 @@ When ticket validation fails, the Data Holder MUST return an OAuth 2.0 error res
 
 ### Conformance
 
-This section defines requirements using RFC 2119 keywords (MUST, SHOULD, MAY).
+This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 
 #### Data Holder Requirements
 
-**MUST:**
+**SHALL:**
 - Accept `https://smarthealthit.org/permission_tickets` claim in client assertions
+- Accept `https://smarthealthit.org/permission_ticket_profile` claim in client assertions
 - Validate client assertion per SMART Backend Services
-- For each ticket: verify signature, `sub` binding, `aud`, and `exp`
+- For each ticket: verify signature, `ticket_type`, `client_binding`, `aud`, and `exp`
 - Calculate granted scopes as intersection of requested, ticket capability, and client registration
+- Enforce all presented `capability` constraints (`scopes`, `periods`, `locations`, `organizations`) or reject with `invalid_grant`
+- If `revocation` is present, perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request
 - Return appropriate error codes on validation failure
 
 **SHOULD:**
 - Cache issuer JWKS with appropriate TTL
+- Cache revocation responses per HTTP cache headers
 - Log `ticket_context.actor` and `ticket_context.context` for audit trail
-- Enforce `capability.periods`, `capability.locations`, `capability.organizations`
-- Check revocation lists when `revocation` is present
 
 **MAY:**
 - Support trust framework audience validation
@@ -617,23 +737,25 @@ This section defines requirements using RFC 2119 keywords (MUST, SHOULD, MAY).
 
 #### Client Requirements
 
-**MUST:**
+**SHALL:**
 - Include tickets as an array in `https://smarthealthit.org/permission_tickets` claim
+- Include profile identifier in `https://smarthealthit.org/permission_ticket_profile`
 - Sign client assertion with registered or federated key
 - Use identical value for `iss` and `sub` in client assertion (the Client ID URL)
 
 **SHOULD:**
 - Request only scopes authorized by held tickets
+- For single-patient profiles, request SMART v2 CRUDS suffix scopes (for example `patient/Observation.rs`)
 - Include `jti` in client assertion for replay protection
 - Refresh tickets before expiration for continued access
 
 #### Issuer Requirements
 
-**MUST:**
+**SHALL:**
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
-- Include claims: `iss`, `sub`, `aud`, `exp`, `ticket_context`
-- Bind each ticket to a specific client via `sub`
-- If supporting revocation: publish CRL at the URL specified in tickets
+- Include claims: `iss`, `sub`, `aud`, `exp`, `ticket_type`, `client_binding`, `ticket_context`
+- Bind each ticket to a specific client key set via `client_binding` (`jwks_uri` or `jwks`)
+- If `revocation` is present, publish CRL at the URL specified in tickets
 
 **SHOULD:**
 - Include `jti` for unique ticket identification

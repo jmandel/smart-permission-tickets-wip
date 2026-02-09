@@ -18,9 +18,10 @@ const config: TJS.Config = {
 const schema = TJS.createGenerator(config).createSchema(config.type);
 const validate = ajv.compile(schema);
 
-const OUTPUT_DIR = path.join(__dirname, '../input/images/signed-tickets');
+const OUTPUT_DIR = path.join(__dirname, '../input/examples/signed-tickets');
 const INCLUDES_DIR = path.join(__dirname, '../input/includes/signed-tickets');
 const KEYS_DIR = path.join(__dirname, 'keys');
+const DEFAULT_EXP = Math.floor(Date.now() / 1000) + 3600;
 
 // Ensure output directories exist
 if (!fs.existsSync(OUTPUT_DIR)) {
@@ -47,11 +48,12 @@ async function loadKey(filename: string): Promise<jose.KeyLike & { kid?: string 
 }
 
 async function signTicket(payload: PermissionTicket, key: jose.KeyLike & { kid?: string }) {
-    return new jose.SignJWT(payload as any) // Cast to any for jose compatibility
-        .setProtectedHeader({ alg: 'ES256', kid: key.kid })
-        .setIssuedAt()
-        .setExpirationTime('1h')
-        .sign(key);
+    const jwt = new jose.SignJWT(payload as any) // Cast to any for jose compatibility
+        .setProtectedHeader({ alg: 'ES256', kid: key.kid });
+    if (!payload.iat) {
+        jwt.setIssuedAt();
+    }
+    return jwt.sign(key);
 }
 
 async function signClientAssertion(payload: ClientAssertion, key: jose.KeyLike & { kid?: string }, trust_chain?: string[]) {
@@ -69,6 +71,11 @@ const uc1_payload: PermissionTicket = {
     iss: "https://trust-broker.org",
     sub: "https://client-app.example.com/123",
     aud: "https://network.org",
+    exp: DEFAULT_EXP,
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+    client_binding: {
+        jwks_uri: "https://client-app.example.com/jwks.json"
+    },
     ticket_context: {
         subject: {
             type: "match",
@@ -79,7 +86,7 @@ const uc1_payload: PermissionTicket = {
             }
         },
         capability: {
-            scopes: ["patient/Immunization.read", "patient/AllergyIntolerance.read"]
+            scopes: ["patient/Immunization.rs", "patient/AllergyIntolerance.rs"]
         }
     }
 };
@@ -89,6 +96,11 @@ const uc2_payload: PermissionTicket = {
     iss: "https://trust-broker.org",
     sub: "https://client-app.example.com/456",
     aud: "https://network.org",
+    exp: DEFAULT_EXP,
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/authorized-representative-v1",
+    client_binding: {
+        jwks_uri: "https://client-app.example.com/jwks.json"
+    },
     ticket_context: {
         subject: {
             resourceType: "Patient",
@@ -107,7 +119,7 @@ const uc2_payload: PermissionTicket = {
             }]
         },
         capability: {
-            scopes: ["patient/*.read", "patient/*.search"]
+            scopes: ["patient/*.rs"]
         }
     }
 };
@@ -117,6 +129,11 @@ const uc3_payload: PermissionTicket = {
     iss: "https://hospital-a.com",
     sub: "https://pha.gov/apps/report-client",
     aud: "https://hospital-a.com",
+    exp: DEFAULT_EXP,
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1",
+    client_binding: {
+        jwks_uri: "https://pha.gov/jwks.json"
+    },
     ticket_context: {
         subject: {
             resourceType: "Patient",
@@ -134,7 +151,7 @@ const uc3_payload: PermissionTicket = {
             identifier: [{ system: "https://doh.wa.gov/cases", value: "CASE-2024-999" }]
         },
         capability: {
-            scopes: ["patient/*.read"],
+            scopes: ["patient/*.rs"],
             periods: [{
                 start: "2025-01-01",
                 end: "2026-01-01"
@@ -148,6 +165,11 @@ const uc4_payload: PermissionTicket = {
     iss: "https://referring-ehr.org",
     sub: "https://foodbank.org/apps/intake",
     aud: "https://referring-ehr.org",
+    exp: DEFAULT_EXP,
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/social-care-referral-v1",
+    client_binding: {
+        jwks_uri: "https://foodbank.org/jwks.json"
+    },
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/123" },
         actor: {
@@ -173,7 +195,7 @@ const uc4_payload: PermissionTicket = {
             focus: { system: "http://snomed.info/sct", code: "733423003", display: "Food insecurity" }
         },
         capability: {
-            scopes: ["patient/ServiceRequest.read", "patient/ServiceRequest.write", "patient/Task.read", "patient/Task.write"]
+            scopes: ["patient/ServiceRequest.rsu", "patient/Task.rsu"]
         }
     }
 };
@@ -183,6 +205,11 @@ const uc5_payload: PermissionTicket = {
     iss: "https://provider.com",
     sub: "https://payer.com/apps/claims-processor",
     aud: "https://provider.com",
+    exp: DEFAULT_EXP,
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1",
+    client_binding: {
+        jwks_uri: "https://payer.com/jwks.json"
+    },
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/456" },
         actor: {
@@ -195,7 +222,7 @@ const uc5_payload: PermissionTicket = {
             focus: { system: "http://snomed.info/sct", code: "80146002", display: "Appendectomy" }
         },
         capability: {
-            scopes: ["patient/DocumentReference.read", "patient/Procedure.read"]
+            scopes: ["patient/DocumentReference.rs", "patient/Procedure.rs"]
         }
     }
 };
@@ -205,6 +232,11 @@ const uc6_payload: PermissionTicket = {
     iss: "https://consent-platform.org",
     sub: "https://research.org/studies/lung-cancer/app",
     aud: "https://hospital.com",
+    exp: DEFAULT_EXP,
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/research-study-v1",
+    client_binding: {
+        jwks_uri: "https://research.org/jwks.json"
+    },
     ticket_context: {
         subject: { resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
         actor: {
@@ -217,7 +249,7 @@ const uc6_payload: PermissionTicket = {
             focus: { system: "http://snomed.info/sct", code: "363358000", display: "Malignant tumor of lung" }
         },
         capability: {
-            scopes: ["patient/*.read"],
+            scopes: ["patient/*.rs"],
             periods: [{
                 start: "2020-01-01",
                 end: "2025-01-01"
@@ -231,6 +263,11 @@ const uc7_payload: PermissionTicket = {
     iss: "https://referring-ehr.org",
     sub: "https://specialist-clinic.org/apps/referral-viewer",
     aud: "https://referring-ehr.org",
+    exp: DEFAULT_EXP,
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
+    client_binding: {
+        jwks_uri: "https://specialist-clinic.org/jwks.json"
+    },
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/999" },
         actor: {
@@ -243,7 +280,7 @@ const uc7_payload: PermissionTicket = {
             focus: { system: "http://snomed.info/sct", code: "49436004", display: "Atrial fibrillation" }
         },
         capability: {
-            scopes: ["patient/*.read"]
+            scopes: ["patient/*.rs"]
         }
     }
 };
@@ -288,10 +325,15 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
         iss: "https://trust-broker.org",
         sub: "https://app.client.id",
         aud: "https://network.org",
+        exp: DEFAULT_EXP,
+        ticket_type: "https://smarthealthit.org/permission-ticket-type/example-v1",
+        client_binding: {
+            jwks_uri: "https://app.client.id/jwks.json"
+        },
         ticket_context: {
             subject: { resourceType: "Patient", id: "123" },
             capability: {
-                scopes: ["patient/*.read"]
+                scopes: ["patient/*.rs"]
             }
         }
     };
@@ -320,6 +362,7 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
         jti: "assertion-jti-123",
         iat: now,
         exp: now + 300,
+        "https://smarthealthit.org/permission_ticket_profile": "https://smarthealthit.org/permission-ticket-profile/single-patient-v1",
         "https://smarthealthit.org/permission_tickets": [signedTicket]
     };
 
@@ -347,16 +390,6 @@ async function saveDecodedJWT(jwtPath: string, title: string) {
     const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString());
     const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
 
-    const decoded = {
-        header,
-        payload,
-        signature: parts[2]
-    };
-
-    const jsonPath = jwtPath.replace('.jwt', '.decoded.json');
-    fs.writeFileSync(jsonPath, JSON.stringify(decoded, null, 2));
-    console.log(`Saved decoded JSON: ${path.basename(jsonPath)}`);
-
     // Also generate static HTML viewer
     const template = fs.readFileSync(path.join(__dirname, '../input/includes/static-jwt-viewer.html'), 'utf-8');
     const html = template
@@ -365,9 +398,11 @@ async function saveDecodedJWT(jwtPath: string, title: string) {
         .replace('{{payload-json}}', JSON.stringify(payload, null, 2))
         .replace('{{raw-jwt}}', jwt);
 
-    const htmlPath = path.join(INCLUDES_DIR, path.basename(jwtPath).replace('.jwt', '.html'));
-    fs.writeFileSync(htmlPath, html);
-    console.log(`Saved static HTML: ${path.basename(htmlPath)}`);
+    const htmlFilename = path.basename(jwtPath).replace('.jwt', '.html');
+    const includeHtmlPath = path.join(INCLUDES_DIR, htmlFilename);
+    fs.writeFileSync(includeHtmlPath, html);
+    console.log(`Saved static HTML: ${path.basename(includeHtmlPath)}`);
+
 }
 
 generate().catch(console.error);

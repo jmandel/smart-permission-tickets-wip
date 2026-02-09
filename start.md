@@ -54,30 +54,45 @@ grant_type=client_credentials
 ### B. The Artifact: Ticket Structure
 The ticket payload wraps standard FHIR JSON objects.
 
-```javascript
+```json
 {
-  "iss": "https://trust-broker.org",  // Who vouches for this?
-  "sub": "https://app.client.id",     // Which App can use this?
-  "aud": "https://network.org",       // Where is it valid?
-  "exp": 1710000000,
-  
+  "iss": "https://trust-broker.org",
+  "sub": "issuer-defined-subject",
+  "aud": "https://network.org",
+  "exp": 1735689600,
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/single-patient-v1",
+  "client_binding": {
+    "jwks_uri": "https://app.client.id/jwks.json"
+  },
   "ticket_context": {
-    // WHO is the data about? (Uses FHIR Patient shape)
-    "subject": { "resourceType": "Patient", ... }, // Patient can be matched traits or direct reference
-
-    // WHO is requesting it? (Uses FHIR Practitioner/Role/Org shapes)
-    // Optional: If missing, implies the App Client is the sole actor.
-    "actor": { "resourceType": "PractitionerRole", ... },
-
-    // WHY is this allowed? (Trigger Context)
-    "context": { 
-      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "REFER" },
-      "focus": { "system": "http://snomed.info/sct", "code": "49436004", "display": "Atrial fibrillation" },
-      "identifier": [ { "system": "https://issuer.org/cases", "value": "CASE-123" } ]
+    "subject": {
+      "resourceType": "Patient"
     },
-
-    // WHAT data is allowed?
-    "capability": { "scopes": ["patient/Immunization.read", "patient/Condition.read"] }
+    "actor": {
+      "resourceType": "PractitionerRole"
+    },
+    "context": {
+      "type": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "REFER"
+      },
+      "focus": {
+        "system": "http://snomed.info/sct",
+        "code": "49436004",
+        "display": "Atrial fibrillation"
+      },
+      "identifier": [
+        {
+          "system": "https://issuer.org/cases",
+          "value": "CASE-123"
+        }
+      ]
+    },
+    "capability": {
+      "scopes": [
+        "patient/*.rs"
+      ]
+    }
   }
 }
 ```
@@ -96,23 +111,34 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Constraint:** Granular scope (Immunizations only).
 
 ```json
-// Ticket Payload
 {
   "ticket_context": {
     "subject": {
       "type": "match",
       "traits": {
         "resourceType": "Patient",
-        "name": [{ "family": "Smith", "given": ["John"] }],
+        "name": [
+          {
+            "family": "Smith",
+            "given": [
+              "John"
+            ]
+          }
+        ],
         "birthDate": "1980-01-01",
-        "identifier": [{ 
-          "system": "urn:oid:2.16.840.1.113883.4.1", 
-          "value": "000-00-0000" 
-        }]
+        "identifier": [
+          {
+            "system": "urn:oid:2.16.840.1.113883.4.1",
+            "value": "000-00-0000"
+          }
+        ]
       }
     },
     "capability": {
-      "scopes": ["patient/Immunization.read", "patient/AllergyIntolerance.read"]
+      "scopes": [
+        "patient/Immunization.rs",
+        "patient/AllergyIntolerance.rs"
+      ]
     }
   }
 }
@@ -125,26 +151,50 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Actor:** The Daughter (`RelatedPerson`).
 
 ```json
-// Ticket Payload
 {
   "ticket_context": {
     "subject": {
       "resourceType": "Patient",
-      "identifier": [{ "system": "https://national-mpi.net", "value": "pt-555" }]
+      "identifier": [
+        {
+          "system": "https://national-mpi.net",
+          "value": "pt-555"
+        }
+      ]
     },
     "actor": {
       "resourceType": "RelatedPerson",
-      "name": [{ "family": "Doe", "given": ["Jane"] }],
-      "telecom": [{ "system": "email", "value": "jane.doe@example.com" }],
-      "relationship": [{
-        "coding": [{ 
-          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode", 
-          "code": "DAU", 
-          "display": "Daughter"
-        }]
-      }]
+      "name": [
+        {
+          "family": "Doe",
+          "given": [
+            "Jane"
+          ]
+        }
+      ],
+      "telecom": [
+        {
+          "system": "email",
+          "value": "jane.doe@example.com"
+        }
+      ],
+      "relationship": [
+        {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+              "code": "DAU",
+              "display": "Daughter"
+            }
+          ]
+        }
+      ]
     },
-    "capability": { "scopes": ["patient/*.read", "patient/*.search"] }
+    "capability": {
+      "scopes": [
+        "patient/*.rs"
+      ]
+    }
   }
 }
 ```
@@ -157,27 +207,60 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** The specific Case ID.
 
 ```json
-// Ticket Payload
 {
   "ticket_context": {
     "subject": {
       "resourceType": "Patient",
-      "id": "local-patient-123" // Hospital knows its own ID
+      "id": "local-patient-123"
     },
     "actor": {
       "resourceType": "Organization",
       "name": "State Dept of Health",
-      "identifier": [{ "system": "urn:ietf:rfc:3986", "value": "https://doh.state.gov" }],
-      "type": [{ "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/organization-type", "code": "govt" }] }]
+      "identifier": [
+        {
+          "system": "urn:ietf:rfc:3986",
+          "value": "https://doh.state.gov"
+        }
+      ],
+      "type": [
+        {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/organization-type",
+              "code": "govt"
+            }
+          ]
+        }
+      ]
     },
     "context": {
-      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "PUBHLTH", "display": "Public Health" },
-      "focus": { "system": "http://snomed.info/sct", "code": "56717001", "display": "Tuberculosis" },
-      "identifier": [{ "system": "https://doh.wa.gov/cases", "value": "CASE-2024-999" }]
+      "type": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "PUBHLTH",
+        "display": "Public Health"
+      },
+      "focus": {
+        "system": "http://snomed.info/sct",
+        "code": "56717001",
+        "display": "Tuberculosis"
+      },
+      "identifier": [
+        {
+          "system": "https://doh.wa.gov/cases",
+          "value": "CASE-2024-999"
+        }
+      ]
     },
     "capability": {
-      "scopes": ["patient/*.read"],
-      "periods": [{ "start": "2025-01-01", "end": "2026-01-01" }]
+      "scopes": [
+        "patient/*.rs"
+      ],
+      "periods": [
+        {
+          "start": "2025-01-01",
+          "end": "2026-01-01"
+        }
+      ]
     }
   }
 }
@@ -190,18 +273,32 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Actor:** A Volunteer (`PractitionerRole`) with identity embedded via **FHIR `contained`**.
 
 ```json
-// Ticket Payload
 {
   "ticket_context": {
-    "subject": { "resourceType": "Patient", "reference": "Patient/123" },
+    "subject": {
+      "resourceType": "Patient",
+      "reference": "Patient/123"
+    },
     "actor": {
       "resourceType": "PractitionerRole",
       "contained": [
         {
           "resourceType": "Practitioner",
           "id": "p1",
-          "name": [{ "family": "Volunteer", "given": ["Alice"] }],
-          "telecom": [{ "system": "email", "value": "alice@foodbank.org" }]
+          "name": [
+            {
+              "family": "Volunteer",
+              "given": [
+                "Alice"
+              ]
+            }
+          ],
+          "telecom": [
+            {
+              "system": "email",
+              "value": "alice@foodbank.org"
+            }
+          ]
         },
         {
           "resourceType": "Organization",
@@ -209,16 +306,36 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
           "name": "Downtown Food Bank"
         }
       ],
-      "practitioner": { "reference": "#p1" },
-      "organization": { "reference": "#o1" }
+      "practitioner": {
+        "reference": "#p1"
+      },
+      "organization": {
+        "reference": "#o1"
+      }
     },
     "context": {
-      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "REFER", "display": "Referral" },
-      "focus": { "system": "http://snomed.info/sct", "code": "733423003", "display": "Food insecurity" },
-      "identifier": [{ "system": "https://referring-ehr.org/referrals", "value": "REF-555" }]
+      "type": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "REFER",
+        "display": "Referral"
+      },
+      "focus": {
+        "system": "http://snomed.info/sct",
+        "code": "733423003",
+        "display": "Food insecurity"
+      },
+      "identifier": [
+        {
+          "system": "https://referring-ehr.org/referrals",
+          "value": "REF-555"
+        }
+      ]
     },
     "capability": {
-      "scopes": ["patient/ServiceRequest.read", "patient/ServiceRequest.write", "patient/Task.read", "patient/Task.write"]
+      "scopes": [
+        "patient/ServiceRequest.rsu",
+        "patient/Task.rsu"
+      ]
     }
   }
 }
@@ -231,22 +348,45 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** The Claim ID.
 
 ```json
-// Ticket Payload
 {
   "ticket_context": {
-    "subject": { "resourceType": "Patient", "reference": "Patient/456" },
+    "subject": {
+      "resourceType": "Patient",
+      "reference": "Patient/456"
+    },
     "actor": {
       "resourceType": "Organization",
-      "identifier": [{ "system": "http://hl7.org/fhir/sid/us-npi", "value": "9876543210" }], // Payer NPI
+      "identifier": [
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "value": "9876543210"
+        }
+      ],
       "name": "Blue Payer Inc"
     },
     "context": {
-      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "CLMATTCH", "display": "Claim Attachment" },
-      "focus": { "system": "http://snomed.info/sct", "code": "80146002", "display": "Appendectomy" },
-      "identifier": [{ "system": "http://provider.com/claims", "value": "CLAIM-2024-XYZ" }]
+      "type": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "CLMATTCH",
+        "display": "Claim Attachment"
+      },
+      "focus": {
+        "system": "http://snomed.info/sct",
+        "code": "80146002",
+        "display": "Appendectomy"
+      },
+      "identifier": [
+        {
+          "system": "http://provider.com/claims",
+          "value": "CLAIM-2024-XYZ"
+        }
+      ]
     },
     "capability": {
-      "scopes": ["patient/DocumentReference.read", "patient/Procedure.read"]
+      "scopes": [
+        "patient/DocumentReference.rs",
+        "patient/Procedure.rs"
+      ]
     }
   }
 }
@@ -259,23 +399,53 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** Research Study + Consent Evidence.
 
 ```json
-// Ticket Payload
 {
   "ticket_context": {
-    "subject": { "resourceType": "Patient", "identifier": [{ "value": "MRN-123" }] },
+    "subject": {
+      "resourceType": "Patient",
+      "identifier": [
+        {
+          "value": "MRN-123"
+        }
+      ]
+    },
     "actor": {
       "resourceType": "Organization",
       "name": "Oncology Research Institute",
-      "identifier": [{ "value": "research-org-id" }]
+      "identifier": [
+        {
+          "value": "research-org-id"
+        }
+      ]
     },
     "context": {
-      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "RESCH", "display": "Biomedical Research" },
-      "focus": { "system": "http://snomed.info/sct", "code": "363358000", "display": "Malignant tumor of lung" },
-      "identifier": [{ "system": "https://consent-service.org/studies", "value": "STUDY-PROTO-22" }]
+      "type": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "RESCH",
+        "display": "Biomedical Research"
+      },
+      "focus": {
+        "system": "http://snomed.info/sct",
+        "code": "363358000",
+        "display": "Malignant tumor of lung"
+      },
+      "identifier": [
+        {
+          "system": "https://consent-service.org/studies",
+          "value": "STUDY-PROTO-22"
+        }
+      ]
     },
     "capability": {
-      "scopes": ["patient/*.read"],
-      "periods": [{ "start": "2020-01-01", "end": "2025-01-01" }]
+      "scopes": [
+        "patient/*.rs"
+      ],
+      "periods": [
+        {
+          "start": "2020-01-01",
+          "end": "2025-01-01"
+        }
+      ]
     }
   }
 }
@@ -287,21 +457,52 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Actor:** The Specialist (`Practitioner`).
 
 ```json
-// Ticket Payload
 {
   "ticket_context": {
-    "subject": { "resourceType": "Patient", "reference": "Patient/999" },
+    "subject": {
+      "resourceType": "Patient",
+      "reference": "Patient/999"
+    },
     "actor": {
       "resourceType": "Practitioner",
-      "identifier": [{ "system": "http://hl7.org/fhir/sid/us-npi", "value": "1112223333" }], // Specialist NPI
-      "name": [{ "family": "Heart", "given": ["A."] }]
+      "identifier": [
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "value": "1112223333"
+        }
+      ],
+      "name": [
+        {
+          "family": "Heart",
+          "given": [
+            "A."
+          ]
+        }
+      ]
     },
     "context": {
-      "type": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason", "code": "REFER", "display": "Referral" },
-      "focus": { "system": "http://snomed.info/sct", "code": "49436004", "display": "Atrial fibrillation" },
-      "identifier": [{ "system": "https://referring-ehr.org/requests", "value": "ref-req-111" }]
+      "type": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "REFER",
+        "display": "Referral"
+      },
+      "focus": {
+        "system": "http://snomed.info/sct",
+        "code": "49436004",
+        "display": "Atrial fibrillation"
+      },
+      "identifier": [
+        {
+          "system": "https://referring-ehr.org/requests",
+          "value": "ref-req-111"
+        }
+      ]
     },
-    "capability": { "scopes": ["patient/*.read"] }
+    "capability": {
+      "scopes": [
+        "patient/*.rs"
+      ]
+    }
   }
 }
 ```
