@@ -93,53 +93,12 @@ grant_type=client_credentials
 ##### Full Client Assertion Example
 Here is what the `client_assertion` looks like when decoded. Note the `trust_chain` for automatic registration and the embedded `ticket_context`.
 
-{% include signed-tickets/example-client-assertion.html %}
+{% include generated/signed-tickets/example-client-assertion.html %}
 
 #### Artifact: Ticket Structure
 The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticket_context` claim.
 
-```json
-{
-  "iss": "https://trust-broker.org",
-  "sub": "issuer-defined-subject",
-  "aud": "https://network.org",
-  "exp": 1735689600,
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/proxy-v1",
-  "client_binding": {
-    "jwks_uri": "https://app.client.id/jwks.json"
-  },
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient"
-    },
-    "actor": {
-      "resourceType": "PractitionerRole"
-    },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "REFER"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "49436004",
-        "display": "Atrial fibrillation"
-      },
-      "identifier": [
-        {
-          "system": "https://issuer.org/cases",
-          "value": "CASE-123"
-        }
-      ]
-    },
-    "capability": {
-      "scopes": [
-        "patient/*.rs"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/index/artifact-ticket.json.md %}
 
 See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal definitions.
 
@@ -199,40 +158,7 @@ The `capability` object defines what access the ticket authorizes:
 - Data Holders that cannot enforce a presented constraint SHALL reject the ticket with `invalid_grant` and `error_description` indicating the unsupported constraint
 
 **Example Capability:**
-```json
-{
-  "capability": {
-    "scopes": [
-      "patient/Condition.rs",
-      "patient/Procedure.rs"
-    ],
-    "periods": [
-      {
-        "start": "2023-01-01",
-        "end": "2024-12-31"
-      }
-    ],
-    "locations": [
-      {
-        "state": "CA"
-      },
-      {
-        "state": "NY"
-      }
-    ],
-    "organizations": [
-      {
-        "identifier": [
-          {
-            "system": "http://hl7.org/fhir/sid/us-npi",
-            "value": "1234567890"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+{% include generated/spec-snippets/index/capability-example.json.md %}
 This ticket authorizes read access to Conditions and Procedures, but only for data:
 - With dates in 2023-2024
 - From California or New York
@@ -254,11 +180,7 @@ Multi-ticket scenarios are defined by **use case profiles**. Each profile specif
 
 The client SHALL assert the profile in the `client_assertion` claim:
 
-```json
-{
-  "https://smarthealthit.org/permission_ticket_profile": "https://smarthealthit.org/permission-ticket-profile/proxy-v1"
-}
-```
+{% include generated/spec-snippets/index/profile-claim.json.md %}
 
 Each ticket SHALL assert its own type via `ticket_type` (a URI). The Data Holder SHALL process tickets only according to the declared profile. Unknown profile, unknown ticket type, or profile/type mismatch SHALL be rejected with `invalid_grant`.
 
@@ -270,69 +192,7 @@ Two tickets are required:
 1. **Identity Ticket** (from Identity Provider): Contains verified `actor` identity
 2. **Authorization Ticket** (from Trust Broker): Contains `subject`, `capability`, and a reference linking to the actor
 
-```
-Ticket 1 (Identity Provider - e.g., Clear):
-{
-  "iss": "https://clear.me",
-  "sub": "clear-subject-789",
-  "aud": "https://tefca.hhs.gov",
-  "exp": 1735689600,
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/identity-v1",
-  "client_binding": {
-    "jwks_uri": "https://health-app.example.com/jwks.json"
-  },
-  "ticket_context": {
-    "actor": {
-      "resourceType": "RelatedPerson",
-      "identifier": [
-        {
-          "system": "https://clear.me/id",
-          "value": "CLR-789"
-        }
-      ],
-      "name": [
-        {
-          "family": "Smith",
-          "given": [
-            "Jane"
-          ]
-        }
-      ]
-    }
-  }
-}
-
-Ticket 2 (Trust Broker):
-{
-  "iss": "https://trust-broker.org",
-  "sub": "trust-subject-456",
-  "aud": "https://tefca.hhs.gov",
-  "exp": 1735689600,
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/authorization-v1",
-  "client_binding": {
-    "jwks_uri": "https://health-app.example.com/jwks.json"
-  },
-  "ticket_context": {
-    "subject": {
-      "type": "match",
-      "traits": {
-        "resourceType": "Patient"
-      }
-    },
-    "context": {
-      "type": {
-        "code": "DPOA"
-      },
-      "actor_reference": "https://clear.me/id|CLR-789"
-    },
-    "capability": {
-      "scopes": [
-        "patient/*.rs"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/index/profile-identity-authorization.md %}
 
 The Data Holder, implementing this profile:
 1. Validates both tickets independently
@@ -362,11 +222,7 @@ The `aud` claim specifies where the ticket is valid. Two modes are supported:
 
 The `aud` is a specific URL or array of URLs:
 
-```json
-{ "aud": "https://fhir.hospital.com" }
-// or
-{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"] }
-```
+{% include generated/spec-snippets/index/aud-enumerated.json.md %}
 
 **Validation:** The Data Holder's base URL SHALL exactly match one of the enumerated values.
 
@@ -374,9 +230,7 @@ The `aud` is a specific URL or array of URLs:
 
 The `aud` references a trust framework identifier:
 
-```json
-{ "aud": "https://tefca.hhs.gov" }
-```
+{% include generated/spec-snippets/index/aud-framework.json.md %}
 
 **Validation:** The Data Holder SHALL be a verified participant in the referenced trust framework. Verification mechanisms are trust-framework-specific (e.g., the Data Holder's Entity ID appears in the framework's federation).
 
@@ -431,33 +285,7 @@ Issuers MAY support revocation of individual tickets before expiration.
 
 Tickets supporting revocation include a `revocation` claim:
 
-```json
-{
-  "iss": "https://trust-broker.org",
-  "sub": "issuer-defined-subject",
-  "aud": "https://tefca.hhs.gov",
-  "exp": 1735689600,
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/proxy-v1",
-  "client_binding": {
-    "jwks_uri": "https://app.example.com/jwks.json"
-  },
-  "jti": "ticket-unique-id",
-  "revocation": {
-    "url": "https://trust-broker.org/.well-known/crl/patient-access.json",
-    "rid": "abc123xyz"
-  },
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient"
-    },
-    "capability": {
-      "scopes": [
-        "patient/*.rs"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/index/revocation-ticket.json.md %}
 
 | Field | Description |
 |-------|-------------|
@@ -473,17 +301,7 @@ rid = base64url(hmac-sha-256(issuer_secret || kid, ticket_jti)[0:8])
 
 The CRL is a JSON file served at the URL specified in the ticket:
 
-```json
-{
-  "kid": "issuer-signing-key-id",
-  "method": "rid",
-  "ctr": 42,
-  "rids": [
-    "abc123xyz",
-    "def456uvw.1710460800"
-  ]
-}
-```
+{% include generated/spec-snippets/index/revocation-list.json.md %}
 
 | Field | Description |
 |-------|-------------|
@@ -535,7 +353,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** None.
 *   **Capability:** `scopes` = `patient/Immunization.rs`, `patient/AllergyIntolerance.rs`.
 
-{% include signed-tickets/uc1-ticket.html %}
+{% include generated/signed-tickets/uc1-ticket.html %}
 
 #### Use Case 2: Authorized Representative (Proxy)
 *An adult daughter accesses her elderly mother's records. The relationship is verified by a Trust Broker, not the Hospital.*
@@ -546,7 +364,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** None.
 *   **Capability:** `scopes` = `patient/*.rs`.
 
-{% include signed-tickets/uc2-ticket.html %}
+{% include generated/signed-tickets/uc2-ticket.html %}
 
 #### Use Case 3: Public Health Investigation
 *A Hospital creates a Case Report. The Public Health Agency (PHA) uses the report as a ticket to query for follow-up data.*
@@ -557,7 +375,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `PUBHLTH` (Public Health), `focus` = `Tuberculosis` (SCT 56717001), `identifier` = Case ID.
 *   **Capability:** `scopes` = `patient/*.rs`, `periods` (Start Date).
 
-{% include signed-tickets/uc3-ticket.html %}
+{% include generated/signed-tickets/uc3-ticket.html %}
 
 #### Use Case 4: Social Care (CBO) Referral
 *A transactional/ad-hoc user. A Food Bank volunteer needs to update a referral status. She does not have an NPI or a user account.*
@@ -568,7 +386,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `REFER` (Referral), `focus` = `Food insecurity` (SCT 733423003).
 *   **Capability:** `scopes` = `patient/ServiceRequest.rsu`, `patient/Task.rsu`.
 
-{% include signed-tickets/uc4-ticket.html %}
+{% include generated/signed-tickets/uc4-ticket.html %}
 
 #### Use Case 5: Payer Claims Adjudication
 *A Payer requests clinical documents to support a specific claim.*
@@ -579,7 +397,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `CLMATTCH` (Claim Attachment), `focus` = `Appendectomy` (SCT 80146002).
 *   **Capability:** `scopes` = `patient/DocumentReference.rs`, `patient/Procedure.rs`.
 
-{% include signed-tickets/uc5-ticket.html %}
+{% include generated/signed-tickets/uc5-ticket.html %}
 
 #### Use Case 6: Research Study
 *A patient consents to a study. The ticket proves consent exists without requiring the researcher to be a "user" at the hospital.*
@@ -590,7 +408,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `RESCH` (Biomedical Research), `focus` = `Malignant tumor of lung` (SCT 363358000).
 *   **Capability:** `scopes` = `patient/*.rs`, `periods` (Start/End Date).
 
-{% include signed-tickets/uc6-ticket.html %}
+{% include generated/signed-tickets/uc6-ticket.html %}
 
 #### Use Case 7: Provider-to-Provider Consult
 *A Specialist (Practitioner) requests data from a Referring Provider.*
@@ -601,7 +419,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Context:** `type` = `REFER` (Referral), `focus` = `Atrial fibrillation` (SCT 49436004).
 *   **Capability:** `scopes` = `patient/*.rs`.
 
-{% include signed-tickets/uc7-ticket.html %}
+{% include generated/signed-tickets/uc7-ticket.html %}
 
 ---
 

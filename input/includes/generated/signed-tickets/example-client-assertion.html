@@ -1,0 +1,41 @@
+<!-- Static JWT Viewer - No JavaScript -->
+<div class="jwt-artifact"
+    style="margin: 20px 0; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; font-family: sans-serif;">
+    <h4 style="margin: 0; padding: 12px; background: #e8e8e8; border-bottom: 1px solid #ddd;">Client Assertion
+    </h4>
+
+    <div style="padding: 15px;">
+        <h5 style="margin-top: 0;">Header</h5>
+        <pre
+            style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
+  "alg": "ES256",
+  "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8",
+  "trust_chain": [
+    "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Client)",
+    "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Intermediate)",
+    "eyJhbGciOiJFUzI1NiIs... (Signed Entity Statement for Trust Anchor)"
+  ]
+}</code></pre>
+
+        <h5>Payload (Claims)</h5>
+        <pre
+            style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
+  "iss": "https://app.client.id",
+  "sub": "https://app.client.id",
+  "aud": "https://network.org/token",
+  "jti": "assertion-jti-123",
+  "iat": 1770661482,
+  "exp": 1770661782,
+  "https://smarthealthit.org/permission_ticket_profile": "https://smarthealthit.org/permission-ticket-profile/single-patient-v1",
+  "https://smarthealthit.org/permission_tickets": [
+    "eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnIiwiZXhwIjoxNzcwNjY1MDgyLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9leGFtcGxlLXYxIiwiY2xpZW50X2JpbmRpbmciOnsiandrc191cmkiOiJodHRwczovL2FwcC5jbGllbnQuaWQvandrcy5qc29uIn0sInRpY2tldF9jb250ZXh0Ijp7InN1YmplY3QiOnsicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkIjoiMTIzIn0sImNhcGFiaWxpdHkiOnsic2NvcGVzIjpbInBhdGllbnQvKi5ycyJdfX0sImlhdCI6MTc3MDY2MTQ4Mn0.6PZC3Xr5YyW1cr5r-NyYCR7HKEzYpXUtKI4uhPcTsA5rNbxfZ0K78gRaZEA43xcn8AjpxEq3PxJ1ZsiVsYaEMA"
+  ]
+}</code></pre>
+
+        <details open style="margin-top: 15px;">
+            <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
+            <pre
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgiLCJ0cnVzdF9jaGFpbiI6WyJleUpoYkdjaU9pSkZVekkxTmlJcy4uLiAoU2lnbmVkIEVudGl0eSBTdGF0ZW1lbnQgZm9yIENsaWVudCkiLCJleUpoYkdjaU9pSkZVekkxTmlJcy4uLiAoU2lnbmVkIEVudGl0eSBTdGF0ZW1lbnQgZm9yIEludGVybWVkaWF0ZSkiLCJleUpoYkdjaU9pSkZVekkxTmlJcy4uLiAoU2lnbmVkIEVudGl0eSBTdGF0ZW1lbnQgZm9yIFRydXN0IEFuY2hvcikiXX0.eyJpc3MiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJzdWIiOiJodHRwczovL2FwcC5jbGllbnQuaWQiLCJhdWQiOiJodHRwczovL25ldHdvcmsub3JnL3Rva2VuIiwianRpIjoiYXNzZXJ0aW9uLWp0aS0xMjMiLCJpYXQiOjE3NzA2NjE0ODIsImV4cCI6MTc3MDY2MTc4MiwiaHR0cHM6Ly9zbWFydGhlYWx0aGl0Lm9yZy9wZXJtaXNzaW9uX3RpY2tldF9wcm9maWxlIjoiaHR0cHM6Ly9zbWFydGhlYWx0aGl0Lm9yZy9wZXJtaXNzaW9uLXRpY2tldC1wcm9maWxlL3NpbmdsZS1wYXRpZW50LXYxIiwiaHR0cHM6Ly9zbWFydGhlYWx0aGl0Lm9yZy9wZXJtaXNzaW9uX3RpY2tldHMiOlsiZXlKaGJHY2lPaUpGVXpJMU5pSXNJbXRwWkNJNkltNTJUMGRTUTNOVWVqSlJTVkZNYzJKc01GcFJYM1Y0TUhSbWVXZzFhV0YyWlMxcWRrNXpRVTVYZGpnaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDNSeWRYTjBMV0p5YjJ0bGNpNXZjbWNpTENKemRXSWlPaUpvZEhSd2N6b3ZMMkZ3Y0M1amJHbGxiblF1YVdRaUxDSmhkV1FpT2lKb2RIUndjem92TDI1bGRIZHZjbXN1YjNKbklpd2laWGh3SWpveE56Y3dOalkxTURneUxDSjBhV05yWlhSZmRIbHdaU0k2SW1oMGRIQnpPaTh2YzIxaGNuUm9aV0ZzZEdocGRDNXZjbWN2Y0dWeWJXbHpjMmx2YmkxMGFXTnJaWFF0ZEhsd1pTOWxlR0Z0Y0d4bExYWXhJaXdpWTJ4cFpXNTBYMkpwYm1ScGJtY2lPbnNpYW5kcmMxOTFjbWtpT2lKb2RIUndjem92TDJGd2NDNWpiR2xsYm5RdWFXUXZhbmRyY3k1cWMyOXVJbjBzSW5ScFkydGxkRjlqYjI1MFpYaDBJanA3SW5OMVltcGxZM1FpT25zaWNtVnpiM1Z5WTJWVWVYQmxJam9pVUdGMGFXVnVkQ0lzSW1sa0lqb2lNVEl6SW4wc0ltTmhjR0ZpYVd4cGRIa2lPbnNpYzJOdmNHVnpJanBiSW5CaGRHbGxiblF2S2k1eWN5SmRmWDBzSW1saGRDSTZNVGMzTURZMk1UUTRNbjAuNlBaQzNYcjVZeVcxY3I1ci1OeVlDUjdIS0V6WXBYVXRLSTR1aFBjVHNBNXJOYnhmWjBLNzhnUmFaRUE0M3hjbjhBanB4RXEzUHhKMVpzaVZzWWFFTUEiXX0.K-A_hIYmJlDS8MiQXtgLIUyX2lx6MLmf0ApFI_WJH5K0o_vjChJ4qyoEmvilVUJSovieAXbB1yTgDka_Zlvl5g</code></pre>
+        </details>
+    </div>
+</div>

@@ -54,48 +54,7 @@ grant_type=client_credentials
 ### B. The Artifact: Ticket Structure
 The ticket payload wraps standard FHIR JSON objects.
 
-```json
-{
-  "iss": "https://trust-broker.org",
-  "sub": "issuer-defined-subject",
-  "aud": "https://network.org",
-  "exp": 1735689600,
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/single-patient-v1",
-  "client_binding": {
-    "jwks_uri": "https://app.client.id/jwks.json"
-  },
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient"
-    },
-    "actor": {
-      "resourceType": "PractitionerRole"
-    },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "REFER"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "49436004",
-        "display": "Atrial fibrillation"
-      },
-      "identifier": [
-        {
-          "system": "https://issuer.org/cases",
-          "value": "CASE-123"
-        }
-      ]
-    },
-    "capability": {
-      "scopes": [
-        "patient/*.rs"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/start/artifact-ticket.json.md %}
 
 ---
 
@@ -110,39 +69,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Actor:** (Implicitly the App/Patient).
 *   **Constraint:** Granular scope (Immunizations only).
 
-```json
-{
-  "ticket_context": {
-    "subject": {
-      "type": "match",
-      "traits": {
-        "resourceType": "Patient",
-        "name": [
-          {
-            "family": "Smith",
-            "given": [
-              "John"
-            ]
-          }
-        ],
-        "birthDate": "1980-01-01",
-        "identifier": [
-          {
-            "system": "urn:oid:2.16.840.1.113883.4.1",
-            "value": "000-00-0000"
-          }
-        ]
-      }
-    },
-    "capability": {
-      "scopes": [
-        "patient/Immunization.rs",
-        "patient/AllergyIntolerance.rs"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/start/uc1-ticket.json.md %}
 
 ### Use Case 2: Authorized Representative (Proxy)
 *An adult daughter accesses her elderly mother's records. The relationship is verified by a Trust Broker, not the Hospital.*
@@ -150,54 +77,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** The Mother (`Patient`).
 *   **Actor:** The Daughter (`RelatedPerson`).
 
-```json
-{
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient",
-      "identifier": [
-        {
-          "system": "https://national-mpi.net",
-          "value": "pt-555"
-        }
-      ]
-    },
-    "actor": {
-      "resourceType": "RelatedPerson",
-      "name": [
-        {
-          "family": "Doe",
-          "given": [
-            "Jane"
-          ]
-        }
-      ],
-      "telecom": [
-        {
-          "system": "email",
-          "value": "jane.doe@example.com"
-        }
-      ],
-      "relationship": [
-        {
-          "coding": [
-            {
-              "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
-              "code": "DAU",
-              "display": "Daughter"
-            }
-          ]
-        }
-      ]
-    },
-    "capability": {
-      "scopes": [
-        "patient/*.rs"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/start/uc2-ticket.json.md %}
 
 ### Use Case 3: Public Health Investigation
 *A Hospital creates a Case Report. The Public Health Agency (PHA) uses the report as a ticket to query for follow-up data.*
@@ -206,65 +86,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Actor:** The Public Health Agency (`Organization`).
 *   **Context:** The specific Case ID.
 
-```json
-{
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient",
-      "id": "local-patient-123"
-    },
-    "actor": {
-      "resourceType": "Organization",
-      "name": "State Dept of Health",
-      "identifier": [
-        {
-          "system": "urn:ietf:rfc:3986",
-          "value": "https://doh.state.gov"
-        }
-      ],
-      "type": [
-        {
-          "coding": [
-            {
-              "system": "http://terminology.hl7.org/CodeSystem/organization-type",
-              "code": "govt"
-            }
-          ]
-        }
-      ]
-    },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "PUBHLTH",
-        "display": "Public Health"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "56717001",
-        "display": "Tuberculosis"
-      },
-      "identifier": [
-        {
-          "system": "https://doh.wa.gov/cases",
-          "value": "CASE-2024-999"
-        }
-      ]
-    },
-    "capability": {
-      "scopes": [
-        "patient/*.rs"
-      ],
-      "periods": [
-        {
-          "start": "2025-01-01",
-          "end": "2026-01-01"
-        }
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/start/uc3-ticket.json.md %}
 
 ### Use Case 4: Social Care (CBO) Referral
 *A transactional/ad-hoc user. A Food Bank volunteer needs to update a referral status. She does not have an NPI or a user account.*
@@ -272,74 +94,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Subject:** The Patient.
 *   **Actor:** A Volunteer (`PractitionerRole`) with identity embedded via **FHIR `contained`**.
 
-```json
-{
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient",
-      "reference": "Patient/123"
-    },
-    "actor": {
-      "resourceType": "PractitionerRole",
-      "contained": [
-        {
-          "resourceType": "Practitioner",
-          "id": "p1",
-          "name": [
-            {
-              "family": "Volunteer",
-              "given": [
-                "Alice"
-              ]
-            }
-          ],
-          "telecom": [
-            {
-              "system": "email",
-              "value": "alice@foodbank.org"
-            }
-          ]
-        },
-        {
-          "resourceType": "Organization",
-          "id": "o1",
-          "name": "Downtown Food Bank"
-        }
-      ],
-      "practitioner": {
-        "reference": "#p1"
-      },
-      "organization": {
-        "reference": "#o1"
-      }
-    },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "REFER",
-        "display": "Referral"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "733423003",
-        "display": "Food insecurity"
-      },
-      "identifier": [
-        {
-          "system": "https://referring-ehr.org/referrals",
-          "value": "REF-555"
-        }
-      ]
-    },
-    "capability": {
-      "scopes": [
-        "patient/ServiceRequest.rsu",
-        "patient/Task.rsu"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/start/uc4-ticket.json.md %}
 
 ### Use Case 5: Payer Claims Adjudication
 *A Payer requests clinical documents to support a specific claim.*
@@ -347,50 +102,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Actor:** The Payer (`Organization`).
 *   **Context:** The Claim ID.
 
-```json
-{
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient",
-      "reference": "Patient/456"
-    },
-    "actor": {
-      "resourceType": "Organization",
-      "identifier": [
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "value": "9876543210"
-        }
-      ],
-      "name": "Blue Payer Inc"
-    },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "CLMATTCH",
-        "display": "Claim Attachment"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "80146002",
-        "display": "Appendectomy"
-      },
-      "identifier": [
-        {
-          "system": "http://provider.com/claims",
-          "value": "CLAIM-2024-XYZ"
-        }
-      ]
-    },
-    "capability": {
-      "scopes": [
-        "patient/DocumentReference.rs",
-        "patient/Procedure.rs"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/start/uc5-ticket.json.md %}
 
 ### Use Case 6: Research Study
 *A patient consents to a study. The ticket proves consent exists without requiring the researcher to be a "user" at the hospital.*
@@ -398,114 +110,14 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 *   **Actor:** The Research Institute (`Organization`).
 *   **Context:** Research Study + Consent Evidence.
 
-```json
-{
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient",
-      "identifier": [
-        {
-          "value": "MRN-123"
-        }
-      ]
-    },
-    "actor": {
-      "resourceType": "Organization",
-      "name": "Oncology Research Institute",
-      "identifier": [
-        {
-          "value": "research-org-id"
-        }
-      ]
-    },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "RESCH",
-        "display": "Biomedical Research"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "363358000",
-        "display": "Malignant tumor of lung"
-      },
-      "identifier": [
-        {
-          "system": "https://consent-service.org/studies",
-          "value": "STUDY-PROTO-22"
-        }
-      ]
-    },
-    "capability": {
-      "scopes": [
-        "patient/*.rs"
-      ],
-      "periods": [
-        {
-          "start": "2020-01-01",
-          "end": "2025-01-01"
-        }
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/start/uc6-ticket.json.md %}
 
 ### Use Case 7: Provider-to-Provider Consult
 *A Specialist (Practitioner) requests data from a Referring Provider.*
 
 *   **Actor:** The Specialist (`Practitioner`).
 
-```json
-{
-  "ticket_context": {
-    "subject": {
-      "resourceType": "Patient",
-      "reference": "Patient/999"
-    },
-    "actor": {
-      "resourceType": "Practitioner",
-      "identifier": [
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "value": "1112223333"
-        }
-      ],
-      "name": [
-        {
-          "family": "Heart",
-          "given": [
-            "A."
-          ]
-        }
-      ]
-    },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "REFER",
-        "display": "Referral"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "49436004",
-        "display": "Atrial fibrillation"
-      },
-      "identifier": [
-        {
-          "system": "https://referring-ehr.org/requests",
-          "value": "ref-req-111"
-        }
-      ]
-    },
-    "capability": {
-      "scopes": [
-        "patient/*.rs"
-      ]
-    }
-  }
-}
-```
+{% include generated/spec-snippets/start/uc7-ticket.json.md %}
 
 ---
 

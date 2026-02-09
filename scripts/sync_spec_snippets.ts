@@ -6,9 +6,22 @@ type JsonObject = { [key: string]: JsonValue };
 type JsonArray = JsonValue[];
 
 const ROOT = path.join(__dirname, "..");
+const INCLUDE_ROOT = path.join(ROOT, "input/includes/generated/spec-snippets");
 
-function renderJsonFence(value: JsonValue, lang = "json"): string {
-  return `\`\`\`${lang}\n${JSON.stringify(value, null, 2)}\n\`\`\``;
+function ensureDir(dirPath: string): void {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+}
+
+function writeInclude(relativePath: string, content: string): void {
+  const fullPath = path.join(INCLUDE_ROOT, relativePath);
+  ensureDir(path.dirname(fullPath));
+  fs.writeFileSync(fullPath, `${content}\n`);
+}
+
+function renderJsonFence(value: JsonValue): string {
+  return `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``;
 }
 
 function renderProfileTicketsBlock(ticket1: JsonValue, ticket2: JsonValue): string {
@@ -23,35 +36,7 @@ function renderProfileTicketsBlock(ticket1: JsonValue, ticket2: JsonValue): stri
   ].join("\n");
 }
 
-function replaceFirstCodeBlockAfterAnchor(source: string, anchor: string, replacementBlock: string): string {
-  const anchorIndex = source.indexOf(anchor);
-  if (anchorIndex === -1) {
-    throw new Error(`Anchor not found: ${anchor}`);
-  }
-
-  const fenceStart = source.indexOf("```", anchorIndex);
-  if (fenceStart === -1) {
-    throw new Error(`No code fence found after anchor: ${anchor}`);
-  }
-
-  const openFenceLineEnd = source.indexOf("\n", fenceStart);
-  if (openFenceLineEnd === -1) {
-    throw new Error(`Malformed code fence after anchor: ${anchor}`);
-  }
-
-  const fenceEndStart = source.indexOf("\n```", openFenceLineEnd);
-  if (fenceEndStart === -1) {
-    throw new Error(`Closing fence not found after anchor: ${anchor}`);
-  }
-
-  const fenceEnd = fenceEndStart + 4;
-  return `${source.slice(0, fenceStart)}${replacementBlock}${source.slice(fenceEnd)}`;
-}
-
-function syncIndexPage(): void {
-  const filePath = path.join(ROOT, "input/pagecontent/index.md");
-  let source = fs.readFileSync(filePath, "utf8");
-
+function buildIndexSnippets(): void {
   const artifactExample: JsonObject = {
     iss: "https://trust-broker.org",
     sub: "issuer-defined-subject",
@@ -131,9 +116,6 @@ function syncIndexPage(): void {
     }
   };
 
-  const audEnumeratedExample = `{ "aud": "https://fhir.hospital.com" }\n// or\n{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"] }`;
-  const audFrameworkExample = `{ "aud": "https://tefca.hhs.gov" }`;
-
   const revocationTicketExample: JsonObject = {
     iss: "https://trust-broker.org",
     sub: "issuer-defined-subject",
@@ -159,54 +141,23 @@ function syncIndexPage(): void {
     rids: ["abc123xyz", "def456uvw.1710460800"]
   };
 
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "#### Artifact: Ticket Structure",
-    renderJsonFence(artifactExample)
-  );
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "**Example Capability:**",
-    renderJsonFence(capabilityExample)
-  );
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "The client SHALL assert the profile in the `client_assertion` claim:",
-    renderJsonFence(profileClaimExample)
-  );
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "Two tickets are required:",
+  writeInclude("index/artifact-ticket.json.md", renderJsonFence(artifactExample));
+  writeInclude("index/capability-example.json.md", renderJsonFence(capabilityExample));
+  writeInclude("index/profile-claim.json.md", renderJsonFence(profileClaimExample));
+  writeInclude(
+    "index/profile-identity-authorization.md",
     renderProfileTicketsBlock(profileIdentityTicket, profileAuthorizationTicket)
   );
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "The `aud` is a specific URL or array of URLs:",
-    `\`\`\`json\n${audEnumeratedExample}\n\`\`\``
+  writeInclude(
+    "index/aud-enumerated.json.md",
+    `\`\`\`json\n{ "aud": "https://fhir.hospital.com" }\n// or\n{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"] }\n\`\`\``
   );
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "The `aud` references a trust framework identifier:",
-    `\`\`\`json\n${audFrameworkExample}\n\`\`\``
-  );
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "Tickets supporting revocation include a `revocation` claim:",
-    renderJsonFence(revocationTicketExample)
-  );
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "The CRL is a JSON file served at the URL specified in the ticket:",
-    renderJsonFence(revocationListExample)
-  );
-
-  fs.writeFileSync(filePath, source);
+  writeInclude("index/aud-framework.json.md", `\`\`\`json\n{ "aud": "https://tefca.hhs.gov" }\n\`\`\``);
+  writeInclude("index/revocation-ticket.json.md", renderJsonFence(revocationTicketExample));
+  writeInclude("index/revocation-list.json.md", renderJsonFence(revocationListExample));
 }
 
-function syncStartDocument(): void {
-  const filePath = path.join(ROOT, "start.md");
-  let source = fs.readFileSync(filePath, "utf8");
-
+function buildStartSnippets(): void {
   const artifactExample: JsonObject = {
     iss: "https://trust-broker.org",
     sub: "issuer-defined-subject",
@@ -417,26 +368,20 @@ function syncStartDocument(): void {
     }
   };
 
-  source = replaceFirstCodeBlockAfterAnchor(
-    source,
-    "### B. The Artifact: Ticket Structure",
-    renderJsonFence(artifactExample)
-  );
-  source = replaceFirstCodeBlockAfterAnchor(source, "### Use Case 1: Network-Mediated Patient Access", renderJsonFence(uc1));
-  source = replaceFirstCodeBlockAfterAnchor(source, "### Use Case 2: Authorized Representative (Proxy)", renderJsonFence(uc2));
-  source = replaceFirstCodeBlockAfterAnchor(source, "### Use Case 3: Public Health Investigation", renderJsonFence(uc3));
-  source = replaceFirstCodeBlockAfterAnchor(source, "### Use Case 4: Social Care (CBO) Referral", renderJsonFence(uc4));
-  source = replaceFirstCodeBlockAfterAnchor(source, "### Use Case 5: Payer Claims Adjudication", renderJsonFence(uc5));
-  source = replaceFirstCodeBlockAfterAnchor(source, "### Use Case 6: Research Study", renderJsonFence(uc6));
-  source = replaceFirstCodeBlockAfterAnchor(source, "### Use Case 7: Provider-to-Provider Consult", renderJsonFence(uc7));
-
-  fs.writeFileSync(filePath, source);
+  writeInclude("start/artifact-ticket.json.md", renderJsonFence(artifactExample));
+  writeInclude("start/uc1-ticket.json.md", renderJsonFence(uc1));
+  writeInclude("start/uc2-ticket.json.md", renderJsonFence(uc2));
+  writeInclude("start/uc3-ticket.json.md", renderJsonFence(uc3));
+  writeInclude("start/uc4-ticket.json.md", renderJsonFence(uc4));
+  writeInclude("start/uc5-ticket.json.md", renderJsonFence(uc5));
+  writeInclude("start/uc6-ticket.json.md", renderJsonFence(uc6));
+  writeInclude("start/uc7-ticket.json.md", renderJsonFence(uc7));
 }
 
 function main(): void {
-  syncIndexPage();
-  syncStartDocument();
-  console.log("Synced generated spec snippets in input/pagecontent/index.md and start.md");
+  buildIndexSnippets();
+  buildStartSnippets();
+  console.log("Synced generated snippet includes under input/includes/generated/spec-snippets");
 }
 
 main();

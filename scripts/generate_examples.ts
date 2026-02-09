@@ -19,7 +19,7 @@ const schema = TJS.createGenerator(config).createSchema(config.type);
 const validate = ajv.compile(schema);
 
 const OUTPUT_DIR = path.join(__dirname, '../input/examples/signed-tickets');
-const INCLUDES_DIR = path.join(__dirname, '../input/includes/signed-tickets');
+const INCLUDES_DIR = path.join(__dirname, '../input/includes/generated/signed-tickets');
 const KEYS_DIR = path.join(__dirname, 'keys');
 const DEFAULT_EXP = Math.floor(Date.now() / 1000) + 3600;
 
