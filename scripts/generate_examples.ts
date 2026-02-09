@@ -346,7 +346,7 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
     // We want standard claims (iss, sub, aud, jti) first, then iat/exp (added by sign), then the tickets claim.
     // However, jose.SignJWT adds iat/exp at the end by default. 
     // To force the order, we'll rely on the fact that we can't easily control iat/exp position added by the library 
-    // unless we add them manually. But the user just wants permission_tickets LAST.
+    // unless we add them manually. But the user just wants permission_tickets last.
     // Actually, jose library might respect the order if we pass them in.
     // Let's try adding iat/exp manually to control order, or just put the tickets claim last in our object 
     // and hope the library appends iat/exp before it? No, library usually appends.
@@ -363,8 +363,8 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
         jti: "assertion-jti-123",
         iat: now,
         exp: now + 300,
-        "https://smarthealthit.org/permission_ticket_profile": USE_CASE_BY_ID.uc1.profileUri,
-        "https://smarthealthit.org/permission_tickets": [signedTicket]
+        permission_ticket_profile: USE_CASE_BY_ID.uc1.profileUri,
+        permission_tickets: [signedTicket]
     };
 
     const trust_chain = [

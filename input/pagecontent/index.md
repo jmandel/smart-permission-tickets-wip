@@ -69,7 +69,7 @@ sequenceDiagram
 #### Transport: SMART Backend Services Profile
 This architecture is a strict profile of **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** (which itself profiles **RFC 7523**).
 
-The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** in a dedicated `https://smarthealthit.org/permission_tickets` claim. Permission Tickets extend authorization context only; they do not alter SMART Backend Services client authentication requirements.
+The key difference is the payload of the `client_assertion`. In standard SMART Backend Services, the assertion proves the client's identity. In this architecture, the assertion **also carries the Permission Tickets** in a dedicated `permission_tickets` claim. Permission Tickets extend authorization context only; they do not alter SMART Backend Services client authentication requirements.
 
 ##### Trust
 
@@ -120,8 +120,8 @@ The Data Holder SHALL perform a two-layer validation:
     *   Ensure the client is registered and active.
 
 2.  **Layer 2: Ticket Validation (Permission Ticket Specific)**
-    *   Extract the `https://smarthealthit.org/permission_tickets` array from the assertion.
-    *   Read `https://smarthealthit.org/permission_ticket_profile` from the assertion and select profile processing rules.
+    *   Extract the `permission_tickets` array from the assertion.
+    *   Read `permission_ticket_profile` from the assertion and select profile processing rules.
     *   For each ticket:
         *   **Verify Signature:** Use the `iss` (Trust Broker) public key.
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
@@ -186,7 +186,7 @@ The client SHALL assert the profile in the `client_assertion` claim:
 
 {% include generated/spec-snippets/index/profile-claim.json.md %}
 
-`https://smarthealthit.org/permission_ticket_profile` is the primary processing selector. It is URI-scoped because it is a custom top-level claim in `client_assertion`.
+`permission_ticket_profile` is the primary processing selector in `client_assertion`.
 
 `ticket_type` is a field inside each Permission Ticket artifact. For single-ticket profiles, `ticket_type` MAY be omitted; if present, it SHALL match the profile's required type. For multi-ticket profiles, each ticket SHALL include `ticket_type` and it SHALL match one of the profile's allowed ticket types.
 
@@ -500,8 +500,8 @@ export interface ClientAssertion {
     jti: string;          // Unique Assertion ID
     iat?: number;         // Issued-at Timestamp
     exp?: number;         // Expiration Timestamp
-    "https://smarthealthit.org/permission_ticket_profile": string; // Primary processing selector
-    "https://smarthealthit.org/permission_tickets": string[];
+    permission_ticket_profile: string; // Primary processing selector
+    permission_tickets: string[];
 }
 ```
 
@@ -543,8 +543,8 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 #### Data Holder Requirements
 
 **SHALL:**
-- Accept `https://smarthealthit.org/permission_tickets` claim in client assertions
-- Accept `https://smarthealthit.org/permission_ticket_profile` claim in client assertions
+- Accept `permission_tickets` claim in client assertions
+- Accept `permission_ticket_profile` claim in client assertions
 - Validate client assertion per SMART Backend Services
 - For each ticket: verify signature, `client_binding`, `aud`, and `exp`
 - Enforce profile/type rules:
@@ -567,8 +567,8 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 #### Client Requirements
 
 **SHALL:**
-- Include tickets as an array in `https://smarthealthit.org/permission_tickets` claim
-- Include profile identifier in `https://smarthealthit.org/permission_ticket_profile`
+- Include tickets as an array in `permission_tickets` claim
+- Include profile identifier in `permission_ticket_profile`
 - Sign client assertion with registered or federated key
 - Use identical value for `iss` and `sub` in client assertion (the Client ID URL)
 

@@ -89,6 +89,6 @@ export interface ClientAssertion {
     jti: string;
     iat?: number;
     exp?: number;
-    "https://smarthealthit.org/permission_ticket_profile": string; // Primary processing selector
-    "https://smarthealthit.org/permission_tickets": string[]; // Array of Signed Ticket Strings
+    permission_ticket_profile: string; // Primary processing selector
+    permission_tickets: string[]; // Array of signed ticket strings
 }
