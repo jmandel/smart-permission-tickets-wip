@@ -178,11 +178,14 @@ Multi-ticket scenarios are defined by **use case profiles**. Each profile specif
 - Claim source mapping (which ticket contributes subject, actor, capability, etc.)
 - Combination logic and validation order
 
+For the current single-ticket catalog in this specification, use case and profile are 1:1:
+{% include generated/spec-snippets/index/use-case-profile-map.md %}
+
 The client SHALL assert the profile in the `client_assertion` claim:
 
 {% include generated/spec-snippets/index/profile-claim.json.md %}
 
-Each ticket SHALL assert its own type via `ticket_type` (a URI). The Data Holder SHALL process tickets only according to the declared profile. Unknown profile, unknown ticket type, or profile/type mismatch SHALL be rejected with `invalid_grant`.
+Each ticket SHALL assert its own type via `ticket_type` (a URI). The Data Holder SHALL process tickets only according to the declared profile. Unknown profile, unknown ticket type, or profile/type mismatch SHALL be rejected with `invalid_grant`. For the 1:1 catalog profiles above, exactly one ticket is expected and its `ticket_type` SHALL match the mapped URI.
 
 #### Example Profiles
 
