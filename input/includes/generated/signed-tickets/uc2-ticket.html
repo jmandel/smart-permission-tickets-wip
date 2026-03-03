@@ -18,10 +18,10 @@
   "iss": "https://trust-broker.org",
   "sub": "https://client-app.example.com/456",
   "aud": "https://network.org",
-  "exp": 1770667941,
+  "exp": 1772575408,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/authorized-representative-v1",
-  "client_binding": {
-    "jwks_uri": "https://client-app.example.com/jwks.json"
+  "cnf": {
+    "jkt": "JuI6ibZHcMPQICaIZ55PbXpnsudQmKt00D0BiEXNrMc"
   },
   "ticket_context": {
     "subject": {
@@ -67,13 +67,13 @@
       ]
     }
   },
-  "iat": 1770664341
+  "iat": 1772571809
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2NsaWVudC1hcHAuZXhhbXBsZS5jb20vNDU2IiwiYXVkIjoiaHR0cHM6Ly9uZXR3b3JrLm9yZyIsImV4cCI6MTc3MDY2Nzk0MSwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvYXV0aG9yaXplZC1yZXByZXNlbnRhdGl2ZS12MSIsImNsaWVudF9iaW5kaW5nIjp7Imp3a3NfdXJpIjoiaHR0cHM6Ly9jbGllbnQtYXBwLmV4YW1wbGUuY29tL2p3a3MuanNvbiJ9LCJ0aWNrZXRfY29udGV4dCI6eyJzdWJqZWN0Ijp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwczovL25hdGlvbmFsLW1waS5uZXQiLCJ2YWx1ZSI6InB0LTU1NSJ9XX0sImFjdG9yIjp7InJlc291cmNlVHlwZSI6IlJlbGF0ZWRQZXJzb24iLCJuYW1lIjpbeyJmYW1pbHkiOiJEb2UiLCJnaXZlbiI6WyJKYW5lIl19XSwidGVsZWNvbSI6W3sic3lzdGVtIjoiZW1haWwiLCJ2YWx1ZSI6ImphbmUuZG9lQGV4YW1wbGUuY29tIn1dLCJyZWxhdGlvbnNoaXAiOlt7ImNvZGluZyI6W3sic3lzdGVtIjoiaHR0cDovL3Rlcm1pbm9sb2d5LmhsNy5vcmcvQ29kZVN5c3RlbS92My1Sb2xlQ29kZSIsImNvZGUiOiJEQVUiLCJkaXNwbGF5IjoiRGF1Z2h0ZXIifV19XX0sImNhcGFiaWxpdHkiOnsic2NvcGVzIjpbInBhdGllbnQvKi5ycyJdfX0sImlhdCI6MTc3MDY2NDM0MX0.--69TzkB0wEAUyOHzW2mhOQl8qc1kppodRGUC9C5v4-60R23F1e7pbpVACKYCG3ADByS3bboIn5bHypmtjOgmg</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0LWJyb2tlci5vcmciLCJzdWIiOiJodHRwczovL2NsaWVudC1hcHAuZXhhbXBsZS5jb20vNDU2IiwiYXVkIjoiaHR0cHM6Ly9uZXR3b3JrLm9yZyIsImV4cCI6MTc3MjU3NTQwOCwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvYXV0aG9yaXplZC1yZXByZXNlbnRhdGl2ZS12MSIsImNuZiI6eyJqa3QiOiJKdUk2aWJaSGNNUFFJQ2FJWjU1UGJYcG5zdWRRbUt0MDBEMEJpRVhOck1jIn0sInRpY2tldF9jb250ZXh0Ijp7InN1YmplY3QiOnsicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHBzOi8vbmF0aW9uYWwtbXBpLm5ldCIsInZhbHVlIjoicHQtNTU1In1dfSwiYWN0b3IiOnsicmVzb3VyY2VUeXBlIjoiUmVsYXRlZFBlcnNvbiIsIm5hbWUiOlt7ImZhbWlseSI6IkRvZSIsImdpdmVuIjpbIkphbmUiXX1dLCJ0ZWxlY29tIjpbeyJzeXN0ZW0iOiJlbWFpbCIsInZhbHVlIjoiamFuZS5kb2VAZXhhbXBsZS5jb20ifV0sInJlbGF0aW9uc2hpcCI6W3siY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vdGVybWlub2xvZ3kuaGw3Lm9yZy9Db2RlU3lzdGVtL3YzLVJvbGVDb2RlIiwiY29kZSI6IkRBVSIsImRpc3BsYXkiOiJEYXVnaHRlciJ9XX1dfSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJzIl19fSwiaWF0IjoxNzcyNTcxODA5fQ.5cWqGkcrHduIGsm-5igOKQq7Ksb4f3lXAz8kNb4NporAlPQb2Is96wCEtnORYXebOKSY0dT5z4NqNlLN9pxujw</code></pre>
         </details>
     </div>
 </div>

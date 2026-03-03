@@ -5,8 +5,8 @@
   "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/proxy-v1",
-  "client_binding": {
-    "jwks_uri": "https://app.example.com/jwks.json"
+  "cnf": {
+    "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
   },
   "jti": "ticket-unique-id",
   "revocation": {

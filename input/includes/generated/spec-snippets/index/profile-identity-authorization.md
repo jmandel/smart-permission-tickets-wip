@@ -6,8 +6,8 @@ Ticket 1 (Identity Provider - e.g., Clear):
   "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/identity-v1",
-  "client_binding": {
-    "jwks_uri": "https://health-app.example.com/jwks.json"
+  "cnf": {
+    "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
   },
   "ticket_context": {
     "actor": {
@@ -37,8 +37,8 @@ Ticket 2 (Trust Broker):
   "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/authorization-v1",
-  "client_binding": {
-    "jwks_uri": "https://health-app.example.com/jwks.json"
+  "cnf": {
+    "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
   },
   "ticket_context": {
     "subject": {
