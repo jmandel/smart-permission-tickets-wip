@@ -61,8 +61,8 @@ function buildIndexSnippets(): void {
     aud: "https://network.org",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/proxy-v1",
-    client_binding: {
-      jwks_uri: "https://app.client.id/jwks.json"
+    cnf: {
+      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
     },
     ticket_context: {
       subject: { resourceType: "Patient" },
@@ -106,7 +106,7 @@ function buildIndexSnippets(): void {
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/identity-v1",
-    client_binding: { jwks_uri: "https://health-app.example.com/jwks.json" },
+    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
     ticket_context: {
       actor: {
         resourceType: "RelatedPerson",
@@ -122,7 +122,7 @@ function buildIndexSnippets(): void {
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/authorization-v1",
-    client_binding: { jwks_uri: "https://health-app.example.com/jwks.json" },
+    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
     ticket_context: {
       subject: { type: "match", traits: { resourceType: "Patient" } },
       context: {
@@ -139,7 +139,7 @@ function buildIndexSnippets(): void {
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/proxy-v1",
-    client_binding: { jwks_uri: "https://app.example.com/jwks.json" },
+    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
     jti: "ticket-unique-id",
     revocation: {
       url: "https://trust-broker.org/.well-known/crl/patient-access.json",
@@ -182,8 +182,8 @@ function buildStartSnippets(): void {
     aud: "https://network.org",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/single-patient-v1",
-    client_binding: {
-      jwks_uri: "https://app.client.id/jwks.json"
+    cnf: {
+      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
     },
     ticket_context: {
       subject: { resourceType: "Patient" },

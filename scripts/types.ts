@@ -4,9 +4,8 @@ export interface PermissionTicket {
     aud: string;          // Network / trust framework audience
     exp: number;          // Expiration Timestamp
     ticket_type?: string;  // Ticket type URI (required for multi-ticket profiles; optional for single-ticket profiles)
-    client_binding: {
-        jwks_uri?: string; // Exactly one of jwks_uri or jwks
-        jwks?: { keys: any[] };
+    cnf: {
+        jkt: string; // JWK Thumbprint (RFC 7638) of the authorized client key
     };
     iat?: number;         // Issued-At Timestamp
     jti?: string;         // Unique Ticket ID

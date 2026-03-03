@@ -24,6 +24,10 @@ const INCLUDES_DIR = path.join(__dirname, '../input/includes/generated/signed-ti
 const KEYS_DIR = path.join(__dirname, 'keys');
 const DEFAULT_EXP = Math.floor(Date.now() / 1000) + 3600;
 
+// Load client public key and compute JWK Thumbprint (RFC 7638) at startup
+const clientPublicJwk = JSON.parse(fs.readFileSync(path.join(KEYS_DIR, 'client.public.json'), 'utf-8'));
+const clientJktPromise = jose.calculateJwkThumbprint(clientPublicJwk);
+
 // Ensure output directories exist
 if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -74,8 +78,8 @@ const uc1_payload: PermissionTicket = {
     aud: "https://network.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc1.ticketTypeUri,
-    client_binding: {
-        jwks_uri: "https://client-app.example.com/jwks.json"
+    cnf: {
+        jkt: "" // populated at runtime
     },
     ticket_context: {
         subject: {
@@ -99,8 +103,8 @@ const uc2_payload: PermissionTicket = {
     aud: "https://network.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc2.ticketTypeUri,
-    client_binding: {
-        jwks_uri: "https://client-app.example.com/jwks.json"
+    cnf: {
+        jkt: "" // populated at runtime
     },
     ticket_context: {
         subject: {
@@ -132,8 +136,8 @@ const uc3_payload: PermissionTicket = {
     aud: "https://hospital-a.com",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc3.ticketTypeUri,
-    client_binding: {
-        jwks_uri: "https://pha.gov/jwks.json"
+    cnf: {
+        jkt: "" // populated at runtime
     },
     ticket_context: {
         subject: {
@@ -168,8 +172,8 @@ const uc4_payload: PermissionTicket = {
     aud: "https://referring-ehr.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc4.ticketTypeUri,
-    client_binding: {
-        jwks_uri: "https://foodbank.org/jwks.json"
+    cnf: {
+        jkt: "" // populated at runtime
     },
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/123" },
@@ -208,8 +212,8 @@ const uc5_payload: PermissionTicket = {
     aud: "https://provider.com",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc5.ticketTypeUri,
-    client_binding: {
-        jwks_uri: "https://payer.com/jwks.json"
+    cnf: {
+        jkt: "" // populated at runtime
     },
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/456" },
@@ -235,8 +239,8 @@ const uc6_payload: PermissionTicket = {
     aud: "https://hospital.com",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc6.ticketTypeUri,
-    client_binding: {
-        jwks_uri: "https://research.org/jwks.json"
+    cnf: {
+        jkt: "" // populated at runtime
     },
     ticket_context: {
         subject: { resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
@@ -266,8 +270,8 @@ const uc7_payload: PermissionTicket = {
     aud: "https://referring-ehr.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc7.ticketTypeUri,
-    client_binding: {
-        jwks_uri: "https://specialist-clinic.org/jwks.json"
+    cnf: {
+        jkt: "" // populated at runtime
     },
     ticket_context: {
         subject: { resourceType: "Patient", reference: "Patient/999" },
@@ -290,7 +294,12 @@ async function generate() {
     console.log("Generating signed examples...");
 
     const ISSUER_KEY = await loadKey('issuer.private.json');
-    // const CLIENT_KEY = await loadKey('client.private.json'); // Not used for simple ticket generation in this batch
+    const clientJkt = await clientJktPromise;
+
+    // Populate computed JWK Thumbprint into all payloads
+    for (const payload of [uc1_payload, uc2_payload, uc3_payload, uc4_payload, uc5_payload, uc6_payload, uc7_payload]) {
+        payload.cnf.jkt = clientJkt;
+    }
 
     const tickets = [
         { name: 'uc1-ticket.jwt', payload: uc1_payload },
@@ -322,14 +331,15 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
     console.log("Generating client assertion example...");
 
     // Create a mock ticket to embed
+    const clientJkt = await clientJktPromise;
     const ticketPayload: PermissionTicket = {
         iss: "https://trust-broker.org",
         sub: "https://app.client.id",
         aud: "https://network.org",
         exp: DEFAULT_EXP,
         ticket_type: USE_CASE_BY_ID.uc1.ticketTypeUri,
-        client_binding: {
-            jwks_uri: "https://app.client.id/jwks.json"
+        cnf: {
+            jkt: clientJkt
         },
         ticket_context: {
             subject: { resourceType: "Patient", id: "123" },

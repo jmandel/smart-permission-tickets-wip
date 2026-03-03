@@ -28,7 +28,7 @@ A **Permission Ticket** is a JWT minted by a Trusted Issuer. It acts as a self-c
 
 #### Core Principles
 1.  **Issuer-Signed:** The ticket is minted by an entity the Data Holder trusts (e.g., a Trust Broker, an Identity Verifier, or the Data Holder itself).
-2.  **Client-Bound:** The ticket is cryptographically bound to the Client ID of the requesting application.
+2.  **Client-Bound:** The ticket is cryptographically bound to the client's public key via a JWK Thumbprint (`cnf.jkt`).
 3.  **FHIR-Native:** The payload uses strict FHIR Resource structures (`Patient`, `PractitionerRole`, `Organization`) to define identities, making integration with existing EHR logic seamless.
 4.  **Zero-Interaction:** The Data Holder validates the ticket signature and grants access immediately. No user login page is presented.
 
@@ -103,14 +103,11 @@ The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticke
 See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal definitions.
 
 #### Ticket Client-Key Binding
-Each Permission Ticket SHALL bind redemption to a client key set using `client_binding`:
+Each Permission Ticket SHALL bind redemption to a specific client key using the `cnf` (Confirmation, [RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)) claim:
 
-- `client_binding.jwks_uri`: HTTPS JWKS URL
-- `client_binding.jwks`: embedded JWK Set
+- `cnf.jkt`: JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the authorized client's public key
 
-Exactly one of `jwks_uri` or `jwks` SHALL be present.
-
-At token processing time, the Data Holder SHALL validate that the JWK used to verify the `client_assertion` signature is a member of the ticket-bound key set. If `jku` is present in the `client_assertion` header and `client_binding.jwks_uri` is present in the ticket, the two values SHALL be identical.
+At token processing time, the Data Holder SHALL compute the JWK Thumbprint of the key used to verify the `client_assertion` signature and compare it to `cnf.jkt`. The ticket SHALL be rejected if the thumbprints do not match.
 
 #### Server-Side Validation
 The Data Holder SHALL perform a two-layer validation:
@@ -126,7 +123,7 @@ The Data Holder SHALL perform a two-layer validation:
         *   **Verify Signature:** Use the `iss` (Trust Broker) public key.
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
         *   **Verify Type Rules:** For multi-ticket profiles, `ticket_type` SHALL be present and recognized in the declared profile. For single-ticket profiles, `ticket_type` MAY be omitted; if present, it SHALL match the profile's required type.
-        *   **Verify Binding:** Does the `client_assertion` signing key match the ticket `client_binding` key set?
+        *   **Verify Binding:** Does the JWK Thumbprint of the `client_assertion` signing key match the ticket's `cnf.jkt`?
     *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `ticket_context.capability` rules.
 
 ---
@@ -216,7 +213,7 @@ A network-level ticket provides baseline access; an additional ticket from a spe
 Regardless of profile, these rules always apply:
 - All tickets SHALL be valid for the Data Holder (per audience rules)
 - All issuers SHALL be trusted by the Data Holder
-- The authenticated `client_assertion` signing key SHALL satisfy each ticket `client_binding`
+- The JWK Thumbprint of the authenticated `client_assertion` signing key SHALL match each ticket's `cnf.jkt`
 - All tickets SHALL match the declared `permission_ticket_profile` rules
 
 ---
@@ -444,9 +441,8 @@ export interface PermissionTicket {
     aud: string;          // Audience (Network/Data Holder set)
     exp: number;          // Expiration Timestamp
     ticket_type?: string; // Required for multi-ticket profiles; optional for single-ticket profiles
-    client_binding: {
-        jwks_uri?: string; // Exactly one of jwks_uri or jwks
-        jwks?: { keys: any[] };
+    cnf: {
+        jkt: string; // JWK Thumbprint (RFC 7638) of the authorized client key
     };
     iat?: number;         // Issued-at timestamp
     jti?: string;         // Unique Ticket ID
@@ -511,7 +507,7 @@ export interface ClientAssertion {
 *   **Keys:**
     *   **Issuer:** Signs the `PermissionTicket`. Public keys SHALL be exposed via a JWK Set URL (e.g., `https://trust-broker.org/.well-known/jwks.json`).
     *   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
-*   **Binding:** `PermissionTicket.client_binding` binds redemption to a client key set (`jwks_uri` or embedded `jwks`). Data Holders verify that the `client_assertion` signing key is in that set.
+*   **Binding:** `PermissionTicket.cnf.jkt` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). Data Holders compute the thumbprint of the `client_assertion` signing key and verify it matches.
 
 #### Error Responses
 
@@ -546,7 +542,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Accept `permission_tickets` claim in client assertions
 - Accept `permission_ticket_profile` claim in client assertions
 - Validate client assertion per SMART Backend Services
-- For each ticket: verify signature, `client_binding`, `aud`, and `exp`
+- For each ticket: verify signature, `cnf.jkt` binding, `aud`, and `exp`
 - Enforce profile/type rules:
   For multi-ticket profiles, require `ticket_type` and validate against profile
   For single-ticket profiles, allow omitted `ticket_type`; if present, validate against profile
@@ -582,9 +578,9 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 
 **SHALL:**
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
-- Include claims: `iss`, `sub`, `aud`, `exp`, `client_binding`, `ticket_context`
+- Include claims: `iss`, `sub`, `aud`, `exp`, `cnf`, `ticket_context`
 - For multi-ticket profiles, include `ticket_type`; for single-ticket profiles, `ticket_type` is optional
-- Bind each ticket to a specific client key set via `client_binding` (`jwks_uri` or `jwks`)
+- Bind each ticket to a specific client key via `cnf.jkt` (JWK Thumbprint)
 - If `revocation` is present, publish CRL at the URL specified in tickets
 
 **SHOULD:**
