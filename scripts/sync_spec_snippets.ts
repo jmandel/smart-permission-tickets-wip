@@ -57,27 +57,24 @@ function renderUseCaseProfileRegistryTable(): string {
 function buildIndexSnippets(): void {
   const artifactExample: JsonObject = {
     iss: "https://trusted-issuer.org",
-    sub: "grant-example-referral",
+    sub: "grant-example-patient-access",
     aud: "https://network.org",
     exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
     cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
     authorization: {
-      subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
-      requester: { resourceType: "PractitionerRole" },
-      access: { scopes: ["patient/*.rs"] }
-    },
-    details: {
-      reason: {
-        system: "http://snomed.info/sct",
-        code: "49436004",
-        display: "Atrial fibrillation"
+      subject: {
+        type: "match",
+        traits: {
+          resourceType: "Patient",
+          name: [{ family: "Smith", given: ["John"] }],
+          birthDate: "1980-01-01",
+          identifier: [{ system: "urn:oid:2.16.840.1.113883.4.1", value: "***-**-1234" }],
+          telecom: [{ system: "phone", value: "555-867-5309" }],
+          address: [{ state: "IL" }]
+        }
       },
-      request: {
-        reference: "ServiceRequest/123",
-        identifier: { system: "https://issuer.org/cases", value: "CASE-123" },
-        display: "Cardiology consult for atrial fibrillation"
-      }
+      access: { scopes: ["patient/Immunization.rs", "patient/AllergyIntolerance.rs"] }
     }
   };
 
@@ -173,27 +170,24 @@ function buildIndexSnippets(): void {
 function buildStartSnippets(): void {
   const artifactExample: JsonObject = {
     iss: "https://trusted-issuer.org",
-    sub: "grant-example-referral",
+    sub: "grant-example-patient-access",
     aud: "https://network.org",
     exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
     cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
     authorization: {
-      subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
-      requester: { resourceType: "PractitionerRole" },
-      access: { scopes: ["patient/*.rs"] }
-    },
-    details: {
-      reason: {
-        system: "http://snomed.info/sct",
-        code: "49436004",
-        display: "Atrial fibrillation"
+      subject: {
+        type: "match",
+        traits: {
+          resourceType: "Patient",
+          name: [{ family: "Smith", given: ["John"] }],
+          birthDate: "1980-01-01",
+          identifier: [{ system: "urn:oid:2.16.840.1.113883.4.1", value: "***-**-1234" }],
+          telecom: [{ system: "phone", value: "555-867-5309" }],
+          address: [{ state: "IL" }]
+        }
       },
-      request: {
-        reference: "ServiceRequest/123",
-        identifier: { system: "https://issuer.org/cases", value: "CASE-123" },
-        display: "Cardiology consult for atrial fibrillation"
-      }
+      access: { scopes: ["patient/Immunization.rs", "patient/AllergyIntolerance.rs"] }
     }
   };
 

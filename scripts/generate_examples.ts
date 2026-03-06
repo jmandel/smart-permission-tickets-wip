@@ -133,7 +133,6 @@ const uc3_payload: PermissionTicket = {
     aud: "https://hospital-a.com",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc3.ticketTypeUri,
-    cnf: { jkt: "" },
     authorization: {
         subject: {
             type: "reference",
@@ -167,7 +166,6 @@ const uc4_payload: PermissionTicket = {
     aud: "https://referring-ehr.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc4.ticketTypeUri,
-    cnf: { jkt: "" },
     authorization: {
         subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
         requester: {
@@ -209,7 +207,6 @@ const uc5_payload: PermissionTicket = {
     aud: "https://provider.com",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc5.ticketTypeUri,
-    cnf: { jkt: "" },
     authorization: {
         subject: { type: "reference", resourceType: "Patient", reference: "Patient/456" },
         requester: {
@@ -266,7 +263,6 @@ const uc7_payload: PermissionTicket = {
     aud: "https://referring-ehr.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc7.ticketTypeUri,
-    cnf: { jkt: "" },
     authorization: {
         subject: { type: "reference", resourceType: "Patient", reference: "Patient/999" },
         requester: {
@@ -294,9 +290,9 @@ async function generate() {
     const ISSUER_KEY = await loadKey('issuer.private.json');
     const clientJkt = await clientJktPromise;
 
-    // Populate computed JWK Thumbprint into all payloads
-    for (const payload of [uc1_payload, uc2_payload, uc3_payload, uc4_payload, uc5_payload, uc6_payload, uc7_payload]) {
-        payload.cnf.jkt = clientJkt;
+    // Populate computed JWK Thumbprint into payloads that use cnf binding
+    for (const payload of [uc1_payload, uc2_payload, uc6_payload]) {
+        payload.cnf!.jkt = clientJkt;
     }
 
     const tickets = [

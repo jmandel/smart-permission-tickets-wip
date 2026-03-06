@@ -10,7 +10,7 @@ Description: "Common core of a Permission Ticket. Includes the security envelope
 * iat 0..1 integer "Issued-At Timestamp"
 * jti 0..1 string "Unique Ticket ID"
 * ticket_type 1..1 uri "Ticket type URI identifying the ticket schema and processing rules"
-* cnf 1..1 BackboneElement "Confirmation (RFC 7800)"
+* cnf 0..1 BackboneElement "Confirmation (RFC 7800). RECOMMENDED. Required by some ticket types (e.g., patient access, authorized representative, research). When present, Data Holders SHALL enforce key binding."
   * jkt 1..1 string "JWK Thumbprint (RFC 7638) of the authorized client key"
 * revocation 0..1 BackboneElement "Revocation Information"
   * url 1..1 url "URL of the Credential Revocation List (CRL)"

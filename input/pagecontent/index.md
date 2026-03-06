@@ -4,14 +4,14 @@ A Permission Ticket is an issuer-signed, sender-constrained JWT presented inside
 
 Each ticket conveys a common **authorization** structure: a **subject** (whose data), an optional **requester** (on whose behalf), and **access** constraints (what, and how much). Ticket-type-specific business semantics live in an optional **details** object whose schema is selected by `ticket_type`. SMART scopes provide the coarse access ceiling. Structured access constraints express finer limits — time range, jurisdiction, source organization.
 
-The ticket is cryptographically bound to the presenting client's key (`cnf.jkt`). A Data Holder verifies the client assertion, verifies the ticket signature against the issuer's published keys, confirms the key binding, and grants access scoped to the intersection of requested and authorized capabilities. No user login is required at the Data Holder.
+When present, a `cnf.jkt` claim cryptographically binds the ticket to the presenting client's key. A Data Holder verifies the client assertion, verifies the ticket signature against the issuer's published keys, enforces key binding if present, and grants access scoped to the intersection of requested and authorized access. No user login is required at the Data Holder.
 
 ### Scope and Non-Goals
 
 **This specification defines:**
 - The Permission Ticket artifact format and required claims
 - Presentation inside a `client_assertion` at the token endpoint
-- Sender-constrained binding via `cnf.jkt`
+- Optional sender-constrained binding via `cnf.jkt`
 - Audience validation for single-recipient and network-wide recipient sets
 - Subject resolution modes and validation rules
 - Access calculation and access constraint enforcement
@@ -97,7 +97,7 @@ Here is what the `client_assertion` looks like when decoded. Note the embedded P
 
 The `client_assertion` serves two roles: it **authenticates the client** (standard SMART Backend Services) and acts as the **cryptographic presentation envelope** for one or more Permission Tickets.
 
-A Permission Ticket authorizes access only when presented inside a valid `client_assertion`, and only when the ticket's `cnf.jkt` matches the key used to sign that assertion. This binding ensures the ticket can only be redeemed by the client it was issued to.
+A Permission Ticket authorizes access only when presented inside a valid `client_assertion`. When the ticket includes `cnf.jkt`, the Data Holder SHALL verify that the thumbprint matches the key used to sign the assertion — this ensures the ticket can only be redeemed by the client it was issued to. When `cnf` is absent, the Data Holder relies on `aud` validation and standard client authentication.
 
 The Data Holder SHALL NOT rely on any cross-party-stable client identifier inside the Permission Ticket itself. Client identity is established by the outer `client_assertion` (`iss`/`sub`). The ticket's `sub` claim is issuer-local and opaque — it identifies the authorization grant, not the client.
 
@@ -111,11 +111,25 @@ See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal de
 Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. In single-ticket flows, the Data Holder uses `ticket_type` to select validation and access logic. In multi-ticket flows, `ticket_type` identifies each component ticket's role within a composition profile.
 
 #### Ticket Client-Key Binding
-Each Permission Ticket SHALL bind redemption to a specific client key using the `cnf` (Confirmation, [RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)) claim:
+A Permission Ticket MAY bind redemption to a specific client key using the `cnf` (Confirmation, [RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)) claim:
 
 - `cnf.jkt`: JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the authorized client's public key
 
-At token processing time, the Data Holder SHALL compute the JWK Thumbprint of the key used to verify the `client_assertion` signature and compare it to `cnf.jkt`. The ticket SHALL be rejected if the thumbprints do not match.
+When `cnf` is present, the Data Holder SHALL compute the JWK Thumbprint of the key used to verify the `client_assertion` signature and compare it to `cnf.jkt`. The ticket SHALL be rejected if the thumbprints do not match.
+
+When `cnf` is absent, the ticket does not constrain which client may present it. The Data Holder still authenticates the client via the `client_assertion` and validates the ticket's `aud` claim. This mode is appropriate for B2B flows where the issuer may not know the recipient's specific client key at ticket-minting time — for example, when a ticket accompanies a referral or case report and the recipient organization's app is not yet determined.
+
+`cnf` is RECOMMENDED. Individual ticket types define whether it is required or optional:
+
+| Ticket Type | `cnf` | Rationale |
+|-------------|-------|-----------|
+| UC1: Patient Access | Required | Issuer has direct relationship with client |
+| UC2: Authorized Rep | Required | Issuer has direct relationship with client |
+| UC3: Public Health | Optional | B2B; `aud` + client auth sufficient |
+| UC4: Social Care | Optional | B2B; `aud` + client auth sufficient |
+| UC5: Payer Claims | Optional | B2B; `aud` + client auth sufficient |
+| UC6: Research | Required | Issuer has direct relationship with client |
+| UC7: Provider Consult | Optional | B2B; strictly better than status quo even without key binding |
 
 #### Server-Side Validation
 The Data Holder SHALL perform a two-layer validation:
@@ -131,7 +145,7 @@ The Data Holder SHALL perform a two-layer validation:
         *   **Verify Signature:** Use the `iss` (Trusted Issuer) public key.
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
         *   **Verify Type:** `ticket_type` SHALL be present and recognized.
-        *   **Verify Binding:** Does the JWK Thumbprint of the `client_assertion` signing key match the ticket's `cnf.jkt`?
+        *   **Verify Binding:** If `cnf` is present, does the JWK Thumbprint of the `client_assertion` signing key match the ticket's `cnf.jkt`?
     *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `authorization.access` rules.
 
 #### Subject Resolution
@@ -295,7 +309,7 @@ A network-level ticket provides baseline access; an additional ticket from a spe
 Regardless of profile, these rules always apply:
 - All tickets SHALL be valid for the Data Holder (per audience rules)
 - All issuers SHALL be trusted by the Data Holder
-- The JWK Thumbprint of the authenticated `client_assertion` signing key SHALL match each ticket's `cnf.jkt`
+- For each ticket with `cnf`, the JWK Thumbprint of the authenticated `client_assertion` signing key SHALL match that ticket's `cnf.jkt`
 - All tickets SHALL include `ticket_type`
 - When `permission_ticket_profile` is present, all tickets SHALL match the declared profile rules
 
@@ -403,15 +417,15 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 
 The table below summarizes required and optional fields for each use case profile:
 
-| Use Case | Subject Mode | Requester | Details | Access Dimensions |
-|----------|-------------|-----------|---------|-------------------|
-| UC1: Patient Access | `match` | — | — | `scopes` (required) |
-| UC2: Authorized Rep | `identifier` | `RelatedPerson` (required) | `basis`, `verifiedAt`, `jurisdiction` | `scopes` (required) |
-| UC3: Public Health | `reference` | `Organization` (required) | `condition` (Coding), `case` (Reference) | `scopes`, `periods` |
-| UC4: Social Care | `reference` | `PractitionerRole` (required) | `concern` (Coding), `referral` (Reference) | `scopes` |
-| UC5: Payer Claims | `reference` | `Organization` (required) | `service` (Coding), `claim` (Reference) | `scopes` |
-| UC6: Research | `identifier` | `Organization` (required) | `condition` (Coding), `study` (Reference) | `scopes`, `periods` |
-| UC7: Provider Consult | `reference` | `Practitioner` (required) | `reason` (Coding), `request` (Reference) | `scopes` |
+| Use Case | `cnf` | Subject Mode | Requester | Details | Access Dimensions |
+|----------|-------|-------------|-----------|---------|-------------------|
+| UC1: Patient Access | Required | `match` | — | — | `scopes` (required) |
+| UC2: Authorized Rep | Required | `identifier` | `RelatedPerson` (required) | `basis`, `verifiedAt`, `jurisdiction` | `scopes` (required) |
+| UC3: Public Health | Optional | `reference` | `Organization` (required) | `condition` (Coding), `case` (Reference) | `scopes`, `periods` |
+| UC4: Social Care | Optional | `reference` | `PractitionerRole` (required) | `concern` (Coding), `referral` (Reference) | `scopes` |
+| UC5: Payer Claims | Optional | `reference` | `Organization` (required) | `service` (Coding), `claim` (Reference) | `scopes` |
+| UC6: Research | Required | `identifier` | `Organization` (required) | `condition` (Coding), `study` (Reference) | `scopes`, `periods` |
+| UC7: Provider Consult | Optional | `reference` | `Practitioner` (required) | `reason` (Coding), `request` (Reference) | `scopes` |
 
 #### Use Case 1: Network-Mediated Patient Access
 *A patient uses a high-assurance Digital ID wallet to authorize an app to fetch their data from multiple hospitals.*
@@ -505,7 +519,7 @@ export interface PermissionTicket {
     aud: string | string[]; // Audience: recipient URL(s) or network / trust framework identifier
     exp: number;          // Expiration Timestamp
     ticket_type: string;  // Ticket type URI identifying the ticket schema and processing rules
-    cnf: {
+    cnf?: {
         jkt: string; // JWK Thumbprint (RFC 7638) of the authorized client key
     };
     iat?: number;         // Issued-at timestamp
@@ -567,7 +581,7 @@ export interface ClientAssertion {
 *   **Keys:**
     *   **Issuer:** Signs the `PermissionTicket`. Public keys SHALL be exposed via a JWK Set URL (e.g., `https://trusted-issuer.org/.well-known/jwks.json`).
     *   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
-*   **Binding:** `PermissionTicket.cnf.jkt` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). Data Holders compute the thumbprint of the `client_assertion` signing key and verify it matches.
+*   **Binding:** When present, `PermissionTicket.cnf.jkt` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). Data Holders compute the thumbprint of the `client_assertion` signing key and verify it matches. When `cnf` is absent, `aud` + client authentication provide the trust boundary.
 
 #### Error Responses
 
@@ -583,7 +597,7 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 | Issuer not trusted | `invalid_grant` | "Ticket issuer not trusted: {iss}" |
 | Issuer JWKS unavailable | `invalid_grant` | "Unable to retrieve issuer keys" |
 | Ticket expired | `invalid_grant` | "Ticket expired" |
-| Client key binding mismatch | `invalid_grant` | "Ticket not bound to client key" |
+| Client key binding mismatch (`cnf` present) | `invalid_grant` | "Ticket not bound to client key" |
 | `aud` mismatch | `invalid_grant` | "Ticket not valid for this server" |
 | Unknown `ticket_type` | `invalid_grant` | "Unsupported ticket type" |
 | Profile/ticket type mismatch | `invalid_grant` | "Ticket type not valid for profile" |
@@ -606,7 +620,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 **SHALL:**
 - Accept `permission_tickets` claim in client assertions
 - Validate client assertion per SMART Backend Services
-- For each ticket: verify signature, `ticket_type`, `cnf.jkt` binding, `aud`, and `exp`
+- For each ticket: verify signature, `ticket_type`, `aud`, and `exp`; if `cnf` is present, verify `cnf.jkt` binding
 - Validate `ticket_type` is recognized and select processing rules accordingly
 - If multiple tickets are presented, require and validate `permission_ticket_profile`
 - If `permission_ticket_profile` is present, validate all tickets match the declared profile rules
@@ -647,8 +661,8 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 
 **SHALL:**
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
-- Include claims: `iss`, `sub`, `aud`, `exp`, `cnf`, `ticket_type`, `authorization`
-- Bind each ticket to a specific client key via `cnf.jkt` (JWK Thumbprint)
+- Include claims: `iss`, `sub`, `aud`, `exp`, `ticket_type`, `authorization`
+- When the ticket type requires `cnf`, bind the ticket to a specific client key via `cnf.jkt` (JWK Thumbprint)
 - If `revocation` is present, include `jti` and publish CRL at the URL specified in tickets
 
 **SHOULD:**

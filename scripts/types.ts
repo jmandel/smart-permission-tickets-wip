@@ -4,7 +4,7 @@ export interface PermissionTicket {
     aud: string | string[]; // Audience: recipient URL(s) or network / trust framework identifier
     exp: number;          // Expiration Timestamp
     ticket_type: string;  // Ticket type URI identifying the ticket schema and processing rules
-    cnf: {
+    cnf?: {
         jkt: string; // JWK Thumbprint (RFC 7638) of the authorized client key
     };
     iat?: number;         // Issued-At Timestamp
