@@ -29,12 +29,14 @@
       "code": "49436004",
       "display": "Atrial fibrillation"
     },
-    "requestIdentifier": [
-      {
+    "request": {
+      "reference": "ServiceRequest/123",
+      "identifier": {
         "system": "https://issuer.org/cases",
         "value": "CASE-123"
-      }
-    ]
+      },
+      "display": "Cardiology consult for atrial fibrillation"
+    }
   }
 }
 ```

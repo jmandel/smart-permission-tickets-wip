@@ -44,12 +44,13 @@
       "code": "56717001",
       "display": "Tuberculosis"
     },
-    "caseIdentifier": [
-      {
+    "case": {
+      "identifier": {
         "system": "https://doh.wa.gov/cases",
         "value": "CASE-2024-999"
-      }
-    ]
+      },
+      "display": "TB investigation, Case 2024-999"
+    }
   }
 }
 ```

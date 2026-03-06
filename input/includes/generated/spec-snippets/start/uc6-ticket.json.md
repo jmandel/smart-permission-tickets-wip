@@ -37,12 +37,13 @@
       "code": "363358000",
       "display": "Malignant tumor of lung"
     },
-    "studyIdentifier": [
-      {
-        "system": "https://consent-service.org/studies",
-        "value": "STUDY-PROTO-22"
-      }
-    ]
+    "study": {
+      "identifier": {
+        "system": "https://clinicaltrials.gov",
+        "value": "NCT-12345"
+      },
+      "display": "Lung cancer immunotherapy trial"
+    }
   }
 }
 ```

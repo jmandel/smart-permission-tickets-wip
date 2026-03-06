@@ -53,12 +53,14 @@
       "code": "733423003",
       "display": "Food insecurity"
     },
-    "referralIdentifier": [
-      {
+    "referral": {
+      "reference": "ServiceRequest/555",
+      "identifier": {
         "system": "https://referring-ehr.org/referrals",
         "value": "REF-555"
-      }
-    ]
+      },
+      "display": "Food insecurity referral"
+    }
   }
 }
 ```

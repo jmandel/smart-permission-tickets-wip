@@ -148,7 +148,10 @@ const uc3_payload: PermissionTicket = {
     },
     details: {
         condition: { system: "http://snomed.info/sct", code: "56717001", display: "Tuberculosis" },
-        caseIdentifier: [{ system: "https://doh.wa.gov/cases", value: "CASE-2024-999" }]
+        case: {
+            identifier: { system: "https://doh.wa.gov/cases", value: "CASE-2024-999" },
+            display: "TB investigation, Case 2024-999"
+        }
     }
 };
 
@@ -186,7 +189,11 @@ const uc4_payload: PermissionTicket = {
     },
     details: {
         concern: { system: "http://snomed.info/sct", code: "733423003", display: "Food insecurity" },
-        referralIdentifier: [{ system: "https://referring-ehr.org/referrals", value: "REF-555" }]
+        referral: {
+            reference: "ServiceRequest/555",
+            identifier: { system: "https://referring-ehr.org/referrals", value: "REF-555" },
+            display: "Food insecurity referral"
+        }
     }
 };
 
@@ -211,7 +218,10 @@ const uc5_payload: PermissionTicket = {
     },
     details: {
         service: { system: "http://snomed.info/sct", code: "80146002", display: "Appendectomy" },
-        claimIdentifier: [{ system: "http://provider.com/claims", value: "CLAIM-2024-XYZ" }]
+        claim: {
+            identifier: { system: "http://payer.com/claims", value: "CLAIM-2024-XYZ" },
+            display: "Appendectomy claim"
+        }
     }
 };
 
@@ -237,7 +247,10 @@ const uc6_payload: PermissionTicket = {
     },
     details: {
         condition: { system: "http://snomed.info/sct", code: "363358000", display: "Malignant tumor of lung" },
-        studyIdentifier: [{ system: "https://consent-service.org/studies", value: "STUDY-PROTO-22" }]
+        study: {
+            identifier: { system: "https://clinicaltrials.gov", value: "NCT-12345" },
+            display: "Lung cancer immunotherapy trial"
+        }
     }
 };
 
@@ -262,7 +275,11 @@ const uc7_payload: PermissionTicket = {
     },
     details: {
         reason: { system: "http://snomed.info/sct", code: "49436004", display: "Atrial fibrillation" },
-        requestIdentifier: [{ system: "https://referring-ehr.org/requests", value: "ref-req-111" }]
+        request: {
+            reference: "ServiceRequest/ref-req-111",
+            identifier: { system: "https://referring-ehr.org/requests", value: "ref-req-111" },
+            display: "Cardiology consult for atrial fibrillation"
+        }
     }
 };
 

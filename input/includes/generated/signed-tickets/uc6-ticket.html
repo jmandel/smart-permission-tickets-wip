@@ -18,7 +18,7 @@
   "iss": "https://consent-platform.org",
   "sub": "grant-uc6-study-proto22",
   "aud": "https://hospital.com",
-  "exp": 1772812558,
+  "exp": 1772814506,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/research-study-v1",
   "cnf": {
     "jkt": "JuI6ibZHcMPQICaIZ55PbXpnsudQmKt00D0BiEXNrMc"
@@ -60,20 +60,21 @@
       "code": "363358000",
       "display": "Malignant tumor of lung"
     },
-    "studyIdentifier": [
-      {
-        "system": "https://consent-service.org/studies",
-        "value": "STUDY-PROTO-22"
-      }
-    ]
+    "study": {
+      "identifier": {
+        "system": "https://clinicaltrials.gov",
+        "value": "NCT-12345"
+      },
+      "display": "Lung cancer immunotherapy trial"
+    }
   },
-  "iat": 1772808958
+  "iat": 1772810906
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2NvbnNlbnQtcGxhdGZvcm0ub3JnIiwic3ViIjoiZ3JhbnQtdWM2LXN0dWR5LXByb3RvMjIiLCJhdWQiOiJodHRwczovL2hvc3BpdGFsLmNvbSIsImV4cCI6MTc3MjgxMjU1OCwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcmVzZWFyY2gtc3R1ZHktdjEiLCJjbmYiOnsiamt0IjoiSnVJNmliWkhjTVBRSUNhSVo1NVBiWHBuc3VkUW1LdDAwRDBCaUVYTnJNYyJ9LCJhdXRob3JpemF0aW9uIjp7InN1YmplY3QiOnsidHlwZSI6ImlkZW50aWZpZXIiLCJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWRlbnRpZmllciI6W3sidmFsdWUiOiJNUk4tMTIzIn1dfSwicmVxdWVzdGVyIjp7InJlc291cmNlVHlwZSI6Ik9yZ2FuaXphdGlvbiIsIm5hbWUiOiJPbmNvbG9neSBSZXNlYXJjaCBJbnN0aXR1dGUiLCJpZGVudGlmaWVyIjpbeyJ2YWx1ZSI6InJlc2VhcmNoLW9yZy1pZCJ9XX0sImFjY2VzcyI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJzIl0sInBlcmlvZHMiOlt7InN0YXJ0IjoiMjAyMC0wMS0wMSIsImVuZCI6IjIwMjUtMDEtMDEifV19fSwiZGV0YWlscyI6eyJjb25kaXRpb24iOnsic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiIzNjMzNTgwMDAiLCJkaXNwbGF5IjoiTWFsaWduYW50IHR1bW9yIG9mIGx1bmcifSwic3R1ZHlJZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwczovL2NvbnNlbnQtc2VydmljZS5vcmcvc3R1ZGllcyIsInZhbHVlIjoiU1RVRFktUFJPVE8tMjIifV19LCJpYXQiOjE3NzI4MDg5NTh9.G3EGY_NhNSz93LPA_WHZX5loswnWblVJkkknrT4sj4zJG7MahPTLvkmbqyBtGURSVPtYo_p93zizwJ4xcrb5dw</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2NvbnNlbnQtcGxhdGZvcm0ub3JnIiwic3ViIjoiZ3JhbnQtdWM2LXN0dWR5LXByb3RvMjIiLCJhdWQiOiJodHRwczovL2hvc3BpdGFsLmNvbSIsImV4cCI6MTc3MjgxNDUwNiwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcmVzZWFyY2gtc3R1ZHktdjEiLCJjbmYiOnsiamt0IjoiSnVJNmliWkhjTVBRSUNhSVo1NVBiWHBuc3VkUW1LdDAwRDBCaUVYTnJNYyJ9LCJhdXRob3JpemF0aW9uIjp7InN1YmplY3QiOnsidHlwZSI6ImlkZW50aWZpZXIiLCJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWRlbnRpZmllciI6W3sidmFsdWUiOiJNUk4tMTIzIn1dfSwicmVxdWVzdGVyIjp7InJlc291cmNlVHlwZSI6Ik9yZ2FuaXphdGlvbiIsIm5hbWUiOiJPbmNvbG9neSBSZXNlYXJjaCBJbnN0aXR1dGUiLCJpZGVudGlmaWVyIjpbeyJ2YWx1ZSI6InJlc2VhcmNoLW9yZy1pZCJ9XX0sImFjY2VzcyI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJzIl0sInBlcmlvZHMiOlt7InN0YXJ0IjoiMjAyMC0wMS0wMSIsImVuZCI6IjIwMjUtMDEtMDEifV19fSwiZGV0YWlscyI6eyJjb25kaXRpb24iOnsic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiIzNjMzNTgwMDAiLCJkaXNwbGF5IjoiTWFsaWduYW50IHR1bW9yIG9mIGx1bmcifSwic3R1ZHkiOnsiaWRlbnRpZmllciI6eyJzeXN0ZW0iOiJodHRwczovL2NsaW5pY2FsdHJpYWxzLmdvdiIsInZhbHVlIjoiTkNULTEyMzQ1In0sImRpc3BsYXkiOiJMdW5nIGNhbmNlciBpbW11bm90aGVyYXB5IHRyaWFsIn19LCJpYXQiOjE3NzI4MTA5MDZ9.9peJ6Sds5fl3w3YuIrEBh89E32OIM3AiPtdEjTJ1jq3MrUv3WhfAmminsCn15GUsrHGESM16LnfwvRZP0P1G-w</code></pre>
         </details>
     </div>
 </div>

@@ -29,12 +29,13 @@
       "code": "80146002",
       "display": "Appendectomy"
     },
-    "claimIdentifier": [
-      {
-        "system": "http://provider.com/claims",
+    "claim": {
+      "identifier": {
+        "system": "http://payer.com/claims",
         "value": "CLAIM-2024-XYZ"
-      }
-    ]
+      },
+      "display": "Appendectomy claim"
+    }
   }
 }
 ```

@@ -18,7 +18,7 @@
   "iss": "https://provider.com",
   "sub": "grant-uc5-claim-xyz",
   "aud": "https://provider.com",
-  "exp": 1772812558,
+  "exp": 1772814506,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1",
   "cnf": {
     "jkt": "JuI6ibZHcMPQICaIZ55PbXpnsudQmKt00D0BiEXNrMc"
@@ -52,20 +52,21 @@
       "code": "80146002",
       "display": "Appendectomy"
     },
-    "claimIdentifier": [
-      {
-        "system": "http://provider.com/claims",
+    "claim": {
+      "identifier": {
+        "system": "http://payer.com/claims",
         "value": "CLAIM-2024-XYZ"
-      }
-    ]
+      },
+      "display": "Appendectomy claim"
+    }
   },
-  "iat": 1772808958
+  "iat": 1772810906
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3Byb3ZpZGVyLmNvbSIsInN1YiI6ImdyYW50LXVjNS1jbGFpbS14eXoiLCJhdWQiOiJodHRwczovL3Byb3ZpZGVyLmNvbSIsImV4cCI6MTc3MjgxMjU1OCwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcGF5ZXItY2xhaW1zLWFkanVkaWNhdGlvbi12MSIsImNuZiI6eyJqa3QiOiJKdUk2aWJaSGNNUFFJQ2FJWjU1UGJYcG5zdWRRbUt0MDBEMEJpRVhOck1jIn0sImF1dGhvcml6YXRpb24iOnsic3ViamVjdCI6eyJ0eXBlIjoicmVmZXJlbmNlIiwicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsInJlZmVyZW5jZSI6IlBhdGllbnQvNDU2In0sInJlcXVlc3RlciI6eyJyZXNvdXJjZVR5cGUiOiJPcmdhbml6YXRpb24iLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaGw3Lm9yZy9maGlyL3NpZC91cy1ucGkiLCJ2YWx1ZSI6Ijk4NzY1NDMyMTAifV0sIm5hbWUiOiJCbHVlIFBheWVyIEluYyJ9LCJhY2Nlc3MiOnsic2NvcGVzIjpbInBhdGllbnQvRG9jdW1lbnRSZWZlcmVuY2UucnMiLCJwYXRpZW50L1Byb2NlZHVyZS5ycyJdfX0sImRldGFpbHMiOnsic2VydmljZSI6eyJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiY29kZSI6IjgwMTQ2MDAyIiwiZGlzcGxheSI6IkFwcGVuZGVjdG9teSJ9LCJjbGFpbUlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHA6Ly9wcm92aWRlci5jb20vY2xhaW1zIiwidmFsdWUiOiJDTEFJTS0yMDI0LVhZWiJ9XX0sImlhdCI6MTc3MjgwODk1OH0.DqsvHDUWwX0bLUjPvZNpMeg-OkrKUTREtbGHuC_bMpusM3k-8ouJJKtSFLFNb8WQBBIb0J9GATbaLq68aLFE-g</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3Byb3ZpZGVyLmNvbSIsInN1YiI6ImdyYW50LXVjNS1jbGFpbS14eXoiLCJhdWQiOiJodHRwczovL3Byb3ZpZGVyLmNvbSIsImV4cCI6MTc3MjgxNDUwNiwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcGF5ZXItY2xhaW1zLWFkanVkaWNhdGlvbi12MSIsImNuZiI6eyJqa3QiOiJKdUk2aWJaSGNNUFFJQ2FJWjU1UGJYcG5zdWRRbUt0MDBEMEJpRVhOck1jIn0sImF1dGhvcml6YXRpb24iOnsic3ViamVjdCI6eyJ0eXBlIjoicmVmZXJlbmNlIiwicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsInJlZmVyZW5jZSI6IlBhdGllbnQvNDU2In0sInJlcXVlc3RlciI6eyJyZXNvdXJjZVR5cGUiOiJPcmdhbml6YXRpb24iLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaGw3Lm9yZy9maGlyL3NpZC91cy1ucGkiLCJ2YWx1ZSI6Ijk4NzY1NDMyMTAifV0sIm5hbWUiOiJCbHVlIFBheWVyIEluYyJ9LCJhY2Nlc3MiOnsic2NvcGVzIjpbInBhdGllbnQvRG9jdW1lbnRSZWZlcmVuY2UucnMiLCJwYXRpZW50L1Byb2NlZHVyZS5ycyJdfX0sImRldGFpbHMiOnsic2VydmljZSI6eyJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiY29kZSI6IjgwMTQ2MDAyIiwiZGlzcGxheSI6IkFwcGVuZGVjdG9teSJ9LCJjbGFpbSI6eyJpZGVudGlmaWVyIjp7InN5c3RlbSI6Imh0dHA6Ly9wYXllci5jb20vY2xhaW1zIiwidmFsdWUiOiJDTEFJTS0yMDI0LVhZWiJ9LCJkaXNwbGF5IjoiQXBwZW5kZWN0b215IGNsYWltIn19LCJpYXQiOjE3NzI4MTA5MDZ9.Uahhs4mbVIUmA_l6cMfib5JhiNOtzeSp4w3oafabxnthfiAxPY5DVfKWJ1qY22seUKs3ZoUNtQMt4gynohfWoA</code></pre>
         </details>
     </div>
 </div>

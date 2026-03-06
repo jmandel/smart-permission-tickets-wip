@@ -402,11 +402,11 @@ The table below summarizes required and optional fields for each use case profil
 |----------|-------------|-----------|---------|-------------------|
 | UC1: Patient Access | `match` | — | — | `scopes` (required) |
 | UC2: Authorized Rep | `identifier` | `RelatedPerson` (required) | — | `scopes` (required) |
-| UC3: Public Health | `reference` | `Organization` (required) | `condition`, `caseIdentifier` | `scopes`, `periods` |
-| UC4: Social Care | `reference` | `PractitionerRole` (required) | `concern`, `referralIdentifier` | `scopes` |
-| UC5: Payer Claims | `reference` | `Organization` (required) | `service`, `claimIdentifier` | `scopes` |
-| UC6: Research | `identifier` | `Organization` (required) | `condition`, `studyIdentifier` | `scopes`, `periods` |
-| UC7: Provider Consult | `reference` | `Practitioner` (required) | `reason`, `requestIdentifier` | `scopes` |
+| UC3: Public Health | `reference` | `Organization` (required) | `condition` (Coding), `case` (Reference) | `scopes`, `periods` |
+| UC4: Social Care | `reference` | `PractitionerRole` (required) | `concern` (Coding), `referral` (Reference) | `scopes` |
+| UC5: Payer Claims | `reference` | `Organization` (required) | `service` (Coding), `claim` (Reference) | `scopes` |
+| UC6: Research | `identifier` | `Organization` (required) | `condition` (Coding), `study` (Reference) | `scopes`, `periods` |
+| UC7: Provider Consult | `reference` | `Practitioner` (required) | `reason` (Coding), `request` (Reference) | `scopes` |
 
 #### Use Case 1: Network-Mediated Patient Access
 *A patient uses a high-assurance Digital ID wallet to authorize an app to fetch their data from multiple hospitals.*
@@ -436,7 +436,7 @@ The table below summarizes required and optional fields for each use case profil
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`reference`, by local resource ID).
 *   **Requester:** `Organization` (Name, Identifier, Type).
-*   **Details:** `condition` = Tuberculosis (SCT 56717001), `caseIdentifier` = Case ID.
+*   **Details:** `condition` = Tuberculosis (SCT 56717001), `case` = Reference (by identifier to PHA case).
 *   **Access:** `scopes` = `patient/*.rs`, `periods` (Start Date).
 
 {% include generated/signed-tickets/uc3-ticket.html %}
@@ -447,7 +447,7 @@ The table below summarizes required and optional fields for each use case profil
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`reference`, by resource reference).
 *   **Requester:** `PractitionerRole` (Contained `Practitioner` + `Organization`).
-*   **Details:** `concern` = Food insecurity (SCT 733423003), `referralIdentifier` = Referral ID.
+*   **Details:** `concern` = Food insecurity (SCT 733423003), `referral` = Reference to local ServiceRequest.
 *   **Access:** `scopes` = `patient/ServiceRequest.rsu`, `patient/Task.rsu`.
 
 {% include generated/signed-tickets/uc4-ticket.html %}
@@ -458,7 +458,7 @@ The table below summarizes required and optional fields for each use case profil
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`reference`, by resource reference).
 *   **Requester:** `Organization` (Payer NPI).
-*   **Details:** `service` = Appendectomy (SCT 80146002), `claimIdentifier` = Claim ID.
+*   **Details:** `service` = Appendectomy (SCT 80146002), `claim` = Reference (by identifier to payer claim).
 *   **Access:** `scopes` = `patient/DocumentReference.rs`, `patient/Procedure.rs`.
 
 {% include generated/signed-tickets/uc5-ticket.html %}
@@ -469,7 +469,7 @@ The table below summarizes required and optional fields for each use case profil
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`identifier`, by MRN).
 *   **Requester:** `Organization` (Research Institute ID).
-*   **Details:** `condition` = Malignant tumor of lung (SCT 363358000), `studyIdentifier` = Study ID.
+*   **Details:** `condition` = Malignant tumor of lung (SCT 363358000), `study` = Reference (by identifier to research study).
 *   **Access:** `scopes` = `patient/*.rs`, `periods` (Start/End Date).
 
 {% include generated/signed-tickets/uc6-ticket.html %}
@@ -480,7 +480,7 @@ The table below summarizes required and optional fields for each use case profil
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`reference`, by resource reference).
 *   **Requester:** `Practitioner` (NPI).
-*   **Details:** `reason` = Atrial fibrillation (SCT 49436004), `requestIdentifier` = Request ID.
+*   **Details:** `reason` = Atrial fibrillation (SCT 49436004), `request` = Reference to local ServiceRequest.
 *   **Access:** `scopes` = `patient/*.rs`.
 
 {% include generated/signed-tickets/uc7-ticket.html %}

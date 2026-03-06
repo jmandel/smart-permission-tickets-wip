@@ -35,12 +35,14 @@
       "code": "49436004",
       "display": "Atrial fibrillation"
     },
-    "requestIdentifier": [
-      {
+    "request": {
+      "reference": "ServiceRequest/ref-req-111",
+      "identifier": {
         "system": "https://referring-ehr.org/requests",
         "value": "ref-req-111"
-      }
-    ]
+      },
+      "display": "Cardiology consult for atrial fibrillation"
+    }
   }
 }
 ```
