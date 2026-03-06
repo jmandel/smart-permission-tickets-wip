@@ -1,41 +1,30 @@
-**Enabling Granular, Context-Aware Authorization in Health Networks**
+### Introduction
 
-### Executive Summary
+A Permission Ticket is an issuer-signed, sender-constrained JWT presented inside a SMART Backend Services `client_assertion`. It allows a client to redeem a portable authorization grant at any eligible Data Holder within the ticket's audience, without requiring the issuer to know where the subject has received care.
 
-Current interoperability standards and frameworks (SMART on FHIR, TEFCA) face a "granularity gap." Authorization flows effectively force a choice between two extremes:
-1.  **User-Centric friction:** Relying on patients to manually log in to **N** different portals to authorize a single app.
-2.  **System-Centric rigidity:** Relying on backend configurations where trusted nodes get broad, "super-user" access because defining granular rules per-patient is administratively impossible.
+Each ticket conveys authorization context in a common structure: a **subject** (whose data), an **actor** (on whose behalf), a **context** (why), and **capability** constraints (what, and how much). SMART scopes provide the coarse access ceiling. Structured capability constraints express finer limits — time range, jurisdiction, source organization.
 
-**Permission Tickets** solve this by introducing a **Capability-Based Access Control** model to OAuth. Instead of the Data Holder asking, "Who are you and what is your pre-configured role?", it asks, "What proof do you hold that authorizes this specific request?"
+The ticket is cryptographically bound to the presenting client's key (`cnf.jkt`). A Data Holder verifies the client assertion, verifies the ticket signature against the issuer's published keys, confirms the key binding, and grants access scoped to the intersection of requested and authorized capabilities. No user login is required at the Data Holder.
 
-A Permission Ticket is a portable, cryptographically signed artifact. It uses standard **FHIR Resources** as data models to describe the *Subject* (Patient), the *Actor* (Requesting Agent), and the *Context* (Trigger Event), enabling precise access control without requiring realtime user interaction at the data source.
+### Scope and Non-Goals
 
----
+**This specification defines:**
+- The Permission Ticket artifact format and required claims
+- Presentation inside a `client_assertion` at the token endpoint
+- Sender-constrained binding via `cnf.jkt`
+- Audience validation for single-recipient and network-wide recipient sets
+- Subject resolution modes and validation rules
+- Access calculation and capability constraint enforcement
+- Seven single-ticket use-case profiles
 
-### Problem Space
+**This specification does not define:**
+- How a ticket issuer verifies real-world facts before minting a ticket
+- Trust framework governance or membership validation procedures
+- User-facing consent or authorization UX
+- Ticket issuance protocols between clients and issuers
+- A universal schema for all possible use cases (profiles define use-case-specific constraints)
 
-#### "N Portals" Bottleneck (Consumer Access)
-In standard SMART flows, if a patient wants to aggregate their data from five different hospitals into a personal health app, they must locate five different portals, remember five usernames/passwords, and click "Approve" five times. This friction destroys adoption. Furthermore, the scopes are coarse; a user can usually only say "Yes" to everything or "No" to everything.
-
-#### "All-or-Nothing" Network (Backend Services)
-In B2B flows (like TEFCA Treatment or Payer exchange), Client Apps authenticate via certificates. Because it is too hard to configure specific permissions for every patient and every external partner, Data Holders often default to binary trust: if the partner is a "Trusted Node," they get access to the firehose. This is unacceptable for sensitive use cases like Research, Public Health, or Social Care.
-
----
-
-### Solution: Permission Tickets
-
-A **Permission Ticket** is a JWT minted by a Trusted Issuer. It acts as a self-contained authorization grant.
-
-In one sentence: a Permission Ticket is a portable, issuer-attested, sender-constrained authorization grant — the issuer vouches for the authorization context, the client proves it holds the right key, and any eligible Data Holder in the ticket's audience can independently validate and honor the ticket without needing to know in advance where the subject's data lives.
-
-#### Core Principles
-1.  **Issuer-Signed:** The ticket is minted by an entity the Data Holder trusts (e.g., a Trust Broker, an Identity Verifier, or the Data Holder itself).
-2.  **Client-Bound:** The ticket is cryptographically bound to the client's public key via a JWK Thumbprint (`cnf.jkt`).
-3.  **Self-Describing:** Every ticket includes a `ticket_type` that identifies its schema and processing rules. The ticket tells you what it is; the outer envelope tells you how it is being presented.
-4.  **FHIR-Native:** The payload uses strict FHIR Resource structures (`Patient`, `PractitionerRole`, `Organization`) to define identities, making integration with existing EHR logic seamless.
-5.  **Zero-Interaction:** The Data Holder validates the ticket signature and grants access immediately. No user login page is presented.
-
-#### Authorization Flow
+### Protocol Overview
 
 ```mermaid
 sequenceDiagram
@@ -64,6 +53,8 @@ sequenceDiagram
     Client->>Server: GET /Patient/123/Immunization
     Server-->>Client: FHIR Resources
 ```
+
+A trusted issuer mints a Permission Ticket and delivers it to the client. The client embeds the ticket in a signed `client_assertion` and presents it to the Data Holder's token endpoint. The Data Holder authenticates the client (standard SMART Backend Services), then validates the ticket: signature, issuer trust, audience, key binding, and capability constraints. If valid, it issues an access token scoped to the intersection of requested and ticket-authorized access.
 
 ---
 
