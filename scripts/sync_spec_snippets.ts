@@ -228,6 +228,11 @@ function buildStartSnippets(): void {
         ]
       },
       access: { scopes: ["patient/*.rs"] }
+    },
+    details: {
+      basis: "patient-designated",
+      verifiedAt: "2026-03-06T15:04:05Z",
+      jurisdiction: [{ state: "IL" }]
     }
   };
 

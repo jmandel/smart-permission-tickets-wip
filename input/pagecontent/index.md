@@ -406,7 +406,7 @@ The table below summarizes required and optional fields for each use case profil
 | Use Case | Subject Mode | Requester | Details | Access Dimensions |
 |----------|-------------|-----------|---------|-------------------|
 | UC1: Patient Access | `match` | — | — | `scopes` (required) |
-| UC2: Authorized Rep | `identifier` | `RelatedPerson` (required) | — | `scopes` (required) |
+| UC2: Authorized Rep | `identifier` | `RelatedPerson` (required) | `basis`, `verifiedAt`, `jurisdiction` | `scopes` (required) |
 | UC3: Public Health | `reference` | `Organization` (required) | `condition` (Coding), `case` (Reference) | `scopes`, `periods` |
 | UC4: Social Care | `reference` | `PractitionerRole` (required) | `concern` (Coding), `referral` (Reference) | `scopes` |
 | UC5: Payer Claims | `reference` | `Organization` (required) | `service` (Coding), `claim` (Reference) | `scopes` |
@@ -430,7 +430,7 @@ The table below summarizes required and optional fields for each use case profil
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`identifier`, matched by MPI identifier).
 *   **Requester:** `RelatedPerson` (Name, Telecom, Relationship Code).
-*   **Details:** None.
+*   **Details:** `basis` = `patient-designated`, `verifiedAt`, `jurisdiction` (optional).
 *   **Access:** `scopes` = `patient/*.rs`.
 
 {% include generated/signed-tickets/uc2-ticket.html %}
