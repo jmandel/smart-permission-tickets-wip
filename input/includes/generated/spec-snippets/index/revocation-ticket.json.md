@@ -13,12 +13,12 @@
     "url": "https://trust-broker.org/.well-known/crl/patient-access.json",
     "rid": "abc123xyz"
   },
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "match",
       "resourceType": "Patient"
     },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/*.rs"
       ]

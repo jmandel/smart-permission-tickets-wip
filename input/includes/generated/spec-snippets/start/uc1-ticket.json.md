@@ -1,6 +1,6 @@
 ```json
 {
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "match",
       "traits": {
@@ -22,7 +22,7 @@
         ]
       }
     },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/Immunization.rs",
         "patient/AllergyIntolerance.rs"

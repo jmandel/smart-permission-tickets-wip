@@ -1,12 +1,12 @@
 ```json
 {
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "reference",
       "resourceType": "Patient",
       "reference": "Patient/456"
     },
-    "actor": {
+    "requester": {
       "resourceType": "Organization",
       "identifier": [
         {
@@ -16,30 +16,25 @@
       ],
       "name": "Blue Payer Inc"
     },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "CLMATTCH",
-        "display": "Claim Attachment"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "80146002",
-        "display": "Appendectomy"
-      },
-      "identifier": [
-        {
-          "system": "http://provider.com/claims",
-          "value": "CLAIM-2024-XYZ"
-        }
-      ]
-    },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/DocumentReference.rs",
         "patient/Procedure.rs"
       ]
     }
+  },
+  "details": {
+    "service": {
+      "system": "http://snomed.info/sct",
+      "code": "80146002",
+      "display": "Appendectomy"
+    },
+    "claimIdentifier": [
+      {
+        "system": "http://provider.com/claims",
+        "value": "CLAIM-2024-XYZ"
+      }
+    ]
   }
 }
 ```

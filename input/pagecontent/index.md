@@ -2,7 +2,7 @@
 
 A Permission Ticket is an issuer-signed, sender-constrained JWT presented inside a SMART Backend Services `client_assertion`. It allows a client to redeem a portable authorization grant at any eligible Data Holder within the ticket's audience, without requiring the issuer to know where the subject has received care.
 
-Each ticket conveys authorization context in a common structure: a **subject** (whose data), an **actor** (on whose behalf), a **context** (why), and **capability** constraints (what, and how much). SMART scopes provide the coarse access ceiling. Structured capability constraints express finer limits — time range, jurisdiction, source organization.
+Each ticket conveys a common **authorization** structure: a **subject** (whose data), an optional **requester** (on whose behalf), and **access** constraints (what, and how much). Ticket-type-specific business semantics live in an optional **details** object whose schema is selected by `ticket_type`. SMART scopes provide the coarse access ceiling. Structured access constraints express finer limits — time range, jurisdiction, source organization.
 
 The ticket is cryptographically bound to the presenting client's key (`cnf.jkt`). A Data Holder verifies the client assertion, verifies the ticket signature against the issuer's published keys, confirms the key binding, and grants access scoped to the intersection of requested and authorized capabilities. No user login is required at the Data Holder.
 
@@ -14,7 +14,7 @@ The ticket is cryptographically bound to the presenting client's key (`cnf.jkt`)
 - Sender-constrained binding via `cnf.jkt`
 - Audience validation for single-recipient and network-wide recipient sets
 - Subject resolution modes and validation rules
-- Access calculation and capability constraint enforcement
+- Access calculation and access constraint enforcement
 - Seven single-ticket use-case profiles
 
 **This specification does not define:**
@@ -54,7 +54,7 @@ sequenceDiagram
     Server-->>Client: FHIR Resources
 ```
 
-A trusted issuer mints a Permission Ticket and delivers it to the client. The client embeds the ticket in a signed `client_assertion` and presents it to the Data Holder's token endpoint. The Data Holder authenticates the client (standard SMART Backend Services), then validates the ticket: signature, issuer trust, audience, key binding, and capability constraints. If valid, it issues an access token scoped to the intersection of requested and ticket-authorized access.
+A trusted issuer mints a Permission Ticket and delivers it to the client. The client embeds the ticket in a signed `client_assertion` and presents it to the Data Holder's token endpoint. The Data Holder authenticates the client (standard SMART Backend Services), then validates the ticket: signature, issuer trust, audience, key binding, and access constraints. If valid, it issues an access token scoped to the intersection of requested and ticket-authorized access.
 
 ---
 
@@ -84,7 +84,7 @@ grant_type=client_credentials
 ```
 
 ##### Full Client Assertion Example
-Here is what the `client_assertion` looks like when decoded. Note the `trust_chain` for automatic registration and the embedded `ticket_context`.
+Here is what the `client_assertion` looks like when decoded. Note the `trust_chain` for automatic registration and the embedded Permission Ticket.
 
 {% include generated/signed-tickets/example-client-assertion.html %}
 
@@ -97,7 +97,7 @@ A Permission Ticket authorizes access only when presented inside a valid `client
 The Data Holder SHALL NOT rely on any cross-party-stable client identifier inside the Permission Ticket itself. Client identity is established by the outer `client_assertion` (`iss`/`sub`). The ticket's `sub` claim is issuer-local and opaque — it identifies the authorization grant, not the client.
 
 #### Artifact: Ticket Structure
-The ticket payload is a JWT. It wraps standard FHIR JSON objects within a `ticket_context` claim.
+The ticket payload is a JWT. It carries a common `authorization` claim with subject, access constraints, and optional requester. Ticket-type-specific business semantics (reason codes, case identifiers, etc.) live in an optional `details` object whose schema is defined by the `ticket_type` URI.
 
 {% include generated/spec-snippets/index/artifact-ticket.json.md %}
 
@@ -127,11 +127,11 @@ The Data Holder SHALL perform a two-layer validation:
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
         *   **Verify Type:** `ticket_type` SHALL be present and recognized.
         *   **Verify Binding:** Does the JWK Thumbprint of the `client_assertion` signing key match the ticket's `cnf.jkt`?
-    *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `ticket_context.capability` rules.
+    *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `authorization.access` rules.
 
 #### Subject Resolution
 
-The `ticket_context.subject` identifies whose data the ticket authorizes access to. Every subject SHALL include a `type` field that declares how the Data Holder should resolve the subject to a local patient. The three modes are:
+The `authorization.subject` identifies whose data the ticket authorizes access to. Every subject SHALL include a `type` field that declares how the Data Holder should resolve the subject to a local patient. The three modes are:
 
 | Mode | Required Fields | Prohibited Fields | Description |
 |------|----------------|-------------------|-------------|
@@ -143,9 +143,11 @@ If subject resolution yields zero matches, or more than one match, the Data Hold
 
 #### Issuer-Attested Claims
 
-`ticket_context.actor` and `ticket_context.context` are issuer-attested facts. The Data Holder uses them for policy evaluation and audit, unless a specific profile requires additional holder-side verification.
+`authorization.requester` and `details` are issuer-attested facts. The Data Holder uses them for policy evaluation and audit, unless a specific profile requires additional holder-side verification.
 
-If `actor` is absent, the ticket does not assert a separate third-party actor. This does not mean anonymous access — the presenting client is still authenticated by the outer `client_assertion`.
+If `requester` is absent, the ticket does not assert a separate third-party requester. This does not mean anonymous access — the presenting client is still authenticated by the outer `client_assertion`.
+
+If `details` is absent, the ticket type has no business-specific fields beyond the common authorization claims.
 
 ---
 
@@ -154,15 +156,15 @@ If `actor` is absent, the ticket does not assert a separate third-party actor. T
 The Data Holder calculates granted access through the **intersection** of:
 
 1. **Requested Scopes**: The `scope` parameter in the token request
-2. **Ticket Capability**: Constraints from `ticket_context.capability`
+2. **Ticket Access**: Constraints from `authorization.access`
 3. **Client Registration**: Scopes the client is permitted to request
 
 If the intersection yields no valid access, return `invalid_scope` error.
 Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on profile. For single-patient Permission Ticket profiles, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
 
-#### Capability Constraints
+#### Access Constraints
 
-The `capability` object defines what access the ticket authorizes:
+The `authorization.access` object defines what access the ticket authorizes:
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -173,7 +175,7 @@ The `capability` object defines what access the ticket authorizes:
 
 ##### Constraint Algebra
 
-Different capability dimensions are combined **conjunctively** (AND): returned data must satisfy every present constraint. Multiple values within the same dimension are combined **disjunctively** (OR): data matching any listed value within a dimension satisfies that dimension. An absent dimension means no restriction for that dimension.
+Different access dimensions are combined **conjunctively** (AND): returned data must satisfy every present constraint. Multiple values within the same dimension are combined **disjunctively** (OR): data matching any listed value within a dimension satisfies that dimension. An absent dimension means no restriction for that dimension.
 
 For example, a ticket with `jurisdictions: [{state: "CA"}, {state: "NY"}]` and `organizations: [{identifier: [...npi: "123"]}]` means: data from (CA **or** NY) **and** from the organization with NPI 123.
 
@@ -188,8 +190,8 @@ For example, a ticket with `jurisdictions: [{state: "CA"}, {state: "NY"}]` and `
 
 Data Holders that cannot enforce a presented constraint SHALL reject the ticket with `invalid_grant` and `error_description` indicating the unsupported constraint.
 
-**Example Capability:**
-{% include generated/spec-snippets/index/capability-example.json.md %}
+**Example Access Constraints:**
+{% include generated/spec-snippets/index/access-example.json.md %}
 This ticket authorizes read access to Conditions and Procedures, but only for data:
 - With dates in 2023-2024
 - From California or New York
@@ -197,7 +199,7 @@ This ticket authorizes read access to Conditions and Procedures, but only for da
 
 #### Token-Time and Resource-Time Enforcement
 
-Some capability constraints — especially `periods`, `jurisdictions`, and `organizations` — may require filtering at the Resource Server rather than at the token endpoint. If a constraint cannot be fully enforced at token issuance, the Authorization Server SHALL carry the normalized constraint set forward in the issued access token (or make it available via token introspection) so the Resource Server can enforce it.
+Some access constraints — especially `periods`, `jurisdictions`, and `organizations` — may require filtering at the Resource Server rather than at the token endpoint. If a constraint cannot be fully enforced at token issuance, the Authorization Server SHALL carry the normalized constraint set forward in the issued access token (or make it available via token introspection) so the Resource Server can enforce it.
 
 If a component responsible for enforcing a constraint cannot do so, the request SHALL be rejected rather than silently ignoring the constraint.
 
@@ -248,7 +250,7 @@ A client MAY present multiple tickets in the `permission_tickets` array to compo
 Multi-ticket scenarios are defined by **use case profiles**. Each profile specifies:
 - Required ticket types
 - Required issuer trust requirements per type
-- Claim source mapping (which ticket contributes subject, actor, capability, etc.)
+- Claim source mapping (which ticket contributes subject, requester, access, etc.)
 - Combination logic and validation order
 
 For the current single-ticket catalog in this specification, use case and profile are 1:1:
@@ -267,17 +269,17 @@ Unknown profile, unknown `ticket_type`, or profile/type mismatch SHALL be reject
 **Profile: Identity + Designated Representative**
 
 Two tickets are required:
-1. **Identity Ticket** (from Identity Provider): Contains verified `actor` identity
-2. **Authorization Ticket** (from Trust Broker): Contains `subject`, `capability`, and a reference linking to the actor
+1. **Identity Ticket** (from Identity Provider): Contains verified `requester` identity
+2. **Authorization Ticket** (from Trust Broker): Contains `subject`, `access`, and a reference linking to the requester
 
 {% include generated/spec-snippets/index/profile-identity-authorization.md %}
 
 The Data Holder, implementing this profile:
 1. Validates both tickets independently
-2. Confirms the `actor_reference` in Ticket 2 matches the `actor.identifier` in Ticket 1
-3. Uses actor from Ticket 1, subject and capability from Ticket 2
+2. Confirms the `requesterReference` in Ticket 2's `details` matches the `requester.identifier` in Ticket 1
+3. Uses requester from Ticket 1, subject and access from Ticket 2
 
-> **Note:** The `actor_reference` field used in this multi-ticket example is defined by the composition profile, not by the base ticket schema. Multi-ticket profile schemas may define additional fields beyond the base model.
+> **Note:** The `requesterReference` field used in this multi-ticket example lives in the ticket's `details` and is defined by the composition profile, not by the base ticket schema. Multi-ticket profile schemas may define additional `details` fields beyond the base model.
 
 **Profile: Base + Sensitive Category**
 
@@ -396,24 +398,24 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 
 The table below summarizes required and optional fields for each use case profile:
 
-| Use Case | Subject Mode | Actor | Context | Capability Dimensions |
-|----------|-------------|-------|---------|----------------------|
+| Use Case | Subject Mode | Requester | Details | Access Dimensions |
+|----------|-------------|-----------|---------|-------------------|
 | UC1: Patient Access | `match` | — | — | `scopes` (required) |
 | UC2: Authorized Rep | `identifier` | `RelatedPerson` (required) | — | `scopes` (required) |
-| UC3: Public Health | `reference` | `Organization` (required) | Required (`PUBHLTH`) | `scopes`, `periods` |
-| UC4: Social Care | `reference` | `PractitionerRole` (required) | Required (`REFER`) | `scopes` |
-| UC5: Payer Claims | `reference` | `Organization` (required) | Required (`CLMATTCH`) | `scopes` |
-| UC6: Research | `identifier` | `Organization` (required) | Required (`RESCH`) | `scopes`, `periods` |
-| UC7: Provider Consult | `reference` | `Practitioner` (required) | Required (`REFER`) | `scopes` |
+| UC3: Public Health | `reference` | `Organization` (required) | `condition`, `caseIdentifier` | `scopes`, `periods` |
+| UC4: Social Care | `reference` | `PractitionerRole` (required) | `concern`, `referralIdentifier` | `scopes` |
+| UC5: Payer Claims | `reference` | `Organization` (required) | `service`, `claimIdentifier` | `scopes` |
+| UC6: Research | `identifier` | `Organization` (required) | `condition`, `studyIdentifier` | `scopes`, `periods` |
+| UC7: Provider Consult | `reference` | `Practitioner` (required) | `reason`, `requestIdentifier` | `scopes` |
 
 #### Use Case 1: Network-Mediated Patient Access
 *A patient uses a high-assurance Digital ID wallet to authorize an app to fetch their data from multiple hospitals.*
 
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`match`, matched by demographics: Name, DOB, Identifier).
-*   **Actor:** None (implicitly the app/patient).
-*   **Context:** None.
-*   **Capability:** `scopes` = `patient/Immunization.rs`, `patient/AllergyIntolerance.rs`.
+*   **Requester:** None (implicitly the app/patient).
+*   **Details:** None.
+*   **Access:** `scopes` = `patient/Immunization.rs`, `patient/AllergyIntolerance.rs`.
 
 {% include generated/signed-tickets/uc1-ticket.html %}
 
@@ -422,9 +424,9 @@ The table below summarizes required and optional fields for each use case profil
 
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`identifier`, matched by MPI identifier).
-*   **Actor:** `RelatedPerson` (Name, Telecom, Relationship Code).
-*   **Context:** None.
-*   **Capability:** `scopes` = `patient/*.rs`.
+*   **Requester:** `RelatedPerson` (Name, Telecom, Relationship Code).
+*   **Details:** None.
+*   **Access:** `scopes` = `patient/*.rs`.
 
 {% include generated/signed-tickets/uc2-ticket.html %}
 
@@ -433,9 +435,9 @@ The table below summarizes required and optional fields for each use case profil
 
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`reference`, by local resource ID).
-*   **Actor:** `Organization` (Name, Identifier, Type).
-*   **Context:** `type` = `PUBHLTH` (Public Health), `focus` = `Tuberculosis` (SCT 56717001), `identifier` = Case ID.
-*   **Capability:** `scopes` = `patient/*.rs`, `periods` (Start Date).
+*   **Requester:** `Organization` (Name, Identifier, Type).
+*   **Details:** `condition` = Tuberculosis (SCT 56717001), `caseIdentifier` = Case ID.
+*   **Access:** `scopes` = `patient/*.rs`, `periods` (Start Date).
 
 {% include generated/signed-tickets/uc3-ticket.html %}
 
@@ -444,9 +446,9 @@ The table below summarizes required and optional fields for each use case profil
 
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`reference`, by resource reference).
-*   **Actor:** `PractitionerRole` (Contained `Practitioner` + `Organization`).
-*   **Context:** `type` = `REFER` (Referral), `focus` = `Food insecurity` (SCT 733423003).
-*   **Capability:** `scopes` = `patient/ServiceRequest.rsu`, `patient/Task.rsu`.
+*   **Requester:** `PractitionerRole` (Contained `Practitioner` + `Organization`).
+*   **Details:** `concern` = Food insecurity (SCT 733423003), `referralIdentifier` = Referral ID.
+*   **Access:** `scopes` = `patient/ServiceRequest.rsu`, `patient/Task.rsu`.
 
 {% include generated/signed-tickets/uc4-ticket.html %}
 
@@ -455,9 +457,9 @@ The table below summarizes required and optional fields for each use case profil
 
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`reference`, by resource reference).
-*   **Actor:** `Organization` (Payer NPI).
-*   **Context:** `type` = `CLMATTCH` (Claim Attachment), `focus` = `Appendectomy` (SCT 80146002).
-*   **Capability:** `scopes` = `patient/DocumentReference.rs`, `patient/Procedure.rs`.
+*   **Requester:** `Organization` (Payer NPI).
+*   **Details:** `service` = Appendectomy (SCT 80146002), `claimIdentifier` = Claim ID.
+*   **Access:** `scopes` = `patient/DocumentReference.rs`, `patient/Procedure.rs`.
 
 {% include generated/signed-tickets/uc5-ticket.html %}
 
@@ -466,9 +468,9 @@ The table below summarizes required and optional fields for each use case profil
 
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`identifier`, by MRN).
-*   **Actor:** `Organization` (Research Institute ID).
-*   **Context:** `type` = `RESCH` (Biomedical Research), `focus` = `Malignant tumor of lung` (SCT 363358000).
-*   **Capability:** `scopes` = `patient/*.rs`, `periods` (Start/End Date).
+*   **Requester:** `Organization` (Research Institute ID).
+*   **Details:** `condition` = Malignant tumor of lung (SCT 363358000), `studyIdentifier` = Study ID.
+*   **Access:** `scopes` = `patient/*.rs`, `periods` (Start/End Date).
 
 {% include generated/signed-tickets/uc6-ticket.html %}
 
@@ -477,9 +479,9 @@ The table below summarizes required and optional fields for each use case profil
 
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`reference`, by resource reference).
-*   **Actor:** `Practitioner` (NPI).
-*   **Context:** `type` = `REFER` (Referral), `focus` = `Atrial fibrillation` (SCT 49436004).
-*   **Capability:** `scopes` = `patient/*.rs`.
+*   **Requester:** `Practitioner` (NPI).
+*   **Details:** `reason` = Atrial fibrillation (SCT 49436004), `requestIdentifier` = Request ID.
+*   **Access:** `scopes` = `patient/*.rs`.
 
 {% include generated/signed-tickets/uc7-ticket.html %}
 
@@ -507,7 +509,7 @@ export interface PermissionTicket {
         url: string;      // CRL URL
         rid: string;      // Revocation ID
     };
-    ticket_context: {
+    authorization: {
         subject: {
             type: "match" | "identifier" | "reference"; // Subject resolution mode
             resourceType?: string;
@@ -521,7 +523,13 @@ export interface PermissionTicket {
             };
             reference?: string;
         };
-        actor?: {
+        access: {
+            scopes?: string[];
+            periods?: { start?: string; end?: string; }[];
+            jurisdictions?: Address[];
+            organizations?: Organization[];
+        };
+        requester?: {
             resourceType: "PractitionerRole" | "RelatedPerson" | "Organization" | "Practitioner";
             name?: any;
             identifier?: any[];
@@ -532,18 +540,8 @@ export interface PermissionTicket {
             practitioner?: { reference: string };
             organization?: { reference: string };
         };
-        context?: {
-            type: { system?: string; code?: string; display?: string; };
-            focus?: { system?: string; code?: string; display?: string; };
-            identifier?: { system?: string; value: string; }[];
-        };
-        capability: {
-            scopes?: string[];
-            periods?: { start?: string; end?: string; }[];
-            jurisdictions?: { state?: string; country?: string }[];
-            organizations?: { identifier?: any[]; name?: string }[];
-        };
     };
+    details?: Record<string, any>; // Schema defined by ticket_type
 }
 
 export interface ClientAssertion {
@@ -589,7 +587,7 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 | Subject type / field mismatch | `invalid_grant` | "Subject type inconsistent with populated fields" |
 | Ticket revoked | `invalid_grant` | "Ticket has been revoked" |
 | Revocable ticket missing `jti` | `invalid_grant` | "Revocable ticket missing jti" |
-| Unsupported constraint | `invalid_grant` | "Unsupported capability constraint: {field}" |
+| Unsupported constraint | `invalid_grant` | "Unsupported access constraint: {field}" |
 | No valid scopes after intersection | `invalid_scope` | "No authorized scopes" |
 
 ---
@@ -608,8 +606,8 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - If multiple tickets are presented, require and validate `permission_ticket_profile`
 - If `permission_ticket_profile` is present, validate all tickets match the declared profile rules
 - Validate subject resolution mode (`type`) and ensure populated fields are consistent with the declared mode
-- Calculate granted scopes as intersection of requested, ticket capability, and client registration
-- Enforce all presented `capability` constraints (`scopes`, `periods`, `jurisdictions`, `organizations`) or reject with `invalid_grant`
+- Calculate granted scopes as intersection of requested, ticket access, and client registration
+- Enforce all presented `access` constraints (`scopes`, `periods`, `jurisdictions`, `organizations`) or reject with `invalid_grant`
 - Enforce subset constraints at the appropriate layer (token endpoint, resource server, or both)
 - If `revocation` is present, verify `jti` is also present; perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request
 - Return appropriate error codes on validation failure
@@ -617,7 +615,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 **SHOULD:**
 - Cache issuer JWKS with appropriate TTL
 - Cache revocation responses per HTTP cache headers
-- Log `ticket_context.actor` and `ticket_context.context` for audit trail
+- Log `authorization.requester` and `details` for audit trail
 
 **MAY:**
 - Support trust framework audience validation
@@ -644,7 +642,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 
 **SHALL:**
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
-- Include claims: `iss`, `sub`, `aud`, `exp`, `cnf`, `ticket_type`, `ticket_context`
+- Include claims: `iss`, `sub`, `aud`, `exp`, `cnf`, `ticket_type`, `authorization`
 - Bind each ticket to a specific client key via `cnf.jkt` (JWK Thumbprint)
 - If `revocation` is present, include `jti` and publish CRL at the URL specified in tickets
 

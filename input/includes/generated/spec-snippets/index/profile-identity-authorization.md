@@ -9,8 +9,8 @@ Ticket 1 (Identity Provider - e.g., Clear):
   "cnf": {
     "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
   },
-  "ticket_context": {
-    "actor": {
+  "authorization": {
+    "requester": {
       "resourceType": "RelatedPerson",
       "identifier": [
         {
@@ -40,24 +40,21 @@ Ticket 2 (Trust Broker):
   "cnf": {
     "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
   },
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "match",
       "traits": {
         "resourceType": "Patient"
       }
     },
-    "context": {
-      "type": {
-        "code": "DPOA"
-      },
-      "actor_reference": "https://clear.me/id|CLR-789"
-    },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/*.rs"
       ]
     }
+  },
+  "details": {
+    "requesterReference": "https://clear.me/id|CLR-789"
   }
 }
 ```

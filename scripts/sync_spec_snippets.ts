@@ -61,37 +61,29 @@ function buildIndexSnippets(): void {
     aud: "https://network.org",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
-    cnf: {
-      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
-    },
-    ticket_context: {
+    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
+    authorization: {
       subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
-      actor: { resourceType: "PractitionerRole" },
-      context: {
-        type: {
-          system: "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-          code: "REFER"
-        },
-        focus: {
-          system: "http://snomed.info/sct",
-          code: "49436004",
-          display: "Atrial fibrillation"
-        },
-        identifier: [{ system: "https://issuer.org/cases", value: "CASE-123" }]
+      requester: { resourceType: "PractitionerRole" },
+      access: { scopes: ["patient/*.rs"] }
+    },
+    details: {
+      reason: {
+        system: "http://snomed.info/sct",
+        code: "49436004",
+        display: "Atrial fibrillation"
       },
-      capability: { scopes: ["patient/*.rs"] }
+      requestIdentifier: [{ system: "https://issuer.org/cases", value: "CASE-123" }]
     }
   };
 
-  const capabilityExample: JsonObject = {
-    capability: {
+  const accessExample: JsonObject = {
+    access: {
       scopes: ["patient/Condition.rs", "patient/Procedure.rs"],
       periods: [{ start: "2023-01-01", end: "2024-12-31" }],
       jurisdictions: [{ state: "CA" }, { state: "NY" }],
       organizations: [
-        {
-          identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1234567890" }]
-        }
+        { identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1234567890" }] }
       ]
     }
   };
@@ -107,8 +99,8 @@ function buildIndexSnippets(): void {
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/identity-v1",
     cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
-    ticket_context: {
-      actor: {
+    authorization: {
+      requester: {
         resourceType: "RelatedPerson",
         identifier: [{ system: "https://clear.me/id", value: "CLR-789" }],
         name: [{ family: "Smith", given: ["Jane"] }]
@@ -123,13 +115,12 @@ function buildIndexSnippets(): void {
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/authorization-v1",
     cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
-    ticket_context: {
+    authorization: {
       subject: { type: "match", traits: { resourceType: "Patient" } },
-      context: {
-        type: { code: "DPOA" },
-        actor_reference: "https://clear.me/id|CLR-789"
-      },
-      capability: { scopes: ["patient/*.rs"] }
+      access: { scopes: ["patient/*.rs"] }
+    },
+    details: {
+      requesterReference: "https://clear.me/id|CLR-789"
     }
   };
 
@@ -145,9 +136,9 @@ function buildIndexSnippets(): void {
       url: "https://trust-broker.org/.well-known/crl/patient-access.json",
       rid: "abc123xyz"
     },
-    ticket_context: {
+    authorization: {
       subject: { type: "match", resourceType: "Patient" },
-      capability: { scopes: ["patient/*.rs"] }
+      access: { scopes: ["patient/*.rs"] }
     }
   };
 
@@ -159,7 +150,7 @@ function buildIndexSnippets(): void {
   };
 
   writeInclude("index/artifact-ticket.json.md", renderJsonFence(artifactExample));
-  writeInclude("index/capability-example.json.md", renderJsonFence(capabilityExample));
+  writeInclude("index/access-example.json.md", renderJsonFence(accessExample));
   writeInclude("index/profile-claim.json.md", renderJsonFence(profileClaimExample));
   writeInclude(
     "index/profile-identity-authorization.md",
@@ -182,30 +173,24 @@ function buildStartSnippets(): void {
     aud: "https://network.org",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
-    cnf: {
-      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
-    },
-    ticket_context: {
+    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
+    authorization: {
       subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
-      actor: { resourceType: "PractitionerRole" },
-      context: {
-        type: {
-          system: "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-          code: "REFER"
-        },
-        focus: {
-          system: "http://snomed.info/sct",
-          code: "49436004",
-          display: "Atrial fibrillation"
-        },
-        identifier: [{ system: "https://issuer.org/cases", value: "CASE-123" }]
+      requester: { resourceType: "PractitionerRole" },
+      access: { scopes: ["patient/*.rs"] }
+    },
+    details: {
+      reason: {
+        system: "http://snomed.info/sct",
+        code: "49436004",
+        display: "Atrial fibrillation"
       },
-      capability: { scopes: ["patient/*.rs"] }
+      requestIdentifier: [{ system: "https://issuer.org/cases", value: "CASE-123" }]
     }
   };
 
   const uc1: JsonObject = {
-    ticket_context: {
+    authorization: {
       subject: {
         type: "match",
         traits: {
@@ -215,78 +200,54 @@ function buildStartSnippets(): void {
           identifier: [{ system: "urn:oid:2.16.840.1.113883.4.1", value: "000-00-0000" }]
         }
       },
-      capability: { scopes: ["patient/Immunization.rs", "patient/AllergyIntolerance.rs"] }
+      access: { scopes: ["patient/Immunization.rs", "patient/AllergyIntolerance.rs"] }
     }
   };
 
   const uc2: JsonObject = {
-    ticket_context: {
+    authorization: {
       subject: {
         type: "identifier",
         resourceType: "Patient",
         identifier: [{ system: "https://national-mpi.net", value: "pt-555" }]
       },
-      actor: {
+      requester: {
         resourceType: "RelatedPerson",
         name: [{ family: "Doe", given: ["Jane"] }],
         telecom: [{ system: "email", value: "jane.doe@example.com" }],
         relationship: [
-          {
-            coding: [
-              {
-                system: "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
-                code: "DAU",
-                display: "Daughter"
-              }
-            ]
-          }
+          { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-RoleCode", code: "DAU", display: "Daughter" }] }
         ]
       },
-      capability: { scopes: ["patient/*.rs"] }
+      access: { scopes: ["patient/*.rs"] }
     }
   };
 
   const uc3: JsonObject = {
-    ticket_context: {
+    authorization: {
       subject: { type: "reference", resourceType: "Patient", id: "local-patient-123" },
-      actor: {
+      requester: {
         resourceType: "Organization",
         name: "State Dept of Health",
         identifier: [{ system: "urn:ietf:rfc:3986", value: "https://doh.state.gov" }],
-        type: [
-          {
-            coding: [
-              { system: "http://terminology.hl7.org/CodeSystem/organization-type", code: "govt" }
-            ]
-          }
-        ]
+        type: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/organization-type", code: "govt" }] }]
       },
-      context: {
-        type: {
-          system: "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-          code: "PUBHLTH",
-          display: "Public Health"
-        },
-        focus: {
-          system: "http://snomed.info/sct",
-          code: "56717001",
-          display: "Tuberculosis"
-        },
-        identifier: [{ system: "https://doh.wa.gov/cases", value: "CASE-2024-999" }]
-      },
-      capability: { scopes: ["patient/*.rs"], periods: [{ start: "2025-01-01", end: "2026-01-01" }] }
+      access: { scopes: ["patient/*.rs"], periods: [{ start: "2025-01-01", end: "2026-01-01" }] }
+    },
+    details: {
+      condition: { system: "http://snomed.info/sct", code: "56717001", display: "Tuberculosis" },
+      caseIdentifier: [{ system: "https://doh.wa.gov/cases", value: "CASE-2024-999" }]
     }
   };
 
   const uc4: JsonObject = {
-    ticket_context: {
+    authorization: {
       subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
-      actor: {
+      requester: {
         resourceType: "PractitionerRole",
         contained: [
           {
-            resourceType: "Practitioner",
-            id: "p1",
+            resourceType: "Practitioner", id: "p1",
             name: [{ family: "Volunteer", given: ["Alice"] }],
             telecom: [{ system: "email", value: "alice@foodbank.org" }]
           },
@@ -295,95 +256,59 @@ function buildStartSnippets(): void {
         practitioner: { reference: "#p1" },
         organization: { reference: "#o1" }
       },
-      context: {
-        type: {
-          system: "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-          code: "REFER",
-          display: "Referral"
-        },
-        focus: {
-          system: "http://snomed.info/sct",
-          code: "733423003",
-          display: "Food insecurity"
-        },
-        identifier: [{ system: "https://referring-ehr.org/referrals", value: "REF-555" }]
-      },
-      capability: { scopes: ["patient/ServiceRequest.rsu", "patient/Task.rsu"] }
+      access: { scopes: ["patient/ServiceRequest.rsu", "patient/Task.rsu"] }
+    },
+    details: {
+      concern: { system: "http://snomed.info/sct", code: "733423003", display: "Food insecurity" },
+      referralIdentifier: [{ system: "https://referring-ehr.org/referrals", value: "REF-555" }]
     }
   };
 
   const uc5: JsonObject = {
-    ticket_context: {
+    authorization: {
       subject: { type: "reference", resourceType: "Patient", reference: "Patient/456" },
-      actor: {
+      requester: {
         resourceType: "Organization",
         identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "9876543210" }],
         name: "Blue Payer Inc"
       },
-      context: {
-        type: {
-          system: "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-          code: "CLMATTCH",
-          display: "Claim Attachment"
-        },
-        focus: {
-          system: "http://snomed.info/sct",
-          code: "80146002",
-          display: "Appendectomy"
-        },
-        identifier: [{ system: "http://provider.com/claims", value: "CLAIM-2024-XYZ" }]
-      },
-      capability: { scopes: ["patient/DocumentReference.rs", "patient/Procedure.rs"] }
+      access: { scopes: ["patient/DocumentReference.rs", "patient/Procedure.rs"] }
+    },
+    details: {
+      service: { system: "http://snomed.info/sct", code: "80146002", display: "Appendectomy" },
+      claimIdentifier: [{ system: "http://provider.com/claims", value: "CLAIM-2024-XYZ" }]
     }
   };
 
   const uc6: JsonObject = {
-    ticket_context: {
+    authorization: {
       subject: { type: "identifier", resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
-      actor: {
+      requester: {
         resourceType: "Organization",
         name: "Oncology Research Institute",
         identifier: [{ value: "research-org-id" }]
       },
-      context: {
-        type: {
-          system: "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-          code: "RESCH",
-          display: "Biomedical Research"
-        },
-        focus: {
-          system: "http://snomed.info/sct",
-          code: "363358000",
-          display: "Malignant tumor of lung"
-        },
-        identifier: [{ system: "https://consent-service.org/studies", value: "STUDY-PROTO-22" }]
-      },
-      capability: { scopes: ["patient/*.rs"], periods: [{ start: "2020-01-01", end: "2025-01-01" }] }
+      access: { scopes: ["patient/*.rs"], periods: [{ start: "2020-01-01", end: "2025-01-01" }] }
+    },
+    details: {
+      condition: { system: "http://snomed.info/sct", code: "363358000", display: "Malignant tumor of lung" },
+      studyIdentifier: [{ system: "https://consent-service.org/studies", value: "STUDY-PROTO-22" }]
     }
   };
 
   const uc7: JsonObject = {
-    ticket_context: {
+    authorization: {
       subject: { type: "reference", resourceType: "Patient", reference: "Patient/999" },
-      actor: {
+      requester: {
         resourceType: "Practitioner",
         identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1112223333" }],
         name: [{ family: "Heart", given: ["A."] }]
       },
-      context: {
-        type: {
-          system: "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-          code: "REFER",
-          display: "Referral"
-        },
-        focus: {
-          system: "http://snomed.info/sct",
-          code: "49436004",
-          display: "Atrial fibrillation"
-        },
-        identifier: [{ system: "https://referring-ehr.org/requests", value: "ref-req-111" }]
-      },
-      capability: { scopes: ["patient/*.rs"] }
+      access: { scopes: ["patient/*.rs"] }
+    },
+    details: {
+      reason: { system: "http://snomed.info/sct", code: "49436004", display: "Atrial fibrillation" },
+      requestIdentifier: [{ system: "https://referring-ehr.org/requests", value: "ref-req-111" }]
     }
   };
 

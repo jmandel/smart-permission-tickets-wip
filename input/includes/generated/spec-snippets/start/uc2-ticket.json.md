@@ -1,6 +1,6 @@
 ```json
 {
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "identifier",
       "resourceType": "Patient",
@@ -11,7 +11,7 @@
         }
       ]
     },
-    "actor": {
+    "requester": {
       "resourceType": "RelatedPerson",
       "name": [
         {
@@ -39,7 +39,7 @@
         }
       ]
     },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/*.rs"
       ]

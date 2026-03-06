@@ -1,6 +1,6 @@
 ```json
 {
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "identifier",
       "resourceType": "Patient",
@@ -10,7 +10,7 @@
         }
       ]
     },
-    "actor": {
+    "requester": {
       "resourceType": "Organization",
       "name": "Oncology Research Institute",
       "identifier": [
@@ -19,25 +19,7 @@
         }
       ]
     },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "RESCH",
-        "display": "Biomedical Research"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "363358000",
-        "display": "Malignant tumor of lung"
-      },
-      "identifier": [
-        {
-          "system": "https://consent-service.org/studies",
-          "value": "STUDY-PROTO-22"
-        }
-      ]
-    },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/*.rs"
       ],
@@ -48,6 +30,19 @@
         }
       ]
     }
+  },
+  "details": {
+    "condition": {
+      "system": "http://snomed.info/sct",
+      "code": "363358000",
+      "display": "Malignant tumor of lung"
+    },
+    "studyIdentifier": [
+      {
+        "system": "https://consent-service.org/studies",
+        "value": "STUDY-PROTO-22"
+      }
+    ]
   }
 }
 ```

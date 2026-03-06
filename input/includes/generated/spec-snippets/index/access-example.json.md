@@ -1,6 +1,6 @@
 ```json
 {
-  "capability": {
+  "access": {
     "scopes": [
       "patient/Condition.rs",
       "patient/Procedure.rs"

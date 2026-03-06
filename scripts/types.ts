@@ -13,12 +13,12 @@ export interface PermissionTicket {
         url: string;      // CRL URL
         rid: string;      // Revocation ID
     };
-    ticket_context: {
+    authorization: {
         subject: {
             type: "match" | "identifier" | "reference"; // Subject resolution mode
-            resourceType?: string; // Resource Type (e.g. Patient)
-            id?: string; // Local resource ID
-            identifier?: any[]; // Business identifier(s)
+            resourceType?: string;
+            id?: string;
+            identifier?: any[];
             traits?: {
                 resourceType: "Patient";
                 name?: { family?: string; given?: string[] }[];
@@ -26,9 +26,15 @@ export interface PermissionTicket {
                 identifier?: any[];
                 [key: string]: any;
             };
-            reference?: string; // Local resource reference (e.g. Patient/123)
+            reference?: string;
         };
-        actor?: {
+        access: {
+            scopes?: string[];
+            periods?: { start?: string; end?: string }[];
+            jurisdictions?: FHIRAddress[];
+            organizations?: FHIROrganization[];
+        };
+        requester?: {
             resourceType: "PractitionerRole" | "RelatedPerson" | "Organization" | "Practitioner";
             name?: any;
             identifier?: any[];
@@ -39,29 +45,8 @@ export interface PermissionTicket {
             practitioner?: { reference: string };
             organization?: { reference: string };
         };
-        context?: {
-            type: {
-                system?: string;
-                code?: string;
-                display?: string;
-            };
-            focus?: {
-                system?: string;
-                code?: string;
-                display?: string;
-            };
-            identifier?: any[]; // Issuer-specific identifiers (Case ID, etc)
-        };
-        capability: {
-            scopes?: string[];
-            periods?: {
-                start?: string;
-                end?: string;
-            }[];
-            jurisdictions?: FHIRAddress[];
-            organizations?: FHIROrganization[];
-        };
     };
+    details?: Record<string, any>; // Schema defined by ticket_type
 }
 
 export interface FHIRAddress {

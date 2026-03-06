@@ -1,12 +1,12 @@
 ```json
 {
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "reference",
       "resourceType": "Patient",
       "id": "local-patient-123"
     },
-    "actor": {
+    "requester": {
       "resourceType": "Organization",
       "name": "State Dept of Health",
       "identifier": [
@@ -26,25 +26,7 @@
         }
       ]
     },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "PUBHLTH",
-        "display": "Public Health"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "56717001",
-        "display": "Tuberculosis"
-      },
-      "identifier": [
-        {
-          "system": "https://doh.wa.gov/cases",
-          "value": "CASE-2024-999"
-        }
-      ]
-    },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/*.rs"
       ],
@@ -55,6 +37,19 @@
         }
       ]
     }
+  },
+  "details": {
+    "condition": {
+      "system": "http://snomed.info/sct",
+      "code": "56717001",
+      "display": "Tuberculosis"
+    },
+    "caseIdentifier": [
+      {
+        "system": "https://doh.wa.gov/cases",
+        "value": "CASE-2024-999"
+      }
+    ]
   }
 }
 ```

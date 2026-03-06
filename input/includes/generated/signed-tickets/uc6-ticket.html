@@ -18,12 +18,12 @@
   "iss": "https://consent-platform.org",
   "sub": "grant-uc6-study-proto22",
   "aud": "https://hospital.com",
-  "exp": 1772775359,
+  "exp": 1772812558,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/research-study-v1",
   "cnf": {
     "jkt": "JuI6ibZHcMPQICaIZ55PbXpnsudQmKt00D0BiEXNrMc"
   },
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "identifier",
       "resourceType": "Patient",
@@ -33,7 +33,7 @@
         }
       ]
     },
-    "actor": {
+    "requester": {
       "resourceType": "Organization",
       "name": "Oncology Research Institute",
       "identifier": [
@@ -42,19 +42,7 @@
         }
       ]
     },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "RESCH",
-        "display": "Biomedical Research"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "363358000",
-        "display": "Malignant tumor of lung"
-      }
-    },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/*.rs"
       ],
@@ -66,13 +54,26 @@
       ]
     }
   },
-  "iat": 1772771759
+  "details": {
+    "condition": {
+      "system": "http://snomed.info/sct",
+      "code": "363358000",
+      "display": "Malignant tumor of lung"
+    },
+    "studyIdentifier": [
+      {
+        "system": "https://consent-service.org/studies",
+        "value": "STUDY-PROTO-22"
+      }
+    ]
+  },
+  "iat": 1772808958
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2NvbnNlbnQtcGxhdGZvcm0ub3JnIiwic3ViIjoiZ3JhbnQtdWM2LXN0dWR5LXByb3RvMjIiLCJhdWQiOiJodHRwczovL2hvc3BpdGFsLmNvbSIsImV4cCI6MTc3Mjc3NTM1OSwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcmVzZWFyY2gtc3R1ZHktdjEiLCJjbmYiOnsiamt0IjoiSnVJNmliWkhjTVBRSUNhSVo1NVBiWHBuc3VkUW1LdDAwRDBCaUVYTnJNYyJ9LCJ0aWNrZXRfY29udGV4dCI6eyJzdWJqZWN0Ijp7InR5cGUiOiJpZGVudGlmaWVyIiwicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkZW50aWZpZXIiOlt7InZhbHVlIjoiTVJOLTEyMyJ9XX0sImFjdG9yIjp7InJlc291cmNlVHlwZSI6Ik9yZ2FuaXphdGlvbiIsIm5hbWUiOiJPbmNvbG9neSBSZXNlYXJjaCBJbnN0aXR1dGUiLCJpZGVudGlmaWVyIjpbeyJ2YWx1ZSI6InJlc2VhcmNoLW9yZy1pZCJ9XX0sImNvbnRleHQiOnsidHlwZSI6eyJzeXN0ZW0iOiJodHRwOi8vdGVybWlub2xvZ3kuaGw3Lm9yZy9Db2RlU3lzdGVtL3YzLUFjdFJlYXNvbiIsImNvZGUiOiJSRVNDSCIsImRpc3BsYXkiOiJCaW9tZWRpY2FsIFJlc2VhcmNoIn0sImZvY3VzIjp7InN5c3RlbSI6Imh0dHA6Ly9zbm9tZWQuaW5mby9zY3QiLCJjb2RlIjoiMzYzMzU4MDAwIiwiZGlzcGxheSI6Ik1hbGlnbmFudCB0dW1vciBvZiBsdW5nIn19LCJjYXBhYmlsaXR5Ijp7InNjb3BlcyI6WyJwYXRpZW50LyoucnMiXSwicGVyaW9kcyI6W3sic3RhcnQiOiIyMDIwLTAxLTAxIiwiZW5kIjoiMjAyNS0wMS0wMSJ9XX19LCJpYXQiOjE3NzI3NzE3NTl9.Fim_cssj4JOZcZwwRT1GT2UxF85tfhPdLAaGDFgTNKkOKhfJaDah8LRVddgkZLclfzMAuO9vxV2rCzpxSF-qtg</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2NvbnNlbnQtcGxhdGZvcm0ub3JnIiwic3ViIjoiZ3JhbnQtdWM2LXN0dWR5LXByb3RvMjIiLCJhdWQiOiJodHRwczovL2hvc3BpdGFsLmNvbSIsImV4cCI6MTc3MjgxMjU1OCwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcmVzZWFyY2gtc3R1ZHktdjEiLCJjbmYiOnsiamt0IjoiSnVJNmliWkhjTVBRSUNhSVo1NVBiWHBuc3VkUW1LdDAwRDBCaUVYTnJNYyJ9LCJhdXRob3JpemF0aW9uIjp7InN1YmplY3QiOnsidHlwZSI6ImlkZW50aWZpZXIiLCJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWRlbnRpZmllciI6W3sidmFsdWUiOiJNUk4tMTIzIn1dfSwicmVxdWVzdGVyIjp7InJlc291cmNlVHlwZSI6Ik9yZ2FuaXphdGlvbiIsIm5hbWUiOiJPbmNvbG9neSBSZXNlYXJjaCBJbnN0aXR1dGUiLCJpZGVudGlmaWVyIjpbeyJ2YWx1ZSI6InJlc2VhcmNoLW9yZy1pZCJ9XX0sImFjY2VzcyI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJzIl0sInBlcmlvZHMiOlt7InN0YXJ0IjoiMjAyMC0wMS0wMSIsImVuZCI6IjIwMjUtMDEtMDEifV19fSwiZGV0YWlscyI6eyJjb25kaXRpb24iOnsic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiIzNjMzNTgwMDAiLCJkaXNwbGF5IjoiTWFsaWduYW50IHR1bW9yIG9mIGx1bmcifSwic3R1ZHlJZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwczovL2NvbnNlbnQtc2VydmljZS5vcmcvc3R1ZGllcyIsInZhbHVlIjoiU1RVRFktUFJPVE8tMjIifV19LCJpYXQiOjE3NzI4MDg5NTh9.G3EGY_NhNSz93LPA_WHZX5loswnWblVJkkknrT4sj4zJG7MahPTLvkmbqyBtGURSVPtYo_p93zizwJ4xcrb5dw</code></pre>
         </details>
     </div>
 </div>

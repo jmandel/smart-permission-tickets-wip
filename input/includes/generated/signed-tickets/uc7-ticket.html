@@ -18,18 +18,18 @@
   "iss": "https://referring-ehr.org",
   "sub": "grant-uc7-consult-req111",
   "aud": "https://referring-ehr.org",
-  "exp": 1772775359,
+  "exp": 1772812558,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
   "cnf": {
     "jkt": "JuI6ibZHcMPQICaIZ55PbXpnsudQmKt00D0BiEXNrMc"
   },
-  "ticket_context": {
+  "authorization": {
     "subject": {
       "type": "reference",
       "resourceType": "Patient",
       "reference": "Patient/999"
     },
-    "actor": {
+    "requester": {
       "resourceType": "Practitioner",
       "identifier": [
         {
@@ -46,31 +46,32 @@
         }
       ]
     },
-    "context": {
-      "type": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-        "code": "REFER",
-        "display": "Referral"
-      },
-      "focus": {
-        "system": "http://snomed.info/sct",
-        "code": "49436004",
-        "display": "Atrial fibrillation"
-      }
-    },
-    "capability": {
+    "access": {
       "scopes": [
         "patient/*.rs"
       ]
     }
   },
-  "iat": 1772771759
+  "details": {
+    "reason": {
+      "system": "http://snomed.info/sct",
+      "code": "49436004",
+      "display": "Atrial fibrillation"
+    },
+    "requestIdentifier": [
+      {
+        "system": "https://referring-ehr.org/requests",
+        "value": "ref-req-111"
+      }
+    ]
+  },
+  "iat": 1772808958
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3JlZmVycmluZy1laHIub3JnIiwic3ViIjoiZ3JhbnQtdWM3LWNvbnN1bHQtcmVxMTExIiwiYXVkIjoiaHR0cHM6Ly9yZWZlcnJpbmctZWhyLm9yZyIsImV4cCI6MTc3Mjc3NTM1OSwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcHJvdmlkZXItY29uc3VsdC12MSIsImNuZiI6eyJqa3QiOiJKdUk2aWJaSGNNUFFJQ2FJWjU1UGJYcG5zdWRRbUt0MDBEMEJpRVhOck1jIn0sInRpY2tldF9jb250ZXh0Ijp7InN1YmplY3QiOnsidHlwZSI6InJlZmVyZW5jZSIsInJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJyZWZlcmVuY2UiOiJQYXRpZW50Lzk5OSJ9LCJhY3RvciI6eyJyZXNvdXJjZVR5cGUiOiJQcmFjdGl0aW9uZXIiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaGw3Lm9yZy9maGlyL3NpZC91cy1ucGkiLCJ2YWx1ZSI6IjExMTIyMjMzMzMifV0sIm5hbWUiOlt7ImZhbWlseSI6IkhlYXJ0IiwiZ2l2ZW4iOlsiQS4iXX1dfSwiY29udGV4dCI6eyJ0eXBlIjp7InN5c3RlbSI6Imh0dHA6Ly90ZXJtaW5vbG9neS5obDcub3JnL0NvZGVTeXN0ZW0vdjMtQWN0UmVhc29uIiwiY29kZSI6IlJFRkVSIiwiZGlzcGxheSI6IlJlZmVycmFsIn0sImZvY3VzIjp7InN5c3RlbSI6Imh0dHA6Ly9zbm9tZWQuaW5mby9zY3QiLCJjb2RlIjoiNDk0MzYwMDQiLCJkaXNwbGF5IjoiQXRyaWFsIGZpYnJpbGxhdGlvbiJ9fSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJzIl19fSwiaWF0IjoxNzcyNzcxNzU5fQ.UIGf29mApw-70BJ2zKgmxA0SUBVLic8MKnU3EHKG-exoAK0DhGoQcBnNcN9NkPTKSFUU-vHaxAMD4FSxBk7dQQ</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3JlZmVycmluZy1laHIub3JnIiwic3ViIjoiZ3JhbnQtdWM3LWNvbnN1bHQtcmVxMTExIiwiYXVkIjoiaHR0cHM6Ly9yZWZlcnJpbmctZWhyLm9yZyIsImV4cCI6MTc3MjgxMjU1OCwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcHJvdmlkZXItY29uc3VsdC12MSIsImNuZiI6eyJqa3QiOiJKdUk2aWJaSGNNUFFJQ2FJWjU1UGJYcG5zdWRRbUt0MDBEMEJpRVhOck1jIn0sImF1dGhvcml6YXRpb24iOnsic3ViamVjdCI6eyJ0eXBlIjoicmVmZXJlbmNlIiwicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsInJlZmVyZW5jZSI6IlBhdGllbnQvOTk5In0sInJlcXVlc3RlciI6eyJyZXNvdXJjZVR5cGUiOiJQcmFjdGl0aW9uZXIiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaGw3Lm9yZy9maGlyL3NpZC91cy1ucGkiLCJ2YWx1ZSI6IjExMTIyMjMzMzMifV0sIm5hbWUiOlt7ImZhbWlseSI6IkhlYXJ0IiwiZ2l2ZW4iOlsiQS4iXX1dfSwiYWNjZXNzIjp7InNjb3BlcyI6WyJwYXRpZW50LyoucnMiXX19LCJkZXRhaWxzIjp7InJlYXNvbiI6eyJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiY29kZSI6IjQ5NDM2MDA0IiwiZGlzcGxheSI6IkF0cmlhbCBmaWJyaWxsYXRpb24ifSwicmVxdWVzdElkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHBzOi8vcmVmZXJyaW5nLWVoci5vcmcvcmVxdWVzdHMiLCJ2YWx1ZSI6InJlZi1yZXEtMTExIn1dfSwiaWF0IjoxNzcyODA4OTU4fQ.BObQyyguOyRbq662iIka3ZEUDkDy4PuGM6LOAbmvaZpqS_C7J7Qkxd4xCA4HK26Darx5wzwRX0V7KjQXGKUHLA</code></pre>
         </details>
     </div>
 </div>
