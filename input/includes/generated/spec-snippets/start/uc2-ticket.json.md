@@ -2,6 +2,7 @@
 {
   "ticket_context": {
     "subject": {
+      "type": "identifier",
       "resourceType": "Patient",
       "identifier": [
         {

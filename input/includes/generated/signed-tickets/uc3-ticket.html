@@ -16,15 +16,16 @@
         <pre
             style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
   "iss": "https://hospital-a.com",
-  "sub": "https://pha.gov/apps/report-client",
+  "sub": "grant-uc3-pubhealth-case999",
   "aud": "https://hospital-a.com",
-  "exp": 1772575408,
+  "exp": 1772775359,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1",
   "cnf": {
     "jkt": "JuI6ibZHcMPQICaIZ55PbXpnsudQmKt00D0BiEXNrMc"
   },
   "ticket_context": {
     "subject": {
+      "type": "reference",
       "resourceType": "Patient",
       "id": "local-patient-123"
     },
@@ -78,13 +79,13 @@
       ]
     }
   },
-  "iat": 1772571809
+  "iat": 1772771759
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2hvc3BpdGFsLWEuY29tIiwic3ViIjoiaHR0cHM6Ly9waGEuZ292L2FwcHMvcmVwb3J0LWNsaWVudCIsImF1ZCI6Imh0dHBzOi8vaG9zcGl0YWwtYS5jb20iLCJleHAiOjE3NzI1NzU0MDgsInRpY2tldF90eXBlIjoiaHR0cHM6Ly9zbWFydGhlYWx0aGl0Lm9yZy9wZXJtaXNzaW9uLXRpY2tldC10eXBlL3B1YmxpYy1oZWFsdGgtaW52ZXN0aWdhdGlvbi12MSIsImNuZiI6eyJqa3QiOiJKdUk2aWJaSGNNUFFJQ2FJWjU1UGJYcG5zdWRRbUt0MDBEMEJpRVhOck1jIn0sInRpY2tldF9jb250ZXh0Ijp7InN1YmplY3QiOnsicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkIjoibG9jYWwtcGF0aWVudC0xMjMifSwiYWN0b3IiOnsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwibmFtZSI6IlN0YXRlIERlcHQgb2YgSGVhbHRoIiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoidXJuOmlldGY6cmZjOjM5ODYiLCJ2YWx1ZSI6Imh0dHBzOi8vZG9oLnN0YXRlLmdvdiJ9XSwidHlwZSI6W3siY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vdGVybWlub2xvZ3kuaGw3Lm9yZy9Db2RlU3lzdGVtL29yZ2FuaXphdGlvbi10eXBlIiwiY29kZSI6ImdvdnQifV19XX0sImNvbnRleHQiOnsidHlwZSI6eyJzeXN0ZW0iOiJodHRwOi8vdGVybWlub2xvZ3kuaGw3Lm9yZy9Db2RlU3lzdGVtL3YzLUFjdFJlYXNvbiIsImNvZGUiOiJQVUJITFRIIiwiZGlzcGxheSI6IlB1YmxpYyBIZWFsdGgifSwiZm9jdXMiOnsic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiI1NjcxNzAwMSIsImRpc3BsYXkiOiJUdWJlcmN1bG9zaXMifSwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoiaHR0cHM6Ly9kb2gud2EuZ292L2Nhc2VzIiwidmFsdWUiOiJDQVNFLTIwMjQtOTk5In1dfSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJzIl0sInBlcmlvZHMiOlt7InN0YXJ0IjoiMjAyNS0wMS0wMSIsImVuZCI6IjIwMjYtMDEtMDEifV19fSwiaWF0IjoxNzcyNTcxODA5fQ.YUeKHPXYp09sJSX4AeAYuCbXCWiLx0jwZ8JKNtwvdbG7wt4kzRgnDEZlkm6wH5jHvCiKA3uMg4ogCdenT6815Q</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2hvc3BpdGFsLWEuY29tIiwic3ViIjoiZ3JhbnQtdWMzLXB1YmhlYWx0aC1jYXNlOTk5IiwiYXVkIjoiaHR0cHM6Ly9ob3NwaXRhbC1hLmNvbSIsImV4cCI6MTc3Mjc3NTM1OSwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcHVibGljLWhlYWx0aC1pbnZlc3RpZ2F0aW9uLXYxIiwiY25mIjp7ImprdCI6Ikp1STZpYlpIY01QUUlDYUlaNTVQYlhwbnN1ZFFtS3QwMEQwQmlFWE5yTWMifSwidGlja2V0X2NvbnRleHQiOnsic3ViamVjdCI6eyJ0eXBlIjoicmVmZXJlbmNlIiwicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkIjoibG9jYWwtcGF0aWVudC0xMjMifSwiYWN0b3IiOnsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwibmFtZSI6IlN0YXRlIERlcHQgb2YgSGVhbHRoIiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoidXJuOmlldGY6cmZjOjM5ODYiLCJ2YWx1ZSI6Imh0dHBzOi8vZG9oLnN0YXRlLmdvdiJ9XSwidHlwZSI6W3siY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vdGVybWlub2xvZ3kuaGw3Lm9yZy9Db2RlU3lzdGVtL29yZ2FuaXphdGlvbi10eXBlIiwiY29kZSI6ImdvdnQifV19XX0sImNvbnRleHQiOnsidHlwZSI6eyJzeXN0ZW0iOiJodHRwOi8vdGVybWlub2xvZ3kuaGw3Lm9yZy9Db2RlU3lzdGVtL3YzLUFjdFJlYXNvbiIsImNvZGUiOiJQVUJITFRIIiwiZGlzcGxheSI6IlB1YmxpYyBIZWFsdGgifSwiZm9jdXMiOnsic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiI1NjcxNzAwMSIsImRpc3BsYXkiOiJUdWJlcmN1bG9zaXMifSwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoiaHR0cHM6Ly9kb2gud2EuZ292L2Nhc2VzIiwidmFsdWUiOiJDQVNFLTIwMjQtOTk5In1dfSwiY2FwYWJpbGl0eSI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJzIl0sInBlcmlvZHMiOlt7InN0YXJ0IjoiMjAyNS0wMS0wMSIsImVuZCI6IjIwMjYtMDEtMDEifV19fSwiaWF0IjoxNzcyNzcxNzU5fQ.uqQJKwKeMDCLKYWzz6NCSuMD5q1HnSxAy0qcibPU2fJOkcrHGId3LEMLnnqFy6k4PjRycCJmygNRVEh9MGl90A</code></pre>
         </details>
     </div>
 </div>

@@ -2,6 +2,7 @@
 {
   "ticket_context": {
     "subject": {
+      "type": "reference",
       "resourceType": "Patient",
       "reference": "Patient/999"
     },

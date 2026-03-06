@@ -1,20 +1,24 @@
 export interface PermissionTicket {
     iss: string;
-    sub: string;          // Issuer-defined ticket subject (profile-specific)
-    aud: string;          // Network / trust framework audience
+    sub: string;          // Issuer-defined subject of the authorization grant (issuer-local, not a cross-party client identifier)
+    aud: string | string[]; // Audience: recipient URL(s) or network / trust framework identifier
     exp: number;          // Expiration Timestamp
-    ticket_type?: string;  // Ticket type URI (required for multi-ticket profiles; optional for single-ticket profiles)
+    ticket_type: string;  // Ticket type URI identifying the ticket schema and processing rules
     cnf: {
         jkt: string; // JWK Thumbprint (RFC 7638) of the authorized client key
     };
     iat?: number;         // Issued-At Timestamp
     jti?: string;         // Unique Ticket ID
+    revocation?: {
+        url: string;      // CRL URL
+        rid: string;      // Revocation ID
+    };
     ticket_context: {
         subject: {
-            type?: "match" | "reference"; // Made optional as some use cases just have resourceType
-            resourceType?: string; // Added for direct resource type usage
-            id?: string; // Added for direct ID usage
-            identifier?: any[]; // Added for identifier usage
+            type: "match" | "identifier" | "reference"; // Subject resolution mode
+            resourceType?: string; // Resource Type (e.g. Patient)
+            id?: string; // Local resource ID
+            identifier?: any[]; // Business identifier(s)
             traits?: {
                 resourceType: "Patient";
                 name?: { family?: string; given?: string[] }[];
@@ -22,7 +26,7 @@ export interface PermissionTicket {
                 identifier?: any[];
                 [key: string]: any;
             };
-            reference?: string;
+            reference?: string; // Local resource reference (e.g. Patient/123)
         };
         actor?: {
             resourceType: "PractitionerRole" | "RelatedPerson" | "Organization" | "Practitioner";
@@ -54,7 +58,7 @@ export interface PermissionTicket {
                 start?: string;
                 end?: string;
             }[];
-            locations?: FHIRAddress[];
+            jurisdictions?: FHIRAddress[];
             organizations?: FHIROrganization[];
         };
     };
@@ -88,6 +92,6 @@ export interface ClientAssertion {
     jti: string;
     iat?: number;
     exp?: number;
-    permission_ticket_profile: string; // Primary processing selector
+    permission_ticket_profile?: string; // Required for multi-ticket; optional for single-ticket
     permission_tickets: string[]; // Array of signed ticket strings
 }

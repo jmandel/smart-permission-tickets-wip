@@ -11,7 +11,7 @@
         "end": "2024-12-31"
       }
     ],
-    "locations": [
+    "jurisdictions": [
       {
         "state": "CA"
       },

@@ -57,15 +57,15 @@ function renderUseCaseProfileRegistryTable(): string {
 function buildIndexSnippets(): void {
   const artifactExample: JsonObject = {
     iss: "https://trust-broker.org",
-    sub: "issuer-defined-subject",
+    sub: "grant-example-referral",
     aud: "https://network.org",
     exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/proxy-v1",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
     cnf: {
       jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
     },
     ticket_context: {
-      subject: { resourceType: "Patient" },
+      subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
       actor: { resourceType: "PractitionerRole" },
       context: {
         type: {
@@ -87,7 +87,7 @@ function buildIndexSnippets(): void {
     capability: {
       scopes: ["patient/Condition.rs", "patient/Procedure.rs"],
       periods: [{ start: "2023-01-01", end: "2024-12-31" }],
-      locations: [{ state: "CA" }, { state: "NY" }],
+      jurisdictions: [{ state: "CA" }, { state: "NY" }],
       organizations: [
         {
           identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1234567890" }]
@@ -97,12 +97,12 @@ function buildIndexSnippets(): void {
   };
 
   const profileClaimExample: JsonObject = {
-    permission_ticket_profile: "https://smarthealthit.org/permission-ticket-profile/proxy-v1"
+    permission_ticket_profile: "https://smarthealthit.org/permission-ticket-profile/identity-authorization-v1"
   };
 
   const profileIdentityTicket: JsonObject = {
     iss: "https://clear.me",
-    sub: "clear-subject-789",
+    sub: "grant-identity-789",
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/identity-v1",
@@ -118,7 +118,7 @@ function buildIndexSnippets(): void {
 
   const profileAuthorizationTicket: JsonObject = {
     iss: "https://trust-broker.org",
-    sub: "trust-subject-456",
+    sub: "grant-authorization-456",
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
     ticket_type: "https://smarthealthit.org/permission-ticket-type/authorization-v1",
@@ -135,10 +135,10 @@ function buildIndexSnippets(): void {
 
   const revocationTicketExample: JsonObject = {
     iss: "https://trust-broker.org",
-    sub: "issuer-defined-subject",
+    sub: "grant-revocable-example",
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/proxy-v1",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
     cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
     jti: "ticket-unique-id",
     revocation: {
@@ -146,7 +146,7 @@ function buildIndexSnippets(): void {
       rid: "abc123xyz"
     },
     ticket_context: {
-      subject: { resourceType: "Patient" },
+      subject: { type: "match", resourceType: "Patient" },
       capability: { scopes: ["patient/*.rs"] }
     }
   };
@@ -178,15 +178,15 @@ function buildIndexSnippets(): void {
 function buildStartSnippets(): void {
   const artifactExample: JsonObject = {
     iss: "https://trust-broker.org",
-    sub: "issuer-defined-subject",
+    sub: "grant-example-referral",
     aud: "https://network.org",
     exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/single-patient-v1",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
     cnf: {
       jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
     },
     ticket_context: {
-      subject: { resourceType: "Patient" },
+      subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
       actor: { resourceType: "PractitionerRole" },
       context: {
         type: {
@@ -222,6 +222,7 @@ function buildStartSnippets(): void {
   const uc2: JsonObject = {
     ticket_context: {
       subject: {
+        type: "identifier",
         resourceType: "Patient",
         identifier: [{ system: "https://national-mpi.net", value: "pt-555" }]
       },
@@ -247,7 +248,7 @@ function buildStartSnippets(): void {
 
   const uc3: JsonObject = {
     ticket_context: {
-      subject: { resourceType: "Patient", id: "local-patient-123" },
+      subject: { type: "reference", resourceType: "Patient", id: "local-patient-123" },
       actor: {
         resourceType: "Organization",
         name: "State Dept of Health",
@@ -279,7 +280,7 @@ function buildStartSnippets(): void {
 
   const uc4: JsonObject = {
     ticket_context: {
-      subject: { resourceType: "Patient", reference: "Patient/123" },
+      subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
       actor: {
         resourceType: "PractitionerRole",
         contained: [
@@ -313,7 +314,7 @@ function buildStartSnippets(): void {
 
   const uc5: JsonObject = {
     ticket_context: {
-      subject: { resourceType: "Patient", reference: "Patient/456" },
+      subject: { type: "reference", resourceType: "Patient", reference: "Patient/456" },
       actor: {
         resourceType: "Organization",
         identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "9876543210" }],
@@ -338,7 +339,7 @@ function buildStartSnippets(): void {
 
   const uc6: JsonObject = {
     ticket_context: {
-      subject: { resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
+      subject: { type: "identifier", resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
       actor: {
         resourceType: "Organization",
         name: "Oncology Research Institute",
@@ -363,7 +364,7 @@ function buildStartSnippets(): void {
 
   const uc7: JsonObject = {
     ticket_context: {
-      subject: { resourceType: "Patient", reference: "Patient/999" },
+      subject: { type: "reference", resourceType: "Patient", reference: "Patient/999" },
       actor: {
         resourceType: "Practitioner",
         identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1112223333" }],

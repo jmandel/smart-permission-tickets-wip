@@ -36,11 +36,6 @@ if (!fs.existsSync(INCLUDES_DIR)) {
     fs.mkdirSync(INCLUDES_DIR, { recursive: true });
 }
 
-// Ensure output directory exists
-if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-}
-
 async function loadKey(filename: string): Promise<jose.KeyLike & { kid?: string }> {
     const keyPath = path.join(KEYS_DIR, filename);
     if (!fs.existsSync(keyPath)) {
@@ -74,7 +69,7 @@ async function signClientAssertion(payload: ClientAssertion, key: jose.KeyLike &
 // Use Case 1: Network Patient Access
 const uc1_payload: PermissionTicket = {
     iss: "https://trust-broker.org",
-    sub: "https://client-app.example.com/123",
+    sub: "grant-uc1-patient-access",
     aud: "https://network.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc1.ticketTypeUri,
@@ -99,7 +94,7 @@ const uc1_payload: PermissionTicket = {
 // Use Case 2: Authorized Representative
 const uc2_payload: PermissionTicket = {
     iss: "https://trust-broker.org",
-    sub: "https://client-app.example.com/456",
+    sub: "grant-uc2-representative",
     aud: "https://network.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc2.ticketTypeUri,
@@ -108,6 +103,7 @@ const uc2_payload: PermissionTicket = {
     },
     ticket_context: {
         subject: {
+            type: "identifier",
             resourceType: "Patient",
             identifier: [{ system: "https://national-mpi.net", value: "pt-555" }]
         },
@@ -118,7 +114,7 @@ const uc2_payload: PermissionTicket = {
             relationship: [{
                 coding: [{
                     system: "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
-                    code: "DAU", // Corrected from GRPRN based on text description
+                    code: "DAU",
                     display: "Daughter"
                 }]
             }]
@@ -132,7 +128,7 @@ const uc2_payload: PermissionTicket = {
 // Use Case 3: Public Health Investigation
 const uc3_payload: PermissionTicket = {
     iss: "https://hospital-a.com",
-    sub: "https://pha.gov/apps/report-client",
+    sub: "grant-uc3-pubhealth-case999",
     aud: "https://hospital-a.com",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc3.ticketTypeUri,
@@ -141,6 +137,7 @@ const uc3_payload: PermissionTicket = {
     },
     ticket_context: {
         subject: {
+            type: "reference",
             resourceType: "Patient",
             id: "local-patient-123"
         },
@@ -168,7 +165,7 @@ const uc3_payload: PermissionTicket = {
 // Use Case 4: Social Care (CBO) Referral
 const uc4_payload: PermissionTicket = {
     iss: "https://referring-ehr.org",
-    sub: "https://foodbank.org/apps/intake",
+    sub: "grant-uc4-referral-555",
     aud: "https://referring-ehr.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc4.ticketTypeUri,
@@ -176,7 +173,7 @@ const uc4_payload: PermissionTicket = {
         jkt: "" // populated at runtime
     },
     ticket_context: {
-        subject: { resourceType: "Patient", reference: "Patient/123" },
+        subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
         actor: {
             resourceType: "PractitionerRole",
             contained: [
@@ -208,7 +205,7 @@ const uc4_payload: PermissionTicket = {
 // Use Case 5: Payer Claims Adjudication
 const uc5_payload: PermissionTicket = {
     iss: "https://provider.com",
-    sub: "https://payer.com/apps/claims-processor",
+    sub: "grant-uc5-claim-xyz",
     aud: "https://provider.com",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc5.ticketTypeUri,
@@ -216,7 +213,7 @@ const uc5_payload: PermissionTicket = {
         jkt: "" // populated at runtime
     },
     ticket_context: {
-        subject: { resourceType: "Patient", reference: "Patient/456" },
+        subject: { type: "reference", resourceType: "Patient", reference: "Patient/456" },
         actor: {
             resourceType: "Organization",
             identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "9876543210" }],
@@ -235,7 +232,7 @@ const uc5_payload: PermissionTicket = {
 // Use Case 6: Research Study
 const uc6_payload: PermissionTicket = {
     iss: "https://consent-platform.org",
-    sub: "https://research.org/studies/lung-cancer/app",
+    sub: "grant-uc6-study-proto22",
     aud: "https://hospital.com",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc6.ticketTypeUri,
@@ -243,7 +240,7 @@ const uc6_payload: PermissionTicket = {
         jkt: "" // populated at runtime
     },
     ticket_context: {
-        subject: { resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
+        subject: { type: "identifier", resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
         actor: {
             resourceType: "Organization",
             name: "Oncology Research Institute",
@@ -266,7 +263,7 @@ const uc6_payload: PermissionTicket = {
 // Use Case 7: Provider-to-Provider Consult
 const uc7_payload: PermissionTicket = {
     iss: "https://referring-ehr.org",
-    sub: "https://specialist-clinic.org/apps/referral-viewer",
+    sub: "grant-uc7-consult-req111",
     aud: "https://referring-ehr.org",
     exp: DEFAULT_EXP,
     ticket_type: USE_CASE_BY_ID.uc7.ticketTypeUri,
@@ -274,7 +271,7 @@ const uc7_payload: PermissionTicket = {
         jkt: "" // populated at runtime
     },
     ticket_context: {
-        subject: { resourceType: "Patient", reference: "Patient/999" },
+        subject: { type: "reference", resourceType: "Patient", reference: "Patient/999" },
         actor: {
             resourceType: "Practitioner",
             identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1112223333" }],
@@ -334,7 +331,7 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
     const clientJkt = await clientJktPromise;
     const ticketPayload: PermissionTicket = {
         iss: "https://trust-broker.org",
-        sub: "https://app.client.id",
+        sub: "grant-example-patient-access",
         aud: "https://network.org",
         exp: DEFAULT_EXP,
         ticket_type: USE_CASE_BY_ID.uc1.ticketTypeUri,
@@ -342,28 +339,13 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
             jkt: clientJkt
         },
         ticket_context: {
-            subject: { resourceType: "Patient", id: "123" },
+            subject: { type: "reference", resourceType: "Patient", id: "123" },
             capability: {
                 scopes: ["patient/*.rs"]
             }
         }
     };
     const signedTicket = await signTicket(ticketPayload, issuerKey);
-
-    // Create the client assertion
-    // Create the client assertion
-    // Note: The order of properties here determines the order in the generated JSON.
-    // We want standard claims (iss, sub, aud, jti) first, then iat/exp (added by sign), then the tickets claim.
-    // However, jose.SignJWT adds iat/exp at the end by default. 
-    // To force the order, we'll rely on the fact that we can't easily control iat/exp position added by the library 
-    // unless we add them manually. But the user just wants permission_tickets last.
-    // Actually, jose library might respect the order if we pass them in.
-    // Let's try adding iat/exp manually to control order, or just put the tickets claim last in our object 
-    // and hope the library appends iat/exp before it? No, library usually appends.
-    // The user wants: iss, sub, aud, jti, iat, exp, permission_tickets.
-
-    // To achieve this specific order with jose, we might need to construct the payload fully manually 
-    // including iat/exp, and then sign it.
 
     const now = Math.floor(Date.now() / 1000);
     const assertionPayload: ClientAssertion = {

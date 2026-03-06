@@ -2,7 +2,7 @@
 Ticket 1 (Identity Provider - e.g., Clear):
 {
   "iss": "https://clear.me",
-  "sub": "clear-subject-789",
+  "sub": "grant-identity-789",
   "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/identity-v1",
@@ -33,7 +33,7 @@ Ticket 1 (Identity Provider - e.g., Clear):
 Ticket 2 (Trust Broker):
 {
   "iss": "https://trust-broker.org",
-  "sub": "trust-subject-456",
+  "sub": "grant-authorization-456",
   "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/authorization-v1",
