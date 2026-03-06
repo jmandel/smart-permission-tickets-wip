@@ -3,7 +3,7 @@
 Logical: PermissionTicket
 Title: "Permission Ticket (JWT Payload)"
 Description: "Common core of a Permission Ticket. Includes the security envelope, shared authorization claims, and a typed details slot. Business-specific semantics are defined by ticket-type-specific schemas selected by ticket_type."
-* iss 1..1 string "Issuer (Trust Broker URL)"
+* iss 1..1 string "Issuer (Trusted Issuer URL)"
 * sub 1..1 string "Issuer-defined subject of the authorization grant (profile-specific). This value is issuer-local and SHALL NOT be relied on as a cross-party client identifier."
 * aud 1..* uri "Audience (recipient URL(s) or network / trust framework identifier)"
 * exp 1..1 integer "Expiration Timestamp"

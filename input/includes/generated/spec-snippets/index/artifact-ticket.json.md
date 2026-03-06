@@ -1,6 +1,6 @@
 ```json
 {
-  "iss": "https://trust-broker.org",
+  "iss": "https://trusted-issuer.org",
   "sub": "grant-example-referral",
   "aud": "https://network.org",
   "exp": 1735689600,

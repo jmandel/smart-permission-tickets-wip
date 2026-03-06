@@ -84,12 +84,12 @@ Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
 &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
-&client_assertion=eyJhbGciOiJ... (Signed JWT containing tickets and trust_chain)
+&client_assertion=eyJhbGciOiJ... (Signed JWT containing tickets)
 &scope=patient/Observation.rs
 ```
 
 ##### Full Client Assertion Example
-Here is what the `client_assertion` looks like when decoded. Note the `trust_chain` for automatic registration and the embedded Permission Ticket.
+Here is what the `client_assertion` looks like when decoded. Note the embedded Permission Ticket.
 
 {% include generated/signed-tickets/example-client-assertion.html %}
 
@@ -128,7 +128,7 @@ The Data Holder SHALL perform a two-layer validation:
     *   Extract the `permission_tickets` array from the assertion.
     *   If multiple tickets are presented, read `permission_ticket_profile` from the assertion and select composition rules. Otherwise, select processing rules based on the ticket's `ticket_type`.
     *   For each ticket:
-        *   **Verify Signature:** Use the `iss` (Trust Broker) public key.
+        *   **Verify Signature:** Use the `iss` (Trusted Issuer) public key.
         *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
         *   **Verify Type:** `ticket_type` SHALL be present and recognized.
         *   **Verify Binding:** Does the JWK Thumbprint of the `client_assertion` signing key match the ticket's `cnf.jkt`?
@@ -275,7 +275,7 @@ Unknown profile, unknown `ticket_type`, or profile/type mismatch SHALL be reject
 
 Two tickets are required:
 1. **Identity Ticket** (from Identity Provider): Contains verified `requester` identity
-2. **Authorization Ticket** (from Trust Broker): Contains `subject`, `access`, and a reference linking to the requester
+2. **Authorization Ticket** (from Trusted Issuer): Contains `subject`, `access`, and a reference linking to the requester
 
 {% include generated/spec-snippets/index/profile-identity-authorization.md %}
 
@@ -425,7 +425,7 @@ The table below summarizes required and optional fields for each use case profil
 {% include generated/signed-tickets/uc1-ticket.html %}
 
 #### Use Case 2: Authorized Representative (Proxy)
-*An adult daughter accesses her elderly mother's records. The relationship is verified by a Trust Broker, not the Hospital.*
+*An adult daughter accesses her elderly mother's records. The relationship is verified by a Trusted Issuer, not the Hospital.*
 
 ##### Ticket Schema
 *   **Subject:** `Patient` (type=`identifier`, matched by MPI identifier).
@@ -500,7 +500,7 @@ The following TypeScript interfaces define the structure of the Permission Ticke
 
 ```typescript
 export interface PermissionTicket {
-    iss: string;          // Issuer URL (Trust Broker)
+    iss: string;          // Issuer URL (Trusted Issuer)
     sub: string;          // Issuer-defined subject of the authorization grant (issuer-local, not a cross-party client identifier)
     aud: string | string[]; // Audience: recipient URL(s) or network / trust framework identifier
     exp: number;          // Expiration Timestamp
@@ -565,7 +565,7 @@ export interface ClientAssertion {
 *   **Algorithm:** ES256 (ECDSA using P-256 and SHA-256) is RECOMMENDED. RS256 is also supported.
 *   **Header:** SHALL include `alg` and `kid` (Key ID) to facilitate key rotation.
 *   **Keys:**
-    *   **Issuer:** Signs the `PermissionTicket`. Public keys SHALL be exposed via a JWK Set URL (e.g., `https://trust-broker.org/.well-known/jwks.json`).
+    *   **Issuer:** Signs the `PermissionTicket`. Public keys SHALL be exposed via a JWK Set URL (e.g., `https://trusted-issuer.org/.well-known/jwks.json`).
     *   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
 *   **Binding:** `PermissionTicket.cnf.jkt` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). Data Holders compute the thumbprint of the `client_assertion` signing key and verify it matches.
 

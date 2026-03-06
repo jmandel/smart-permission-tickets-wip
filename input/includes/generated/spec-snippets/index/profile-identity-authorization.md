@@ -30,9 +30,9 @@ Ticket 1 (Identity Provider - e.g., Clear):
   }
 }
 
-Ticket 2 (Trust Broker):
+Ticket 2 (Trusted Issuer):
 {
-  "iss": "https://trust-broker.org",
+  "iss": "https://trusted-issuer.org",
   "sub": "grant-authorization-456",
   "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,

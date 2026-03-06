@@ -31,7 +31,7 @@ function renderProfileTicketsBlock(ticket1: JsonValue, ticket2: JsonValue): stri
     "Ticket 1 (Identity Provider - e.g., Clear):",
     JSON.stringify(ticket1, null, 2),
     "",
-    "Ticket 2 (Trust Broker):",
+    "Ticket 2 (Trusted Issuer):",
     JSON.stringify(ticket2, null, 2),
     "```"
   ].join("\n");
@@ -56,7 +56,7 @@ function renderUseCaseProfileRegistryTable(): string {
 
 function buildIndexSnippets(): void {
   const artifactExample: JsonObject = {
-    iss: "https://trust-broker.org",
+    iss: "https://trusted-issuer.org",
     sub: "grant-example-referral",
     aud: "https://network.org",
     exp: 1735689600,
@@ -113,7 +113,7 @@ function buildIndexSnippets(): void {
   };
 
   const profileAuthorizationTicket: JsonObject = {
-    iss: "https://trust-broker.org",
+    iss: "https://trusted-issuer.org",
     sub: "grant-authorization-456",
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
@@ -129,7 +129,7 @@ function buildIndexSnippets(): void {
   };
 
   const revocationTicketExample: JsonObject = {
-    iss: "https://trust-broker.org",
+    iss: "https://trusted-issuer.org",
     sub: "grant-revocable-example",
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
@@ -137,7 +137,7 @@ function buildIndexSnippets(): void {
     cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
     jti: "ticket-unique-id",
     revocation: {
-      url: "https://trust-broker.org/.well-known/crl/patient-access.json",
+      url: "https://trusted-issuer.org/.well-known/crl/patient-access.json",
       rid: "abc123xyz"
     },
     authorization: {
@@ -172,7 +172,7 @@ function buildIndexSnippets(): void {
 
 function buildStartSnippets(): void {
   const artifactExample: JsonObject = {
-    iss: "https://trust-broker.org",
+    iss: "https://trusted-issuer.org",
     sub: "grant-example-referral",
     aud: "https://network.org",
     exp: 1735689600,

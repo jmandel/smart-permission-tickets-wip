@@ -1,6 +1,6 @@
 ```json
 {
-  "iss": "https://trust-broker.org",
+  "iss": "https://trusted-issuer.org",
   "sub": "grant-revocable-example",
   "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,
@@ -10,7 +10,7 @@
   },
   "jti": "ticket-unique-id",
   "revocation": {
-    "url": "https://trust-broker.org/.well-known/crl/patient-access.json",
+    "url": "https://trusted-issuer.org/.well-known/crl/patient-access.json",
     "rid": "abc123xyz"
   },
   "authorization": {

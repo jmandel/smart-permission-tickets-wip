@@ -68,7 +68,7 @@ async function signClientAssertion(payload: ClientAssertion, key: jose.KeyLike &
 
 // Use Case 1: Network Patient Access
 const uc1_payload: PermissionTicket = {
-    iss: "https://trust-broker.org",
+    iss: "https://trusted-issuer.org",
     sub: "grant-uc1-patient-access",
     aud: "https://network.org",
     exp: DEFAULT_EXP,
@@ -91,7 +91,7 @@ const uc1_payload: PermissionTicket = {
 
 // Use Case 2: Authorized Representative
 const uc2_payload: PermissionTicket = {
-    iss: "https://trust-broker.org",
+    iss: "https://trusted-issuer.org",
     sub: "grant-uc2-representative",
     aud: "https://network.org",
     exp: DEFAULT_EXP,
@@ -325,7 +325,7 @@ async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: 
 
     const clientJkt = await clientJktPromise;
     const ticketPayload: PermissionTicket = {
-        iss: "https://trust-broker.org",
+        iss: "https://trusted-issuer.org",
         sub: "grant-example-patient-access",
         aud: "https://network.org",
         exp: DEFAULT_EXP,
