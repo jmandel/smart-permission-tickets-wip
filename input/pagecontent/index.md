@@ -64,12 +64,17 @@ A trusted issuer mints a Permission Ticket and delivers it to the client. The cl
 
 This architecture reuses **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** client authentication and token endpoint conventions (which themselves profile **RFC 7523**), and adds Permission Ticket presentation and validation semantics. The `client_assertion` continues to authenticate the client. Permission Tickets contribute authorization context only; they do not replace client authentication.
 
-##### Trust
+##### Trust and Client Registration
 
-*   **Automatic Registration**: Clients can be automatically registered using [OpenID Federation 1.0](https://openid.net/specs/openid-federation-1_0.html). The client includes a `trust_chain` in the **header** of its `client_assertion`, allowing the Authorization Server to verify the client's metadata and trust status dynamically.
-*   **Client IDs** SHALL be **URL Entity Identifiers** (e.g., `https://app.example.com`).
-*   Clients SHOULD include a `trust_chain` in their assertion. This allows Data Holders to verify the client's legitimacy via a common Trust Anchor without requiring manual pre-registration of every client.
-*   Client-to-Issuer issuance protocol details are out of scope for this specification; profile-specific guides may define them.
+This specification is designed so that **client identity does not need to be universally understood**. The Permission Ticket carries the authorization context; the client only needs to prove it holds the key bound to the ticket. Data Holders need to authenticate clients, but do not need to maintain a shared global client registry.
+
+Several client registration models are compatible with this architecture:
+
+*   **[OpenID Federation 1.0](https://openid.net/specs/openid-federation-1_0.html)**: The client includes a `trust_chain` in the **header** of its `client_assertion`, allowing the Data Holder to verify the client's metadata and trust status dynamically via a common Trust Anchor — no pre-registration required.
+*   **[UDAP](https://www.udap.org/)**: Clients present signed metadata using certificates from a trusted CA. Data Holders validate the certificate chain to authenticate the client.
+*   **Manual Registration**: Clients register directly with each Data Holder, exchanging public keys out of band. Suitable for small-scale deployments or where dynamic trust is not available.
+
+Client ID format and registration details are determined by the chosen registration model. Client-to-Issuer issuance protocol details are out of scope for this specification; profile-specific guides may define them.
 
 **The Request:**
 ```http
