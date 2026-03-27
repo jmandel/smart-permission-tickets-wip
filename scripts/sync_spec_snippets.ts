@@ -25,27 +25,16 @@ function renderJsonFence(value: JsonValue): string {
   return `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``;
 }
 
-function renderProfileTicketsBlock(ticket1: JsonValue, ticket2: JsonValue): string {
-  return [
-    "```",
-    "Ticket 1 (Identity Provider - e.g., Clear):",
-    JSON.stringify(ticket1, null, 2),
-    "",
-    "Ticket 2 (Trusted Issuer):",
-    JSON.stringify(ticket2, null, 2),
-    "```"
-  ].join("\n");
-}
 
 function renderUseCaseProfileRegistryTable(): string {
   const rows = USE_CASE_CATALOG.map(
     (entry) =>
-      `  <tr><td>${entry.label}</td><td><code>${entry.profileUri}</code></td><td><code>${entry.ticketTypeUri}</code></td></tr>`
+      `  <tr><td>${entry.label}</td><td><code>${entry.ticketTypeUri}</code></td></tr>`
   ).join("\n");
   return [
     "<table>",
     "  <thead>",
-    "    <tr><th>Use Case</th><th>Profile URI</th><th>Canonical <code>ticket_type</code> URI</th></tr>",
+    "    <tr><th>Use Case</th><th><code>ticket_type</code> URI</th></tr>",
     "  </thead>",
     "  <tbody>",
     rows,
@@ -89,42 +78,6 @@ function buildIndexSnippets(): void {
     }
   };
 
-  const profileClaimExample: JsonObject = {
-    permission_ticket_profile: "https://smarthealthit.org/permission-ticket-profile/identity-authorization-v1"
-  };
-
-  const profileIdentityTicket: JsonObject = {
-    iss: "https://clear.me",
-    sub: "grant-identity-789",
-    aud: "https://tefca.hhs.gov",
-    exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/identity-v1",
-    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
-    authorization: {
-      requester: {
-        resourceType: "RelatedPerson",
-        identifier: [{ system: "https://clear.me/id", value: "CLR-789" }],
-        name: [{ family: "Smith", given: ["Jane"] }]
-      }
-    }
-  };
-
-  const profileAuthorizationTicket: JsonObject = {
-    iss: "https://trusted-issuer.org",
-    sub: "grant-authorization-456",
-    aud: "https://tefca.hhs.gov",
-    exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/authorization-v1",
-    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
-    authorization: {
-      subject: { type: "match", traits: { resourceType: "Patient" } },
-      access: { scopes: ["patient/*.rs"] }
-    },
-    details: {
-      requesterReference: "https://clear.me/id|CLR-789"
-    }
-  };
-
   const revocationTicketExample: JsonObject = {
     iss: "https://trusted-issuer.org",
     sub: "grant-revocable-example",
@@ -152,11 +105,6 @@ function buildIndexSnippets(): void {
 
   writeInclude("index/artifact-ticket.json.md", renderJsonFence(artifactExample));
   writeInclude("index/access-example.json.md", renderJsonFence(accessExample));
-  writeInclude("index/profile-claim.json.md", renderJsonFence(profileClaimExample));
-  writeInclude(
-    "index/profile-identity-authorization.md",
-    renderProfileTicketsBlock(profileIdentityTicket, profileAuthorizationTicket)
-  );
   writeInclude(
     "index/aud-enumerated.json.md",
     `\`\`\`json\n{ "aud": "https://fhir.hospital.com" }\n// or\n{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"] }\n\`\`\``

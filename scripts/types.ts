@@ -71,12 +71,19 @@ export interface FHIROrganization {
 }
 
 export interface ClientAssertion {
-    iss: string;
-    sub: string;
-    aud: string;
-    jti: string;
-    iat?: number;
-    exp?: number;
-    permission_ticket_profile?: string; // Required for multi-ticket; optional for single-ticket
-    permission_tickets: string[]; // Array of signed ticket strings
+    iss: string;          // Client ID
+    sub: string;          // Client ID (same as iss)
+    aud: string;          // Token Endpoint URL
+    jti: string;          // Unique Assertion ID
+    iat?: number;         // Issued-At Timestamp
+    exp?: number;         // Expiration Timestamp
+}
+
+export interface TokenExchangeRequest {
+    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange";
+    subject_token: string;  // Signed Permission Ticket JWT
+    subject_token_type: "https://smarthealthit.org/token-type/permission-ticket";
+    scope?: string;         // Requested SMART scopes
+    client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+    client_assertion: string; // Signed Client Assertion JWT
 }

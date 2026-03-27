@@ -1,28 +1,30 @@
 ### Introduction
 
-A Permission Ticket is an issuer-signed, sender-constrained JWT presented inside a SMART Backend Services `client_assertion`. It allows a client to redeem a portable authorization grant at any eligible Data Holder within the ticket's audience, without requiring the issuer to know where the subject has received care.
+A Permission Ticket is an issuer-signed, sender-constrained JWT presented to a Data Holder's token endpoint via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). It allows a client to redeem a portable authorization grant at any eligible Data Holder within the ticket's audience, without requiring the issuer to know where the subject has received care.
 
 Each ticket conveys a common **authorization** structure: a **subject** (whose data), an optional **requester** (on whose behalf), and **access** constraints (what, and how much). Ticket-type-specific business semantics live in an optional **details** object whose schema is selected by `ticket_type`. SMART scopes provide the coarse access ceiling. Structured access constraints express finer limits — time range, jurisdiction, source organization.
 
-When present, a `cnf.jkt` claim cryptographically binds the ticket to the presenting client's key. A Data Holder verifies the client assertion, verifies the ticket signature against the issuer's published keys, enforces key binding if present, and grants access scoped to the intersection of requested and authorized access. No user login is required at the Data Holder.
+When present, a `cnf.jkt` claim cryptographically binds the ticket to the presenting client's key. A Data Holder authenticates the client, verifies the ticket signature against the issuer's published keys, enforces key binding if present, and grants access scoped to the intersection of requested and authorized access. No user login is required at the Data Holder.
 
 ### Scope and Non-Goals
 
 **This specification defines:**
 - The Permission Ticket artifact format and required claims
-- Presentation inside a `client_assertion` at the token endpoint
+- Presentation via OAuth 2.0 Token Exchange (RFC 8693) at the token endpoint
+- A custom `subject_token_type` for Permission Tickets
+- Discovery of Permission Ticket support via SMART configuration
 - Optional sender-constrained binding via `cnf.jkt`
 - Audience validation for single-recipient and network-wide recipient sets
 - Subject resolution modes and validation rules
 - Access calculation and access constraint enforcement
-- Seven single-ticket use-case profiles
+- Seven use-case ticket types
 
 **This specification does not define:**
 - How a ticket issuer verifies real-world facts before minting a ticket
 - Trust framework governance or membership validation procedures
 - User-facing consent or authorization UX
 - Ticket issuance protocols between clients and issuers
-- A universal schema for all possible use cases (profiles define use-case-specific constraints)
+- A universal schema for all possible use cases (ticket types define use-case-specific constraints)
 
 ### Protocol Overview
 
@@ -40,11 +42,10 @@ sequenceDiagram
 
     Note over Client, Server: 2. Redemption
     Client->>Client: Generate Client Assertion (JWT)
-    Client->>Client: Embed Ticket in Assertion
-    Client->>Server: POST /token (client_credentials + assertion)
+    Client->>Server: POST /token (token exchange + ticket as subject_token)
 
     Note over Server: 3. Validation
-    Server->>Server: Verify Client Signature
+    Server->>Server: Verify Client Assertion
     Server->>Server: Verify Ticket Signature (Issuer Trust)
     Server->>Server: Enforce Ticket Constraints
     Server-->>Client: Access Token (Down-scoped)
@@ -54,15 +55,39 @@ sequenceDiagram
     Server-->>Client: FHIR Resources
 ```
 
-A trusted issuer mints a Permission Ticket and delivers it to the client. The client embeds the ticket in a signed `client_assertion` and presents it to the Data Holder's token endpoint. The Data Holder authenticates the client (standard SMART Backend Services), then validates the ticket: signature, issuer trust, audience, key binding, and access constraints. If valid, it issues an access token scoped to the intersection of requested and ticket-authorized access.
+A trusted issuer mints a Permission Ticket and delivers it to the client. The client presents the ticket as a `subject_token` in an [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693) token exchange request, authenticating itself with a separate `client_assertion`. The Data Holder authenticates the client (standard SMART Backend Services), then validates the ticket: signature, issuer trust, audience, key binding, and access constraints. If valid, it issues an access token scoped to the intersection of requested and ticket-authorized access.
 
 ---
 
 ### Technical Specification
 
-#### Transport: SMART Backend Services
+#### Transport: Token Exchange (RFC 8693)
 
-This architecture reuses **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** client authentication and token endpoint conventions (which themselves profile **RFC 7523**), and adds Permission Ticket presentation and validation semantics. The `client_assertion` continues to authenticate the client. Permission Tickets contribute authorization context only; they do not replace client authentication.
+Permission Tickets are presented via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). The client authenticates using **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** conventions (JWT `client_assertion` per **RFC 7523**) and presents the Permission Ticket as a separate `subject_token` parameter. This cleanly separates client **authentication** from the authorization **grant**: the `client_assertion` proves client identity; the `subject_token` carries the Permission Ticket.
+
+Using a distinct grant type (`urn:ietf:params:oauth:grant-type:token-exchange`) ensures that Data Holders that do not support Permission Tickets will reject the request with `unsupported_grant_type` rather than silently ignoring the ticket.
+
+##### Discovery
+
+Data Holders that support Permission Tickets SHALL advertise this in their `.well-known/smart-configuration`:
+
+```json
+{
+  "grant_types_supported": [
+    "client_credentials",
+    "urn:ietf:params:oauth:grant-type:token-exchange"
+  ],
+  "smart_permission_ticket_types_supported": [
+    "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+    "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1"
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `grant_types_supported` | SHALL include `urn:ietf:params:oauth:grant-type:token-exchange` |
+| `smart_permission_ticket_types_supported` | Array of `ticket_type` URIs the Data Holder accepts. Clients SHOULD check this before presenting a ticket. |
 
 ##### Trust and Client Registration
 
@@ -82,24 +107,40 @@ POST /token HTTP/1.1
 Host: fhir.hospital.com
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials
-&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
-&client_assertion=eyJhbGciOiJ... (Signed JWT containing tickets)
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+&subject_token=eyJhbGciOiJ... (Permission Ticket JWT, signed by issuer)
+&subject_token_type=https://smarthealthit.org/token-type/permission-ticket
 &scope=patient/Observation.rs
+&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+&client_assertion=eyJhbGciOiJ... (Client authentication JWT)
 ```
 
-##### Full Client Assertion Example
-Here is what the `client_assertion` looks like when decoded. Note the embedded Permission Ticket.
+| Parameter | Value |
+|-----------|-------|
+| `grant_type` | `urn:ietf:params:oauth:grant-type:token-exchange` |
+| `subject_token` | The signed Permission Ticket JWT |
+| `subject_token_type` | `https://smarthealthit.org/token-type/permission-ticket` |
+| `scope` | Requested SMART scopes |
+| `client_assertion_type` | `urn:ietf:params:oauth:client-assertion-type:jwt-bearer` |
+| `client_assertion` | Standard SMART Backend Services client authentication JWT |
+
+##### Full Example
+Here is what the `client_assertion` looks like when decoded. It is a standard SMART Backend Services authentication JWT — it does not contain the Permission Ticket.
 
 {% include generated/signed-tickets/example-client-assertion.html %}
 
+The Permission Ticket is sent separately in the `subject_token` parameter. See the [use case examples](#catalog-of-use-cases) below for decoded ticket payloads.
+
 ##### Presentation Model
 
-The `client_assertion` serves two roles: it **authenticates the client** (standard SMART Backend Services) and acts as the **cryptographic presentation envelope** for one or more Permission Tickets.
+Client authentication and authorization are separated:
 
-A Permission Ticket authorizes access only when presented inside a valid `client_assertion`. When the ticket includes `cnf.jkt`, the Data Holder SHALL verify that the thumbprint matches the key used to sign the assertion — this ensures the ticket can only be redeemed by the client it was issued to. When `cnf` is absent, the Data Holder relies on `aud` validation and standard client authentication.
+- The **`client_assertion`** authenticates the client per standard SMART Backend Services. It contains only `iss`, `sub`, `aud`, `jti`, and `exp` — no ticket content.
+- The **`subject_token`** carries the Permission Ticket. It is a separate form parameter, not embedded in the assertion.
 
-The Data Holder SHALL NOT rely on any cross-party-stable client identifier inside the Permission Ticket itself. Client identity is established by the outer `client_assertion` (`iss`/`sub`). The ticket's `sub` claim is issuer-local and opaque — it identifies the authorization grant, not the client.
+When the ticket includes `cnf.jkt`, the Data Holder SHALL verify that the thumbprint matches the key used to sign the `client_assertion` — this ensures the ticket can only be redeemed by the client it was issued to. When `cnf` is absent, the Data Holder relies on `aud` validation and standard client authentication.
+
+The Data Holder SHALL NOT rely on any cross-party-stable client identifier inside the Permission Ticket itself. Client identity is established by the `client_assertion` (`iss`/`sub`). The ticket's `sub` claim is issuer-local and opaque — it identifies the authorization grant, not the client.
 
 #### Artifact: Ticket Structure
 The ticket payload is a JWT. It carries a common `authorization` claim with subject, access constraints, and optional requester. Ticket-type-specific business semantics (reason codes, case identifiers, etc.) live in an optional `details` object whose schema is defined by the `ticket_type` URI.
@@ -108,7 +149,7 @@ The ticket payload is a JWT. It carries a common `authorization` claim with subj
 
 See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal definitions.
 
-Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. In single-ticket flows, the Data Holder uses `ticket_type` to select validation and access logic. In multi-ticket flows, `ticket_type` identifies each component ticket's role within a composition profile.
+Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. The Data Holder uses `ticket_type` to select validation and access logic.
 
 #### Ticket Client-Key Binding
 A Permission Ticket MAY bind redemption to a specific client key using the `cnf` (Confirmation, [RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)) claim:
@@ -139,13 +180,12 @@ The Data Holder SHALL perform a two-layer validation:
     *   Ensure the client is registered and active.
 
 2.  **Layer 2: Ticket Validation (Permission Ticket Specific)**
-    *   Extract the `permission_tickets` array from the assertion.
-    *   If multiple tickets are presented, read `permission_ticket_profile` from the assertion and select composition rules. Otherwise, select processing rules based on the ticket's `ticket_type`.
-    *   For each ticket:
-        *   **Verify Signature:** Use the `iss` (Trusted Issuer) public key.
-        *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
-        *   **Verify Type:** `ticket_type` SHALL be present and recognized.
-        *   **Verify Binding:** If `cnf` is present, does the JWK Thumbprint of the `client_assertion` signing key match the ticket's `cnf.jkt`?
+    *   Verify the `subject_token_type` is `https://smarthealthit.org/token-type/permission-ticket`.
+    *   Parse the `subject_token` as a JWT.
+    *   **Verify Signature:** Use the `iss` (Trusted Issuer) public key.
+    *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
+    *   **Verify Type:** `ticket_type` SHALL be present and recognized. The Data Holder SHALL verify the `ticket_type` is listed in its `smart_permission_ticket_types_supported`.
+    *   **Verify Binding:** If `cnf` is present, does the JWK Thumbprint of the `client_assertion` signing key match the ticket's `cnf.jkt`?
     *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `authorization.access` rules.
 
 #### Subject Resolution
@@ -162,7 +202,7 @@ If subject resolution yields zero matches, or more than one match, the Data Hold
 
 #### Issuer-Attested Claims
 
-`authorization.requester` and `details` are issuer-attested facts. The Data Holder uses them for policy evaluation and audit, unless a specific profile requires additional holder-side verification.
+`authorization.requester` and `details` are issuer-attested facts. The Data Holder uses them for policy evaluation and audit, unless a specific ticket type requires additional holder-side verification.
 
 If `requester` is absent, the ticket does not assert a separate third-party requester. This does not mean anonymous access — the presenting client is still authenticated by the outer `client_assertion`.
 
@@ -179,7 +219,7 @@ The Data Holder calculates granted access through the **intersection** of:
 3. **Client Registration**: Scopes the client is permitted to request
 
 If the intersection yields no valid access, return `invalid_scope` error.
-Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on profile. For single-patient Permission Ticket profiles, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
+Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on ticket type. For single-patient ticket types, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
 
 #### Access Constraints
 
@@ -258,60 +298,15 @@ Data Holders SHALL reject tickets where `aud` validation fails with error `inval
 
 ---
 
-### Multiple Tickets
+### Ticket Type Registry
 
-> **Note:** Multi-ticket composition is informative in this version. It is outside the minimum conformance requirements unless a specific profile explicitly requires it. Implementations MAY support multi-ticket composition, but single-ticket flows are the normative center of this specification.
+Each use case maps to a `ticket_type` URI that identifies the ticket's schema and processing rules:
 
-A client MAY present multiple tickets in the `permission_tickets` array to compose authorization from multiple sources.
-
-#### Use Case Profiles
-
-Multi-ticket scenarios are defined by **use case profiles**. Each profile specifies:
-- Required ticket types
-- Required issuer trust requirements per type
-- Claim source mapping (which ticket contributes subject, requester, access, etc.)
-- Combination logic and validation order
-
-For the current single-ticket catalog in this specification, use case and profile are 1:1:
 {% include generated/spec-snippets/index/use-case-profile-map.md %}
 
-When presenting multiple tickets, the client SHALL include the `permission_ticket_profile` claim in the `client_assertion`:
+Data Holders advertise which `ticket_type` URIs they support via `smart_permission_ticket_types_supported` in their `.well-known/smart-configuration`. Unknown `ticket_type` values SHALL be rejected with `invalid_grant`.
 
-{% include generated/spec-snippets/index/profile-claim.json.md %}
-
-`permission_ticket_profile` selects a multi-ticket composition profile when multiple tickets are presented or when a profile defines cross-ticket combination rules. In single-ticket flows, the Data Holder selects processing rules based on the ticket's `ticket_type`, and `permission_ticket_profile` MAY be omitted.
-
-Unknown profile, unknown `ticket_type`, or profile/type mismatch SHALL be rejected with `invalid_grant`.
-
-#### Example Profiles
-
-**Profile: Identity + Designated Representative**
-
-Two tickets are required:
-1. **Identity Ticket** (from Identity Provider): Contains verified `requester` identity
-2. **Authorization Ticket** (from Trusted Issuer): Contains `subject`, `access`, and a reference linking to the requester
-
-{% include generated/spec-snippets/index/profile-identity-authorization.md %}
-
-The Data Holder, implementing this profile:
-1. Validates both tickets independently
-2. Confirms the `requesterReference` in Ticket 2's `details` matches the `requester.identifier` in Ticket 1
-3. Uses requester from Ticket 1, subject and access from Ticket 2
-
-> **Note:** The `requesterReference` field used in this multi-ticket example lives in the ticket's `details` and is defined by the composition profile, not by the base ticket schema. Multi-ticket profile schemas may define additional `details` fields beyond the base model.
-
-**Profile: Base + Sensitive Category**
-
-A network-level ticket provides baseline access; an additional ticket from a specialized authority grants access to sensitive categories (e.g., behavioral health, substance use).
-
-#### Common Rules
-
-Regardless of profile, these rules always apply:
-- All tickets SHALL be valid for the Data Holder (per audience rules)
-- All issuers SHALL be trusted by the Data Holder
-- For each ticket with `cnf`, the JWK Thumbprint of the authenticated `client_assertion` signing key SHALL match that ticket's `cnf.jkt`
-- All tickets SHALL include `ticket_type`
-- When `permission_ticket_profile` is present, all tickets SHALL match the declared profile rules
+> **Note on future multi-token composition:** RFC 8693 defines an optional `actor_token` parameter alongside `subject_token`. Future versions of this specification may use `actor_token` to support multi-token composition scenarios (e.g., a separate identity ticket from a verified identity provider combined with an authorization ticket from a trusted issuer). All current use cases require only a single Permission Ticket as the `subject_token`.
 
 ---
 
@@ -415,7 +410,7 @@ Here are seven scenarios demonstrating how FHIR resources are used to model dive
 
 #### Per-Profile Constraints
 
-The table below summarizes required and optional fields for each use case profile:
+The table below summarizes required and optional fields for each ticket type:
 
 | Use Case | `cnf` | Subject Mode | Requester | Details | Access Dimensions |
 |----------|-------|-------------|-----------|---------|-------------------|
@@ -510,7 +505,7 @@ The table below summarizes required and optional fields for each use case profil
 
 #### TypeScript Interfaces
 
-The following TypeScript interfaces define the structure of the Permission Ticket and the Client Assertion.
+The following TypeScript interfaces define the structure of the Permission Ticket, the Client Assertion, and the Token Exchange request.
 
 ```typescript
 export interface PermissionTicket {
@@ -570,8 +565,15 @@ export interface ClientAssertion {
     jti: string;          // Unique Assertion ID
     iat?: number;         // Issued-at Timestamp
     exp?: number;         // Expiration Timestamp
-    permission_ticket_profile?: string; // Composition profile (required for multi-ticket; optional for single-ticket)
-    permission_tickets: string[];
+}
+
+export interface TokenExchangeRequest {
+    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange";
+    subject_token: string;  // Signed Permission Ticket JWT
+    subject_token_type: "https://smarthealthit.org/token-type/permission-ticket";
+    scope?: string;         // Requested SMART scopes
+    client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+    client_assertion: string; // Signed Client Assertion JWT
 }
 ```
 
@@ -589,8 +591,9 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 
 | Scenario | `error` | `error_description` |
 |----------|---------|---------------------|
-| No tickets in assertion | `invalid_request` | "No permission tickets provided" |
-| Multiple tickets without profile | `invalid_request` | "Missing permission ticket profile for multi-ticket request" |
+| Grant type not supported | `unsupported_grant_type` | "Token exchange not supported" |
+| Missing or wrong `subject_token_type` | `invalid_request` | "Unsupported subject token type" |
+| Missing `subject_token` | `invalid_request` | "No permission ticket provided" |
 | Malformed ticket (not valid JWT) | `invalid_grant` | "Malformed permission ticket" |
 | Missing `ticket_type` | `invalid_grant` | "Missing ticket type" |
 | Ticket signature invalid | `invalid_grant` | "Ticket signature verification failed" |
@@ -600,7 +603,6 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 | Client key binding mismatch (`cnf` present) | `invalid_grant` | "Ticket not bound to client key" |
 | `aud` mismatch | `invalid_grant` | "Ticket not valid for this server" |
 | Unknown `ticket_type` | `invalid_grant` | "Unsupported ticket type" |
-| Profile/ticket type mismatch | `invalid_grant` | "Ticket type not valid for profile" |
 | Subject not resolvable | `invalid_grant` | "Unable to resolve ticket subject" |
 | Ambiguous subject match | `invalid_grant` | "Ambiguous ticket subject match" |
 | Subject type / field mismatch | `invalid_grant` | "Subject type inconsistent with populated fields" |
@@ -618,12 +620,13 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 #### Data Holder Requirements
 
 **SHALL:**
-- Accept `permission_tickets` claim in client assertions
+- Support the `urn:ietf:params:oauth:grant-type:token-exchange` grant type at the token endpoint
+- Advertise `urn:ietf:params:oauth:grant-type:token-exchange` in `grant_types_supported` in `.well-known/smart-configuration`
+- Advertise supported ticket types in `smart_permission_ticket_types_supported` in `.well-known/smart-configuration`
+- Accept `subject_token_type` of `https://smarthealthit.org/token-type/permission-ticket`
 - Validate client assertion per SMART Backend Services
-- For each ticket: verify signature, `ticket_type`, `aud`, and `exp`; if `cnf` is present, verify `cnf.jkt` binding
-- Validate `ticket_type` is recognized and select processing rules accordingly
-- If multiple tickets are presented, require and validate `permission_ticket_profile`
-- If `permission_ticket_profile` is present, validate all tickets match the declared profile rules
+- Verify the ticket's signature, `ticket_type`, `aud`, and `exp`; if `cnf` is present, verify `cnf.jkt` binding against the `client_assertion` signing key
+- Validate `ticket_type` is recognized (listed in `smart_permission_ticket_types_supported`) and select processing rules accordingly
 - Validate subject resolution mode (`type`) and ensure populated fields are consistent with the declared mode
 - Calculate granted scopes as intersection of requested, ticket access, and client registration
 - Enforce all presented `access` constraints (`scopes`, `periods`, `jurisdictions`, `organizations`) or reject with `invalid_grant`
@@ -638,22 +641,19 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 
 **MAY:**
 - Support trust framework audience validation
-- Support multi-ticket composition (multi-ticket composition is outside the minimum conformance requirements for this version unless a specific profile explicitly requires it)
 
 #### Client Requirements
 
 **SHALL:**
-- Include tickets as an array in `permission_tickets` claim
-- Include `permission_ticket_profile` when presenting more than one ticket
+- Use `grant_type=urn:ietf:params:oauth:grant-type:token-exchange`
+- Include the Permission Ticket as `subject_token` with `subject_token_type=https://smarthealthit.org/token-type/permission-ticket`
 - Sign client assertion with registered or federated key
 - Use identical value for `iss` and `sub` in client assertion (the Client ID URL)
 
-**MAY:**
-- Omit `permission_ticket_profile` when presenting exactly one ticket
-
 **SHOULD:**
+- Check `smart_permission_ticket_types_supported` in the Data Holder's `.well-known/smart-configuration` before presenting a ticket
 - Request only scopes authorized by held tickets
-- For single-patient profiles, request SMART v2 CRUDS suffix scopes (for example `patient/Observation.rs`)
+- For single-patient ticket types, request SMART v2 CRUDS suffix scopes (for example `patient/Observation.rs`)
 - Include `jti` in client assertion for replay protection
 - Refresh tickets before expiration for continued access
 

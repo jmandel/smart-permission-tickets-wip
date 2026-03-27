@@ -37,8 +37,8 @@ A **Permission Ticket** is a JWT minted by a Trusted Issuer. It acts as a self-c
 
 ## 4. Technical Specification
 
-### A. Transport: The "Ticket-Carrying" Assertion
-We use **RFC 7523 (OAuth 2.0 Client Authentication)**. The client embeds the tickets inside the JWT used to authenticate to the token endpoint.
+### A. Transport: Token Exchange (RFC 8693)
+The client presents a Permission Ticket via **[OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693)**. The ticket is the `subject_token`; client authentication uses a separate `client_assertion` per **RFC 7523**. This cleanly separates authorization (the ticket) from authentication (the assertion).
 
 **The Request:**
 ```http
@@ -46,9 +46,12 @@ POST /token HTTP/1.1
 Host: fhir.hospital.com
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+&subject_token=eyJhbGciOiJ... (Permission Ticket JWT, signed by issuer)
+&subject_token_type=https://smarthealthit.org/token-type/permission-ticket
+&scope=patient/Observation.rs
 &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
-&client_assertion=eyJhbGciOiJ... (Signed JWT containing tickets)
+&client_assertion=eyJhbGciOiJ... (Client authentication JWT)
 ```
 
 ### B. The Artifact: Ticket Structure

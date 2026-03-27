@@ -1,7 +1,7 @@
 import * as jose from 'jose';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PermissionTicket, ClientAssertion } from './types';
+import { PermissionTicket, ClientAssertion, TokenExchangeRequest } from './types';
 import { USE_CASE_BY_ID } from './use_case_catalog';
 import Ajv from 'ajv';
 
@@ -324,31 +324,14 @@ async function generate() {
 async function generateClientAssertionExample(issuerKey: jose.KeyLike & { kid?: string }) {
     console.log("Generating client assertion example...");
 
-    const clientJkt = await clientJktPromise;
-    const ticketPayload: PermissionTicket = {
-        iss: "https://trusted-issuer.org",
-        sub: "grant-example-patient-access",
-        aud: "https://network.org",
-        exp: DEFAULT_EXP,
-        ticket_type: USE_CASE_BY_ID.uc1.ticketTypeUri,
-        cnf: { jkt: clientJkt },
-        authorization: {
-            subject: { type: "reference", resourceType: "Patient", id: "123" },
-            access: { scopes: ["patient/*.rs"] }
-        }
-    };
-    const signedTicket = await signTicket(ticketPayload, issuerKey);
-
     const now = Math.floor(Date.now() / 1000);
     const assertionPayload: ClientAssertion = {
         iss: "https://app.client.id",
         sub: "https://app.client.id",
-        aud: "https://network.org/token",
+        aud: "https://fhir.hospital.com/token",
         jti: "assertion-jti-123",
         iat: now,
-        exp: now + 300,
-        permission_ticket_profile: USE_CASE_BY_ID.uc1.profileUri,
-        permission_tickets: [signedTicket]
+        exp: now + 300
     };
 
     const trust_chain = [
