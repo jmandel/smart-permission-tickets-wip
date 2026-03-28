@@ -47,10 +47,13 @@ This is a FHIR Implementation Guide. Prerequisites: Node.js, Java (for the IG Pu
 ```sh
 # Install dependencies
 npm install
+cd scripts && npm install && cd ..
 
 # Generate examples and spec snippets
-npx ts-node scripts/generate_examples.ts
-npx ts-node scripts/sync_spec_snippets.ts
+cd scripts
+npx ts-node generate_examples.ts
+npx ts-node sync_spec_snippets.ts
+cd ..
 
 # Build the IG (requires FHIR IG Publisher)
 ./_genonce.sh
