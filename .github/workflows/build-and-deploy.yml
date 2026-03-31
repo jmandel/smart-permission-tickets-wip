@@ -29,7 +29,12 @@ jobs:
         with:
           node-version: 20
 
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+
       # Install dependencies
+      - run: gem install jekyll
       - run: npm install
       - run: npm install -g fsh-sushi
       - run: npm --prefix scripts install
