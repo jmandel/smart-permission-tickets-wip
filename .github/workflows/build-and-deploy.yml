@@ -31,11 +31,12 @@ jobs:
 
       # Install dependencies
       - run: npm install
+      - run: npm install -g fsh-sushi
       - run: npm --prefix scripts install
 
       # Sync spec snippets + run SUSHI
       - run: npm --prefix scripts run sync-spec-snippets
-      - run: npx sushi .
+      - run: sushi .
 
       # Download and run FHIR IG Publisher
       - name: Download IG Publisher
