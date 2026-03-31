@@ -41,6 +41,8 @@ Off-white (#FAF9F6) — very slightly warm, like good paper. NOT pure white (too
 
    This hand-lettering is always legible, always confident, always sparse. If more than ~20% of the text on a slide is hand-lettered, there's too much.
 
+   **Tone:** Hand-lettered annotations should feel like quiet margin notes from a thoughtful researcher — not taglines or sound bites. They observe, they don't announce. "strongest signal" not "STRONGEST SIGNAL →". Think pencil-in-the-margin, not movie poster.
+
 ### Color Palette — 5 colors, strict roles
 
 | Color | Hex | Role | Where it appears |
@@ -80,11 +82,51 @@ However, when the ticket appears in a diagram, hand-drawn arrows or connector li
 - NO background fills, NO boxes, NO rounded corners on quote cards
 - Generous whitespace around each card
 
+The color coding is explained on the title slide so individual slides don't need legends.
+
 ### Slide Dimensions & Footer
 
 16:9 landscape (1920×1080 proportions). Consistent margins: ~120px left/right, ~80px top, ~60px bottom.
 
-Footer on every slide: a thin horizontal rule in #D4D4D4, then "SMART Permission Tickets · Argonaut Working Group" left-aligned and slide number right-aligned, both in sans-serif light, #8C8C8C, small.
+Footer on every slide — MUST be identical in positioning, size, and font across all slides:
+- A thin horizontal rule in #D4D4D4 at the same vertical position on every slide
+- Left-aligned: "SMART Permission Tickets · Argonaut Working Group" in sans-serif light, #8C8C8C, 11pt equivalent
+- Right-aligned: slide number in the same font
+- Title area must also be consistent: same vertical position, same serif font at the same size, same subtitle positioning below it
+
+---
+
+## SLIDE 0: Title Slide
+
+### Image Generation Prompt
+
+A presentation slide, 16:9 landscape, off-white background (#FAF9F6). This is the title and reading-key slide — it sets up the deck's topic and teaches the viewer how to read the visual language used on subsequent slides.
+
+**Upper half:**
+Large serif headline, near-black, centered or left-aligned: "SMART Permission Tickets"
+Below, sans-serif subtitle, medium gray: "What we heard from 18 stakeholder interviews"
+Below that, sans-serif, smaller, #8C8C8C: "Argonaut Working Group · March 2026"
+
+**Lower half — "How to read these slides" section:**
+
+A clean, compact visual key with the heading "Reading this deck" in sans-serif medium, near-black, small.
+
+Three items, each showing the visual element alongside a brief label:
+
+1. A short amber (#D4932A) vertical line followed by the label: "patient or caregiver voice"
+2. A short light gray (#D4D4D4) vertical line followed by the label: "system builder voice (EHR vendor, app developer, payer, consultant)"
+3. A small teal (#1A8A7D) rounded rectangle with white text "Permission Ticket" followed by the label: "the cryptographic artifact at the center of the spec"
+
+Below those, a brief note in sans-serif light, #8C8C8C: "Hand-drawn marks are the presenter's annotations — emphasis, connections, and editorial notes added to typeset content."
+
+The visual key should feel like a natural part of the slide's design, not a dense legend block. Use generous whitespace and the same typography system as the rest of the deck.
+
+**Footer:** Standard footer, no slide number (or "0").
+
+**Key rendering notes:**
+- This slide is clean and spacious — mostly whitespace with the title and visual key
+- The visual key teaches the color coding so subsequent slides don't need per-slide legends
+- The teal ticket object appears here so it's introduced before Slide 3
 
 ---
 
@@ -170,7 +212,7 @@ Each stage is a vertical column. The five columns are separated by generous whit
 **The key visual device — a hand-drawn attrition line:**
 Running horizontally across the top of all five columns, a single hand-drawn line in near-black starts thick/confident on the left (~3px) and gradually thins and fades as it moves right, until it's barely a wisp at Stage 5. This line is drawn with the character of a confident pen stroke — it doesn't wobble or jitter, but it does taper naturally like a real pen line losing pressure. This is the ONLY visual metaphor for attrition. It's elegant, minimal, and immediately readable.
 
-At each stage transition along this line, small hand-drawn tick marks (like hash marks on a tally) in light gray indicate drop-off — 2 marks after Stage 1, 4 marks after Stage 2 (the worst), 3 marks after Stage 3, 2 after Stage 4. These are tiny, like marks someone scratched in the margin.
+At each stage transition along this line, small hand-drawn tick marks (like hash marks on a tally) in light gray indicate drop-off — 2 marks after Stage 1, 4 marks after Stage 2 (the worst), 3 marks after Stage 3, 2 after Stage 4. These are tiny, like marks someone scratched in the margin. At the far left, a small typeset label in #8C8C8C reads "each mark ≈ users lost" so the tick marks are self-explanatory.
 
 **Stage 1 — FIND THE PORTAL** (far left)
 Stage label (sans-serif, medium, small caps, near-black): FIND THE PORTAL
@@ -200,8 +242,8 @@ Failure note (hand-lettered, teal): Arrives ≠ useful.
 **Stage 5 — STAY CONNECTED** (far right)
 Stage label: STAY CONNECTED
 Quote A (gray left line): "Some drop-off when users get logged out because the refresh token expires." — Pascal Pfiffner, Apple Health
-Quote B (gray left line): "Long-lived tokens today are an unresolved pain point." — Gino Canessa, App Developer
-Failure note (hand-lettered, teal): Tokens expire. Users don't reconnect.
+Quote B (gray left line): "The more disconnects happen, the less likely users are to manually reconnect." — Pascal Pfiffner, Apple Health
+Failure note (hand-lettered, teal): tokens expire, users don't come back
 
 **Spanning bottom quote** (below all five columns, full width):
 A quote card with a thicker amber left line (4px):
@@ -336,7 +378,7 @@ Suggested marks:
 - Research: Data Holder ●, Network/QHIN ●
 - Provider Consult: Data Holder ●, Network/QHIN ●
 
-**Visual emphasis on rows:** Rows 1, 3, and 5 (Patient Access, Public Health, Payer Claims) have their labels in sans-serif medium weight — subtly bolder. Rows 6 and 7 have labels in #8C8C8C — lighter.
+**Visual emphasis on rows:** Rows 1, 3, and 5 (Patient Access, Public Health, Payer Claims) have their labels in sans-serif medium weight — subtly bolder. Rows 6 and 7 have labels in medium gray — lighter, less prominent.
 
 **HAND-DRAWN LAYER for this slide:**
 
@@ -352,9 +394,12 @@ Suggested marks:
 ③ (amber left line): "I trust my health insurance provider and my primary care provider the most." — Brett Marquard, Patient
 ④ (gray left line): "The PHA could present the ticket to other hospitals in the region." — Cooper Thompson, Epic
 
-**Below table and annotations:**
-Sans-serif, regular, #8C8C8C: "● = plausible issuer based on interview evidence."
-Hand-lettered, teal: "The spec defines format and validation. Issuer governance is a deployment decision."
+**Legend (below table, clearly visible):**
+Sans-serif, regular, #8C8C8C, in a single line with visual examples:
+"● plausible issuer · ◉ strongest advocacy · blank = not a natural fit"
+This legend must be prominent enough to read at a glance — it's essential for understanding the table without narration.
+
+Below the legend, in sans-serif regular, #8C8C8C, smaller: "The spec defines format and validation. Issuer governance is a deployment decision."
 
 **Footer:** Standard, slide number 4.
 
@@ -487,7 +532,7 @@ Each column contains:
 **HAND-DRAWN LAYER for this slide:**
 - Each central question (in teal) gets a hand-drawn box around it — a simple rectangle, slightly imperfect, drawn in teal. Not a rounded rectangle, not a heavy border. A single-line box, like someone put a pen frame around the key question. This is the visual signal: "this is what we need to discuss."
 - Between the position labels within each column, small hand-drawn double-headed arrows (↔) in light gray suggest the spectrum without drawing a formal scale. These are tiny — just spatial cues between positions.
-- In the bottom margin, a hand-lettered note in near-black: "real disagreements — the group decides"
+- No hand-lettered annotation in the margin. The slide speaks for itself.
 
 **Column 1 — "Granularity"**
 
@@ -571,9 +616,8 @@ Sans-serif subtitle, medium gray: "Helping the group narrow from seven use cases
 The top 3 are visually prominent. The bottom 4 are lighter and more compact. A thin horizontal rule separates the tiers.
 
 **HAND-DRAWN LAYER for this slide:**
-- A hand-drawn bracket on the left margin groups the top 3 entries, with a hand-lettered label: "natural starting zone"
+- A hand-drawn bracket on the left margin groups the top 3 entries, with a hand-lettered label: "most interview energy"
 - The number "14" in "14 of 18" for Patient Access gets a hand-drawn circle in teal — the highest number, worth calling out
-- A small hand-drawn arrow in the bottom margin points from the closing question upward toward the list, with a hand-lettered note: "not a vote — a starting point"
 - Next to "Research" and "Provider Consult," small hand-drawn asterisks (*) with a marginal note: "less explored ≠ less important"
 
 **Top tier:**
@@ -593,7 +637,7 @@ Right annotation (teal, small): Active harm identified — self-pay data leaking
 
 — thin horizontal rule (#D4D4D4) —
 
-**Lower tier** (labels in #8C8C8C, smaller text):
+**Lower tier** (labels in medium gray, smaller text):
 
 **4. Social Care Referral**
 "Write-back needed but not mature. Referral response today limited to 360X, Direct, or fax."
@@ -608,9 +652,7 @@ Right annotation (teal, small): Active harm identified — self-pay data leaking
 "Limited coverage. Relates to CDS Hooks opportunity Jason Vogt raised."
 
 **Below the list, with whitespace:**
-Sans-serif, medium weight, teal: "Given limited time and energy — which 1–2 use cases should drive the initial spec work?"
-
-Sans-serif, regular, #8C8C8C, smaller: "This isn't a vote. All seven remain in scope. The question is sequence, not exclusion."
+Sans-serif, medium weight, teal: "Where should we start?"
 
 **Footer:** Standard, slide number 7.
 
