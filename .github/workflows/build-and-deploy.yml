@@ -1,0 +1,88 @@
+name: Build IG and Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install dependencies
+      - run: npm install
+      - run: npm --prefix scripts install
+
+      # Sync spec snippets + run SUSHI
+      - run: npm --prefix scripts run sync-spec-snippets
+      - run: npx sushi .
+
+      # Download and run FHIR IG Publisher
+      - name: Download IG Publisher
+        run: |
+          mkdir -p input-cache
+          curl -L https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar -o input-cache/publisher.jar
+
+      - name: Run IG Publisher
+        run: java -jar input-cache/publisher.jar -ig .
+        env:
+          JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
+
+      # Copy call decks (HTML + slide images) into output/decks/
+      - name: Collect decks
+        run: |
+          mkdir -p output/decks
+          for dir in calls/*/; do
+            call_name=$(basename "$dir")
+            [ "$call_name" = "deck-to-slides" ] && continue
+            if [ -f "$dir/deck.html" ]; then
+              mkdir -p "output/decks/${call_name}/slides"
+              cp "$dir/deck.html" "output/decks/${call_name}/index.html"
+              cp "$dir"/slides/* "output/decks/${call_name}/slides/" 2>/dev/null || true
+              [ -f "$dir/deck.pptx" ] && cp "$dir/deck.pptx" "output/decks/${call_name}/deck.pptx"
+            fi
+          done
+          # Deck index page
+          cat > output/decks/index.html << 'EOHTML'
+          <!DOCTYPE html><html><head><meta charset="utf-8"><title>Presentation Decks</title></head>
+          <body><h1>Presentation Decks</h1><ul>
+          EOHTML
+          for dir in output/decks/*/; do
+            name=$(basename "$dir")
+            echo "<li><a href=\"${name}/\">${name}</a></li>" >> output/decks/index.html
+          done
+          echo '</ul></body></html>' >> output/decks/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: output
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
