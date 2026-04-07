@@ -94,16 +94,24 @@ Data Holders that support Permission Tickets SHALL advertise this in their `.wel
 
 This specification is designed so that **client identity does not need to be universally understood**. The Permission Ticket carries the authorization context; the client only needs to prove it holds the key bound to the ticket (or satisfies the framework binding). Data Holders need to authenticate clients, but do not need to maintain a shared global client registry.
 
-Several client identity approaches are compatible with this architecture. The same approaches appear in two contexts: **registration** (how a Data Holder learns the client's keys) and **ticket binding** (how a ticket constrains which client may redeem it). The table below summarizes both.
+Several client identity approaches are compatible with this architecture. The same approaches appear in two contexts: **registration** (how a Data Holder learns the client's keys) and **ticket binding** (how a ticket constrains which client may redeem it). These are related but not identical: for example, a manually registered unaffiliated client may still be bound by key thumbprint if the issuer knows the exact client key, or may be left unbound if the issuer does not know which client will redeem the ticket. The table below summarizes both.
 
 | Approach | Registration | Ticket Binding (`presenter_binding`) | Key Discovery |
 |----------|-------------|--------------------------------------|---------------|
 | **UDAP** | Client presents X.509 certificate chain from a trusted CA | `framework_client` with `framework_type: "udap"` and `entity_uri` matching certificate SAN | Certificate in `x5c` header of `client_assertion` |
 | **Well-Known JWKS** | Client publishes keys at `{entity_uri}/.well-known/jwks.json`; trust frameworks (published directories) list recognized entities | `framework_client` with `framework_type: "well-known"` and `entity_uri` matching the client's URL identity | Fetched from `{entity_uri}/.well-known/jwks.json` |
 | **OpenID Federation** | Client includes a `trust_chain` in the header of its `client_assertion`; Data Holder validates via a common Trust Anchor | `framework_client` with appropriate `framework`/`entity_uri` | Resolved from federation `trust_chain` |
-| **Manual / Unaffiliated** | Client registers directly with each Data Holder, exchanging public keys out of band | No `presenter_binding` — any authenticated client in the ticket's `aud` may redeem it | Pre-registered JWK or JWKS |
+| **Manual / Unaffiliated** | Client registers directly with each Data Holder, exchanging public keys out of band | Either `jkt` binding when the issuer knows the exact client key, or no `presenter_binding` when the issuer does not know which client will redeem the ticket | Pre-registered JWK or JWKS |
 
 Client ID format and registration details are determined by the chosen approach. Client-to-Issuer issuance protocol details are out of scope for this specification; profile-specific guides may define them.
+
+For the **Well-Known JWKS** approach, this specification uses a deterministic client identifier convention:
+
+- the client's stable identifier is `well-known:{entity_uri}`
+- `entity_uri` is the HTTPS URL identity of the client
+- the same `entity_uri` yields the same `client_id` at every Data Holder, so no per-holder registration-assigned identifier is needed for this class of client
+
+This is how a set of independently operated Data Holders can recognize the same well-known client consistently. The `well-known:` prefix indicates that the remainder of the `client_id` is an entity URL whose keys are published at `{entity_uri}/.well-known/jwks.json`. When a client presents a `client_assertion` with `iss = sub = well-known:{entity_uri}`, the Data Holder strips the prefix, resolves the JWKS from the entity's well-known location, verifies the signature, and then applies any relevant trust-framework checks for that entity.
 
 **The Request:**
 ```http
@@ -1013,6 +1021,8 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Include the Permission Ticket as `subject_token` with `subject_token_type=https://smarthealthit.org/token-type/permission-ticket`
 - Sign client assertion with registered or federated key
 - Use identical value for `iss` and `sub` in client assertion (the Client ID URL)
+
+For well-known clients, that Client ID URL is the deterministic identifier `well-known:{entity_uri}` rather than a Data Holder-assigned registration identifier.
 
 **SHOULD:**
 - Check `smart_permission_ticket_types_supported` in the Data Holder's `.well-known/smart-configuration` before presenting a ticket
