@@ -15,55 +15,117 @@
         <h5>Payload (Claims)</h5>
         <pre
             style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
-  "iss": "https://provider.com",
-  "sub": "grant-uc5-claim-xyz",
-  "aud": "https://provider.com",
-  "exp": 1774630337,
+  "iss": "https://issuer.example.org",
+  "aud": "https://network.org",
+  "exp": 1775508769,
+  "jti": "uc5-9096d8d2-3627-45ee-8ea2-5e5a0ab51b7b",
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1",
-  "authorization": {
-    "subject": {
-      "type": "reference",
+  "presenter_binding": {
+    "framework_client": {
+      "framework": "https://payer.example.org/trust-framework",
+      "framework_type": "udap",
+      "entity_uri": "https://payer.example.org/entities/claims-ops"
+    }
+  },
+  "subject": {
+    "patient": {
       "resourceType": "Patient",
-      "reference": "Patient/456"
-    },
-    "requester": {
-      "resourceType": "Organization",
       "identifier": [
         {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "value": "9876543210"
+          "system": "http://hospital.example.org/mrn",
+          "value": "C112233"
         }
       ],
-      "name": "Blue Payer Inc"
-    },
-    "access": {
-      "scopes": [
-        "patient/DocumentReference.rs",
-        "patient/Procedure.rs"
+      "birthDate": "1954-07-19",
+      "name": [
+        {
+          "family": "Johnson",
+          "given": [
+            "Amelia"
+          ]
+        }
       ]
     }
   },
-  "details": {
+  "requester": {
+    "resourceType": "Organization",
+    "identifier": [
+      {
+        "system": "urn:ietf:rfc:3986",
+        "value": "https://payer.example.org/entities/claims-ops"
+      }
+    ],
+    "name": "Acme Health Plan Claims Operations"
+  },
+  "access": {
+    "permissions": [
+      {
+        "kind": "data",
+        "resource_type": "Claim",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      },
+      {
+        "kind": "data",
+        "resource_type": "ExplanationOfBenefit",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      },
+      {
+        "kind": "data",
+        "resource_type": "DocumentReference",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      }
+    ],
+    "data_period": {
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    },
+    "source_organizations": [
+      {
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "1234567893"
+      }
+    ],
+    "sensitive_data": "exclude"
+  },
+  "context": {
+    "kind": "payer-claims",
     "service": {
-      "system": "http://snomed.info/sct",
-      "code": "80146002",
-      "display": "Appendectomy"
+      "coding": [
+        {
+          "system": "http://www.ama-assn.org/go/cpt",
+          "code": "99214",
+          "display": "Office or other outpatient visit"
+        }
+      ]
     },
     "claim": {
-      "identifier": {
-        "system": "http://payer.com/claims",
-        "value": "CLAIM-2024-XYZ"
-      },
-      "display": "Appendectomy claim"
+      "resourceType": "Claim",
+      "identifier": [
+        {
+          "system": "http://payer.example.org/claims",
+          "value": "CLM-884422"
+        }
+      ],
+      "status": "active",
+      "use": "claim"
     }
   },
-  "iat": 1774626737
+  "iat": 1775505169
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3Byb3ZpZGVyLmNvbSIsInN1YiI6ImdyYW50LXVjNS1jbGFpbS14eXoiLCJhdWQiOiJodHRwczovL3Byb3ZpZGVyLmNvbSIsImV4cCI6MTc3NDYzMDMzNywidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcGF5ZXItY2xhaW1zLWFkanVkaWNhdGlvbi12MSIsImF1dGhvcml6YXRpb24iOnsic3ViamVjdCI6eyJ0eXBlIjoicmVmZXJlbmNlIiwicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsInJlZmVyZW5jZSI6IlBhdGllbnQvNDU2In0sInJlcXVlc3RlciI6eyJyZXNvdXJjZVR5cGUiOiJPcmdhbml6YXRpb24iLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaGw3Lm9yZy9maGlyL3NpZC91cy1ucGkiLCJ2YWx1ZSI6Ijk4NzY1NDMyMTAifV0sIm5hbWUiOiJCbHVlIFBheWVyIEluYyJ9LCJhY2Nlc3MiOnsic2NvcGVzIjpbInBhdGllbnQvRG9jdW1lbnRSZWZlcmVuY2UucnMiLCJwYXRpZW50L1Byb2NlZHVyZS5ycyJdfX0sImRldGFpbHMiOnsic2VydmljZSI6eyJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiY29kZSI6IjgwMTQ2MDAyIiwiZGlzcGxheSI6IkFwcGVuZGVjdG9teSJ9LCJjbGFpbSI6eyJpZGVudGlmaWVyIjp7InN5c3RlbSI6Imh0dHA6Ly9wYXllci5jb20vY2xhaW1zIiwidmFsdWUiOiJDTEFJTS0yMDI0LVhZWiJ9LCJkaXNwbGF5IjoiQXBwZW5kZWN0b215IGNsYWltIn19LCJpYXQiOjE3NzQ2MjY3Mzd9.Gseu9CgTswh5HCNOa_nwCVlmVaKMJIhmeRgmvrkAmBrygGfXPlmMI0EaLdKUhbHQCMwf8cbr3EP4tS9i_CB8QQ</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2lzc3Vlci5leGFtcGxlLm9yZyIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3NzU1MDg3NjksImp0aSI6InVjNS05MDk2ZDhkMi0zNjI3LTQ1ZWUtOGVhMi01ZTVhMGFiNTFiN2IiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wYXllci1jbGFpbXMtYWRqdWRpY2F0aW9uLXYxIiwicHJlc2VudGVyX2JpbmRpbmciOnsiZnJhbWV3b3JrX2NsaWVudCI6eyJmcmFtZXdvcmsiOiJodHRwczovL3BheWVyLmV4YW1wbGUub3JnL3RydXN0LWZyYW1ld29yayIsImZyYW1ld29ya190eXBlIjoidWRhcCIsImVudGl0eV91cmkiOiJodHRwczovL3BheWVyLmV4YW1wbGUub3JnL2VudGl0aWVzL2NsYWltcy1vcHMifX0sInN1YmplY3QiOnsicGF0aWVudCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoiaHR0cDovL2hvc3BpdGFsLmV4YW1wbGUub3JnL21ybiIsInZhbHVlIjoiQzExMjIzMyJ9XSwiYmlydGhEYXRlIjoiMTk1NC0wNy0xOSIsIm5hbWUiOlt7ImZhbWlseSI6IkpvaG5zb24iLCJnaXZlbiI6WyJBbWVsaWEiXX1dfX0sInJlcXVlc3RlciI6eyJyZXNvdXJjZVR5cGUiOiJPcmdhbml6YXRpb24iLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJ1cm46aWV0ZjpyZmM6Mzk4NiIsInZhbHVlIjoiaHR0cHM6Ly9wYXllci5leGFtcGxlLm9yZy9lbnRpdGllcy9jbGFpbXMtb3BzIn1dLCJuYW1lIjoiQWNtZSBIZWFsdGggUGxhbiBDbGFpbXMgT3BlcmF0aW9ucyJ9LCJhY2Nlc3MiOnsicGVybWlzc2lvbnMiOlt7ImtpbmQiOiJkYXRhIiwicmVzb3VyY2VfdHlwZSI6IkNsYWltIiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX0seyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJFeHBsYW5hdGlvbk9mQmVuZWZpdCIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiRG9jdW1lbnRSZWZlcmVuY2UiLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfV0sImRhdGFfcGVyaW9kIjp7InN0YXJ0IjoiMjAyNS0wMS0wMSIsImVuZCI6IjIwMjUtMTItMzEifSwic291cmNlX29yZ2FuaXphdGlvbnMiOlt7InN5c3RlbSI6Imh0dHA6Ly9obDcub3JnL2ZoaXIvc2lkL3VzLW5waSIsInZhbHVlIjoiMTIzNDU2Nzg5MyJ9XSwic2Vuc2l0aXZlX2RhdGEiOiJleGNsdWRlIn0sImNvbnRleHQiOnsia2luZCI6InBheWVyLWNsYWltcyIsInNlcnZpY2UiOnsiY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vd3d3LmFtYS1hc3NuLm9yZy9nby9jcHQiLCJjb2RlIjoiOTkyMTQiLCJkaXNwbGF5IjoiT2ZmaWNlIG9yIG90aGVyIG91dHBhdGllbnQgdmlzaXQifV19LCJjbGFpbSI6eyJyZXNvdXJjZVR5cGUiOiJDbGFpbSIsImlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHA6Ly9wYXllci5leGFtcGxlLm9yZy9jbGFpbXMiLCJ2YWx1ZSI6IkNMTS04ODQ0MjIifV0sInN0YXR1cyI6ImFjdGl2ZSIsInVzZSI6ImNsYWltIn19LCJpYXQiOjE3NzU1MDUxNjl9.SEBdWyzYKCk3kiVPYb4uN5tVleUeGmLwE2N52vnYLrWgs-1dSQWejMgvMLdoApiTH8g0fwgmsR8hbsCpIBCufw</code></pre>
         </details>
     </div>
 </div>

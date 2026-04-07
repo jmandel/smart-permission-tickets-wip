@@ -1,47 +1,55 @@
+import {
+  type PermissionTicketType,
+  AUTHORIZED_REPRESENTATIVE_ACCESS_TICKET_TYPE,
+  NETWORK_PATIENT_ACCESS_TICKET_TYPE,
+  PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
+  PROVIDER_CONSULT_TICKET_TYPE,
+  PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
+  RESEARCH_STUDY_ACCESS_TICKET_TYPE,
+  SOCIAL_CARE_REFERRAL_TICKET_TYPE,
+} from "../reference-implementation/shared/permission-ticket-schema";
+
 export type UseCaseCatalogEntry = {
   id: string;
   label: string;
-  ticketTypeUri: string;
+  ticketTypeUri: PermissionTicketType;
 };
 
 export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   {
     id: "uc1",
     label: "Use Case 1: Network-Mediated Patient Access",
-    ticketTypeUri: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1"
+    ticketTypeUri: NETWORK_PATIENT_ACCESS_TICKET_TYPE
   },
   {
     id: "uc2",
     label: "Use Case 2: Authorized Representative (Proxy)",
-    ticketTypeUri:
-      "https://smarthealthit.org/permission-ticket-type/authorized-representative-v1"
+    ticketTypeUri: AUTHORIZED_REPRESENTATIVE_ACCESS_TICKET_TYPE
   },
   {
     id: "uc3",
     label: "Use Case 3: Public Health Investigation",
-    ticketTypeUri:
-      "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1"
+    ticketTypeUri: PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE
   },
   {
     id: "uc4",
     label: "Use Case 4: Social Care (CBO) Referral",
-    ticketTypeUri: "https://smarthealthit.org/permission-ticket-type/social-care-referral-v1"
+    ticketTypeUri: SOCIAL_CARE_REFERRAL_TICKET_TYPE
   },
   {
     id: "uc5",
     label: "Use Case 5: Payer Claims Adjudication",
-    ticketTypeUri:
-      "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1"
+    ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE
   },
   {
     id: "uc6",
     label: "Use Case 6: Research Study",
-    ticketTypeUri: "https://smarthealthit.org/permission-ticket-type/research-study-v1"
+    ticketTypeUri: RESEARCH_STUDY_ACCESS_TICKET_TYPE
   },
   {
     id: "uc7",
     label: "Use Case 7: Provider-to-Provider Consult",
-    ticketTypeUri: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1"
+    ticketTypeUri: PROVIDER_CONSULT_TICKET_TYPE
   }
 ];
 

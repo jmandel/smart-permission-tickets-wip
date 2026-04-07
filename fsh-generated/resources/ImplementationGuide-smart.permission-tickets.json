@@ -17,7 +17,7 @@
           "reference": "StructureDefinition/PermissionTicket"
         },
         "name": "Permission Ticket (JWT Payload)",
-        "description": "The full payload of a Permission Ticket, including standard JWT claims and the custom ticket_context object.",
+        "description": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, workflow context, unified presenter binding, and optional must-understand extensibility.",
         "exampleBoolean": false
       }
     ],

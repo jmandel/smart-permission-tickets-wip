@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "fsh-sushi": "^3.16.5"
+    "fsh-sushi": "^3.16.5",
+    "zod": "^4.3.6"
   }
 }

@@ -5,7 +5,7 @@
   "name": "PermissionTicket",
   "title": "Permission Ticket (JWT Payload)",
   "status": "draft",
-  "description": "The full payload of a Permission Ticket, including standard JWT claims and the custom ticket_context object.",
+  "description": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, workflow context, unified presenter binding, and optional must-understand extensibility.",
   "fhirVersion": "4.0.1",
   "kind": "logical",
   "abstract": false,
@@ -18,26 +18,13 @@
         "id": "PermissionTicket",
         "path": "PermissionTicket",
         "short": "Permission Ticket (JWT Payload)",
-        "definition": "The full payload of a Permission Ticket, including standard JWT claims and the custom ticket_context object."
+        "definition": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, workflow context, unified presenter binding, and optional must-understand extensibility."
       },
       {
         "id": "PermissionTicket.iss",
         "path": "PermissionTicket.iss",
-        "short": "Issuer (Trust Broker URL)",
-        "definition": "Issuer (Trust Broker URL)",
-        "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "string"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.sub",
-        "path": "PermissionTicket.sub",
-        "short": "Issuer-defined ticket subject (profile-specific)",
-        "definition": "Issuer-defined ticket subject (profile-specific)",
+        "short": "Issuer URL",
+        "definition": "Issuer URL",
         "min": 1,
         "max": "1",
         "type": [
@@ -49,13 +36,13 @@
       {
         "id": "PermissionTicket.aud",
         "path": "PermissionTicket.aud",
-        "short": "Audience (Network / Trust Framework / Recipient Set)",
-        "definition": "Audience (Network / Trust Framework / Recipient Set)",
+        "short": "Audience (recipient URL(s) or trust framework identifier)",
+        "definition": "Audience (recipient URL(s) or trust framework identifier)",
         "min": 1,
-        "max": "1",
+        "max": "*",
         "type": [
           {
-            "code": "string"
+            "code": "uri"
           }
         ]
       },
@@ -90,7 +77,7 @@
         "path": "PermissionTicket.jti",
         "short": "Unique Ticket ID",
         "definition": "Unique Ticket ID",
-        "min": 0,
+        "min": 1,
         "max": "1",
         "type": [
           {
@@ -101,9 +88,9 @@
       {
         "id": "PermissionTicket.ticket_type",
         "path": "PermissionTicket.ticket_type",
-        "short": "Ticket type URI identifying the ticket schema/semantics (required for multi-ticket profiles; optional for single-ticket profiles)",
-        "definition": "Ticket type URI identifying the ticket schema/semantics (required for multi-ticket profiles; optional for single-ticket profiles)",
-        "min": 0,
+        "short": "Ticket type URI identifying the ticket schema and processing rules",
+        "definition": "Ticket type URI identifying the ticket schema and processing rules",
+        "min": 1,
         "max": "1",
         "type": [
           {
@@ -112,11 +99,11 @@
         ]
       },
       {
-        "id": "PermissionTicket.client_binding",
-        "path": "PermissionTicket.client_binding",
-        "short": "Client key-set binding",
-        "definition": "Client key-set binding",
-        "min": 1,
+        "id": "PermissionTicket.presenter_binding",
+        "path": "PermissionTicket.presenter_binding",
+        "short": "Unified presenter binding container. key and framework_client are independent; either may appear alone, or both may appear together.",
+        "definition": "Unified presenter binding container. key and framework_client are independent; either may appear alone, or both may appear together.",
+        "min": 0,
         "max": "1",
         "type": [
           {
@@ -125,28 +112,80 @@
         ]
       },
       {
-        "id": "PermissionTicket.client_binding.jwks_uri",
-        "path": "PermissionTicket.client_binding.jwks_uri",
-        "short": "HTTPS JWKS URI for authorized client key set",
-        "definition": "HTTPS JWKS URI for authorized client key set",
+        "id": "PermissionTicket.presenter_binding.key",
+        "path": "PermissionTicket.presenter_binding.key",
+        "short": "Exact-key binding (replaces RFC 7800 cnf; identical semantics)",
+        "definition": "Exact-key binding (replaces RFC 7800 cnf; identical semantics)",
         "min": 0,
         "max": "1",
         "type": [
           {
-            "code": "url"
+            "code": "BackboneElement"
           }
         ]
       },
       {
-        "id": "PermissionTicket.client_binding.jwks",
-        "path": "PermissionTicket.client_binding.jwks",
-        "short": "Embedded JWKS JSON for authorized client key set",
-        "definition": "Embedded JWKS JSON for authorized client key set",
-        "min": 0,
+        "id": "PermissionTicket.presenter_binding.key.jkt",
+        "path": "PermissionTicket.presenter_binding.key.jkt",
+        "short": "JWK Thumbprint (RFC 7638) of the authorized client key",
+        "definition": "JWK Thumbprint (RFC 7638) of the authorized client key",
+        "min": 1,
         "max": "1",
         "type": [
           {
             "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.presenter_binding.framework_client",
+        "path": "PermissionTicket.presenter_binding.framework_client",
+        "short": "Trust-framework client identity binding",
+        "definition": "Trust-framework client identity binding",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.presenter_binding.framework_client.framework",
+        "path": "PermissionTicket.presenter_binding.framework_client.framework",
+        "short": "Framework instance URI",
+        "definition": "Framework instance URI",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "uri"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.presenter_binding.framework_client.framework_type",
+        "path": "PermissionTicket.presenter_binding.framework_client.framework_type",
+        "short": "Framework family: well-known | udap",
+        "definition": "Framework family: well-known | udap",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.presenter_binding.framework_client.entity_uri",
+        "path": "PermissionTicket.presenter_binding.framework_client.entity_uri",
+        "short": "Framework-recognized client entity URI",
+        "definition": "Framework-recognized client entity URI",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "uri"
           }
         ]
       },
@@ -190,10 +229,23 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context",
-        "path": "PermissionTicket.ticket_context",
-        "short": "Permission Details",
-        "definition": "Permission Details",
+        "id": "PermissionTicket.must_understand",
+        "path": "PermissionTicket.must_understand",
+        "short": "Payload claim names the recipient MUST understand beyond the base kernel. Inspired by JWS crit (RFC 7515), applied to payload claims.",
+        "definition": "Payload claim names the recipient MUST understand beyond the base kernel. Inspired by JWS crit (RFC 7515), applied to payload claims.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.subject",
+        "path": "PermissionTicket.subject",
+        "short": "Subject whose data may be accessed",
+        "definition": "Subject whose data may be accessed",
         "min": 1,
         "max": "1",
         "type": [
@@ -203,37 +255,11 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.subject",
-        "path": "PermissionTicket.ticket_context.subject",
-        "short": "The Patient or Subject of the data",
-        "definition": "The Patient or Subject of the data",
+        "id": "PermissionTicket.subject.patient",
+        "path": "PermissionTicket.subject.patient",
+        "short": "Inline patient facts for recipient-side resolution. May be thin.",
+        "definition": "Inline patient facts for recipient-side resolution. May be thin.",
         "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "BackboneElement"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.subject.type",
-        "path": "PermissionTicket.ticket_context.subject.type",
-        "short": "Type of subject match (e.g., 'match' or 'reference')",
-        "definition": "Type of subject match (e.g., 'match' or 'reference')",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "code"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.subject.traits",
-        "path": "PermissionTicket.ticket_context.subject.traits",
-        "short": "Demographic traits for matching",
-        "definition": "Demographic traits for matching",
-        "min": 0,
         "max": "1",
         "type": [
           {
@@ -242,142 +268,25 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.subject.resourceType",
-        "path": "PermissionTicket.ticket_context.subject.resourceType",
-        "short": "Resource Type (e.g. Patient)",
-        "definition": "Resource Type (e.g. Patient)",
+        "id": "PermissionTicket.subject.recipient_record",
+        "path": "PermissionTicket.subject.recipient_record",
+        "short": "Optional recipient-local patient locator",
+        "definition": "Optional recipient-local patient locator",
         "min": 0,
         "max": "1",
         "type": [
           {
-            "code": "string"
+            "code": "Reference"
           }
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.subject.id",
-        "path": "PermissionTicket.ticket_context.subject.id",
-        "short": "Resource ID",
-        "definition": "Resource ID",
+        "id": "PermissionTicket.requester",
+        "path": "PermissionTicket.requester",
+        "short": "Issuer-attested real-world party for whom the grant exists. Typical types: RelatedPerson, Practitioner, PractitionerRole, Organization.",
+        "definition": "Issuer-attested real-world party for whom the grant exists. Typical types: RelatedPerson, Practitioner, PractitionerRole, Organization.",
         "min": 0,
         "max": "1",
-        "type": [
-          {
-            "code": "string"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.subject.identifier",
-        "path": "PermissionTicket.ticket_context.subject.identifier",
-        "short": "Business Identifier",
-        "definition": "Business Identifier",
-        "min": 0,
-        "max": "*",
-        "type": [
-          {
-            "code": "Identifier"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.actor",
-        "path": "PermissionTicket.ticket_context.actor",
-        "short": "The Requesting Agent",
-        "definition": "The Requesting Agent",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "BackboneElement"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.actor.resourceType",
-        "path": "PermissionTicket.ticket_context.actor.resourceType",
-        "short": "Type of actor (PractitionerRole, RelatedPerson, Organization)",
-        "definition": "Type of actor (PractitionerRole, RelatedPerson, Organization)",
-        "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "string"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.actor.name",
-        "path": "PermissionTicket.ticket_context.actor.name",
-        "short": "Name of the actor",
-        "definition": "Name of the actor",
-        "min": 0,
-        "max": "*",
-        "type": [
-          {
-            "code": "HumanName"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.actor.telecom",
-        "path": "PermissionTicket.ticket_context.actor.telecom",
-        "short": "Contact details",
-        "definition": "Contact details",
-        "min": 0,
-        "max": "*",
-        "type": [
-          {
-            "code": "ContactPoint"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.actor.identifier",
-        "path": "PermissionTicket.ticket_context.actor.identifier",
-        "short": "Actor identifiers (NPI, etc)",
-        "definition": "Actor identifiers (NPI, etc)",
-        "min": 0,
-        "max": "*",
-        "type": [
-          {
-            "code": "Identifier"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.actor.relationship",
-        "path": "PermissionTicket.ticket_context.actor.relationship",
-        "short": "Relationship to subject",
-        "definition": "Relationship to subject",
-        "min": 0,
-        "max": "*",
-        "type": [
-          {
-            "code": "CodeableConcept"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.actor.type",
-        "path": "PermissionTicket.ticket_context.actor.type",
-        "short": "Organization type",
-        "definition": "Organization type",
-        "min": 0,
-        "max": "*",
-        "type": [
-          {
-            "code": "CodeableConcept"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.actor.contained",
-        "path": "PermissionTicket.ticket_context.actor.contained",
-        "short": "Embedded resources",
-        "definition": "Embedded resources",
-        "min": 0,
-        "max": "*",
         "type": [
           {
             "code": "Resource"
@@ -385,62 +294,10 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.context",
-        "path": "PermissionTicket.ticket_context.context",
-        "short": "The Trigger Event",
-        "definition": "The Trigger Event",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "BackboneElement"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.context.type",
-        "path": "PermissionTicket.ticket_context.context.type",
-        "short": "Type of context (e.g. ActReason)",
-        "definition": "Type of context (e.g. ActReason)",
-        "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "Coding"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.context.focus",
-        "path": "PermissionTicket.ticket_context.context.focus",
-        "short": "Clinical Focus (e.g. Condition)",
-        "definition": "Clinical Focus (e.g. Condition)",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "Coding"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.context.identifier",
-        "path": "PermissionTicket.ticket_context.context.identifier",
-        "short": "Issuer-specific identifiers (Case ID, etc)",
-        "definition": "Issuer-specific identifiers (Case ID, etc)",
-        "min": 0,
-        "max": "*",
-        "type": [
-          {
-            "code": "Identifier"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.ticket_context.capability",
-        "path": "PermissionTicket.ticket_context.capability",
-        "short": "Access Capabilities",
-        "definition": "Access Capabilities",
+        "id": "PermissionTicket.access",
+        "path": "PermissionTicket.access",
+        "short": "Normative authorization model",
+        "definition": "Normative authorization model",
         "min": 1,
         "max": "1",
         "type": [
@@ -450,12 +307,38 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.capability.scopes",
-        "path": "PermissionTicket.ticket_context.capability.scopes",
-        "short": "SMART Scopes (e.g. patient/Immunization.rs)",
-        "definition": "SMART Scopes (e.g. patient/Immunization.rs)",
-        "min": 0,
+        "id": "PermissionTicket.access.permissions",
+        "path": "PermissionTicket.access.permissions",
+        "short": "One or more permission rules. When kind=data: resource_type and interactions are required (interactions must be non-empty). When kind=operation: name is required.",
+        "definition": "One or more permission rules. When kind=data: resource_type and interactions are required (interactions must be non-empty). When kind=operation: name is required.",
+        "min": 1,
         "max": "*",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.permissions.kind",
+        "path": "PermissionTicket.access.permissions.kind",
+        "short": "Permission kind: data | operation",
+        "definition": "Permission kind: data | operation",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.permissions.resource_type",
+        "path": "PermissionTicket.access.permissions.resource_type",
+        "short": "FHIR resource type (or * for broad access). Required when kind=data.",
+        "definition": "FHIR resource type (or * for broad access). Required when kind=data.",
+        "min": 0,
+        "max": "1",
         "type": [
           {
             "code": "string"
@@ -463,12 +346,77 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.capability.periods",
-        "path": "PermissionTicket.ticket_context.capability.periods",
-        "short": "Time restrictions (Service Date)",
-        "definition": "Time restrictions (Service Date)",
+        "id": "PermissionTicket.access.permissions.interactions",
+        "path": "PermissionTicket.access.permissions.interactions",
+        "short": "REST interactions: read | search | history | create | update | patch | delete. Required and non-empty when kind=data.",
+        "definition": "REST interactions: read | search | history | create | update | patch | delete. Required and non-empty when kind=data.",
         "min": 0,
         "max": "*",
+        "type": [
+          {
+            "code": "code"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.permissions.category_any_of",
+        "path": "PermissionTicket.access.permissions.category_any_of",
+        "short": "Category filter group (OR within group). Only when kind=data.",
+        "definition": "Category filter group (OR within group). Only when kind=data.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.permissions.code_any_of",
+        "path": "PermissionTicket.access.permissions.code_any_of",
+        "short": "Code filter group (OR within group). Only when kind=data.",
+        "definition": "Code filter group (OR within group). Only when kind=data.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.permissions.name",
+        "path": "PermissionTicket.access.permissions.name",
+        "short": "Operation name when kind=operation. Required when kind=operation.",
+        "definition": "Operation name when kind=operation. Required when kind=operation.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.permissions.target",
+        "path": "PermissionTicket.access.permissions.target",
+        "short": "Operation target. Only when kind=operation.",
+        "definition": "Operation target. Only when kind=operation.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.data_period",
+        "path": "PermissionTicket.access.data_period",
+        "short": "One coarse timeframe. Mint separate tickets for disjoint windows.",
+        "definition": "One coarse timeframe. Mint separate tickets for disjoint windows.",
+        "min": 0,
+        "max": "1",
         "type": [
           {
             "code": "Period"
@@ -476,10 +424,10 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.capability.locations",
-        "path": "PermissionTicket.ticket_context.capability.locations",
-        "short": "Allowed Locations (Jurisdictions)",
-        "definition": "Allowed Locations (Jurisdictions)",
+        "id": "PermissionTicket.access.jurisdictions",
+        "path": "PermissionTicket.access.jurisdictions",
+        "short": "Coarse geographic restriction (country/state only)",
+        "definition": "Coarse geographic restriction (country/state only)",
         "min": 0,
         "max": "*",
         "type": [
@@ -489,15 +437,249 @@
         ]
       },
       {
-        "id": "PermissionTicket.ticket_context.capability.organizations",
-        "path": "PermissionTicket.ticket_context.capability.organizations",
-        "short": "Allowed Organizations",
-        "definition": "Allowed Organizations",
+        "id": "PermissionTicket.access.source_organizations",
+        "path": "PermissionTicket.access.source_organizations",
+        "short": "Positive data-holder scoping by organizational identity",
+        "definition": "Positive data-holder scoping by organizational identity",
         "min": 0,
         "max": "*",
         "type": [
           {
-            "code": "Organization"
+            "code": "Identifier"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.sensitive_data",
+        "path": "PermissionTicket.access.sensitive_data",
+        "short": "exclude | include. If absent, recipients default to exclude.",
+        "definition": "exclude | include. If absent, recipients default to exclude.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context",
+        "path": "PermissionTicket.context",
+        "short": "Ticket-type-specific mandatory workflow semantics",
+        "definition": "Ticket-type-specific mandatory workflow semantics",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.kind",
+        "path": "PermissionTicket.context.kind",
+        "short": "Context family: patient-access | public-health | social-care-referral | payer-claims | research | provider-consult",
+        "definition": "Context family: patient-access | public-health | social-care-referral | payer-claims | research | provider-consult",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.reportable_condition",
+        "path": "PermissionTicket.context.reportable_condition",
+        "short": "Public health: reportable condition",
+        "definition": "Public health: reportable condition",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.investigation_case",
+        "path": "PermissionTicket.context.investigation_case",
+        "short": "Public health: case identifier",
+        "definition": "Public health: case identifier",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.triggering_resource",
+        "path": "PermissionTicket.context.triggering_resource",
+        "short": "Public health: triggering Condition, Observation, or DiagnosticReport",
+        "definition": "Public health: triggering Condition, Observation, or DiagnosticReport",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Resource"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.source_report",
+        "path": "PermissionTicket.context.source_report",
+        "short": "Public health: source DocumentReference",
+        "definition": "Public health: source DocumentReference",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Resource"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.concern",
+        "path": "PermissionTicket.context.concern",
+        "short": "Social care: concern being addressed",
+        "definition": "Social care: concern being addressed",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.referral",
+        "path": "PermissionTicket.context.referral",
+        "short": "Social care: referral ServiceRequest",
+        "definition": "Social care: referral ServiceRequest",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Resource"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.task",
+        "path": "PermissionTicket.context.task",
+        "short": "Social care: supporting Task",
+        "definition": "Social care: supporting Task",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Resource"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.service",
+        "path": "PermissionTicket.context.service",
+        "short": "Payer claims: service being adjudicated",
+        "definition": "Payer claims: service being adjudicated",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.claim",
+        "path": "PermissionTicket.context.claim",
+        "short": "Payer claims: Claim artifact",
+        "definition": "Payer claims: Claim artifact",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Resource"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.study",
+        "path": "PermissionTicket.context.study",
+        "short": "Research: ResearchStudy artifact",
+        "definition": "Research: ResearchStudy artifact",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Resource"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.research_subject",
+        "path": "PermissionTicket.context.research_subject",
+        "short": "Research: ResearchSubject artifact",
+        "definition": "Research: ResearchSubject artifact",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Resource"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.condition",
+        "path": "PermissionTicket.context.condition",
+        "short": "Research: condition of interest",
+        "definition": "Research: condition of interest",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.reason",
+        "path": "PermissionTicket.context.reason",
+        "short": "Provider consult: reason for consult",
+        "definition": "Provider consult: reason for consult",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.context.consult_request",
+        "path": "PermissionTicket.context.consult_request",
+        "short": "Provider consult: ServiceRequest",
+        "definition": "Provider consult: ServiceRequest",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Resource"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.supporting_artifacts",
+        "path": "PermissionTicket.supporting_artifacts",
+        "short": "Optional evidence and review material. Not required for the base protocol's yes/no decision.",
+        "definition": "Optional evidence and review material. Not required for the base protocol's yes/no decision.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Resource"
           }
         ]
       }

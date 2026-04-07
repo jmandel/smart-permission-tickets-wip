@@ -1,0 +1,41 @@
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "iss": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sub": {
+      "type": "string",
+      "minLength": 1
+    },
+    "aud": {
+      "type": "string",
+      "minLength": 1
+    },
+    "jti": {
+      "type": "string",
+      "minLength": 1
+    },
+    "iat": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "exp": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "iss",
+    "sub",
+    "aud",
+    "jti"
+  ],
+  "additionalProperties": false
+}
+```

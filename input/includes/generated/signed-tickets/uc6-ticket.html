@@ -15,66 +15,94 @@
         <h5>Payload (Claims)</h5>
         <pre
             style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
-  "iss": "https://consent-platform.org",
-  "sub": "grant-uc6-study-proto22",
-  "aud": "https://hospital.com",
-  "exp": 1774630337,
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/research-study-v1",
-  "cnf": {
-    "jkt": "JuI6ibZHcMPQICaIZ55PbXpnsudQmKt00D0BiEXNrMc"
+  "iss": "https://issuer.example.org",
+  "aud": "https://network.org",
+  "exp": 1775508769,
+  "jti": "uc6-b5774e14-a020-46f2-94d3-2bb95b7ac4af",
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/research-study-access-v1",
+  "presenter_binding": {
+    "framework_client": {
+      "framework": "https://research.example.org/trust-framework",
+      "framework_type": "udap",
+      "entity_uri": "https://research.example.org/entities/study-team-204"
+    }
   },
-  "authorization": {
-    "subject": {
-      "type": "identifier",
+  "subject": {
+    "patient": {
       "resourceType": "Patient",
       "identifier": [
         {
-          "value": "MRN-123"
+          "system": "http://hospital.example.org/mrn",
+          "value": "R445500"
+        }
+      ],
+      "birthDate": "1970-05-30",
+      "name": [
+        {
+          "family": "Lopez",
+          "given": [
+            "Marina"
+          ]
         }
       ]
+    }
+  },
+  "requester": {
+    "resourceType": "Organization",
+    "identifier": [
+      {
+        "system": "urn:ietf:rfc:3986",
+        "value": "https://research.example.org/entities/study-team-204"
+      }
+    ],
+    "name": "Study Team 204"
+  },
+  "access": {
+    "permissions": [
+      {
+        "kind": "data",
+        "resource_type": "Condition",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      },
+      {
+        "kind": "data",
+        "resource_type": "Observation",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      }
+    ],
+    "data_period": {
+      "start": "2024-01-01",
+      "end": "2026-12-31"
     },
-    "requester": {
-      "resourceType": "Organization",
-      "name": "Oncology Research Institute",
+    "sensitive_data": "exclude"
+  },
+  "context": {
+    "kind": "research",
+    "study": {
+      "resourceType": "ResearchStudy",
       "identifier": [
         {
-          "value": "research-org-id"
+          "system": "http://research.example.org/studies",
+          "value": "STUDY-204"
         }
-      ]
-    },
-    "access": {
-      "scopes": [
-        "patient/*.rs"
       ],
-      "periods": [
-        {
-          "start": "2020-01-01",
-          "end": "2025-01-01"
-        }
-      ]
+      "status": "active",
+      "title": "Diabetes Outcomes Registry"
     }
   },
-  "details": {
-    "condition": {
-      "system": "http://snomed.info/sct",
-      "code": "363358000",
-      "display": "Malignant tumor of lung"
-    },
-    "study": {
-      "identifier": {
-        "system": "https://clinicaltrials.gov",
-        "value": "NCT-12345"
-      },
-      "display": "Lung cancer immunotherapy trial"
-    }
-  },
-  "iat": 1774626737
+  "iat": 1775505169
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2NvbnNlbnQtcGxhdGZvcm0ub3JnIiwic3ViIjoiZ3JhbnQtdWM2LXN0dWR5LXByb3RvMjIiLCJhdWQiOiJodHRwczovL2hvc3BpdGFsLmNvbSIsImV4cCI6MTc3NDYzMDMzNywidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcmVzZWFyY2gtc3R1ZHktdjEiLCJjbmYiOnsiamt0IjoiSnVJNmliWkhjTVBRSUNhSVo1NVBiWHBuc3VkUW1LdDAwRDBCaUVYTnJNYyJ9LCJhdXRob3JpemF0aW9uIjp7InN1YmplY3QiOnsidHlwZSI6ImlkZW50aWZpZXIiLCJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWRlbnRpZmllciI6W3sidmFsdWUiOiJNUk4tMTIzIn1dfSwicmVxdWVzdGVyIjp7InJlc291cmNlVHlwZSI6Ik9yZ2FuaXphdGlvbiIsIm5hbWUiOiJPbmNvbG9neSBSZXNlYXJjaCBJbnN0aXR1dGUiLCJpZGVudGlmaWVyIjpbeyJ2YWx1ZSI6InJlc2VhcmNoLW9yZy1pZCJ9XX0sImFjY2VzcyI6eyJzY29wZXMiOlsicGF0aWVudC8qLnJzIl0sInBlcmlvZHMiOlt7InN0YXJ0IjoiMjAyMC0wMS0wMSIsImVuZCI6IjIwMjUtMDEtMDEifV19fSwiZGV0YWlscyI6eyJjb25kaXRpb24iOnsic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiIzNjMzNTgwMDAiLCJkaXNwbGF5IjoiTWFsaWduYW50IHR1bW9yIG9mIGx1bmcifSwic3R1ZHkiOnsiaWRlbnRpZmllciI6eyJzeXN0ZW0iOiJodHRwczovL2NsaW5pY2FsdHJpYWxzLmdvdiIsInZhbHVlIjoiTkNULTEyMzQ1In0sImRpc3BsYXkiOiJMdW5nIGNhbmNlciBpbW11bm90aGVyYXB5IHRyaWFsIn19LCJpYXQiOjE3NzQ2MjY3Mzd9.Ie50ZkPelKqycY6x4BUIy76pU9n-sE7OzRxGKvFuNPA_efKeNzniQwmlG5ki_7A24EuSA5sXc3R-gJ9QCZyIAw</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2lzc3Vlci5leGFtcGxlLm9yZyIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3NzU1MDg3NjksImp0aSI6InVjNi1iNTc3NGUxNC1hMDIwLTQ2ZjItOTRkMy0yYmI5NWI3YWM0YWYiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9yZXNlYXJjaC1zdHVkeS1hY2Nlc3MtdjEiLCJwcmVzZW50ZXJfYmluZGluZyI6eyJmcmFtZXdvcmtfY2xpZW50Ijp7ImZyYW1ld29yayI6Imh0dHBzOi8vcmVzZWFyY2guZXhhbXBsZS5vcmcvdHJ1c3QtZnJhbWV3b3JrIiwiZnJhbWV3b3JrX3R5cGUiOiJ1ZGFwIiwiZW50aXR5X3VyaSI6Imh0dHBzOi8vcmVzZWFyY2guZXhhbXBsZS5vcmcvZW50aXRpZXMvc3R1ZHktdGVhbS0yMDQifX0sInN1YmplY3QiOnsicGF0aWVudCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoiaHR0cDovL2hvc3BpdGFsLmV4YW1wbGUub3JnL21ybiIsInZhbHVlIjoiUjQ0NTUwMCJ9XSwiYmlydGhEYXRlIjoiMTk3MC0wNS0zMCIsIm5hbWUiOlt7ImZhbWlseSI6IkxvcGV6IiwiZ2l2ZW4iOlsiTWFyaW5hIl19XX19LCJyZXF1ZXN0ZXIiOnsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoidXJuOmlldGY6cmZjOjM5ODYiLCJ2YWx1ZSI6Imh0dHBzOi8vcmVzZWFyY2guZXhhbXBsZS5vcmcvZW50aXRpZXMvc3R1ZHktdGVhbS0yMDQifV0sIm5hbWUiOiJTdHVkeSBUZWFtIDIwNCJ9LCJhY2Nlc3MiOnsicGVybWlzc2lvbnMiOlt7ImtpbmQiOiJkYXRhIiwicmVzb3VyY2VfdHlwZSI6IkNvbmRpdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiT2JzZXJ2YXRpb24iLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfV0sImRhdGFfcGVyaW9kIjp7InN0YXJ0IjoiMjAyNC0wMS0wMSIsImVuZCI6IjIwMjYtMTItMzEifSwic2Vuc2l0aXZlX2RhdGEiOiJleGNsdWRlIn0sImNvbnRleHQiOnsia2luZCI6InJlc2VhcmNoIiwic3R1ZHkiOnsicmVzb3VyY2VUeXBlIjoiUmVzZWFyY2hTdHVkeSIsImlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHA6Ly9yZXNlYXJjaC5leGFtcGxlLm9yZy9zdHVkaWVzIiwidmFsdWUiOiJTVFVEWS0yMDQifV0sInN0YXR1cyI6ImFjdGl2ZSIsInRpdGxlIjoiRGlhYmV0ZXMgT3V0Y29tZXMgUmVnaXN0cnkifX0sImlhdCI6MTc3NTUwNTE2OX0.rxsjSunOrc65mZZIBIc2UeB4FYvXXZj2lk1o0w81cicssy15I4nPpE6LY6z9uSCexJ2o7lBOLM0EK9WsSTZ2Hg</code></pre>
         </details>
     </div>
 </div>

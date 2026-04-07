@@ -1,5 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
+import {
+  clientAssertionJsonSchema,
+  permissionTicketJsonSchema,
+  tokenExchangeRequestJsonSchema,
+} from "../reference-implementation/shared/permission-ticket-schema";
 import { USE_CASE_CATALOG } from "./use_case_catalog";
 
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
@@ -8,6 +13,7 @@ type JsonArray = JsonValue[];
 
 const ROOT = path.join(__dirname, "..");
 const INCLUDE_ROOT = path.join(ROOT, "input/includes/generated/spec-snippets");
+const JSON_SCHEMA_ROOT = path.join(ROOT, "input/includes/generated/json-schema");
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
@@ -21,10 +27,15 @@ function writeInclude(relativePath: string, content: string): void {
   fs.writeFileSync(fullPath, `${content}\n`);
 }
 
+function writeJsonSchema(relativePath: string, value: JsonValue): void {
+  const fullPath = path.join(JSON_SCHEMA_ROOT, relativePath);
+  ensureDir(path.dirname(fullPath));
+  fs.writeFileSync(fullPath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
 function renderJsonFence(value: JsonValue): string {
   return `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``;
 }
-
 
 function renderUseCaseProfileRegistryTable(): string {
   const rows = USE_CASE_CATALOG.map(
@@ -44,56 +55,72 @@ function renderUseCaseProfileRegistryTable(): string {
 }
 
 function buildIndexSnippets(): void {
+  // Artifact example — minimal UC1-style ticket
   const artifactExample: JsonObject = {
     iss: "https://trusted-issuer.org",
-    sub: "grant-example-patient-access",
     aud: "https://network.org",
     exp: 1735689600,
+    jti: "ticket-example-001",
     ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
-    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
-    authorization: {
-      subject: {
-        type: "match",
-        traits: {
-          resourceType: "Patient",
-          name: [{ family: "Smith", given: ["John"] }],
-          birthDate: "1980-01-01",
-          identifier: [{ system: "urn:oid:2.16.840.1.113883.4.1", value: "***-**-1234" }],
-          telecom: [{ system: "phone", value: "555-867-5309" }],
-          address: [{ state: "IL" }]
-        }
-      },
-      access: { scopes: ["patient/Immunization.rs", "patient/AllergyIntolerance.rs"] }
-    }
+    presenter_binding: {
+      key: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" }
+    },
+    subject: {
+      patient: {
+        resourceType: "Patient",
+        name: [{ family: "Smith", given: ["John"] }],
+        birthDate: "1980-01-01",
+        identifier: [{ system: "http://hospital.example.org/mrn", value: "A12345" }]
+      }
+    },
+    access: {
+      permissions: [
+        { kind: "data", resource_type: "Immunization", interactions: ["read", "search"] },
+        { kind: "data", resource_type: "AllergyIntolerance", interactions: ["read", "search"] }
+      ]
+    },
+    context: { kind: "patient-access" }
   };
 
+  // Access constraints example
   const accessExample: JsonObject = {
     access: {
-      scopes: ["patient/Condition.rs", "patient/Procedure.rs"],
-      periods: [{ start: "2023-01-01", end: "2024-12-31" }],
-      jurisdictions: [{ state: "CA" }, { state: "NY" }],
-      organizations: [
-        { identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1234567890" }] }
-      ]
+      permissions: [
+        { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
+        { kind: "data", resource_type: "Procedure", interactions: ["read", "search"] }
+      ],
+      data_period: { start: "2023-01-01", end: "2024-12-31" },
+      jurisdictions: [{ country: "US", state: "CA" }, { country: "US", state: "NY" }],
+      source_organizations: [
+        { system: "http://hl7.org/fhir/sid/us-npi", value: "1234567890" }
+      ],
+      sensitive_data: "exclude"
     }
   };
 
+  // Revocation examples (unchanged semantics)
   const revocationTicketExample: JsonObject = {
     iss: "https://trusted-issuer.org",
-    sub: "grant-revocable-example",
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
-    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
     jti: "ticket-unique-id",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+    presenter_binding: {
+      key: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" }
+    },
     revocation: {
       url: "https://trusted-issuer.org/.well-known/crl/patient-access.json",
       rid: "abc123xyz"
     },
-    authorization: {
-      subject: { type: "match", resourceType: "Patient" },
-      access: { scopes: ["patient/*.rs"] }
-    }
+    subject: {
+      patient: { resourceType: "Patient" }
+    },
+    access: {
+      permissions: [
+        { kind: "data", resource_type: "*", interactions: ["read", "search"] }
+      ]
+    },
+    context: { kind: "patient-access" }
   };
 
   const revocationListExample: JsonObject = {
@@ -113,190 +140,17 @@ function buildIndexSnippets(): void {
   writeInclude("index/revocation-ticket.json.md", renderJsonFence(revocationTicketExample));
   writeInclude("index/revocation-list.json.md", renderJsonFence(revocationListExample));
   writeInclude("index/use-case-profile-map.md", renderUseCaseProfileRegistryTable());
-}
+  writeInclude("index/permission-ticket.schema.json.md", renderJsonFence(permissionTicketJsonSchema as JsonValue));
+  writeInclude("index/client-assertion.schema.json.md", renderJsonFence(clientAssertionJsonSchema as JsonValue));
+  writeInclude("index/token-exchange-request.schema.json.md", renderJsonFence(tokenExchangeRequestJsonSchema as JsonValue));
 
-function buildStartSnippets(): void {
-  const artifactExample: JsonObject = {
-    iss: "https://trusted-issuer.org",
-    sub: "grant-example-patient-access",
-    aud: "https://network.org",
-    exp: 1735689600,
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
-    cnf: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" },
-    authorization: {
-      subject: {
-        type: "match",
-        traits: {
-          resourceType: "Patient",
-          name: [{ family: "Smith", given: ["John"] }],
-          birthDate: "1980-01-01",
-          identifier: [{ system: "urn:oid:2.16.840.1.113883.4.1", value: "***-**-1234" }],
-          telecom: [{ system: "phone", value: "555-867-5309" }],
-          address: [{ state: "IL" }]
-        }
-      },
-      access: { scopes: ["patient/Immunization.rs", "patient/AllergyIntolerance.rs"] }
-    }
-  };
-
-  const uc1: JsonObject = {
-    authorization: {
-      subject: {
-        type: "match",
-        traits: {
-          resourceType: "Patient",
-          name: [{ family: "Smith", given: ["John"] }],
-          birthDate: "1980-01-01",
-          identifier: [{ system: "urn:oid:2.16.840.1.113883.4.1", value: "000-00-0000" }]
-        }
-      },
-      access: { scopes: ["patient/Immunization.rs", "patient/AllergyIntolerance.rs"] }
-    }
-  };
-
-  const uc2: JsonObject = {
-    authorization: {
-      subject: {
-        type: "identifier",
-        resourceType: "Patient",
-        identifier: [{ system: "https://national-mpi.net", value: "pt-555" }]
-      },
-      requester: {
-        resourceType: "RelatedPerson",
-        name: [{ family: "Doe", given: ["Jane"] }],
-        telecom: [{ system: "email", value: "jane.doe@example.com" }],
-        relationship: [
-          { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-RoleCode", code: "DAU", display: "Daughter" }] }
-        ]
-      },
-      access: { scopes: ["patient/*.rs"] }
-    },
-    details: {
-      basis: "patient-designated",
-      verifiedAt: "2026-03-06T15:04:05Z",
-      jurisdiction: [{ state: "IL" }]
-    }
-  };
-
-  const uc3: JsonObject = {
-    authorization: {
-      subject: { type: "reference", resourceType: "Patient", id: "local-patient-123" },
-      requester: {
-        resourceType: "Organization",
-        name: "State Dept of Health",
-        identifier: [{ system: "urn:ietf:rfc:3986", value: "https://doh.state.gov" }],
-        type: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/organization-type", code: "govt" }] }]
-      },
-      access: { scopes: ["patient/*.rs"], periods: [{ start: "2025-01-01", end: "2026-01-01" }] }
-    },
-    details: {
-      condition: { system: "http://snomed.info/sct", code: "56717001", display: "Tuberculosis" },
-      case: {
-        identifier: { system: "https://doh.wa.gov/cases", value: "CASE-2024-999" },
-        display: "TB investigation, Case 2024-999"
-      }
-    }
-  };
-
-  const uc4: JsonObject = {
-    authorization: {
-      subject: { type: "reference", resourceType: "Patient", reference: "Patient/123" },
-      requester: {
-        resourceType: "PractitionerRole",
-        contained: [
-          {
-            resourceType: "Practitioner", id: "p1",
-            name: [{ family: "Volunteer", given: ["Alice"] }],
-            telecom: [{ system: "email", value: "alice@foodbank.org" }]
-          },
-          { resourceType: "Organization", id: "o1", name: "Downtown Food Bank" }
-        ],
-        practitioner: { reference: "#p1" },
-        organization: { reference: "#o1" }
-      },
-      access: { scopes: ["patient/ServiceRequest.rsu", "patient/Task.rsu"] }
-    },
-    details: {
-      concern: { system: "http://snomed.info/sct", code: "733423003", display: "Food insecurity" },
-      referral: {
-        reference: "ServiceRequest/555",
-        identifier: { system: "https://referring-ehr.org/referrals", value: "REF-555" },
-        display: "Food insecurity referral"
-      }
-    }
-  };
-
-  const uc5: JsonObject = {
-    authorization: {
-      subject: { type: "reference", resourceType: "Patient", reference: "Patient/456" },
-      requester: {
-        resourceType: "Organization",
-        identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "9876543210" }],
-        name: "Blue Payer Inc"
-      },
-      access: { scopes: ["patient/DocumentReference.rs", "patient/Procedure.rs"] }
-    },
-    details: {
-      service: { system: "http://snomed.info/sct", code: "80146002", display: "Appendectomy" },
-      claim: {
-        identifier: { system: "http://payer.com/claims", value: "CLAIM-2024-XYZ" },
-        display: "Appendectomy claim"
-      }
-    }
-  };
-
-  const uc6: JsonObject = {
-    authorization: {
-      subject: { type: "identifier", resourceType: "Patient", identifier: [{ value: "MRN-123" }] },
-      requester: {
-        resourceType: "Organization",
-        name: "Oncology Research Institute",
-        identifier: [{ value: "research-org-id" }]
-      },
-      access: { scopes: ["patient/*.rs"], periods: [{ start: "2020-01-01", end: "2025-01-01" }] }
-    },
-    details: {
-      condition: { system: "http://snomed.info/sct", code: "363358000", display: "Malignant tumor of lung" },
-      study: {
-        identifier: { system: "https://clinicaltrials.gov", value: "NCT-12345" },
-        display: "Lung cancer immunotherapy trial"
-      }
-    }
-  };
-
-  const uc7: JsonObject = {
-    authorization: {
-      subject: { type: "reference", resourceType: "Patient", reference: "Patient/999" },
-      requester: {
-        resourceType: "Practitioner",
-        identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1112223333" }],
-        name: [{ family: "Heart", given: ["A."] }]
-      },
-      access: { scopes: ["patient/*.rs"] }
-    },
-    details: {
-      reason: { system: "http://snomed.info/sct", code: "49436004", display: "Atrial fibrillation" },
-      request: {
-        reference: "ServiceRequest/ref-req-111",
-        identifier: { system: "https://referring-ehr.org/requests", value: "ref-req-111" },
-        display: "Cardiology consult for atrial fibrillation"
-      }
-    }
-  };
-
-  writeInclude("start/artifact-ticket.json.md", renderJsonFence(artifactExample));
-  writeInclude("start/uc1-ticket.json.md", renderJsonFence(uc1));
-  writeInclude("start/uc2-ticket.json.md", renderJsonFence(uc2));
-  writeInclude("start/uc3-ticket.json.md", renderJsonFence(uc3));
-  writeInclude("start/uc4-ticket.json.md", renderJsonFence(uc4));
-  writeInclude("start/uc5-ticket.json.md", renderJsonFence(uc5));
-  writeInclude("start/uc6-ticket.json.md", renderJsonFence(uc6));
-  writeInclude("start/uc7-ticket.json.md", renderJsonFence(uc7));
+  writeJsonSchema("permission-ticket.schema.json", permissionTicketJsonSchema as JsonValue);
+  writeJsonSchema("client-assertion.schema.json", clientAssertionJsonSchema as JsonValue);
+  writeJsonSchema("token-exchange-request.schema.json", tokenExchangeRequestJsonSchema as JsonValue);
 }
 
 function main(): void {
   buildIndexSnippets();
-  buildStartSnippets();
   console.log("Synced generated snippet includes under input/includes/generated/spec-snippets");
 }
 

@@ -1,28 +1,38 @@
 ```json
 {
   "iss": "https://trusted-issuer.org",
-  "sub": "grant-revocable-example",
   "aud": "https://tefca.hhs.gov",
   "exp": 1735689600,
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
-  "cnf": {
-    "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
-  },
   "jti": "ticket-unique-id",
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+  "presenter_binding": {
+    "key": {
+      "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
+    }
+  },
   "revocation": {
     "url": "https://trusted-issuer.org/.well-known/crl/patient-access.json",
     "rid": "abc123xyz"
   },
-  "authorization": {
-    "subject": {
-      "type": "match",
+  "subject": {
+    "patient": {
       "resourceType": "Patient"
-    },
-    "access": {
-      "scopes": [
-        "patient/*.rs"
-      ]
     }
+  },
+  "access": {
+    "permissions": [
+      {
+        "kind": "data",
+        "resource_type": "*",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      }
+    ]
+  },
+  "context": {
+    "kind": "patient-access"
   }
 }
 ```

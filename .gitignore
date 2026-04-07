@@ -3,6 +3,7 @@ output/
 temp/
 template/
 txCache/
+input-cache/
 publisher.jar
 fhir-ig-publisher.jar
 
@@ -21,3 +22,4 @@ scripts/node_modules/
 # Temporary files
 *.tmp
 *~
+.seed-data/
