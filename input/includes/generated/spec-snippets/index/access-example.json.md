@@ -23,20 +23,33 @@
       "start": "2023-01-01",
       "end": "2024-12-31"
     },
-    "jurisdictions": [
+    "responder_filter": [
       {
-        "country": "US",
-        "state": "CA"
+        "kind": "jurisdiction",
+        "address": {
+          "country": "US",
+          "state": "CA"
+        }
       },
       {
-        "country": "US",
-        "state": "NY"
-      }
-    ],
-    "source_organizations": [
+        "kind": "jurisdiction",
+        "address": {
+          "country": "US",
+          "state": "NY"
+        }
+      },
       {
-        "system": "http://hl7.org/fhir/sid/us-npi",
-        "value": "1234567890"
+        "kind": "organization",
+        "organization": {
+          "resourceType": "Organization",
+          "identifier": [
+            {
+              "system": "http://hl7.org/fhir/sid/us-npi",
+              "value": "1234567890"
+            }
+          ],
+          "name": "General Hospital"
+        }
       }
     ],
     "sensitive_data": "exclude"

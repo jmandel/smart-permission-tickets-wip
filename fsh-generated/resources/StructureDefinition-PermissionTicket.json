@@ -5,7 +5,7 @@
   "name": "PermissionTicket",
   "title": "Permission Ticket (JWT Payload)",
   "status": "draft",
-  "description": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, workflow context, unified presenter binding, and optional must-understand extensibility.",
+  "description": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, ticket-type-specific context, optional presenter binding, optional revocation, and optional must-understand extensibility.",
   "fhirVersion": "4.0.1",
   "kind": "logical",
   "abstract": false,
@@ -18,7 +18,7 @@
         "id": "PermissionTicket",
         "path": "PermissionTicket",
         "short": "Permission Ticket (JWT Payload)",
-        "definition": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, workflow context, unified presenter binding, and optional must-understand extensibility."
+        "definition": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, ticket-type-specific context, optional presenter binding, optional revocation, and optional must-understand extensibility."
       },
       {
         "id": "PermissionTicket.iss",
@@ -101,8 +101,8 @@
       {
         "id": "PermissionTicket.presenter_binding",
         "path": "PermissionTicket.presenter_binding",
-        "short": "Unified presenter binding container. key and framework_client are independent; either may appear alone, or both may appear together.",
-        "definition": "Unified presenter binding container. key and framework_client are independent; either may appear alone, or both may appear together.",
+        "short": "Optional presenter binding. Exactly one method applies when present.",
+        "definition": "Optional presenter binding. Exactly one method applies when present.",
         "min": 0,
         "max": "1",
         "type": [
@@ -112,62 +112,10 @@
         ]
       },
       {
-        "id": "PermissionTicket.presenter_binding.key",
-        "path": "PermissionTicket.presenter_binding.key",
-        "short": "Exact-key binding (replaces RFC 7800 cnf; identical semantics)",
-        "definition": "Exact-key binding (replaces RFC 7800 cnf; identical semantics)",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "BackboneElement"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.presenter_binding.key.jkt",
-        "path": "PermissionTicket.presenter_binding.key.jkt",
-        "short": "JWK Thumbprint (RFC 7638) of the authorized client key",
-        "definition": "JWK Thumbprint (RFC 7638) of the authorized client key",
-        "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "string"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.presenter_binding.framework_client",
-        "path": "PermissionTicket.presenter_binding.framework_client",
-        "short": "Trust-framework client identity binding",
-        "definition": "Trust-framework client identity binding",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "BackboneElement"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.presenter_binding.framework_client.framework",
-        "path": "PermissionTicket.presenter_binding.framework_client.framework",
-        "short": "Framework instance URI",
-        "definition": "Framework instance URI",
-        "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "uri"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.presenter_binding.framework_client.framework_type",
-        "path": "PermissionTicket.presenter_binding.framework_client.framework_type",
-        "short": "Framework family: well-known | udap",
-        "definition": "Framework family: well-known | udap",
+        "id": "PermissionTicket.presenter_binding.method",
+        "path": "PermissionTicket.presenter_binding.method",
+        "short": "Binding method: jkt | framework_client",
+        "definition": "Binding method: jkt | framework_client",
         "min": 1,
         "max": "1",
         "type": [
@@ -177,11 +125,50 @@
         ]
       },
       {
-        "id": "PermissionTicket.presenter_binding.framework_client.entity_uri",
-        "path": "PermissionTicket.presenter_binding.framework_client.entity_uri",
+        "id": "PermissionTicket.presenter_binding.jkt",
+        "path": "PermissionTicket.presenter_binding.jkt",
+        "short": "JWK Thumbprint (RFC 7638) when method=jkt",
+        "definition": "JWK Thumbprint (RFC 7638) when method=jkt",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.presenter_binding.framework",
+        "path": "PermissionTicket.presenter_binding.framework",
+        "short": "Framework instance URI when method=framework_client",
+        "definition": "Framework instance URI when method=framework_client",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "uri"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.presenter_binding.framework_type",
+        "path": "PermissionTicket.presenter_binding.framework_type",
+        "short": "Framework family: well-known | udap",
+        "definition": "Framework family: well-known | udap",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.presenter_binding.entity_uri",
+        "path": "PermissionTicket.presenter_binding.entity_uri",
         "short": "Framework-recognized client entity URI",
         "definition": "Framework-recognized client entity URI",
-        "min": 1,
+        "min": 0,
         "max": "1",
         "type": [
           {
@@ -192,8 +179,8 @@
       {
         "id": "PermissionTicket.revocation",
         "path": "PermissionTicket.revocation",
-        "short": "Revocation Information",
-        "definition": "Revocation Information",
+        "short": "Optional revocation information",
+        "definition": "Optional revocation information",
         "min": 0,
         "max": "1",
         "type": [
@@ -205,8 +192,8 @@
       {
         "id": "PermissionTicket.revocation.url",
         "path": "PermissionTicket.revocation.url",
-        "short": "URL of the Credential Revocation List (CRL)",
-        "definition": "URL of the Credential Revocation List (CRL)",
+        "short": "URL of the issuer's status list",
+        "definition": "URL of the issuer's status list",
         "min": 1,
         "max": "1",
         "type": [
@@ -216,23 +203,23 @@
         ]
       },
       {
-        "id": "PermissionTicket.revocation.rid",
-        "path": "PermissionTicket.revocation.rid",
-        "short": "Revocation Identifier (opaque, max 24 chars)",
-        "definition": "Revocation Identifier (opaque, max 24 chars)",
+        "id": "PermissionTicket.revocation.index",
+        "path": "PermissionTicket.revocation.index",
+        "short": "Zero-based bit position assigned to this ticket",
+        "definition": "Zero-based bit position assigned to this ticket",
         "min": 1,
         "max": "1",
         "type": [
           {
-            "code": "string"
+            "code": "integer"
           }
         ]
       },
       {
         "id": "PermissionTicket.must_understand",
         "path": "PermissionTicket.must_understand",
-        "short": "Payload claim names the recipient MUST understand beyond the base kernel. Inspired by JWS crit (RFC 7515), applied to payload claims.",
-        "definition": "Payload claim names the recipient MUST understand beyond the base kernel. Inspired by JWS crit (RFC 7515), applied to payload claims.",
+        "short": "Payload claim names the recipient MUST understand beyond the base kernel. Top-level claims only.",
+        "definition": "Payload claim names the recipient MUST understand beyond the base kernel. Top-level claims only.",
         "min": 0,
         "max": "*",
         "type": [
@@ -424,12 +411,38 @@
         ]
       },
       {
-        "id": "PermissionTicket.access.jurisdictions",
-        "path": "PermissionTicket.access.jurisdictions",
-        "short": "Coarse geographic restriction (country/state only)",
-        "definition": "Coarse geographic restriction (country/state only)",
+        "id": "PermissionTicket.access.responder_filter",
+        "path": "PermissionTicket.access.responder_filter",
+        "short": "Optional responder scoping. Entries are ORed.",
+        "definition": "Optional responder scoping. Entries are ORed.",
         "min": 0,
         "max": "*",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.responder_filter.kind",
+        "path": "PermissionTicket.access.responder_filter.kind",
+        "short": "Filter kind: jurisdiction | organization",
+        "definition": "Filter kind: jurisdiction | organization",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.access.responder_filter.address",
+        "path": "PermissionTicket.access.responder_filter.address",
+        "short": "Jurisdiction restriction when kind=jurisdiction",
+        "definition": "Jurisdiction restriction when kind=jurisdiction",
+        "min": 0,
+        "max": "1",
         "type": [
           {
             "code": "Address"
@@ -437,23 +450,23 @@
         ]
       },
       {
-        "id": "PermissionTicket.access.source_organizations",
-        "path": "PermissionTicket.access.source_organizations",
-        "short": "Positive data-holder scoping by organizational identity",
-        "definition": "Positive data-holder scoping by organizational identity",
+        "id": "PermissionTicket.access.responder_filter.organization",
+        "path": "PermissionTicket.access.responder_filter.organization",
+        "short": "Organization restriction when kind=organization",
+        "definition": "Organization restriction when kind=organization",
         "min": 0,
-        "max": "*",
+        "max": "1",
         "type": [
           {
-            "code": "Identifier"
+            "code": "Organization"
           }
         ]
       },
       {
         "id": "PermissionTicket.access.sensitive_data",
         "path": "PermissionTicket.access.sensitive_data",
-        "short": "exclude | include. If absent, recipients default to exclude.",
-        "definition": "exclude | include. If absent, recipients default to exclude.",
+        "short": "exclude | include. If absent, recipient applies its own default policy.",
+        "definition": "exclude | include. If absent, recipient applies its own default policy.",
         "min": 0,
         "max": "1",
         "type": [
@@ -465,26 +478,13 @@
       {
         "id": "PermissionTicket.context",
         "path": "PermissionTicket.context",
-        "short": "Ticket-type-specific mandatory workflow semantics",
-        "definition": "Ticket-type-specific mandatory workflow semantics",
-        "min": 1,
+        "short": "Ticket-type-specific required workflow semantics. For ticket types with no context fields, this may be omitted or empty.",
+        "definition": "Ticket-type-specific required workflow semantics. For ticket types with no context fields, this may be omitted or empty.",
+        "min": 0,
         "max": "1",
         "type": [
           {
             "code": "BackboneElement"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.context.kind",
-        "path": "PermissionTicket.context.kind",
-        "short": "Context family: patient-access | public-health | social-care-referral | payer-claims | research | provider-consult",
-        "definition": "Context family: patient-access | public-health | social-care-referral | payer-claims | research | provider-consult",
-        "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "code"
           }
         ]
       },
@@ -498,45 +498,6 @@
         "type": [
           {
             "code": "CodeableConcept"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.context.investigation_case",
-        "path": "PermissionTicket.context.investigation_case",
-        "short": "Public health: case identifier",
-        "definition": "Public health: case identifier",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "Identifier"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.context.triggering_resource",
-        "path": "PermissionTicket.context.triggering_resource",
-        "short": "Public health: triggering Condition, Observation, or DiagnosticReport",
-        "definition": "Public health: triggering Condition, Observation, or DiagnosticReport",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "Resource"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.context.source_report",
-        "path": "PermissionTicket.context.source_report",
-        "short": "Public health: source DocumentReference",
-        "definition": "Public health: source DocumentReference",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "Resource"
           }
         ]
       },
@@ -558,19 +519,6 @@
         "path": "PermissionTicket.context.referral",
         "short": "Social care: referral ServiceRequest",
         "definition": "Social care: referral ServiceRequest",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "Resource"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.context.task",
-        "path": "PermissionTicket.context.task",
-        "short": "Social care: supporting Task",
-        "definition": "Social care: supporting Task",
         "min": 0,
         "max": "1",
         "type": [
@@ -619,32 +567,6 @@
         ]
       },
       {
-        "id": "PermissionTicket.context.research_subject",
-        "path": "PermissionTicket.context.research_subject",
-        "short": "Research: ResearchSubject artifact",
-        "definition": "Research: ResearchSubject artifact",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "Resource"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.context.condition",
-        "path": "PermissionTicket.context.condition",
-        "short": "Research: condition of interest",
-        "definition": "Research: condition of interest",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "CodeableConcept"
-          }
-        ]
-      },
-      {
         "id": "PermissionTicket.context.reason",
         "path": "PermissionTicket.context.reason",
         "short": "Provider consult: reason for consult",
@@ -664,19 +586,6 @@
         "definition": "Provider consult: ServiceRequest",
         "min": 0,
         "max": "1",
-        "type": [
-          {
-            "code": "Resource"
-          }
-        ]
-      },
-      {
-        "id": "PermissionTicket.supporting_artifacts",
-        "path": "PermissionTicket.supporting_artifacts",
-        "short": "Optional evidence and review material. Not required for the base protocol's yes/no decision.",
-        "definition": "Optional evidence and review material. Not required for the base protocol's yes/no decision.",
-        "min": 0,
-        "max": "*",
         "type": [
           {
             "code": "Resource"

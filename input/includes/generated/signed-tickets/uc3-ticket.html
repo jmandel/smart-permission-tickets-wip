@@ -17,15 +17,14 @@
             style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
   "iss": "https://issuer.state.example.gov",
   "aud": "https://network.org",
-  "exp": 1775508769,
+  "exp": 1775576085,
   "jti": "uc3-16ff62cf-2d2d-4b30-8c86-6a13d7ab7d16",
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1",
   "presenter_binding": {
-    "framework_client": {
-      "framework": "https://state.example.gov/trust-framework/public-health",
-      "framework_type": "udap",
-      "entity_uri": "https://state.example.gov/organizations/epi-unit"
-    }
+    "method": "framework_client",
+    "framework": "https://state.example.gov/trust-framework/public-health",
+    "framework_type": "udap",
+    "entity_uri": "https://state.example.gov/organizations/epi-unit"
   },
   "subject": {
     "patient": {
@@ -88,16 +87,18 @@
       "start": "2025-12-01",
       "end": "2026-06-01"
     },
-    "jurisdictions": [
+    "responder_filter": [
       {
-        "country": "US",
-        "state": "TX"
+        "kind": "jurisdiction",
+        "address": {
+          "country": "US",
+          "state": "TX"
+        }
       }
     ],
     "sensitive_data": "include"
   },
   "context": {
-    "kind": "public-health",
     "reportable_condition": {
       "coding": [
         {
@@ -108,13 +109,13 @@
       ]
     }
   },
-  "iat": 1775505169
+  "iat": 1775572485
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2lzc3Vlci5zdGF0ZS5leGFtcGxlLmdvdiIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3NzU1MDg3NjksImp0aSI6InVjMy0xNmZmNjJjZi0yZDJkLTRiMzAtOGM4Ni02YTEzZDdhYjdkMTYiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wdWJsaWMtaGVhbHRoLWludmVzdGlnYXRpb24tdjEiLCJwcmVzZW50ZXJfYmluZGluZyI6eyJmcmFtZXdvcmtfY2xpZW50Ijp7ImZyYW1ld29yayI6Imh0dHBzOi8vc3RhdGUuZXhhbXBsZS5nb3YvdHJ1c3QtZnJhbWV3b3JrL3B1YmxpYy1oZWFsdGgiLCJmcmFtZXdvcmtfdHlwZSI6InVkYXAiLCJlbnRpdHlfdXJpIjoiaHR0cHM6Ly9zdGF0ZS5leGFtcGxlLmdvdi9vcmdhbml6YXRpb25zL2VwaS11bml0In19LCJzdWJqZWN0Ijp7InBhdGllbnQiOnsicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHA6Ly9ob3NwaXRhbC5leGFtcGxlLm9yZy9tcm4iLCJ2YWx1ZSI6Ik00NDU1NjYifV0sImJpcnRoRGF0ZSI6IjE5NzgtMDItMjEiLCJuYW1lIjpbeyJmYW1pbHkiOiJDYXJ0ZXIiLCJnaXZlbiI6WyJNb25pY2EiXX1dfX0sInJlcXVlc3RlciI6eyJyZXNvdXJjZVR5cGUiOiJPcmdhbml6YXRpb24iLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJ1cm46aWV0ZjpyZmM6Mzk4NiIsInZhbHVlIjoiaHR0cHM6Ly9zdGF0ZS5leGFtcGxlLmdvdi9vcmdhbml6YXRpb25zL2VwaS11bml0In1dLCJuYW1lIjoiU3RhdGUgRXBpZGVtaW9sb2d5IFVuaXQifSwiYWNjZXNzIjp7InBlcm1pc3Npb25zIjpbeyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJDb25kaXRpb24iLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfSx7ImtpbmQiOiJkYXRhIiwicmVzb3VyY2VfdHlwZSI6Ik9ic2VydmF0aW9uIiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX0seyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJEaWFnbm9zdGljUmVwb3J0IiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX1dLCJkYXRhX3BlcmlvZCI6eyJzdGFydCI6IjIwMjUtMTItMDEiLCJlbmQiOiIyMDI2LTA2LTAxIn0sImp1cmlzZGljdGlvbnMiOlt7ImNvdW50cnkiOiJVUyIsInN0YXRlIjoiVFgifV0sInNlbnNpdGl2ZV9kYXRhIjoiaW5jbHVkZSJ9LCJjb250ZXh0Ijp7ImtpbmQiOiJwdWJsaWMtaGVhbHRoIiwicmVwb3J0YWJsZV9jb25kaXRpb24iOnsiY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiY29kZSI6Ijg0MDUzOTAwNiIsImRpc3BsYXkiOiJEaXNlYXNlIGNhdXNlZCBieSBzZXZlcmUgYWN1dGUgcmVzcGlyYXRvcnkgc3luZHJvbWUgY29yb25hdmlydXMgMiAoZGlzb3JkZXIpIn1dfX0sImlhdCI6MTc3NTUwNTE2OX0.fCsV0A0ydo-WezfpHoEg2m-vx3Oots6a15FNQifzf6yVRGxjhoaH28wZx9lIL-LkGXeQKkeP8r83Gxw529rU5w</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2lzc3Vlci5zdGF0ZS5leGFtcGxlLmdvdiIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3NzU1NzYwODUsImp0aSI6InVjMy0xNmZmNjJjZi0yZDJkLTRiMzAtOGM4Ni02YTEzZDdhYjdkMTYiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wdWJsaWMtaGVhbHRoLWludmVzdGlnYXRpb24tdjEiLCJwcmVzZW50ZXJfYmluZGluZyI6eyJtZXRob2QiOiJmcmFtZXdvcmtfY2xpZW50IiwiZnJhbWV3b3JrIjoiaHR0cHM6Ly9zdGF0ZS5leGFtcGxlLmdvdi90cnVzdC1mcmFtZXdvcmsvcHVibGljLWhlYWx0aCIsImZyYW1ld29ya190eXBlIjoidWRhcCIsImVudGl0eV91cmkiOiJodHRwczovL3N0YXRlLmV4YW1wbGUuZ292L29yZ2FuaXphdGlvbnMvZXBpLXVuaXQifSwic3ViamVjdCI6eyJwYXRpZW50Ijp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaG9zcGl0YWwuZXhhbXBsZS5vcmcvbXJuIiwidmFsdWUiOiJNNDQ1NTY2In1dLCJiaXJ0aERhdGUiOiIxOTc4LTAyLTIxIiwibmFtZSI6W3siZmFtaWx5IjoiQ2FydGVyIiwiZ2l2ZW4iOlsiTW9uaWNhIl19XX19LCJyZXF1ZXN0ZXIiOnsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoidXJuOmlldGY6cmZjOjM5ODYiLCJ2YWx1ZSI6Imh0dHBzOi8vc3RhdGUuZXhhbXBsZS5nb3Yvb3JnYW5pemF0aW9ucy9lcGktdW5pdCJ9XSwibmFtZSI6IlN0YXRlIEVwaWRlbWlvbG9neSBVbml0In0sImFjY2VzcyI6eyJwZXJtaXNzaW9ucyI6W3sia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiQ29uZGl0aW9uIiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX0seyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJPYnNlcnZhdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiRGlhZ25vc3RpY1JlcG9ydCIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19XSwiZGF0YV9wZXJpb2QiOnsic3RhcnQiOiIyMDI1LTEyLTAxIiwiZW5kIjoiMjAyNi0wNi0wMSJ9LCJyZXNwb25kZXJfZmlsdGVyIjpbeyJraW5kIjoianVyaXNkaWN0aW9uIiwiYWRkcmVzcyI6eyJjb3VudHJ5IjoiVVMiLCJzdGF0ZSI6IlRYIn19XSwic2Vuc2l0aXZlX2RhdGEiOiJpbmNsdWRlIn0sImNvbnRleHQiOnsicmVwb3J0YWJsZV9jb25kaXRpb24iOnsiY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiY29kZSI6Ijg0MDUzOTAwNiIsImRpc3BsYXkiOiJEaXNlYXNlIGNhdXNlZCBieSBzZXZlcmUgYWN1dGUgcmVzcGlyYXRvcnkgc3luZHJvbWUgY29yb25hdmlydXMgMiAoZGlzb3JkZXIpIn1dfX0sImlhdCI6MTc3NTU3MjQ4NX0.XbZDti0VeGx5ynuvplCMgeNE4xUH1m7qPnZDz9ahoh992qpRLyWrzaG44CGWdyf9Rlh9-PhZGw87CkjttuTPnQ</code></pre>
         </details>
     </div>
 </div>

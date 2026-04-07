@@ -1,7 +1,7 @@
 import {
   type PermissionTicketType,
-  AUTHORIZED_REPRESENTATIVE_ACCESS_TICKET_TYPE,
-  NETWORK_PATIENT_ACCESS_TICKET_TYPE,
+  PATIENT_DELEGATED_ACCESS_TICKET_TYPE,
+  PATIENT_SELF_ACCESS_TICKET_TYPE,
   PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
   PROVIDER_CONSULT_TICKET_TYPE,
   PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
@@ -18,13 +18,13 @@ export type UseCaseCatalogEntry = {
 export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   {
     id: "uc1",
-    label: "Use Case 1: Network-Mediated Patient Access",
-    ticketTypeUri: NETWORK_PATIENT_ACCESS_TICKET_TYPE
+    label: "Use Case 1: Patient Self Access",
+    ticketTypeUri: PATIENT_SELF_ACCESS_TICKET_TYPE
   },
   {
     id: "uc2",
-    label: "Use Case 2: Authorized Representative (Proxy)",
-    ticketTypeUri: AUTHORIZED_REPRESENTATIVE_ACCESS_TICKET_TYPE
+    label: "Use Case 2: Patient-Delegated Access",
+    ticketTypeUri: PATIENT_DELEGATED_ACCESS_TICKET_TYPE
   },
   {
     id: "uc3",

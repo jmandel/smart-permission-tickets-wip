@@ -61,9 +61,10 @@ function buildIndexSnippets(): void {
     aud: "https://network.org",
     exp: 1735689600,
     jti: "ticket-example-001",
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
     presenter_binding: {
-      key: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" }
+      method: "jkt",
+      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
     },
     subject: {
       patient: {
@@ -78,8 +79,7 @@ function buildIndexSnippets(): void {
         { kind: "data", resource_type: "Immunization", interactions: ["read", "search"] },
         { kind: "data", resource_type: "AllergyIntolerance", interactions: ["read", "search"] }
       ]
-    },
-    context: { kind: "patient-access" }
+    }
   };
 
   // Access constraints example
@@ -90,27 +90,36 @@ function buildIndexSnippets(): void {
         { kind: "data", resource_type: "Procedure", interactions: ["read", "search"] }
       ],
       data_period: { start: "2023-01-01", end: "2024-12-31" },
-      jurisdictions: [{ country: "US", state: "CA" }, { country: "US", state: "NY" }],
-      source_organizations: [
-        { system: "http://hl7.org/fhir/sid/us-npi", value: "1234567890" }
+      responder_filter: [
+        { kind: "jurisdiction", address: { country: "US", state: "CA" } },
+        { kind: "jurisdiction", address: { country: "US", state: "NY" } },
+        {
+          kind: "organization",
+          organization: {
+            resourceType: "Organization",
+            identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1234567890" }],
+            name: "General Hospital"
+          }
+        }
       ],
       sensitive_data: "exclude"
     }
   };
 
-  // Revocation examples (unchanged semantics)
+  // Revocation examples
   const revocationTicketExample: JsonObject = {
     iss: "https://trusted-issuer.org",
     aud: "https://tefca.hhs.gov",
     exp: 1735689600,
     jti: "ticket-unique-id",
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
     presenter_binding: {
-      key: { jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I" }
+      method: "jkt",
+      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
     },
     revocation: {
-      url: "https://trusted-issuer.org/.well-known/crl/patient-access.json",
-      rid: "abc123xyz"
+      url: "https://trusted-issuer.org/.well-known/status/patient-access",
+      index: 4722
     },
     subject: {
       patient: { resourceType: "Patient" }
@@ -119,15 +128,12 @@ function buildIndexSnippets(): void {
       permissions: [
         { kind: "data", resource_type: "*", interactions: ["read", "search"] }
       ]
-    },
-    context: { kind: "patient-access" }
+    }
   };
 
   const revocationListExample: JsonObject = {
     kid: "issuer-signing-key-id",
-    method: "rid",
-    ctr: 42,
-    rids: ["abc123xyz", "def456uvw.1710460800"]
+    bits: "H4sIAAAAAAAA/2NgYGBgBGIOAwA+T46LBQAAAA"
   };
 
   writeInclude("index/artifact-ticket.json.md", renderJsonFence(artifactExample));

@@ -4,11 +4,10 @@
   "aud": "https://network.org",
   "exp": 1735689600,
   "jti": "ticket-example-001",
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/network-patient-access-v1",
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
   "presenter_binding": {
-    "key": {
-      "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
-    }
+    "method": "jkt",
+    "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
   },
   "subject": {
     "patient": {
@@ -49,9 +48,6 @@
         ]
       }
     ]
-  },
-  "context": {
-    "kind": "patient-access"
   }
 }
 ```

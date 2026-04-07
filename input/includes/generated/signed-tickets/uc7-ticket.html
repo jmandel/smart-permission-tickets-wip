@@ -17,15 +17,14 @@
             style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
   "iss": "https://issuer.example.org",
   "aud": "https://network.org",
-  "exp": 1775508769,
+  "exp": 1775576085,
   "jti": "uc7-d6927f7f-74c8-4b1b-a7a5-7f4e6d99390a",
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/provider-consult-v1",
   "presenter_binding": {
-    "framework_client": {
-      "framework": "https://smarthealthit.org/trust-frameworks/reference-demo-well-known",
-      "framework_type": "well-known",
-      "entity_uri": "https://hospital.example.org/entities/cardiology-group"
-    }
+    "method": "framework_client",
+    "framework": "https://smarthealthit.org/trust-frameworks/reference-demo-well-known",
+    "framework_type": "well-known",
+    "entity_uri": "https://hospital.example.org/entities/cardiology-group"
   },
   "subject": {
     "patient": {
@@ -91,7 +90,6 @@
     "sensitive_data": "exclude"
   },
   "context": {
-    "kind": "provider-consult",
     "reason": {
       "coding": [
         {
@@ -113,13 +111,13 @@
       "intent": "order"
     }
   },
-  "iat": 1775505169
+  "iat": 1775572485
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2lzc3Vlci5leGFtcGxlLm9yZyIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3NzU1MDg3NjksImp0aSI6InVjNy1kNjkyN2Y3Zi03NGM4LTRiMWItYTdhNS03ZjRlNmQ5OTM5MGEiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wcm92aWRlci1jb25zdWx0LXYxIiwicHJlc2VudGVyX2JpbmRpbmciOnsiZnJhbWV3b3JrX2NsaWVudCI6eyJmcmFtZXdvcmsiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3RydXN0LWZyYW1ld29ya3MvcmVmZXJlbmNlLWRlbW8td2VsbC1rbm93biIsImZyYW1ld29ya190eXBlIjoid2VsbC1rbm93biIsImVudGl0eV91cmkiOiJodHRwczovL2hvc3BpdGFsLmV4YW1wbGUub3JnL2VudGl0aWVzL2NhcmRpb2xvZ3ktZ3JvdXAifX0sInN1YmplY3QiOnsicGF0aWVudCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoiaHR0cDovL2hvc3BpdGFsLmV4YW1wbGUub3JnL21ybiIsInZhbHVlIjoiSzY2Nzc4OCJ9XSwiYmlydGhEYXRlIjoiMTk4MS0wMy0wOCIsIm5hbWUiOlt7ImZhbWlseSI6IlRob21hcyIsImdpdmVuIjpbIkphcmVkIl19XX19LCJyZXF1ZXN0ZXIiOnsicmVzb3VyY2VUeXBlIjoiUHJhY3RpdGlvbmVyUm9sZSIsImNvZGUiOlt7ImNvZGluZyI6W3sic3lzdGVtIjoiaHR0cDovL3Nub21lZC5pbmZvL3NjdCIsImNvZGUiOiIxNzU2MTAwMCIsImRpc3BsYXkiOiJDYXJkaW9sb2dpc3QifV19XX0sImFjY2VzcyI6eyJwZXJtaXNzaW9ucyI6W3sia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiQ29uZGl0aW9uIiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX0seyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJPYnNlcnZhdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiRGlhZ25vc3RpY1JlcG9ydCIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19XSwic2Vuc2l0aXZlX2RhdGEiOiJleGNsdWRlIn0sImNvbnRleHQiOnsia2luZCI6InByb3ZpZGVyLWNvbnN1bHQiLCJyZWFzb24iOnsiY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiY29kZSI6IjUzNzQxMDA4IiwiZGlzcGxheSI6IkNvcm9uYXJ5IGFydGVyaW9zY2xlcm9zaXMifV19LCJjb25zdWx0X3JlcXVlc3QiOnsicmVzb3VyY2VUeXBlIjoiU2VydmljZVJlcXVlc3QiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaXNzdWVyLmV4YW1wbGUub3JnL2NvbnN1bHRzIiwidmFsdWUiOiJDT05TVUxULTc3ODgifV0sInN0YXR1cyI6ImFjdGl2ZSIsImludGVudCI6Im9yZGVyIn19LCJpYXQiOjE3NzU1MDUxNjl9.P4aZ_YtpxdscIFgTJtEnQg8Q-e8gI4Taf5cKiXRqQIwLZ76X-yPcTrCPNcn1sKOow1YTlACXUlmYjBgu4eBo4g</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2lzc3Vlci5leGFtcGxlLm9yZyIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3NzU1NzYwODUsImp0aSI6InVjNy1kNjkyN2Y3Zi03NGM4LTRiMWItYTdhNS03ZjRlNmQ5OTM5MGEiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wcm92aWRlci1jb25zdWx0LXYxIiwicHJlc2VudGVyX2JpbmRpbmciOnsibWV0aG9kIjoiZnJhbWV3b3JrX2NsaWVudCIsImZyYW1ld29yayI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvdHJ1c3QtZnJhbWV3b3Jrcy9yZWZlcmVuY2UtZGVtby13ZWxsLWtub3duIiwiZnJhbWV3b3JrX3R5cGUiOiJ3ZWxsLWtub3duIiwiZW50aXR5X3VyaSI6Imh0dHBzOi8vaG9zcGl0YWwuZXhhbXBsZS5vcmcvZW50aXRpZXMvY2FyZGlvbG9neS1ncm91cCJ9LCJzdWJqZWN0Ijp7InBhdGllbnQiOnsicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHA6Ly9ob3NwaXRhbC5leGFtcGxlLm9yZy9tcm4iLCJ2YWx1ZSI6Iks2Njc3ODgifV0sImJpcnRoRGF0ZSI6IjE5ODEtMDMtMDgiLCJuYW1lIjpbeyJmYW1pbHkiOiJUaG9tYXMiLCJnaXZlbiI6WyJKYXJlZCJdfV19fSwicmVxdWVzdGVyIjp7InJlc291cmNlVHlwZSI6IlByYWN0aXRpb25lclJvbGUiLCJjb2RlIjpbeyJjb2RpbmciOlt7InN5c3RlbSI6Imh0dHA6Ly9zbm9tZWQuaW5mby9zY3QiLCJjb2RlIjoiMTc1NjEwMDAiLCJkaXNwbGF5IjoiQ2FyZGlvbG9naXN0In1dfV19LCJhY2Nlc3MiOnsicGVybWlzc2lvbnMiOlt7ImtpbmQiOiJkYXRhIiwicmVzb3VyY2VfdHlwZSI6IkNvbmRpdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiT2JzZXJ2YXRpb24iLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfSx7ImtpbmQiOiJkYXRhIiwicmVzb3VyY2VfdHlwZSI6IkRpYWdub3N0aWNSZXBvcnQiLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfV0sInNlbnNpdGl2ZV9kYXRhIjoiZXhjbHVkZSJ9LCJjb250ZXh0Ijp7InJlYXNvbiI6eyJjb2RpbmciOlt7InN5c3RlbSI6Imh0dHA6Ly9zbm9tZWQuaW5mby9zY3QiLCJjb2RlIjoiNTM3NDEwMDgiLCJkaXNwbGF5IjoiQ29yb25hcnkgYXJ0ZXJpb3NjbGVyb3NpcyJ9XX0sImNvbnN1bHRfcmVxdWVzdCI6eyJyZXNvdXJjZVR5cGUiOiJTZXJ2aWNlUmVxdWVzdCIsImlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHA6Ly9pc3N1ZXIuZXhhbXBsZS5vcmcvY29uc3VsdHMiLCJ2YWx1ZSI6IkNPTlNVTFQtNzc4OCJ9XSwic3RhdHVzIjoiYWN0aXZlIiwiaW50ZW50Ijoib3JkZXIifX0sImlhdCI6MTc3NTU3MjQ4NX0.LMPWjGyOgiNVi0s7GyIhnMagJOY40-QJJhcTjiDiMEe7SjQQT_op-7aR4nIRRe5aiQs1p0N7rTNgWHa_1blLTw</code></pre>
         </details>
     </div>
 </div>

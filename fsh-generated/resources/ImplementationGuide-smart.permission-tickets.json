@@ -17,7 +17,7 @@
           "reference": "StructureDefinition/PermissionTicket"
         },
         "name": "Permission Ticket (JWT Payload)",
-        "description": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, workflow context, unified presenter binding, and optional must-understand extensibility.",
+        "description": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, ticket-type-specific context, optional presenter binding, optional revocation, and optional must-understand extensibility.",
         "exampleBoolean": false
       }
     ],
