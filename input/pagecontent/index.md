@@ -101,7 +101,7 @@ Several client identity approaches are compatible with this architecture. The sa
 | **UDAP** | Client presents X.509 certificate chain from a trusted CA | `framework_client` with `framework_type: "udap"` and `entity_uri` matching certificate SAN | Certificate in `x5c` header of `client_assertion` |
 | **Well-Known JWKS** | Client publishes keys at `{entity_uri}/.well-known/jwks.json`; trust frameworks (published directories) list recognized entities | `framework_client` with `framework_type: "well-known"` and `entity_uri` matching the client's URL identity | Fetched from `{entity_uri}/.well-known/jwks.json` |
 | **OpenID Federation** | Client includes a `trust_chain` in the header of its `client_assertion`; Data Holder validates via a common Trust Anchor | `framework_client` with appropriate `framework`/`entity_uri` | Resolved from federation `trust_chain` |
-| **Manual / Unaffiliated** | Client registers directly with each Data Holder, exchanging public keys out of band | No `presenter_binding` — any authenticated client in the ticket's `aud` may redeem it | Pre-registered JWK |
+| **Manual / Unaffiliated** | Client registers directly with each Data Holder, exchanging public keys out of band | No `presenter_binding` — any authenticated client in the ticket's `aud` may redeem it | Pre-registered JWK or JWKS |
 
 Client ID format and registration details are determined by the chosen approach. Client-to-Issuer issuance protocol details are out of scope for this specification; profile-specific guides may define them.
 
