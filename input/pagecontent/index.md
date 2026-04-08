@@ -948,9 +948,22 @@ export interface TokenExchangeRequest {
 *   **Algorithm:** ES256 (ECDSA using P-256 and SHA-256) is RECOMMENDED. RS256 is also supported.
 *   **Header:** SHALL include `alg` and `kid` (Key ID) to facilitate key rotation.
 *   **Keys:**
-*   **Issuer:** Signs the `PermissionTicket`. Public keys SHALL be exposed via a JWK Set URL (e.g., `https://trusted-issuer.org/.well-known/jwks.json`).
-*   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
+    *   **Issuer:** Signs the `PermissionTicket`. Public keys are discovered via the trust framework the issuer participates in:
+        *   **Direct trust (framework-agnostic):** publish via a JWK Set URL the Data Holder has been pre-configured to trust, e.g. `${issuerBaseUrl}/.well-known/jwks.json`. This is the common-denominator fallback.
+        *   **OpenID Federation:** publish keys inside an entity configuration at `${entityId}/.well-known/openid-federation`; verification keys are taken from the resolved trust chain after metadata policy is applied.
+        *   **UDAP:** sign each `PermissionTicket` with a UDAP-issued X.509 certificate and carry the certificate chain in the JWT `x5c` header; the Data Holder validates the chain to a configured community trust anchor.
+    *   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
 *   **Binding:** When present, `presenter_binding.method = "jkt"` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). `presenter_binding.method = "framework_client"` binds redemption to a framework-recognized entity. When `presenter_binding` is absent, `aud` + client authentication provide the trust boundary.
+
+#### Issuer Key Publication
+
+The common-denominator issuer publication path is a JWK Set URL such as `${issuerBaseUrl}/.well-known/jwks.json`. This direct JWKS path is framework-agnostic and serves as the fallback publication mechanism when no more specific framework path is configured for the issuer.
+
+OpenID Federation issuers publish verification keys through their entity configuration at `${entityId}/.well-known/openid-federation`. The Data Holder resolves the issuer's trust chain to a configured trust anchor, applies metadata policy, and takes verification keys from the resolved issuer metadata.
+
+UDAP issuers publish verification keys by signing each `PermissionTicket` with a UDAP-issued X.509 certificate and carrying the certificate chain in the JWT `x5c` header. The Data Holder validates the certificate chain to a configured community trust anchor and extracts the verification key from the leaf certificate.
+
+When multiple publication paths are available, the Data Holder SHOULD use the most-specific framework path it has configured for the issuer. When multiple sources are configured for the same issuer, the Data Holder is RECOMMENDED to verify that they do not disagree on any shared `kid`; this consistency check is RECOMMENDED at the specification level and enforced as a hard check in the reference implementation.
 
 #### Error Responses
 
