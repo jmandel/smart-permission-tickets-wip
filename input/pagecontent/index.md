@@ -963,7 +963,7 @@ OpenID Federation issuers publish verification keys through their entity configu
 
 UDAP issuers publish verification keys through the standard UDAP discovery surface at `${iss}/.well-known/udap`. The Data Holder evaluates the issuer through a configured UDAP trust community and verifier-side policy rooted in `iss`, without requiring UDAP participation to alter the `PermissionTicket` payload or JOSE header.
 
-When multiple publication paths are available, the Data Holder SHOULD evaluate them according to its configured issuer-trust policy for that issuer. When multiple sources are configured for the same issuer, the Data Holder is RECOMMENDED to verify that they do not disagree on any shared `kid`; this consistency check is RECOMMENDED at the specification level and enforced as a hard check in the reference implementation.
+When multiple publication paths are available, the Data Holder SHOULD evaluate them according to its configured issuer-trust policy for that issuer. Implementations that publish the same issuer through multiple mechanisms SHOULD keep any shared `kid` values aligned across those publication surfaces; this is an interoperability and deployment-quality recommendation, not a token-time validation requirement.
 
 #### Error Responses
 
