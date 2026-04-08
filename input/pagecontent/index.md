@@ -968,10 +968,9 @@ An issuer that participates in OpenID Federation SHALL publish its leaf entity s
 
 The `smart_permission_ticket_issuer` metadata object SHALL contain:
 
-- `issuer_url`: a parseable absolute URL. This is the `iss` value the issuer publishes in `PermissionTicket` JWTs.
 - `jwks`: an inline JWK Set carrying the public keys that sign `PermissionTicket` JWTs.
 
-Under the unified assumption used by this specification, the issuer's OpenID Federation leaf entity ID and its `PermissionTicket` issuer base URL are the same base URL. In that case, `issuer_url` is expected to equal the leaf entity statement's `iss` and `sub`, and the OpenID Federation entity configuration is discovered at `${iss}/.well-known/openid-federation`.
+When resolving issuer trust through OpenID Federation, the Data Holder discovers the issuer's entity configuration by fetching `${iss}/.well-known/openid-federation`. The leaf entity statement's `iss` and `sub` MUST equal the `PermissionTicket`'s `iss` claim; this is the structural binding that ties the `PermissionTicket` to its OIDF identity.
 
 The `jwks` field is inline rather than a URI reference so that the federation chain itself cryptographically attests to the ticket-signing keys and the verifier does not need an additional HTTP fetch at ticket-verification time.
 
@@ -1001,7 +1000,6 @@ Example leaf entity statement payload:
       "organization_name": "Example Health Issuer"
     },
     "smart_permission_ticket_issuer": {
-      "issuer_url": "https://issuer.example/issuer/example",
       "jwks": {
         "keys": [
           {
