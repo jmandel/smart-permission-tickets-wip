@@ -950,7 +950,7 @@ export interface TokenExchangeRequest {
 *   **Algorithm:** ES256 (ECDSA using P-256 and SHA-256) is RECOMMENDED. RS256 is also supported.
 *   **Header:** SHALL include `alg` and `kid` (Key ID) to facilitate key rotation.
 *   **Keys:**
-    *   **Issuer:** Signs the `PermissionTicket`. Every issuer SHALL publish its verification keys as a JWK Set at `${iss}/.well-known/jwks.json`, regardless of any trust framework it also participates in. Issuers that participate in a trust framework may additionally be discoverable through that framework's native publication format (e.g., `${iss}/.well-known/openid-federation` for OpenID Federation, `${iss}/.well-known/udap` for UDAP).
+    *   **Issuer:** Signs the `PermissionTicket`. Every issuer SHALL publish its verification keys as a JWK Set at `${iss}/.well-known/jwks.json`, regardless of any trust framework it also participates in. Issuers that participate in a trust framework may additionally be discoverable through that framework's native publication format. For OpenID Federation, see **OpenID Federation Issuer Metadata** below. For UDAP, discovery begins from `${iss}/.well-known/udap`.
     *   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
 *   **Binding:** When present, `presenter_binding.method = "jkt"` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). `presenter_binding.method = "framework_client"` binds redemption to a framework-recognized entity. When `presenter_binding` is absent, `aud` + client authentication provide the trust boundary.
 
@@ -958,9 +958,63 @@ export interface TokenExchangeRequest {
 
 Every `PermissionTicket` issuer SHALL publish its verification keys as a JWK Set at `${iss}/.well-known/jwks.json`, regardless of any trust framework it also participates in. This ensures any Data Holder can resolve the issuer's keys without framework-specific configuration.
 
-Issuers participating in a trust framework may additionally be discoverable through that framework's native publication format, for example `${iss}/.well-known/openid-federation` for OpenID Federation or `${iss}/.well-known/udap` for UDAP. The Data Holder decides which published path to use for a given issuer based on its own configured trust policy.
+Issuers participating in a trust framework may additionally be discoverable through that framework's native publication format. For OpenID Federation, see **OpenID Federation Issuer Metadata** below. For UDAP, discovery begins from `${iss}/.well-known/udap`. The Data Holder decides which published path to use for a given issuer based on its own configured trust policy.
 
 Implementations that publish the same issuer through multiple mechanisms SHOULD keep any shared `kid` values aligned across those publication surfaces; this is an interoperability recommendation, not a token-time validation requirement.
+
+#### OpenID Federation Issuer Metadata
+
+An issuer that participates in OpenID Federation SHALL publish the custom metadata type `smart_permission_ticket_issuer` in the `metadata` object of its leaf entity statement. The identifier is a project-defined bare snake_case OpenID Federation metadata type.
+
+The `smart_permission_ticket_issuer` metadata object SHALL contain:
+
+- `issuer_url`: a parseable absolute URL. This is the `iss` value the issuer publishes in `PermissionTicket` JWTs.
+- `jwks`: an inline JWK Set carrying the public keys that sign `PermissionTicket` JWTs.
+
+The `jwks` field is inline rather than a URI reference so that the federation chain itself cryptographically attests to the ticket-signing keys and the verifier does not need an additional HTTP fetch at ticket-verification time.
+
+When resolving issuer trust through OpenID Federation, the Data Holder SHALL validate the federation chain, apply metadata policy, and then read the ticket-signing keys from `metadata.smart_permission_ticket_issuer.jwks`. The Data Holder SHALL NOT treat the leaf entity statement's top-level `jwks` as the ticket-signing key set; that top-level `jwks` is the federation-signing key set used to validate the federation artifact itself.
+
+This OpenID Federation metadata publication is the federation-discovery counterpart to direct JWKS publication at `${iss}/.well-known/jwks.json`. An issuer that participates in OpenID Federation SHOULD publish the same ticket-signing key set through both paths.
+
+Example leaf entity statement payload:
+
+```json
+{
+  "iss": "https://issuer.example/federation/leafs/ticket-issuer",
+  "sub": "https://issuer.example/federation/leafs/ticket-issuer",
+  "jwks": {
+    "keys": [
+      {
+        "kid": "fed-2026-04",
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "...",
+        "y": "..."
+      }
+    ]
+  },
+  "metadata": {
+    "federation_entity": {
+      "organization_name": "Example Health Issuer"
+    },
+    "smart_permission_ticket_issuer": {
+      "issuer_url": "https://issuer.example/issuer/example",
+      "jwks": {
+        "keys": [
+          {
+            "kid": "tickets-2026-04",
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "...",
+            "y": "..."
+          }
+        ]
+      }
+    }
+  }
+}
+```
 
 #### Error Responses
 
