@@ -951,7 +951,7 @@ export interface TokenExchangeRequest {
     *   **Issuer:** Signs the `PermissionTicket`. Public keys are discovered via the trust framework the issuer participates in:
         *   **Direct trust (framework-agnostic):** publish via a JWK Set URL the Data Holder has been pre-configured to trust, e.g. `${issuerBaseUrl}/.well-known/jwks.json`. This is the common-denominator fallback.
         *   **OpenID Federation:** publish keys inside an entity configuration at `${entityId}/.well-known/openid-federation`; verification keys are taken from the resolved trust chain after metadata policy is applied.
-        *   **UDAP:** sign each `PermissionTicket` with a UDAP-issued X.509 certificate and carry the certificate chain in the JWT `x5c` header; the Data Holder validates the chain to a configured community trust anchor.
+        *   **UDAP:** discover issuer trust from `${iss}/.well-known/udap` using a configured UDAP trust community and verifier-side policy. This specification does not require UDAP participation to alter the `PermissionTicket` payload or JOSE header.
     *   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
 *   **Binding:** When present, `presenter_binding.method = "jkt"` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). `presenter_binding.method = "framework_client"` binds redemption to a framework-recognized entity. When `presenter_binding` is absent, `aud` + client authentication provide the trust boundary.
 
@@ -961,9 +961,9 @@ The common-denominator issuer publication path is a JWK Set URL such as `${issue
 
 OpenID Federation issuers publish verification keys through their entity configuration at `${entityId}/.well-known/openid-federation`. The Data Holder resolves the issuer's trust chain to a configured trust anchor, applies metadata policy, and takes verification keys from the resolved issuer metadata.
 
-UDAP issuers publish verification keys by signing each `PermissionTicket` with a UDAP-issued X.509 certificate and carrying the certificate chain in the JWT `x5c` header. The Data Holder validates the certificate chain to a configured community trust anchor and extracts the verification key from the leaf certificate.
+UDAP issuers publish verification keys through the standard UDAP discovery surface at `${iss}/.well-known/udap`. The Data Holder evaluates the issuer through a configured UDAP trust community and verifier-side policy rooted in `iss`, without requiring UDAP participation to alter the `PermissionTicket` payload or JOSE header.
 
-When multiple publication paths are available, the Data Holder SHOULD use the most-specific framework path it has configured for the issuer. When multiple sources are configured for the same issuer, the Data Holder is RECOMMENDED to verify that they do not disagree on any shared `kid`; this consistency check is RECOMMENDED at the specification level and enforced as a hard check in the reference implementation.
+When multiple publication paths are available, the Data Holder SHOULD evaluate them according to its configured issuer-trust policy for that issuer. When multiple sources are configured for the same issuer, the Data Holder is RECOMMENDED to verify that they do not disagree on any shared `kid`; this consistency check is RECOMMENDED at the specification level and enforced as a hard check in the reference implementation.
 
 #### Error Responses
 
