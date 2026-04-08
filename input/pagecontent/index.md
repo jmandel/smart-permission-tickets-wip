@@ -170,18 +170,20 @@ See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal de
 Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. The Data Holder uses `ticket_type` to select validation and access logic.
 
 #### Presenter Binding
-A Permission Ticket MAY bind redemption to a specific client using the `presenter_binding` claim. `presenter_binding` is a discriminated union selected by `method`.
+A Permission Ticket MAY bind redemption to a specific client using the `presenter_binding` claim. `presenter_binding` is a discriminated union selected by `method`, with two shapes:
+
+- **Key binding** — `{ "method": "jkt", "jkt": "<RFC 7638 thumbprint>" }`
+- **Framework binding** — `{ "method": "framework_client", "framework": "<framework id>", "framework_type": "<udap | well-known>", "entity_uri": "<client entity URI>" }`
 
 **Note on `cnf`:** Standard JWT confirmation uses the `cnf` claim ([RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)). This specification uses `presenter_binding.method = "jkt"` with a sibling `jkt` field instead, keeping all presenter-binding semantics in one place. The binding semantics are the same as `cnf.jkt`; only the claim shape differs.
 
 ##### Binding Modes
 
-| Mode | `presenter_binding` | Verification |
-|------|---------------------|-------------|
-| **Key-bound** | `{ "method": "jkt", "jkt": "..." }` | Data Holder computes JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the `client_assertion` signing key and compares it to `jkt`. Reject on mismatch. |
-| **Framework-bound (UDAP)** | `{ "method": "framework_client", "framework_type": "udap", ... }` | Data Holder verifies the client's certificate SAN URI matches `entity_uri` and chains to a trust anchor for the named `framework`. |
-| **Framework-bound (Well-Known)** | `{ "method": "framework_client", "framework_type": "well-known", ... }` | Data Holder fetches `{entity_uri}/.well-known/jwks.json`, verifies the `client_assertion` signature, and confirms the entity is recognized within the named `framework`. |
-| **No binding** | `presenter_binding` absent | Ticket does not constrain which client may redeem it. Any authenticated client in the ticket's `aud` may present it. |
+| Mode | `method` | Verification |
+|------|----------|--------------|
+| **Key-bound** | `"jkt"` | Data Holder computes the JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the `client_assertion` signing key and compares it to `presenter_binding.jkt`. Reject on mismatch. |
+| **Framework-bound** | `"framework_client"` | Data Holder confirms the presenting client matches `presenter_binding.entity_uri` within `presenter_binding.framework`, using that framework's native client authentication. Typical patterns: for UDAP (`framework_type = "udap"`), the client's X.509 certificate SAN URI matches `entity_uri` and chains to a trust anchor for the framework; for well-known clients (`framework_type = "well-known"`), the Data Holder fetches `${entity_uri}/.well-known/jwks.json` and verifies the `client_assertion` against that key set. |
+| **No binding** | *(claim absent)* | Ticket does not constrain which client may redeem it. Any authenticated client in the ticket's `aud` may present it. |
 
 In all modes, the Data Holder authenticates the presenting client through its standard mechanism. Presenter binding adds a constraint on top of that authentication, not in place of it.
 
@@ -948,22 +950,17 @@ export interface TokenExchangeRequest {
 *   **Algorithm:** ES256 (ECDSA using P-256 and SHA-256) is RECOMMENDED. RS256 is also supported.
 *   **Header:** SHALL include `alg` and `kid` (Key ID) to facilitate key rotation.
 *   **Keys:**
-    *   **Issuer:** Signs the `PermissionTicket`. Public keys are discovered via the trust framework the issuer participates in:
-        *   **Direct trust (framework-agnostic):** publish via a JWK Set URL the Data Holder has been pre-configured to trust, e.g. `${issuerBaseUrl}/.well-known/jwks.json`. This is the common-denominator fallback.
-        *   **OpenID Federation:** publish keys inside an entity configuration at `${entityId}/.well-known/openid-federation`; verification keys are taken from the resolved trust chain after metadata policy is applied.
-        *   **UDAP:** discover issuer trust from `${iss}/.well-known/udap` using a configured UDAP trust community and verifier-side policy. This specification does not require UDAP participation to alter the `PermissionTicket` payload or JOSE header.
+    *   **Issuer:** Signs the `PermissionTicket`. Every issuer SHALL publish its verification keys as a JWK Set at `${iss}/.well-known/jwks.json`, regardless of any trust framework it also participates in. Issuers that participate in a trust framework may additionally be discoverable through that framework's native publication format (e.g., `${iss}/.well-known/openid-federation` for OpenID Federation, `${iss}/.well-known/udap` for UDAP).
     *   **Client:** Signs the `ClientAssertion`. Public keys SHALL be registered with the Data Holder or exposed via JWKS.
 *   **Binding:** When present, `presenter_binding.method = "jkt"` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). `presenter_binding.method = "framework_client"` binds redemption to a framework-recognized entity. When `presenter_binding` is absent, `aud` + client authentication provide the trust boundary.
 
 #### Issuer Key Publication
 
-The common-denominator issuer publication path is a JWK Set URL such as `${issuerBaseUrl}/.well-known/jwks.json`. This direct JWKS path is framework-agnostic and serves as the fallback publication mechanism when no more specific framework path is configured for the issuer.
+Every `PermissionTicket` issuer SHALL publish its verification keys as a JWK Set at `${iss}/.well-known/jwks.json`, regardless of any trust framework it also participates in. This ensures any Data Holder can resolve the issuer's keys without framework-specific configuration.
 
-OpenID Federation issuers publish verification keys through their entity configuration at `${entityId}/.well-known/openid-federation`. The Data Holder resolves the issuer's trust chain to a configured trust anchor, applies metadata policy, and takes verification keys from the resolved issuer metadata.
+Issuers participating in a trust framework may additionally be discoverable through that framework's native publication format, for example `${iss}/.well-known/openid-federation` for OpenID Federation or `${iss}/.well-known/udap` for UDAP. The Data Holder decides which published path to use for a given issuer based on its own configured trust policy.
 
-UDAP issuers publish verification keys through the standard UDAP discovery surface at `${iss}/.well-known/udap`. The Data Holder evaluates the issuer through a configured UDAP trust community and verifier-side policy rooted in `iss`, without requiring UDAP participation to alter the `PermissionTicket` payload or JOSE header.
-
-When multiple publication paths are available, the Data Holder SHOULD evaluate them according to its configured issuer-trust policy for that issuer. Implementations that publish the same issuer through multiple mechanisms SHOULD keep any shared `kid` values aligned across those publication surfaces; this is an interoperability and deployment-quality recommendation, not a token-time validation requirement.
+Implementations that publish the same issuer through multiple mechanisms SHOULD keep any shared `kid` values aligned across those publication surfaces; this is an interoperability recommendation, not a token-time validation requirement.
 
 #### Error Responses
 
