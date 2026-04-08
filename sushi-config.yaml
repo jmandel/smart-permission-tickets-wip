@@ -11,10 +11,13 @@ releaseLabel: ci-build
 pages:
   index.md:
     title: Permission Ticket Architecture
+  oidf-issuers.md:
+    title: OpenID Federation Issuers
   downloads.md:
     title: Downloads
 
 menu:
   IG Home: index.html
+  OpenID Federation: oidf-issuers.html
   Downloads: downloads.html
   Artifacts: artifacts.html
