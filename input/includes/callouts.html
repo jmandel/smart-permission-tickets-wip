@@ -1,8 +1,8 @@
 <style>
   .callout {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 10px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
     margin: 20px 0;
     padding: 14px 18px;
     border-radius: 8px;
@@ -13,9 +13,10 @@
   }
 
   .callout::before {
-    grid-row: 1 / span 99;
+    flex: 0 0 auto;
     font-size: 1.2rem;
     line-height: 1.4;
+    margin-top: 1px;
   }
 
   .callout > :first-child {

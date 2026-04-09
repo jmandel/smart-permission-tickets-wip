@@ -302,6 +302,36 @@ Within a single `DataPermission`, populated filter groups (`category_any_of`, `c
 For example, a ticket with:
 
 ```json
+"permissions": [
+  {
+    "kind": "data",
+    "resource_type": "Observation",
+    "interactions": ["read", "search"],
+    "category_any_of": [
+      { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory" },
+      { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs" }
+    ],
+    "code_any_of": [
+      { "system": "http://loinc.org", "code": "718-7" },
+      { "system": "http://loinc.org", "code": "4548-4" }
+    ]
+  },
+  {
+    "kind": "data",
+    "resource_type": "Condition",
+    "interactions": ["read", "search"]
+  }
+]
+```
+
+means:
+
+- an `Observation` is authorized only if it matches at least one listed category **and** at least one listed code
+- a `Condition` is authorized by the second rule even though it does not satisfy the `Observation` filters
+
+Separately, a ticket with:
+
+```json
 "data_holder_filter": [
   { "kind": "jurisdiction", "address": { "state": "CA" } },
   { "kind": "jurisdiction", "address": { "state": "NY" } },
@@ -332,7 +362,7 @@ Data Holders that cannot enforce a presented constraint SHALL reject the ticket 
 {% include generated/spec-snippets/index/access-example.json.md %}
 This ticket authorizes read and search access to Conditions and Procedures, but only for data:
 - With dates in 2023-2024
-- And only from responders that match one of the listed responder filters
+- And only from Data Holders that match one of the listed Data Holder filters
 
 #### Timeframe and Data Period Matching
 
