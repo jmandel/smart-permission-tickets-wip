@@ -41,7 +41,7 @@ This specification uses the following role terms consistently:
 * **Client** — the software application that presents a Permission Ticket. When redeeming a particular ticket, this specification may refer to the client as the **presenting client** to emphasize redemption-time behavior.
 * **Data Holder** — the party or system that evaluates the ticket and answers with data.
 * **Authorization Server** — the token endpoint surface operated by or for a Data Holder.
-* **Resource Server** — the API surface that serves data for a Data Holder.
+* **Resource Server** — an API surface that serves data for a Data Holder.
 * **Subject** — the person whose data the ticket concerns.
 * **Requester** — the real-world party for whom the grant exists, as attested by the issuer.
 * **Organization** — the organizational identity used in `data_holder_filter.organization`.
