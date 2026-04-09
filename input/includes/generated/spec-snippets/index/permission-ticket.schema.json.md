@@ -74,7 +74,8 @@
                   "type": "string",
                   "enum": [
                     "well-known",
-                    "udap"
+                    "udap",
+                    "oidf"
                   ]
                 },
                 "entity_uri": {
@@ -657,7 +658,8 @@
                   "type": "string",
                   "enum": [
                     "well-known",
-                    "udap"
+                    "udap",
+                    "oidf"
                   ]
                 },
                 "entity_uri": {
@@ -1353,7 +1355,8 @@
                   "type": "string",
                   "enum": [
                     "well-known",
-                    "udap"
+                    "udap",
+                    "oidf"
                   ]
                 },
                 "entity_uri": {
@@ -2024,7 +2027,8 @@
                   "type": "string",
                   "enum": [
                     "well-known",
-                    "udap"
+                    "udap",
+                    "oidf"
                   ]
                 },
                 "entity_uri": {
@@ -2761,7 +2765,8 @@
                   "type": "string",
                   "enum": [
                     "well-known",
-                    "udap"
+                    "udap",
+                    "oidf"
                   ]
                 },
                 "entity_uri": {
@@ -3498,7 +3503,8 @@
                   "type": "string",
                   "enum": [
                     "well-known",
-                    "udap"
+                    "udap",
+                    "oidf"
                   ]
                 },
                 "entity_uri": {
@@ -4205,7 +4211,8 @@
                   "type": "string",
                   "enum": [
                     "well-known",
-                    "udap"
+                    "udap",
+                    "oidf"
                   ]
                 },
                 "entity_uri": {
