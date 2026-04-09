@@ -79,7 +79,7 @@ sequenceDiagram
     Server-->>Client: FHIR Resources
 ```
 
-A trusted issuer mints a Permission Ticket and delivers it to the client. The client presents the ticket as a `subject_token` in an [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693) token exchange request, authenticating itself with a separate `client_assertion`. The Data Holder authenticates the client (standard SMART Backend Services), then validates the ticket: signature, issuer trust, audience, presenter binding, and access constraints. If valid, it issues an access token scoped to the intersection of requested and ticket-authorized access.
+A trusted issuer mints a Permission Ticket and delivers it to the client. The client presents the ticket as a `subject_token` in an [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693) token exchange request, authenticating itself separately. The Data Holder authenticates the client using its supported OAuth client-authentication mechanism, then validates the ticket: signature, issuer trust, audience, presenter binding, and access constraints. If valid, it issues an access token scoped to the intersection of requested and ticket-authorized access.
 
 ---
 
@@ -87,7 +87,7 @@ A trusted issuer mints a Permission Ticket and delivers it to the client. The cl
 
 #### Transport: Token Exchange (RFC 8693)
 
-Permission Tickets are presented via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). The client authenticates using **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** conventions (JWT `client_assertion` per **RFC 7523**) and presents the Permission Ticket as a separate `subject_token` parameter. This cleanly separates client **authentication** from the authorization **grant**: the `client_assertion` proves client identity; the `subject_token` carries the Permission Ticket.
+Permission Tickets are presented via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). The client authenticates using a standard OAuth client-authentication mechanism and presents the Permission Ticket as a separate `subject_token` parameter. A common pattern is a JWT `client_assertion` per **RFC 7523**, as profiled by **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** and **UDAP**. This cleanly separates client **authentication** from the authorization **grant**: the client-authentication artifact proves client identity; the `subject_token` carries the Permission Ticket.
 
 Using a distinct grant type (`urn:ietf:params:oauth:grant-type:token-exchange`) ensures that Data Holders that do not support Permission Tickets will reject the request with `unsupported_grant_type` rather than silently ignoring the ticket.
 
@@ -157,10 +157,10 @@ grant_type=urn:ietf:params:oauth:grant-type:token-exchange
 | `subject_token_type` | `https://smarthealthit.org/token-type/permission-ticket` |
 | `scope` | Requested SMART scopes |
 | `client_assertion_type` | `urn:ietf:params:oauth:client-assertion-type:jwt-bearer` |
-| `client_assertion` | Standard SMART Backend Services client authentication JWT |
+| `client_assertion` | Client authentication JWT (for example, a SMART Backend Services or UDAP assertion) |
 
 ##### Full Example
-Here is what the `client_assertion` looks like when decoded. It is a standard SMART Backend Services authentication JWT — it does not contain the Permission Ticket.
+Here is what the `client_assertion` looks like when decoded. This example uses SMART Backend Services conventions; it does not contain the Permission Ticket.
 
 {% include generated/signed-tickets/example-client-assertion.html %}
 
@@ -170,7 +170,7 @@ The Permission Ticket is sent separately in the `subject_token` parameter. See t
 
 Client authentication and authorization are separated:
 
-- The **`client_assertion`** authenticates the client per standard SMART Backend Services. It contains only `iss`, `sub`, `aud`, `jti`, and `exp` — no ticket content.
+- The **client-authentication artifact** authenticates the client separately from the ticket. In the common JWT-based profiles shown here, the `client_assertion` contains only `iss`, `sub`, `aud`, `jti`, and `exp` — no ticket content.
 - The **`subject_token`** carries the Permission Ticket. It is a separate form parameter, not embedded in the assertion.
 
 The ticket's `presenter_binding` claim determines how tightly the ticket is bound to a specific client. There are three modes:
@@ -227,9 +227,10 @@ In all modes, the Data Holder authenticates the presenting client through its st
 #### Server-Side Validation
 The Data Holder SHALL perform a two-layer validation:
 
-1.  **Layer 1: Client Authentication (Standard SMART)**
-    *   Verify the `client_assertion` signature using the Client's registered public key (JWK).
-    *   Ensure the client is registered and active.
+1.  **Layer 1: Client Authentication (Standard OAuth)**
+    *   Validate the client's authentication according to the locally supported OAuth client-authentication mechanism.
+    *   When JWT `client_assertion` authentication is used, verify the signature using the configured key material or trust framework for that client.
+    *   Ensure the client is eligible to authenticate using that mechanism.
 
 2.  **Layer 2: Ticket Validation (Permission Ticket Specific)**
     *   Verify the `subject_token_type` is `https://smarthealthit.org/token-type/permission-ticket`.
@@ -590,7 +591,7 @@ UC1 and UC2 intentionally define no context fields. Delegation is expressed by t
 
 For Permission Tickets, `aud` identifies the coarse intended Data Holder audience for the ticket. It does not imply that the issuer knows where the subject has received care or where data is actually held, and it does not by itself determine the final eligible set. The effective eligible Data Holder set is determined by Data Holders that trust the issuer, match the ticket's `aud`, and satisfy `data_holder_filter` when present.
 
-This is distinct from `aud` in the outer `client_assertion`, which remains the Data Holder's token endpoint URL per SMART Backend Services.
+This is distinct from `aud` in the outer client-authentication artifact. In JWT `client_assertion` profiles such as SMART Backend Services or UDAP, that `aud` remains the Data Holder's token endpoint URL.
 
 #### Mode 1: Enumerated Data Holders
 
@@ -1101,7 +1102,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Advertise `urn:ietf:params:oauth:grant-type:token-exchange` in `grant_types_supported` in `.well-known/smart-configuration`
 - Advertise supported ticket types in `smart_permission_ticket_types_supported` in `.well-known/smart-configuration`
 - Accept `subject_token_type` of `https://smarthealthit.org/token-type/permission-ticket`
-- Validate client assertion per SMART Backend Services
+- Validate client authentication per the locally supported OAuth client-authentication mechanism (for example, SMART Backend Services or UDAP)
 - Verify the ticket's signature, `ticket_type`, `aud`, and `exp`
 - If `presenter_binding` is present, verify it according to `presenter_binding.method`
 - Validate `ticket_type` is recognized (listed in `smart_permission_ticket_types_supported`) and select processing rules accordingly
