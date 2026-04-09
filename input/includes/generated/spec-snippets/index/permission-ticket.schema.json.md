@@ -446,7 +446,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -1142,7 +1142,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -1782,7 +1782,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -2454,7 +2454,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -3192,7 +3192,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -3930,7 +3930,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -4665,7 +4665,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {

@@ -23,7 +23,7 @@
       "start": "2023-01-01",
       "end": "2024-12-31"
     },
-    "responder_filter": [
+    "data_holder_filter": [
       {
         "kind": "jurisdiction",
         "address": {
