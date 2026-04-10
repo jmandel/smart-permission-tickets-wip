@@ -6,16 +6,23 @@ import {
   permissionTicketJsonSchema,
   tokenExchangeRequestJsonSchema,
 } from "./permission-ticket-schema";
+import {
+  AnnotatedTicketDocument,
+  JsonObject,
+  JsonValue,
+  readJsonFile,
+  renderAnnotatedTicketHtml,
+} from "./render_annotated_ticket";
 import { USE_CASE_CATALOG } from "./use_case_catalog";
 
-type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-type JsonObject = { [key: string]: JsonValue };
 type JsonArray = JsonValue[];
 
 const ROOT = path.join(__dirname, "..");
 const INCLUDE_ROOT = path.join(ROOT, "input/includes/generated/spec-snippets");
 const JSON_SCHEMA_ROOT = path.join(ROOT, "input/includes/generated/json-schema");
 const TYPESCRIPT_ROOT = path.join(ROOT, "input/includes/generated/typescript");
+const PUBLISHED_ARTIFACT_ROOT = path.join(ROOT, "input/images/generated");
+const ANNOTATED_TICKET_ROOT = path.join(__dirname, "annotated-ticket-source");
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
@@ -37,6 +44,18 @@ function writeJsonSchema(relativePath: string, value: JsonValue): void {
 
 function writeTypeScript(relativePath: string, content: string): void {
   const fullPath = path.join(TYPESCRIPT_ROOT, relativePath);
+  ensureDir(path.dirname(fullPath));
+  fs.writeFileSync(fullPath, `${content}\n`);
+}
+
+function writePublishedJson(relativePath: string, value: JsonValue): void {
+  const fullPath = path.join(PUBLISHED_ARTIFACT_ROOT, relativePath);
+  ensureDir(path.dirname(fullPath));
+  fs.writeFileSync(fullPath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function writePublishedText(relativePath: string, content: string): void {
+  const fullPath = path.join(PUBLISHED_ARTIFACT_ROOT, relativePath);
   ensureDir(path.dirname(fullPath));
   fs.writeFileSync(fullPath, `${content}\n`);
 }
@@ -63,31 +82,12 @@ function renderUseCaseProfileRegistryTable(): string {
 }
 
 function buildIndexSnippets(): void {
-  const artifactExample: JsonObject = {
-    iss: "https://trusted-issuer.org",
-    aud: "https://network.org",
-    exp: 1735689600,
-    jti: "ticket-example-001",
-    ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
-    presenter_binding: {
-      method: "jkt",
-      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I",
-    },
-    subject: {
-      patient: {
-        resourceType: "Patient",
-        name: [{ family: "Smith", given: ["John"] }],
-        birthDate: "1980-01-01",
-        identifier: [{ system: "http://hospital.example.org/mrn", value: "A12345" }],
-      },
-    },
-    access: {
-      permissions: [
-        { kind: "data", resource_type: "Immunization", interactions: ["read", "search"] },
-        { kind: "data", resource_type: "AllergyIntolerance", interactions: ["read", "search"] },
-      ],
-    },
-  };
+  const artifactExample = readJsonFile<JsonObject>(
+    path.join(ANNOTATED_TICKET_ROOT, "ticket.json")
+  );
+  const artifactAnnotations = readJsonFile<AnnotatedTicketDocument>(
+    path.join(ANNOTATED_TICKET_ROOT, "ticket-annotations.json")
+  );
 
   const accessExample: JsonObject = {
     access: {
@@ -157,6 +157,10 @@ function buildIndexSnippets(): void {
   };
 
   writeInclude("index/artifact-ticket.json.md", renderJsonFence(artifactExample));
+  writeInclude(
+    "index/artifact-ticket.annotated.html",
+    renderAnnotatedTicketHtml(artifactExample, artifactAnnotations)
+  );
   writeInclude("index/access-example.json.md", renderJsonFence(accessExample));
   writeInclude(
     "index/aud-enumerated.json.md",
@@ -169,9 +173,18 @@ function buildIndexSnippets(): void {
   writeInclude("index/revocation-ticket.json.md", renderJsonFence(revocationTicketExample));
   writeInclude("index/revocation-list.json.md", renderJsonFence(revocationListExample));
   writeInclude("index/use-case-profile-map.md", renderUseCaseProfileRegistryTable());
-  writeInclude("index/permission-ticket.schema.json.md", renderJsonFence(permissionTicketJsonSchema as JsonValue));
-  writeInclude("index/client-assertion.schema.json.md", renderJsonFence(clientAssertionJsonSchema as JsonValue));
-  writeInclude("index/token-exchange-request.schema.json.md", renderJsonFence(tokenExchangeRequestJsonSchema as JsonValue));
+  writeInclude(
+    "index/permission-ticket.schema.json.md",
+    renderJsonFence(permissionTicketJsonSchema as JsonValue)
+  );
+  writeInclude(
+    "index/client-assertion.schema.json.md",
+    renderJsonFence(clientAssertionJsonSchema as JsonValue)
+  );
+  writeInclude(
+    "index/token-exchange-request.schema.json.md",
+    renderJsonFence(tokenExchangeRequestJsonSchema as JsonValue)
+  );
   writeTypeScript(
     "permission-ticket-types.ts",
     fs.readFileSync(path.join(__dirname, "permission-ticket-types.ts"), "utf-8").trimEnd()
@@ -180,6 +193,22 @@ function buildIndexSnippets(): void {
   writeJsonSchema("permission-ticket.schema.json", permissionTicketJsonSchema as JsonValue);
   writeJsonSchema("client-assertion.schema.json", clientAssertionJsonSchema as JsonValue);
   writeJsonSchema("token-exchange-request.schema.json", tokenExchangeRequestJsonSchema as JsonValue);
+  writePublishedJson(
+    "json-schema/permission-ticket.schema.json",
+    permissionTicketJsonSchema as JsonValue
+  );
+  writePublishedJson(
+    "json-schema/client-assertion.schema.json",
+    clientAssertionJsonSchema as JsonValue
+  );
+  writePublishedJson(
+    "json-schema/token-exchange-request.schema.json",
+    tokenExchangeRequestJsonSchema as JsonValue
+  );
+  writePublishedText(
+    "typescript/permission-ticket-types.ts",
+    fs.readFileSync(path.join(__dirname, "permission-ticket-types.ts"), "utf-8").trimEnd()
+  );
 }
 
 function main(): void {

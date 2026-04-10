@@ -186,7 +186,7 @@ The Data Holder SHALL NOT rely on any cross-party-stable client identifier insid
 #### Artifact: Ticket Structure
 The ticket payload is a JWT. It carries top-level `subject`, `access`, optional `requester`, and optional `context` claims alongside the standard JWT envelope. `ticket_type` is the sole discriminator for the context schema and processing rules.
 
-{% include generated/spec-snippets/index/artifact-ticket.json.md %}
+{% include generated/spec-snippets/index/artifact-ticket.annotated.html %}
 
 See the JSON Schema and generated TypeScript definitions below for formal structural definitions.
 

@@ -4,8 +4,8 @@
   "description": "Generates signed Permission Ticket examples",
   "main": "generate_examples.ts",
   "scripts": {
-    "sync-spec-snippets": "ts-node sync_spec_snippets.ts",
-    "generate": "ts-node generate_examples.ts"
+    "sync-spec-snippets": "bun run sync_spec_snippets.ts",
+    "generate": "bun run generate_examples.ts"
   },
   "dependencies": {
     "@types/node": "^20.11.24",

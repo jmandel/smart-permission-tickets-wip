@@ -7,7 +7,7 @@ Source files:
 
 Published artifact:
 
-* [Generated TypeScript Definitions](includes/generated/typescript/permission-ticket-types.ts)
+* [Generated TypeScript Definitions](generated/typescript/permission-ticket-types.ts)
 
 ```typescript
 {% include generated/typescript/permission-ticket-types.ts %}

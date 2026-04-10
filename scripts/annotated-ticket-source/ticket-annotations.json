@@ -1,0 +1,53 @@
+{
+  "title": "Annotated Permission Ticket",
+  "subtitle": "A SMART Permission Ticket with inline explanations of each field and section.",
+  "annotations": [
+    {
+      "id": "envelope",
+      "title": "JWT Envelope",
+      "body": "Standard JWT claims that identify who minted the ticket, who it is intended for, how long it lasts, which instance this is, and which profile the Data Holder should apply.",
+      "pointers": ["/iss", "/aud", "/exp", "/jti", "/ticket_type"],
+      "fields": {
+        "/iss": "Issuer: who minted this ticket",
+        "/aud": "Audience: the intended network endpoint",
+        "/exp": "Expiration: Unix timestamp after which this ticket is invalid",
+        "/jti": "Unique ticket identifier",
+        "/ticket_type": "Profile URI telling the Data Holder which validation rules to apply"
+      }
+    },
+    {
+      "id": "binding",
+      "title": "Presenter Binding",
+      "body": "Binds redemption to the client that holds the private key corresponding to the JWK thumbprint. The Data Holder verifies a DPoP-like proof at redemption time.",
+      "pointers": ["/presenter_binding"],
+      "fields": {
+        "/presenter_binding/method": "\"jkt\" means a JWK Thumbprint confirmation",
+        "/presenter_binding/jkt": "JWK thumbprint of the client's public key"
+      }
+    },
+    {
+      "id": "subject",
+      "title": "Subject",
+      "body": "Identifies whose data the ticket is about. Carries a thin FHIR Patient resource with enough demographic detail for the Data Holder to match against its records.",
+      "pointers": ["/subject"],
+      "fields": {
+        "/subject/patient/resourceType": "FHIR resource type",
+        "/subject/patient/name": "Name(s) for demographic matching",
+        "/subject/patient/birthDate": "Date of birth for matching",
+        "/subject/patient/identifier": "External identifiers (e.g. MRN) for matching"
+      }
+    },
+    {
+      "id": "access",
+      "title": "Access",
+      "body": "The authorization payload. Declares what the client may do after the ticket is redeemed: which FHIR resource types and which interactions (read, search, etc.).",
+      "pointers": ["/access"],
+      "fields": {
+        "/access/permissions": "Array of permission grants",
+        "/access/permissions/0/kind": "Permission category: \"data\" means FHIR resource access",
+        "/access/permissions/0/resource_type": "FHIR resource type this grant covers",
+        "/access/permissions/0/interactions": "Allowed operations: read, search, etc."
+      }
+    }
+  ]
+}

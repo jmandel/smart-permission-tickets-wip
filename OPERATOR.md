@@ -12,7 +12,7 @@ Regenerate when:
 
 ## Prerequisites
 
-- `bun` on PATH (for `scripts/bundle-context.ts`).
+- `bun` on PATH (the standard local runner for repository scripts, including `scripts/bundle-context.ts`).
 - `files-to-prompt` on PATH (install with `uv tool install files-to-prompt` or `pipx install files-to-prompt`). The bundle script calls it.
 - A Claude Code session or Agent SDK capable of launching Opus subagents with ~1M context. The context bundle is ~1.8 MB (~470k tokens); Opus 4.6 1M handles it comfortably, smaller context windows do not.
 

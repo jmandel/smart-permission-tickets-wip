@@ -97,20 +97,20 @@ The canonical Zod schema for the specification lives in [scripts/permission-tick
 
 ## Building the IG
 
-Prerequisites: Node.js, Java 17 (for the IG Publisher), [SUSHI](https://fshschool.org/docs/sushi/) (`fsh-sushi`, installed by `npm install` at the root), and Ruby 3.3 with `jekyll` (for the IG template). The build script downloads the IG Publisher jar on first run.
+Prerequisites: Bun (for all local scripts and dependency installs), Java 17 (for the IG Publisher), [SUSHI](https://fshschool.org/docs/sushi/) (`fsh-sushi`, installed by `bun install` at the root), and Ruby 3.3 with `jekyll` (for the IG template). The build script downloads the IG Publisher jar on first run.
 
 ```bash
 # Install spec dependencies (fsh-sushi, zod)
-npm install
+bun install
 
 # Install the helpers under scripts/ (snippet sync, example signing)
-npm --prefix scripts install
+(cd scripts && bun install)
 
 # Regenerate snippets, run SUSHI, and run the IG Publisher in one shot
 ./_genonce.sh
 ```
 
-`./_genonce.sh` runs `npm --prefix scripts run sync-spec-snippets` to regenerate the prose snippets, JSON Schemas, and copied TypeScript include file, then `npm --prefix scripts run generate` to re-sign the example tickets, then `sushi .`, then `./_updatePublisher.sh` (which fetches `input-cache/publisher.jar` if missing), and finally `java -jar input-cache/publisher.jar -ig .`. The rendered IG is written to `output/`.
+`./_genonce.sh` runs `(cd scripts && bun run sync-spec-snippets)` to regenerate the prose snippets, JSON Schemas, and copied TypeScript include file, then `(cd scripts && bun run generate)` to re-sign the example tickets and refresh their published includes, then `sushi .`, then `./_updatePublisher.sh` (which fetches `input-cache/publisher.jar` if missing), and finally `java -jar input-cache/publisher.jar -ig .`. The rendered IG is written to `output/`.
 
 Continuous build preview: **<https://build.fhir.org/ig/jmandel/smart-permission-tickets-wip/>**.
 

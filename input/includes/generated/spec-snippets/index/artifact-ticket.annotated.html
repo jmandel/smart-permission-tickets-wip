@@ -1,0 +1,337 @@
+<div class="annotated-ticket-example" role="figure" aria-label="Annotated Permission Ticket">
+  <style>
+    .annotated-ticket-example {
+      margin: 1rem 0;
+    }
+    
+    .annotated-ticket-example__view {
+      background: #fbf8f2;
+      border: 1px solid rgba(120, 100, 82, 0.2);
+      border-radius: 8px;
+      padding: 16px 0;
+      overflow-x: auto;
+    }
+    
+    .annotated-ticket-example__banner {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: 8px 0 2px;
+      padding: 8px 20px 8px 17px;
+      border-left: 3px solid transparent;
+      background: rgba(0, 0, 0, 0.025);
+    }
+    
+    .annotated-ticket-example__banner:first-child {
+      margin-top: 0;
+    }
+    
+    .annotated-ticket-example__banner--envelope { border-left-color: #cc6b2c; }
+    .annotated-ticket-example__banner--binding  { border-left-color: #2063b8; }
+    .annotated-ticket-example__banner--subject  { border-left-color: #2c8a57; }
+    .annotated-ticket-example__banner--access   { border-left-color: #8e3d52; }
+    
+    .annotated-ticket-example__banner-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+    
+    .annotated-ticket-example__banner--envelope .annotated-ticket-example__banner-title { color: #cc6b2c; }
+    .annotated-ticket-example__banner--binding  .annotated-ticket-example__banner-title { color: #2063b8; }
+    .annotated-ticket-example__banner--subject  .annotated-ticket-example__banner-title { color: #2c8a57; }
+    .annotated-ticket-example__banner--access   .annotated-ticket-example__banner-title { color: #8e3d52; }
+    
+    .annotated-ticket-example__banner-body {
+      font-size: 0.76rem;
+      line-height: 1.45;
+      color: #6f6257;
+      font-style: italic;
+    }
+    
+    .annotated-ticket-example__row {
+      padding: 0 20px;
+      min-height: 1.7em;
+    }
+    
+    .annotated-ticket-example__row--envelope,
+    .annotated-ticket-example__row--binding,
+    .annotated-ticket-example__row--subject,
+    .annotated-ticket-example__row--access {
+      border-left: 3px solid transparent;
+      padding-left: 17px;
+    }
+    
+    .annotated-ticket-example__row--envelope { border-left-color: #cc6b2c; }
+    .annotated-ticket-example__row--binding  { border-left-color: #2063b8; }
+    .annotated-ticket-example__row--subject  { border-left-color: #2c8a57; }
+    .annotated-ticket-example__row--access   { border-left-color: #8e3d52; }
+    
+    .annotated-ticket-example__code,
+    .annotated-ticket-example__hint {
+      font-family: "Berkeley Mono", "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+    
+    .annotated-ticket-example__code {
+      white-space: pre;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #241c15;
+    }
+    
+    .annotated-ticket-example__hint-row {
+      min-height: auto;
+    }
+    
+    .annotated-ticket-example__hint {
+      white-space: pre;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: #6f6257;
+    }
+    
+    .annotated-ticket-example__indent,
+    .annotated-ticket-example__punct { color: #8a7e72; }
+    .annotated-ticket-example__key { color: #6844b8; }
+    .annotated-ticket-example__string { color: #b5440a; }
+    .annotated-ticket-example__number { color: #1860b8; }
+    .annotated-ticket-example__boolean,
+    .annotated-ticket-example__null { color: #258050; }
+    
+    @media (max-width: 700px) {
+      .annotated-ticket-example__row {
+        padding: 0 12px;
+      }
+    
+      .annotated-ticket-example__row--envelope,
+      .annotated-ticket-example__row--binding,
+      .annotated-ticket-example__row--subject,
+      .annotated-ticket-example__row--access {
+        padding-left: 9px;
+      }
+    
+      .annotated-ticket-example__banner {
+        padding-left: 9px;
+      }
+    }
+  </style>
+  <div class="annotated-ticket-example__view">
+    <div class="annotated-ticket-example__row">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__banner annotated-ticket-example__banner--envelope">
+      <span class="annotated-ticket-example__banner-title">JWT Envelope</span>
+      <span class="annotated-ticket-example__banner-body">Standard JWT claims that identify who minted the ticket, who it is intended for, how long it lasts, which instance this is, and which profile the Data Holder should apply.</span>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">  // Issuer: who minted this ticket</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__key">&quot;iss&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;https://trusted-issuer.org&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">  // Audience: the intended network endpoint</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__key">&quot;aud&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;https://network.org&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">  // Expiration: Unix timestamp after which this ticket is invalid</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__key">&quot;exp&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__number">1735689600</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">  // Unique ticket identifier</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__key">&quot;jti&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;ticket-example-001&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">  // Profile URI telling the Data Holder which validation rules to apply</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--envelope">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__key">&quot;ticket_type&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;https://smarthealthit.org/permission-ticket-type/patient-self-access-v1&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__banner annotated-ticket-example__banner--binding">
+      <span class="annotated-ticket-example__banner-title">Presenter Binding</span>
+      <span class="annotated-ticket-example__banner-body">Binds redemption to the client that holds the private key corresponding to the JWK thumbprint. The Data Holder verifies a DPoP-like proof at redemption time.</span>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--binding">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__key">&quot;presenter_binding&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--binding annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">    // &quot;jkt&quot; means a JWK Thumbprint confirmation</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--binding">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">    </span><span class="annotated-ticket-example__key">&quot;method&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;jkt&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--binding annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">    // JWK thumbprint of the client's public key</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--binding">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">    </span><span class="annotated-ticket-example__key">&quot;jkt&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I&quot;</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--binding">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__punct">}</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__banner annotated-ticket-example__banner--subject">
+      <span class="annotated-ticket-example__banner-title">Subject</span>
+      <span class="annotated-ticket-example__banner-body">Identifies whose data the ticket is about. Carries a thin FHIR Patient resource with enough demographic detail for the Data Holder to match against its records.</span>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__key">&quot;subject&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">    </span><span class="annotated-ticket-example__key">&quot;patient&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">      // FHIR resource type</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__key">&quot;resourceType&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;Patient&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">      // Name(s) for demographic matching</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__key">&quot;name&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">[</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__key">&quot;family&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;Smith&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__key">&quot;given&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">[</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">            </span><span class="annotated-ticket-example__string">&quot;John&quot;</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__punct">]</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__punct">}</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__punct">]</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">      // Date of birth for matching</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__key">&quot;birthDate&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;1980-01-01&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">      // External identifiers (e.g. MRN) for matching</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__key">&quot;identifier&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">[</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__key">&quot;system&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;http://hospital.example.org/mrn&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__key">&quot;value&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;A12345&quot;</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__punct">}</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__punct">]</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">    </span><span class="annotated-ticket-example__punct">}</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--subject">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__punct">}</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__banner annotated-ticket-example__banner--access">
+      <span class="annotated-ticket-example__banner-title">Access</span>
+      <span class="annotated-ticket-example__banner-body">The authorization payload. Declares what the client may do after the ticket is redeemed: which FHIR resource types and which interactions (read, search, etc.).</span>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__key">&quot;access&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">    // Array of permission grants</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">    </span><span class="annotated-ticket-example__key">&quot;permissions&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">[</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">        // Permission category: &quot;data&quot; means FHIR resource access</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__key">&quot;kind&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;data&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">        // FHIR resource type this grant covers</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__key">&quot;resource_type&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;Immunization&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access annotated-ticket-example__hint-row">
+      <code class="annotated-ticket-example__hint">        // Allowed operations: read, search, etc.</code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__key">&quot;interactions&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">[</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__string">&quot;read&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__string">&quot;search&quot;</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__punct">]</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__punct">}</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__punct">{</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__key">&quot;kind&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;data&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__key">&quot;resource_type&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__string">&quot;AllergyIntolerance&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__key">&quot;interactions&quot;</span><span class="annotated-ticket-example__punct">:</span> <span class="annotated-ticket-example__punct">[</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__string">&quot;read&quot;</span><span class="annotated-ticket-example__punct">,</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">          </span><span class="annotated-ticket-example__string">&quot;search&quot;</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">        </span><span class="annotated-ticket-example__punct">]</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">      </span><span class="annotated-ticket-example__punct">}</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">    </span><span class="annotated-ticket-example__punct">]</span></code>
+    </div>
+    <div class="annotated-ticket-example__row annotated-ticket-example__row--access">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__indent">  </span><span class="annotated-ticket-example__punct">}</span></code>
+    </div>
+    <div class="annotated-ticket-example__row">
+      <code class="annotated-ticket-example__code"><span class="annotated-ticket-example__punct">}</span></code>
+    </div>
+  </div>
+</div>
