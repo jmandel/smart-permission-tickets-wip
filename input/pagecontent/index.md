@@ -395,7 +395,7 @@ This ticket authorizes read and search access to Conditions and Procedures, but 
 
 <div class="callout callout-info" markdown="1">
 
-**Implementation Note: A site selection may authorize a broader shared Data Holder.**
+**Implementation Note: An organization filter may authorize a broader shared Data Holder.**
 
 In the real-world ecosystem, a single Data Holder frequently serves multiple independent physical clinics, hospitals, and sometimes entirely distinct organizations through one or more shared technical endpoints. Within these shared systems, clinical data such as Allergies, Problems, and Medications is integrated into a unified patient chart and often cannot be reliably attributed to or filtered by a specific leaf-node facility.
 
