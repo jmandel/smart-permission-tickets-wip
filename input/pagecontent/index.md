@@ -312,11 +312,14 @@ The `access` object defines what access the ticket authorizes:
 
 ##### Constraint Algebra
 
-Different access dimensions are combined **conjunctively** (AND): returned data must satisfy every present constraint. Within `data_holder_filter`, entries are combined **disjunctively** (OR): any listed jurisdiction or organization match authorizes that Data Holder to answer. An absent dimension means no restriction for that dimension.
+Constraints combine as follows:
 
-Within a single `DataPermission`, populated filter groups (`category_any_of`, `code_any_of`) are ANDed across groups, and values within one group are ORed. Multiple `DataPermission` entries are additive (OR) — a resource matching any single permission rule is authorized.
+- **Across dimensions** (AND): returned data must satisfy every present constraint (`permissions`, `data_period`, `data_holder_filter`, `sensitive_data`). An absent dimension means no restriction.
+- **Across permission entries** (OR): a resource matching any single `DataPermission` rule is authorized.
+- **Within a permission's filters** (AND across groups, OR within): if both `category_any_of` and `code_any_of` are populated, a resource must match at least one category AND at least one code.
+- **Within `data_holder_filter`** (OR): a Data Holder may answer if it matches any listed filter.
 
-For example, a ticket with:
+##### Example Walkthrough
 
 ```json
 "access": {
@@ -340,6 +343,10 @@ For example, a ticket with:
       "interactions": ["read", "search"]
     }
   ],
+  "data_period": {
+    "start": "2023-01-01",
+    "end": "2024-12-31"
+  },
   "data_holder_filter": [
     { "kind": "jurisdiction", "address": { "state": "CA" } },
     { "kind": "jurisdiction", "address": { "state": "NY" } },
@@ -350,39 +357,21 @@ For example, a ticket with:
         "identifier": [{ "system": "http://hl7.org/fhir/sid/us-npi", "value": "123" }]
       }
     }
-  ]
+  ],
+  "sensitive_data": "exclude"
 }
 ```
 
-means:
+This example applies all four constraint dimensions together:
 
-- only a Data Holder operating in CA, in NY, or matching organization NPI `123` may answer at all
-- at a matching Data Holder, an `Observation` is authorized only if it matches at least one listed category **and** at least one listed code
-- at a matching Data Holder, a `Condition` is authorized by the second rule even though it does not satisfy the `Observation` filters
-- a matching `Observation` from a non-matching Data Holder is still not authorized, because access dimensions are ANDed together
+- **`data_holder_filter`** (OR): only a Data Holder operating in CA, in NY, or matching organization NPI `123` may answer at all.
+- **`permissions`** (OR across entries): at a matching Data Holder, an Observation is authorized if it matches at least one listed category AND at least one listed code. A Condition is authorized by the second rule regardless of those filters.
+- **`data_period`**: only resources with clinically relevant dates in 2023–2024 are returned. Relevant dates are `authored`, `recorded`, `issued`, or `effective[x]`, falling back to encounter timing. Identity-type resources (Patient, Practitioner, Organization, Location) are exempt.
+- **`sensitive_data`**: locally classified sensitive data is excluded.
 
-##### Constraint Semantics
-
-| Dimension | What it restricts | Matching basis |
-|-----------|-------------------|----------------|
-| `permissions` | Resource types, interactions, and optional category/code filters | Resource type + FHIR REST interaction + coded attributes |
-| `data_period` | Relevant clinical or service dates of returned data | Date comparison against `authored`, `recorded`, `issued`, or `effective[x]`, falling back to encounter timing |
-| `data_holder_filter` | Which Data Holders may answer | Jurisdiction address match or organization identity match |
-| `sensitive_data` | Whether locally classified sensitive data is included | Data Holder-local sensitivity labels and policy |
+Because dimensions are ANDed: a matching Observation from a non-matching Data Holder is still not authorized, and data outside the period is excluded even if it matches a permission rule. If disjoint time windows are needed, mint separate tickets.
 
 Data Holders that cannot enforce a presented constraint SHALL reject the ticket with `invalid_grant` and `error_description` indicating the unsupported constraint.
-
-**Example Access Constraints:**
-{% include generated/spec-snippets/index/access-example.json.md %}
-This ticket authorizes read and search access to Conditions and Procedures, but only for data:
-- With dates in 2023-2024
-- And only from Data Holders that match one of the listed Data Holder filters
-
-#### Timeframe and Data Period Matching
-
-* `data_period` is one coarse timeframe for the ticket.
-* If multiple disjoint windows are needed, mint separate tickets.
-* Matching semantics: the Data Holder filters to resources whose clinically relevant date falls within the period. Relevant dates are `authored`, `recorded`, `issued`, or `effective[x]` where present, falling back to encounter timing when no resource-level date is available. Identity-type resources (Patient, Practitioner, Organization, Location) are exempt from date filtering.
 
 #### Sensitive Data
 
