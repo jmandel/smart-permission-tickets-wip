@@ -7,7 +7,7 @@ import {
   PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
   RESEARCH_STUDY_ACCESS_TICKET_TYPE,
   SOCIAL_CARE_REFERRAL_TICKET_TYPE,
-} from "../reference-implementation/shared/permission-ticket-schema";
+} from "./permission-ticket-schema";
 
 export type UseCaseCatalogEntry = {
   id: string;

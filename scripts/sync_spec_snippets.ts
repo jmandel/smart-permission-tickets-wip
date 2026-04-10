@@ -1,10 +1,44 @@
 import * as fs from "fs";
 import * as path from "path";
+import { createAuxiliaryTypeStore, createTypeAlias, printNode, zodToTs } from "zod-to-ts";
 import {
+  AccessGrantSchema,
+  ClientAssertionSchema,
+  DataHolderFilterSchema,
+  DataPermissionSchema,
+  FHIRAddressSchema,
+  FHIRCodeableConceptSchema,
+  FHIRCodingSchema,
+  FHIRHumanNameSchema,
+  FHIRIdentifierSchema,
+  FHIRPeriodSchema,
+  FHIRReferenceSchema,
+  FrameworkClientBindingSchema,
+  JurisdictionFilterSchema,
+  KeyBindingSchema,
+  OperationPermissionSchema,
+  OrganizationFilterSchema,
+  PatientAccessContextSchema,
+  PayerClaimsContextSchema,
+  PermissionRuleSchema,
+  PermissionTicketSchema,
+  PermissionTicketTypeSchema,
+  PresenterBindingSchema,
+  ProviderConsultContextSchema,
+  PublicHealthContextSchema,
+  RequesterSchema,
+  ResearchContextSchema,
+  RestInteractionSchema,
+  SensitiveDataPolicySchema,
+  SocialCareReferralContextSchema,
+  SubjectSchema,
+  TicketAudienceTypeSchema,
+  TicketContextSchema,
+  TokenExchangeRequestSchema,
   clientAssertionJsonSchema,
   permissionTicketJsonSchema,
   tokenExchangeRequestJsonSchema,
-} from "../reference-implementation/shared/permission-ticket-schema";
+} from "./permission-ticket-schema";
 import { USE_CASE_CATALOG } from "./use_case_catalog";
 
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
@@ -14,6 +48,7 @@ type JsonArray = JsonValue[];
 const ROOT = path.join(__dirname, "..");
 const INCLUDE_ROOT = path.join(ROOT, "input/includes/generated/spec-snippets");
 const JSON_SCHEMA_ROOT = path.join(ROOT, "input/includes/generated/json-schema");
+const TYPESCRIPT_ROOT = path.join(ROOT, "input/includes/generated/typescript");
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
@@ -33,8 +68,72 @@ function writeJsonSchema(relativePath: string, value: JsonValue): void {
   fs.writeFileSync(fullPath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function writeTypeScript(relativePath: string, content: string): void {
+  const fullPath = path.join(TYPESCRIPT_ROOT, relativePath);
+  ensureDir(path.dirname(fullPath));
+  fs.writeFileSync(fullPath, `${content}\n`);
+}
+
 function renderJsonFence(value: JsonValue): string {
   return `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``;
+}
+
+function buildTypeScriptDefinitions(): string {
+  const auxiliaryTypeStore = createAuxiliaryTypeStore();
+  const options = {
+    auxiliaryTypeStore,
+    io: "output" as const,
+    unrepresentable: "any" as const,
+  };
+
+  const aliases = [
+    { name: "PermissionTicketType", schema: PermissionTicketTypeSchema },
+    { name: "RestInteraction", schema: RestInteractionSchema },
+    { name: "SensitiveDataPolicy", schema: SensitiveDataPolicySchema },
+    { name: "TicketAudienceType", schema: TicketAudienceTypeSchema },
+    { name: "FHIRCoding", schema: FHIRCodingSchema },
+    { name: "FHIRCodeableConcept", schema: FHIRCodeableConceptSchema },
+    { name: "FHIRIdentifier", schema: FHIRIdentifierSchema },
+    { name: "FHIRHumanName", schema: FHIRHumanNameSchema },
+    { name: "FHIRPeriod", schema: FHIRPeriodSchema },
+    { name: "FHIRReference", schema: FHIRReferenceSchema },
+    { name: "FHIRAddress", schema: FHIRAddressSchema },
+    { name: "KeyBinding", schema: KeyBindingSchema },
+    { name: "FrameworkClientBinding", schema: FrameworkClientBindingSchema },
+    { name: "PresenterBinding", schema: PresenterBindingSchema },
+    { name: "Subject", schema: SubjectSchema },
+    { name: "Requester", schema: RequesterSchema },
+    { name: "DataPermission", schema: DataPermissionSchema },
+    { name: "OperationPermission", schema: OperationPermissionSchema },
+    { name: "PermissionRule", schema: PermissionRuleSchema },
+    { name: "JurisdictionFilter", schema: JurisdictionFilterSchema },
+    { name: "OrganizationFilter", schema: OrganizationFilterSchema },
+    { name: "DataHolderFilter", schema: DataHolderFilterSchema },
+    { name: "AccessGrant", schema: AccessGrantSchema },
+    { name: "PatientAccessContext", schema: PatientAccessContextSchema },
+    { name: "PublicHealthContext", schema: PublicHealthContextSchema },
+    { name: "SocialCareReferralContext", schema: SocialCareReferralContextSchema },
+    { name: "PayerClaimsContext", schema: PayerClaimsContextSchema },
+    { name: "ResearchContext", schema: ResearchContextSchema },
+    { name: "ProviderConsultContext", schema: ProviderConsultContextSchema },
+    { name: "TicketContext", schema: TicketContextSchema },
+    { name: "PermissionTicket", schema: PermissionTicketSchema },
+    { name: "ClientAssertion", schema: ClientAssertionSchema },
+    { name: "TokenExchangeRequest", schema: TokenExchangeRequestSchema },
+  ] as const;
+
+  const mainAliases = aliases.map(({ name, schema }) =>
+    printNode(createTypeAlias(zodToTs(schema, options).node, name)).replace(/^type /, "export type ")
+  );
+  const auxiliaryAliases = [...auxiliaryTypeStore.definitions.values()].map((definition) =>
+    printNode(definition.node)
+  );
+
+  return [
+    "// Generated from scripts/permission-ticket-schema.ts. Do not edit by hand.",
+    ...auxiliaryAliases,
+    ...mainAliases,
+  ].join("\n\n");
 }
 
 function renderUseCaseProfileRegistryTable(): string {
@@ -50,12 +149,11 @@ function renderUseCaseProfileRegistryTable(): string {
     "  <tbody>",
     rows,
     "  </tbody>",
-    "</table>"
+    "</table>",
   ].join("\n");
 }
 
 function buildIndexSnippets(): void {
-  // Artifact example — minimal UC1-style ticket
   const artifactExample: JsonObject = {
     iss: "https://trusted-issuer.org",
     aud: "https://network.org",
@@ -64,49 +162,64 @@ function buildIndexSnippets(): void {
     ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
     presenter_binding: {
       method: "jkt",
-      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
+      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I",
     },
     subject: {
       patient: {
         resourceType: "Patient",
         name: [{ family: "Smith", given: ["John"] }],
         birthDate: "1980-01-01",
-        identifier: [{ system: "http://hospital.example.org/mrn", value: "A12345" }]
-      }
+        identifier: [{ system: "http://hospital.example.org/mrn", value: "A12345" }],
+      },
     },
     access: {
       permissions: [
         { kind: "data", resource_type: "Immunization", interactions: ["read", "search"] },
-        { kind: "data", resource_type: "AllergyIntolerance", interactions: ["read", "search"] }
-      ]
-    }
+        { kind: "data", resource_type: "AllergyIntolerance", interactions: ["read", "search"] },
+      ],
+    },
   };
 
-  // Access constraints example
   const accessExample: JsonObject = {
     access: {
       permissions: [
+        {
+          kind: "data",
+          resource_type: "Observation",
+          interactions: ["read", "search"],
+          category_any_of: [
+            {
+              system: "http://terminology.hl7.org/CodeSystem/observation-category",
+              code: "laboratory",
+            },
+            {
+              system: "http://terminology.hl7.org/CodeSystem/observation-category",
+              code: "vital-signs",
+            },
+          ],
+          code_any_of: [
+            { system: "http://loinc.org", code: "718-7" },
+            { system: "http://loinc.org", code: "4548-4" },
+          ],
+        },
         { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
-        { kind: "data", resource_type: "Procedure", interactions: ["read", "search"] }
       ],
       data_period: { start: "2023-01-01", end: "2024-12-31" },
-      responder_filter: [
+      data_holder_filter: [
         { kind: "jurisdiction", address: { country: "US", state: "CA" } },
         { kind: "jurisdiction", address: { country: "US", state: "NY" } },
         {
           kind: "organization",
           organization: {
             resourceType: "Organization",
-            identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1234567890" }],
-            name: "General Hospital"
-          }
-        }
+            identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "123" }],
+          },
+        },
       ],
-      sensitive_data: "exclude"
-    }
+      sensitive_data: "exclude",
+    },
   };
 
-  // Revocation examples
   const revocationTicketExample: JsonObject = {
     iss: "https://trusted-issuer.org",
     aud: "https://tefca.hhs.gov",
@@ -115,40 +228,42 @@ function buildIndexSnippets(): void {
     ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
     presenter_binding: {
       method: "jkt",
-      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
+      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I",
     },
     revocation: {
       url: "https://trusted-issuer.org/.well-known/status/patient-access",
-      index: 4722
+      index: 4722,
     },
     subject: {
-      patient: { resourceType: "Patient" }
+      patient: { resourceType: "Patient" },
     },
     access: {
-      permissions: [
-        { kind: "data", resource_type: "*", interactions: ["read", "search"] }
-      ]
-    }
+      permissions: [{ kind: "data", resource_type: "*", interactions: ["read", "search"] }],
+    },
   };
 
   const revocationListExample: JsonObject = {
     kid: "issuer-signing-key-id",
-    bits: "H4sIAAAAAAAA/2NgYGBgBGIOAwA+T46LBQAAAA"
+    bits: "H4sIAAAAAAAA/2NgYGBgBGIOAwA+T46LBQAAAA",
   };
 
   writeInclude("index/artifact-ticket.json.md", renderJsonFence(artifactExample));
   writeInclude("index/access-example.json.md", renderJsonFence(accessExample));
   writeInclude(
     "index/aud-enumerated.json.md",
-    `\`\`\`json\n{ "aud": "https://fhir.hospital.com" }\n// or\n{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"] }\n\`\`\``
+    `\`\`\`json\n{ "aud": "https://fhir.hospital.com", "aud_type": "data_holder_url" }\n// or\n{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"], "aud_type": "data_holder_url" }\n\`\`\``
   );
-  writeInclude("index/aud-framework.json.md", `\`\`\`json\n{ "aud": "https://tefca.hhs.gov" }\n\`\`\``);
+  writeInclude(
+    "index/aud-framework.json.md",
+    `\`\`\`json\n{ "aud": "https://tefca.hhs.gov", "aud_type": "trust_framework" }\n\`\`\``
+  );
   writeInclude("index/revocation-ticket.json.md", renderJsonFence(revocationTicketExample));
   writeInclude("index/revocation-list.json.md", renderJsonFence(revocationListExample));
   writeInclude("index/use-case-profile-map.md", renderUseCaseProfileRegistryTable());
   writeInclude("index/permission-ticket.schema.json.md", renderJsonFence(permissionTicketJsonSchema as JsonValue));
   writeInclude("index/client-assertion.schema.json.md", renderJsonFence(clientAssertionJsonSchema as JsonValue));
   writeInclude("index/token-exchange-request.schema.json.md", renderJsonFence(tokenExchangeRequestJsonSchema as JsonValue));
+  writeTypeScript("permission-ticket-types.ts", buildTypeScriptDefinitions());
 
   writeJsonSchema("permission-ticket.schema.json", permissionTicketJsonSchema as JsonValue);
   writeJsonSchema("client-assertion.schema.json", clientAssertionJsonSchema as JsonValue);
@@ -157,7 +272,7 @@ function buildIndexSnippets(): void {
 
 function main(): void {
   buildIndexSnippets();
-  console.log("Synced generated snippet includes under input/includes/generated/spec-snippets");
+  console.log("Synced generated spec snippets, schemas, and TypeScript definitions");
 }
 
 main();

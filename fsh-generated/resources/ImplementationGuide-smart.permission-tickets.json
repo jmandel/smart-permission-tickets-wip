@@ -32,6 +32,11 @@
           "generation": "markdown"
         },
         {
+          "nameUrl": "oidf-issuers.html",
+          "title": "OpenID Federation Issuers",
+          "generation": "markdown"
+        },
+        {
           "nameUrl": "downloads.html",
           "title": "Downloads",
           "generation": "markdown"

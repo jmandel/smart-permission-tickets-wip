@@ -36,13 +36,26 @@
       {
         "id": "PermissionTicket.aud",
         "path": "PermissionTicket.aud",
-        "short": "Audience (recipient URL(s) or trust framework identifier)",
-        "definition": "Audience (recipient URL(s) or trust framework identifier)",
+        "short": "Coarse intended Data Holder audience (specific Data Holder URL(s) or trust framework identifier). Arrays SHALL be homogeneous.",
+        "definition": "Coarse intended Data Holder audience (specific Data Holder URL(s) or trust framework identifier). Arrays SHALL be homogeneous.",
         "min": 1,
         "max": "*",
         "type": [
           {
             "code": "uri"
+          }
+        ]
+      },
+      {
+        "id": "PermissionTicket.aud_type",
+        "path": "PermissionTicket.aud_type",
+        "short": "Optional interpretation of aud: data_holder_url | trust_framework. Applies uniformly to the singleton or every entry in the aud array.",
+        "definition": "Optional interpretation of aud: data_holder_url | trust_framework. Applies uniformly to the singleton or every entry in the aud array.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
           }
         ]
       },
@@ -218,8 +231,8 @@
       {
         "id": "PermissionTicket.must_understand",
         "path": "PermissionTicket.must_understand",
-        "short": "Payload claim names the recipient MUST understand beyond the base kernel. Top-level claims only.",
-        "definition": "Payload claim names the recipient MUST understand beyond the base kernel. Top-level claims only.",
+        "short": "Payload claim names the Data Holder MUST understand beyond the base kernel. Top-level claims only.",
+        "definition": "Payload claim names the Data Holder MUST understand beyond the base kernel. Top-level claims only.",
         "min": 0,
         "max": "*",
         "type": [
@@ -244,8 +257,8 @@
       {
         "id": "PermissionTicket.subject.patient",
         "path": "PermissionTicket.subject.patient",
-        "short": "Inline patient facts for recipient-side resolution. May be thin.",
-        "definition": "Inline patient facts for recipient-side resolution. May be thin.",
+        "short": "Inline patient facts for Data Holder-side resolution. May be thin.",
+        "definition": "Inline patient facts for Data Holder-side resolution. May be thin.",
         "min": 1,
         "max": "1",
         "type": [
@@ -257,8 +270,8 @@
       {
         "id": "PermissionTicket.subject.recipient_record",
         "path": "PermissionTicket.subject.recipient_record",
-        "short": "Optional recipient-local patient locator",
-        "definition": "Optional recipient-local patient locator",
+        "short": "Optional Data Holder-local patient locator",
+        "definition": "Optional Data Holder-local patient locator",
         "min": 0,
         "max": "1",
         "type": [
@@ -465,8 +478,8 @@
       {
         "id": "PermissionTicket.access.sensitive_data",
         "path": "PermissionTicket.access.sensitive_data",
-        "short": "exclude | include. If absent, recipient applies its own default policy.",
-        "definition": "exclude | include. If absent, recipient applies its own default policy.",
+        "short": "exclude | include. If absent, the Data Holder applies its own default policy.",
+        "definition": "exclude | include. If absent, the Data Holder applies its own default policy.",
         "min": 0,
         "max": "1",
         "type": [

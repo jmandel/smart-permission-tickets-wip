@@ -13,7 +13,7 @@ import {
     SOCIAL_CARE_REFERRAL_TICKET_TYPE,
     type PermissionTicket,
     PermissionTicketSchema
-} from '../reference-implementation/shared/permission-ticket-schema';
+} from './permission-ticket-schema';
 
 const OUTPUT_DIR = path.join(__dirname, '../input/examples/signed-tickets');
 const INCLUDES_DIR = path.join(__dirname, '../input/includes/generated/signed-tickets');
@@ -152,7 +152,7 @@ const uc3_payload: PermissionTicket = {
             { kind: "data", resource_type: "DiagnosticReport", interactions: ["read", "search"] }
         ],
         data_period: { start: "2025-12-01", end: "2026-06-01" },
-        responder_filter: [{ kind: "jurisdiction", address: { country: "US", state: "TX" } }],
+        data_holder_filter: [{ kind: "jurisdiction", address: { country: "US", state: "TX" } }],
         sensitive_data: "include"
     },
     context: {
@@ -244,7 +244,7 @@ const uc5_payload: PermissionTicket = {
             { kind: "data", resource_type: "DocumentReference", interactions: ["read", "search"] }
         ],
         data_period: { start: "2025-01-01", end: "2025-12-31" },
-        responder_filter: [{
+        data_holder_filter: [{
             kind: "organization",
             organization: {
                 resourceType: "Organization",

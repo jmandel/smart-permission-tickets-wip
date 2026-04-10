@@ -11,9 +11,10 @@
     "@types/node": "^20.11.24",
     "ajv": "^8.17.1",
     "jose": "^5.2.3",
-    "zod": "^4.3.6",
     "ts-json-schema-generator": "^2.4.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "zod": "^4.3.6",
+    "zod-to-ts": "^2.0.0"
   }
 }

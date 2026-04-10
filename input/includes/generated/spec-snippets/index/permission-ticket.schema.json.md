@@ -25,6 +25,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -607,6 +614,13 @@
                 "minLength": 1
               }
             }
+          ]
+        },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
           ]
         },
         "exp": {
@@ -1306,6 +1320,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -1976,6 +1997,13 @@
                 "minLength": 1
               }
             }
+          ]
+        },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
           ]
         },
         "exp": {
@@ -2716,6 +2744,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -3454,6 +3489,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -4160,6 +4202,13 @@
                 "minLength": 1
               }
             }
+          ]
+        },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
           ]
         },
         "exp": {

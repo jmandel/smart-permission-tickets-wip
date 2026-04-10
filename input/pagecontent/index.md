@@ -283,6 +283,8 @@ For example, a permission `{ kind: "data", resource_type: "Observation", interac
 
 `OperationPermission` rules (e.g., `$everything`, `$export`) do not have a direct SMART scope equivalent; Data Holders should map these to appropriate local operation-level authorization.
 
+> **Open Question (OQ-5): Ticket-Level Scope Mode for Future Non-Patient Subjects.** The current base kernel always includes `subject.patient`, so current tickets naturally project to patient-level semantics even when redeemed by backend clients. If future use cases introduce a different subject shape (for example, `Group`) or no subject at all, the working group may need an explicit ticket-level scope mode (for example, `patient` vs `system`) or a profile rule that changes SMART scope projection. This question is only relevant if future use cases require non-individual or subjectless tickets.
+
 #### Access Constraints
 
 The `access` object defines what access the ticket authorizes:
@@ -588,21 +590,31 @@ UC1 and UC2 intentionally define no context fields. Delegation is expressed by t
 
 For Permission Tickets, `aud` identifies the coarse intended Data Holder audience for the ticket. It does not imply that the issuer knows where the subject has received care or where data is actually held, and it does not by itself determine the final eligible set. The effective eligible Data Holder set is determined by Data Holders that trust the issuer, match the ticket's `aud`, and satisfy `data_holder_filter` when present.
 
+Optional `aud_type` indicates how `aud` should be interpreted. When present, it applies uniformly to the singleton value or to every entry in the `aud` array. Mixed arrays are invalid. This specification defines two values: `data_holder_url` and `trust_framework`. This base specification allows `aud_type` to be omitted for backward compatibility, but profiles SHOULD populate it whenever ambiguity is possible.
+
 This is distinct from `aud` in the outer client-authentication artifact. In JWT `client_assertion` profiles such as SMART Backend Services or UDAP, that `aud` remains the Data Holder's token endpoint URL.
 
 #### Mode 1: Enumerated Data Holders
 
-The `aud` is a specific URL or array of URLs:
+The `aud` is a specific URL or array of URLs, optionally accompanied by `aud_type: "data_holder_url"`:
 
-{% include generated/spec-snippets/index/aud-enumerated.json.md %}
+```json
+{ "aud": "https://fhir.hospital.com", "aud_type": "data_holder_url" }
+```
+
+```json
+{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"], "aud_type": "data_holder_url" }
+```
 
 **Validation:** The Data Holder's base URL SHALL exactly match one of the enumerated values.
 
 #### Mode 2: Trust Framework
 
-The `aud` references a trust framework identifier:
+The `aud` references a trust framework identifier, optionally accompanied by `aud_type: "trust_framework"`:
 
-{% include generated/spec-snippets/index/aud-framework.json.md %}
+```json
+{ "aud": "https://tefca.hhs.gov", "aud_type": "trust_framework" }
+```
 
 **Validation:** The Data Holder SHALL be a verified participant in the referenced trust framework. Verification mechanisms are trust-framework-specific (e.g., the Data Holder's Entity ID appears in the framework's federation).
 
@@ -811,226 +823,12 @@ The table below summarizes required and optional fields for each ticket type:
 
 ### Developer Reference
 
-#### TypeScript Interfaces
+#### TypeScript Types
 
-The following TypeScript interfaces define the structure of the Permission Ticket, the Client Assertion, and the Token Exchange request.
+The following TypeScript definitions are generated from the canonical Zod schema in `scripts/permission-ticket-schema.ts`.
 
 ```typescript
-// ─── FHIR Primitives ────────────────────────────────────────────────────────
-
-export type Uri = string;
-export type Instant = string; // ISO 8601 timestamp per FHIR
-export type NonEmptyArray<T> = [T, ...T[]];
-export type JwtAudience = string | NonEmptyArray<string>;
-
-// ─── FHIR Building Blocks ───────────────────────────────────────────────────
-
-export interface FHIRCoding {
-    system?: string;
-    code?: string;
-    display?: string;
-}
-
-export interface FHIRCodeableConcept {
-    coding?: FHIRCoding[];
-    text?: string;
-}
-
-export interface FHIRIdentifier {
-    system?: string;
-    value?: string;
-    type?: FHIRCodeableConcept;
-}
-
-export interface FHIRHumanName {
-    family?: string;
-    given?: string[];
-    prefix?: string[];
-    suffix?: string[];
-}
-
-export interface FHIRPeriod {
-    start?: string;
-    end?: string;
-}
-
-export interface FHIRReference {
-    reference?: string;
-    identifier?: FHIRIdentifier;
-    type?: string;
-    display?: string;
-}
-
-export interface FHIRAddress {
-    country?: string;
-    state?: string;
-}
-
-// ─── Permission Ticket ──────────────────────────────────────────────────────
-
-export interface PermissionTicket {
-    iss: Uri;
-    aud: JwtAudience;
-    exp: number;
-    jti: string;
-    ticket_type: Uri;
-    iat?: number;
-
-    presenter_binding?:
-        | {
-            method: "jkt";
-            jkt: string;
-          }
-        | {
-            method: "framework_client";
-            framework: Uri;
-            framework_type: "well-known" | "udap";
-            entity_uri: Uri;
-          };
-
-    revocation?: {
-        url: Uri;
-        index: number;
-    };
-
-    /**
-     * Payload claim names the Data Holder MUST understand beyond the base kernel.
-     * Inspired by JWS crit (RFC 7515 §4.1.11), applied to payload claims.
-     */
-    must_understand?: string[];
-
-    subject: Subject;
-
-    /**
-     * The real-world party for whom the grant exists.
-     * Issuer-attested; the Data Holder trusts this without independent verification.
-     */
-    requester?: Requester;
-
-    /**
-     * Normative authorization model.
-     */
-    access: AccessGrant;
-
-    /**
-     * Ticket-type-specific mandatory workflow semantics.
-     * Omitted when the ticket type defines no context fields.
-     */
-    context?: TicketContext;
-}
-
-export interface Subject {
-    patient: {
-        resourceType: "Patient";
-        identifier?: FHIRIdentifier[];
-        name?: FHIRHumanName[];
-        birthDate?: string;
-        gender?: string;
-    };
-    recipient_record?: FHIRReference & { type?: "Patient" };
-}
-
-export type Requester =
-    | { resourceType: "RelatedPerson"; relationship?: FHIRCodeableConcept[];
-        name?: FHIRHumanName[]; identifier?: FHIRIdentifier[] }
-    | { resourceType: "Practitioner"; name?: FHIRHumanName[];
-        identifier?: FHIRIdentifier[] }
-    | { resourceType: "PractitionerRole"; code?: FHIRCodeableConcept[];
-        identifier?: FHIRIdentifier[] }
-    | { resourceType: "Organization"; name?: string;
-        identifier?: FHIRIdentifier[] };
-
-export type SensitiveDataPolicy = "exclude" | "include";
-
-export type RestInteraction =
-    | "read"
-    | "search"
-    | "history"
-    | "create"
-    | "update"
-    | "patch"
-    | "delete";
-
-export interface DataPermission {
-    kind: "data";
-    resource_type: string;
-    interactions: NonEmptyArray<RestInteraction>;
-    category_any_of?: NonEmptyArray<FHIRCoding>;
-    code_any_of?: NonEmptyArray<FHIRCoding>;
-}
-
-export interface OperationPermission {
-    kind: "operation";
-    name: string;
-    target?: FHIRReference;
-}
-
-export type PermissionRule = DataPermission | OperationPermission;
-
-export interface AccessGrant {
-    permissions: NonEmptyArray<PermissionRule>;
-    data_period?: FHIRPeriod;
-    data_holder_filter?: NonEmptyArray<
-        | { kind: "jurisdiction"; address: FHIRAddress }
-        | { kind: "organization"; organization: FHIROrganization }
-    >;
-    sensitive_data?: SensitiveDataPolicy;
-}
-
-// ─── Context Types ──────────────────────────────────────────────────────────
-
-export type PatientAccessContext = Record<string, never>;
-
-export interface PublicHealthContext {
-    reportable_condition: FHIRCodeableConcept;
-}
-
-export interface SocialCareReferralContext {
-    concern: FHIRCodeableConcept;
-    referral: any;
-}
-
-export interface PayerClaimsContext {
-    service: FHIRCodeableConcept;
-    claim: any;
-}
-
-export interface ResearchContext {
-    study: any;
-}
-
-export interface ProviderConsultContext {
-    reason: FHIRCodeableConcept;
-    consult_request: any;
-}
-
-export type TicketContext =
-    | PatientAccessContext
-    | PublicHealthContext
-    | SocialCareReferralContext
-    | PayerClaimsContext
-    | ResearchContext
-    | ProviderConsultContext;
-
-// ─── Client Assertion & Token Exchange ──────────────────────────────────────
-
-export interface ClientAssertion {
-    iss: string;          // Client ID
-    sub: string;          // Client ID
-    aud: string;          // Token Endpoint URL
-    jti: string;          // Unique Assertion ID
-    iat?: number;         // Issued-at Timestamp
-    exp?: number;         // Expiration Timestamp
-}
-
-export interface TokenExchangeRequest {
-    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange";
-    subject_token: string;  // Signed Permission Ticket JWT
-    subject_token_type: "https://smarthealthit.org/token-type/permission-ticket";
-    scope?: string;         // Requested SMART scopes
-    client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
-    client_assertion: string; // Signed Client Assertion JWT
-}
+{% include generated/typescript/permission-ticket-types.ts %}
 ```
 
 #### Signing Algorithm
