@@ -666,7 +666,7 @@ The issuer mints a ticket with extended validity (weeks to months) and supports 
 
 #### Revocation
 
-Issuers MAY support revocation of individual tickets before expiration. If a ticket includes a `revocation` claim, it SHALL also include a `jti` (unique ticket ID).
+Issuers MAY support revocation of individual tickets before expiration.
 
 **Status List Pointer**
 
