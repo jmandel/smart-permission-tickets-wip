@@ -1,40 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import { createAuxiliaryTypeStore, createTypeAlias, printNode, zodToTs } from "zod-to-ts";
 import {
-  AccessGrantSchema,
   ClientAssertionSchema,
-  DataHolderFilterSchema,
-  DataPermissionSchema,
-  FHIRAddressSchema,
-  FHIRCodeableConceptSchema,
-  FHIRCodingSchema,
-  FHIRHumanNameSchema,
-  FHIRIdentifierSchema,
-  FHIRPeriodSchema,
-  FHIRReferenceSchema,
-  FrameworkClientBindingSchema,
-  JurisdictionFilterSchema,
-  KeyBindingSchema,
-  OperationPermissionSchema,
-  OrganizationFilterSchema,
-  PatientAccessContextSchema,
-  PayerClaimsContextSchema,
-  PermissionRuleSchema,
-  PermissionTicketSchema,
-  PermissionTicketTypeSchema,
-  PresenterBindingSchema,
-  ProviderConsultContextSchema,
-  PublicHealthContextSchema,
-  RequesterSchema,
-  ResearchContextSchema,
-  RestInteractionSchema,
-  SensitiveDataPolicySchema,
-  SocialCareReferralContextSchema,
-  SubjectSchema,
-  TicketAudienceTypeSchema,
-  TicketContextSchema,
-  TokenExchangeRequestSchema,
   clientAssertionJsonSchema,
   permissionTicketJsonSchema,
   tokenExchangeRequestJsonSchema,
@@ -76,64 +43,6 @@ function writeTypeScript(relativePath: string, content: string): void {
 
 function renderJsonFence(value: JsonValue): string {
   return `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``;
-}
-
-function buildTypeScriptDefinitions(): string {
-  const auxiliaryTypeStore = createAuxiliaryTypeStore();
-  const options = {
-    auxiliaryTypeStore,
-    io: "output" as const,
-    unrepresentable: "any" as const,
-  };
-
-  const aliases = [
-    { name: "PermissionTicketType", schema: PermissionTicketTypeSchema },
-    { name: "RestInteraction", schema: RestInteractionSchema },
-    { name: "SensitiveDataPolicy", schema: SensitiveDataPolicySchema },
-    { name: "TicketAudienceType", schema: TicketAudienceTypeSchema },
-    { name: "FHIRCoding", schema: FHIRCodingSchema },
-    { name: "FHIRCodeableConcept", schema: FHIRCodeableConceptSchema },
-    { name: "FHIRIdentifier", schema: FHIRIdentifierSchema },
-    { name: "FHIRHumanName", schema: FHIRHumanNameSchema },
-    { name: "FHIRPeriod", schema: FHIRPeriodSchema },
-    { name: "FHIRReference", schema: FHIRReferenceSchema },
-    { name: "FHIRAddress", schema: FHIRAddressSchema },
-    { name: "KeyBinding", schema: KeyBindingSchema },
-    { name: "FrameworkClientBinding", schema: FrameworkClientBindingSchema },
-    { name: "PresenterBinding", schema: PresenterBindingSchema },
-    { name: "Subject", schema: SubjectSchema },
-    { name: "Requester", schema: RequesterSchema },
-    { name: "DataPermission", schema: DataPermissionSchema },
-    { name: "OperationPermission", schema: OperationPermissionSchema },
-    { name: "PermissionRule", schema: PermissionRuleSchema },
-    { name: "JurisdictionFilter", schema: JurisdictionFilterSchema },
-    { name: "OrganizationFilter", schema: OrganizationFilterSchema },
-    { name: "DataHolderFilter", schema: DataHolderFilterSchema },
-    { name: "AccessGrant", schema: AccessGrantSchema },
-    { name: "PatientAccessContext", schema: PatientAccessContextSchema },
-    { name: "PublicHealthContext", schema: PublicHealthContextSchema },
-    { name: "SocialCareReferralContext", schema: SocialCareReferralContextSchema },
-    { name: "PayerClaimsContext", schema: PayerClaimsContextSchema },
-    { name: "ResearchContext", schema: ResearchContextSchema },
-    { name: "ProviderConsultContext", schema: ProviderConsultContextSchema },
-    { name: "TicketContext", schema: TicketContextSchema },
-    { name: "PermissionTicket", schema: PermissionTicketSchema },
-    { name: "ClientAssertion", schema: ClientAssertionSchema },
-    { name: "TokenExchangeRequest", schema: TokenExchangeRequestSchema },
-  ] as const;
-
-  const mainAliases = aliases.map(({ name, schema }) =>
-    printNode(createTypeAlias(zodToTs(schema, options).node, name)).replace(/^type /, "export type ")
-  );
-  const auxiliaryAliases = [...auxiliaryTypeStore.definitions.values()].map((definition) =>
-    printNode(definition.node)
-  );
-
-  return [
-    "// Generated from scripts/permission-ticket-schema.ts. Do not edit by hand.",
-    ...auxiliaryAliases,
-    ...mainAliases,
-  ].join("\n\n");
 }
 
 function renderUseCaseProfileRegistryTable(): string {
@@ -263,7 +172,10 @@ function buildIndexSnippets(): void {
   writeInclude("index/permission-ticket.schema.json.md", renderJsonFence(permissionTicketJsonSchema as JsonValue));
   writeInclude("index/client-assertion.schema.json.md", renderJsonFence(clientAssertionJsonSchema as JsonValue));
   writeInclude("index/token-exchange-request.schema.json.md", renderJsonFence(tokenExchangeRequestJsonSchema as JsonValue));
-  writeTypeScript("permission-ticket-types.ts", buildTypeScriptDefinitions());
+  writeTypeScript(
+    "permission-ticket-types.ts",
+    fs.readFileSync(path.join(__dirname, "permission-ticket-types.ts"), "utf-8").trimEnd()
+  );
 
   writeJsonSchema("permission-ticket.schema.json", permissionTicketJsonSchema as JsonValue);
   writeJsonSchema("client-assertion.schema.json", clientAssertionJsonSchema as JsonValue);
@@ -272,7 +184,7 @@ function buildIndexSnippets(): void {
 
 function main(): void {
   buildIndexSnippets();
-  console.log("Synced generated spec snippets, schemas, and TypeScript definitions");
+  console.log("Synced generated spec snippets, schemas, and copied TypeScript definitions");
 }
 
 main();

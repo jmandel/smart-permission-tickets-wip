@@ -93,7 +93,7 @@ _genonce.sh                     One-shot SUSHI + IG Publisher build script
 _updatePublisher.sh             Downloads the IG Publisher jar on demand
 ```
 
-The canonical Zod schema for the specification lives in [scripts/permission-ticket-schema.ts](scripts/permission-ticket-schema.ts). The spec's generated JSON Schemas, TypeScript type output, snippet includes, and signed example tickets are all derived from that local file so the published artifacts are reproducible from one source of truth inside the spec repo.
+The canonical Zod schema for the specification lives in [scripts/permission-ticket-schema.ts](scripts/permission-ticket-schema.ts). A compact, human-readable TypeScript view of the same model lives beside it in [scripts/permission-ticket-types.ts](scripts/permission-ticket-types.ts). The sync script copies that TypeScript file into the IG include path and regenerates the JSON Schemas, snippet includes, and signed example tickets.
 
 ## Building the IG
 
@@ -110,7 +110,7 @@ npm --prefix scripts install
 ./_genonce.sh
 ```
 
-`./_genonce.sh` runs `npm --prefix scripts run sync-spec-snippets` to regenerate the prose snippets, JSON Schemas, and generated TypeScript type file from the local Zod schema, then `npm --prefix scripts run generate` to re-sign the example tickets, then `sushi .`, then `./_updatePublisher.sh` (which fetches `input-cache/publisher.jar` if missing), and finally `java -jar input-cache/publisher.jar -ig .`. The rendered IG is written to `output/`.
+`./_genonce.sh` runs `npm --prefix scripts run sync-spec-snippets` to regenerate the prose snippets, JSON Schemas, and copied TypeScript include file, then `npm --prefix scripts run generate` to re-sign the example tickets, then `sushi .`, then `./_updatePublisher.sh` (which fetches `input-cache/publisher.jar` if missing), and finally `java -jar input-cache/publisher.jar -ig .`. The rendered IG is written to `output/`.
 
 Continuous build preview: **<https://build.fhir.org/ig/jmandel/smart-permission-tickets-wip/>**.
 
@@ -120,7 +120,8 @@ CI mirrors this pipeline: [`.github/workflows/build-and-deploy.yml`](.github/wor
 
 - Normative prose: [input/pagecontent/index.md](input/pagecontent/index.md).
 - Canonical Zod schema: [scripts/permission-ticket-schema.ts](scripts/permission-ticket-schema.ts).
-- Generated TypeScript type output: [input/includes/generated/typescript/permission-ticket-types.ts](input/includes/generated/typescript/permission-ticket-types.ts).
+- Hand-authored TypeScript definitions: [scripts/permission-ticket-types.ts](scripts/permission-ticket-types.ts).
+- IG-published TypeScript include: [input/includes/generated/typescript/permission-ticket-types.ts](input/includes/generated/typescript/permission-ticket-types.ts).
 - Use-case catalog: [scripts/use_case_catalog.ts](scripts/use_case_catalog.ts).
 - IG configuration (id, canonical URL, version, FHIR version, status): [sushi-config.yaml](sushi-config.yaml).
 
