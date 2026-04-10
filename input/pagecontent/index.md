@@ -236,7 +236,7 @@ The Data Holder SHALL perform a two-layer validation:
     *   Verify the `subject_token_type` is `https://smarthealthit.org/token-type/permission-ticket`.
     *   Parse the `subject_token` as a JWT.
     *   **Verify Signature:** Use the `iss` (Trusted Issuer) public key.
-    *   **Verify Trust:** Is this `iss` in the Data Holder's trusted list?
+    *   **Verify Trust:** Is this `iss` accepted under the Data Holder's locally configured trust policy?
     *   **Verify Type:** `ticket_type` SHALL be present and recognized. The Data Holder SHALL verify the `ticket_type` is listed in its `smart_permission_ticket_types_supported`.
     *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`.
     *   **Check `must_understand`:** If `must_understand` is present, verify the Data Holder recognizes every listed claim name. Reject with `invalid_grant` if any entry is unrecognized.
@@ -270,7 +270,7 @@ The Data Holder calculates granted access through the **intersection** of:
 3. **Client Registration**: Scopes the client is permitted to request
 
 If the intersection yields no valid access, return `invalid_scope` error.
-Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on ticket type. For single-patient ticket types, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
+Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on ticket type. The `patient/*` versus `system/*` scope prefix reflects the OAuth client/access mode at the Data Holder, not whether the ticket is single-patient or population-level. In the current base kernel, every ticket still identifies a single patient via `subject.patient`. For single-patient ticket types, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
 
 #### SMART Scope Projection
 
@@ -279,7 +279,7 @@ The `access.permissions` array is the normative authorization model. Each `DataP
 * `resource_type` maps to the SMART resource type (e.g., `Observation`, `Condition`, or `*` for all resources)
 * `interactions` map to SMART CRUDS suffixes: `create` = `c`, `read` = `r`, `update` = `u`, `delete` = `d`, `search` = `s`
 
-For example, a permission `{ kind: "data", resource_type: "Observation", interactions: ["read", "search"] }` projects to the SMART scope `patient/Observation.rs`.
+For example, a permission `{ kind: "data", resource_type: "Observation", interactions: ["read", "search"] }` projects to a SMART scope such as `patient/Observation.rs` or `system/Observation.rs`, depending on the applicable ticket profile and client mode.
 
 `OperationPermission` rules (e.g., `$everything`, `$export`) do not have a direct SMART scope equivalent; Data Holders should map these to appropriate local operation-level authorization.
 
@@ -612,7 +612,7 @@ The `aud` references a trust framework identifier:
 |----------|-------------------|
 | Ticket for known single Data Holder | Specific Data Holder URL |
 | Ticket valid across a network | Trust framework identifier |
-| Ticket for multiple known recipients | Array of Data Holder URLs |
+| Ticket for multiple known Data Holders | Array of Data Holder URLs |
 
 Data Holders SHALL reject tickets where `aud` validation fails with error `invalid_grant` and `error_description`: "Ticket not valid for this server".
 
@@ -1046,9 +1046,9 @@ For where issuer and client signing keys are published and discovered, see [Issu
 
 #### Issuer Key Publication
 
-Every `PermissionTicket` issuer SHALL publish its verification keys as a JWK Set at `${iss}/.well-known/jwks.json`, regardless of any trust framework it participates in. This is the framework-agnostic publication path; any Data Holder can resolve the issuer's keys from it without framework-specific configuration.
+Every Permission Ticket issuer SHALL publish its verification keys as a JWK Set at `${iss}/.well-known/jwks.json`. This is the required framework-agnostic baseline publication path for Permission Ticket verification.
 
-Issuers that participate in a trust framework MAY additionally publish through that framework's native discovery format. The Data Holder decides which path to use based on its own configured trust policy.
+Issuers that participate in a trust framework MAY additionally publish through that framework's native discovery format. The Data Holder MAY use the baseline JWKS path, a framework-native mechanism, or both, according to its own configured trust policy.
 
 *   **OpenID Federation** — the issuer publishes its leaf entity configuration at `${iss}/.well-known/openid-federation`. See [OpenID Federation for Permission Ticket Issuers](oidf-issuers.html) for the metadata layout, the structural binding between `iss` and the OIDF leaf entity ID, the federation-signing vs ticket-signing key separation, and the verifier pipeline.
 *   **UDAP** — discovery begins from `${iss}/.well-known/udap`.
@@ -1057,7 +1057,7 @@ Implementations that publish the same issuer through multiple mechanisms SHOULD 
 
 #### Client Key Publication
 
-Client public keys used to verify a `ClientAssertion` SHALL either be registered with the Data Holder out of band, or be discoverable via a JWKS the Data Holder is configured to consult. The specific publication path depends on the client identity approach in use; see [Trust and Client Registration](#trust-and-client-registration) above for representative patterns.
+Client public keys used to verify a `ClientAssertion` SHALL be available through the client identity approach accepted by the Data Holder, such as out-of-band registration, configured JWKS discovery, certificate-based validation, or trust-framework-native resolution. The specific publication path depends on the client identity approach in use; see [Trust and Client Registration](#trust-and-client-registration) above for representative patterns.
 
 #### Error Responses
 
@@ -1109,7 +1109,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Calculate granted access as intersection of requested scopes, ticket `access.permissions`, and client registration
 - Enforce all presented `access` constraints (`permissions`, `data_period`, `data_holder_filter`, `sensitive_data`) or reject with `invalid_grant`
 - Enforce subset constraints at the appropriate layer (token endpoint, resource server, or both)
-- If `revocation` is present, verify `jti` is also present; perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request
+- If `revocation` is present, perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request
 - Return appropriate error codes on validation failure
 
 **SHOULD:**
@@ -1144,7 +1144,7 @@ For well-known clients, that Client ID URL is the deterministic identifier `well
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
 - Include claims: `iss`, `aud`, `exp`, `jti`, `ticket_type`, `subject`, `access`, and `context` when the ticket type defines context fields
 - When using `presenter_binding`, bind the ticket appropriately with one method (`jkt` or `framework_client`)
-- If `revocation` is present, include `jti` and publish the status list at the URL specified in tickets
+- If `revocation` is present, publish the status list at the URL specified in tickets
 
 **SHOULD:**
 - Verify real-world facts (patient identity, requester identity, legal basis, scope appropriateness) before minting
