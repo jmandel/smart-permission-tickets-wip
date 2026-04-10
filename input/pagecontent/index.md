@@ -597,29 +597,17 @@ Optional `aud_type` indicates how `aud` should be interpreted. When present, it 
 
 This is distinct from `aud` in the outer client-authentication artifact. In JWT `client_assertion` profiles such as SMART Backend Services or UDAP, that `aud` remains the Data Holder's token endpoint URL.
 
-#### Mode 1: Enumerated Data Holders
-
-The `aud` is a specific URL or array of URLs, optionally accompanied by `aud_type: "data_holder_url"`:
+When `aud` is a **specific Data Holder URL** (or array of URLs), the Data Holder's base URL SHALL exactly match one of the values. `aud_type: "data_holder_url"` makes this explicit:
 
 ```json
 { "aud": "https://fhir.hospital.com", "aud_type": "data_holder_url" }
 ```
 
-```json
-{ "aud": ["https://fhir.hospital-a.com", "https://fhir.hospital-b.com"], "aud_type": "data_holder_url" }
-```
-
-**Validation:** The Data Holder's base URL SHALL exactly match one of the enumerated values.
-
-#### Mode 2: Trust Framework
-
-The `aud` references a trust framework identifier, optionally accompanied by `aud_type: "trust_framework"`:
+When `aud` is a **trust framework identifier**, the Data Holder SHALL be a verified participant in that framework (e.g., the Data Holder's Entity ID appears in the framework's federation). `aud_type: "trust_framework"` makes this explicit:
 
 ```json
 { "aud": "https://tefca.hhs.gov", "aud_type": "trust_framework" }
 ```
-
-**Validation:** The Data Holder SHALL be a verified participant in the referenced trust framework. Verification mechanisms are trust-framework-specific (e.g., the Data Holder's Entity ID appears in the framework's federation).
 
 #### Recommendations
 
