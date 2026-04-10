@@ -1,10 +1,8 @@
 <style>
   .callout {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
+    position: relative;
     margin: 20px 0;
-    padding: 14px 18px;
+    padding: 14px 18px 14px 44px;
     border-radius: 8px;
     border: 1px solid transparent;
     border-left-width: 4px;
@@ -13,10 +11,11 @@
   }
 
   .callout::before {
-    flex: 0 0 auto;
+    position: absolute;
+    left: 12px;
+    top: 14px;
     font-size: 1.2rem;
     line-height: 1.4;
-    margin-top: 1px;
   }
 
   .callout > :first-child {

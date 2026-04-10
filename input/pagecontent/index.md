@@ -303,50 +303,47 @@ Within a single `DataPermission`, populated filter groups (`category_any_of`, `c
 For example, a ticket with:
 
 ```json
-"permissions": [
-  {
-    "kind": "data",
-    "resource_type": "Observation",
-    "interactions": ["read", "search"],
-    "category_any_of": [
-      { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory" },
-      { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs" }
-    ],
-    "code_any_of": [
-      { "system": "http://loinc.org", "code": "718-7" },
-      { "system": "http://loinc.org", "code": "4548-4" }
-    ]
-  },
-  {
-    "kind": "data",
-    "resource_type": "Condition",
-    "interactions": ["read", "search"]
-  }
-]
+"access": {
+  "permissions": [
+    {
+      "kind": "data",
+      "resource_type": "Observation",
+      "interactions": ["read", "search"],
+      "category_any_of": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory" },
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs" }
+      ],
+      "code_any_of": [
+        { "system": "http://loinc.org", "code": "718-7" },
+        { "system": "http://loinc.org", "code": "4548-4" }
+      ]
+    },
+    {
+      "kind": "data",
+      "resource_type": "Condition",
+      "interactions": ["read", "search"]
+    }
+  ],
+  "data_holder_filter": [
+    { "kind": "jurisdiction", "address": { "state": "CA" } },
+    { "kind": "jurisdiction", "address": { "state": "NY" } },
+    {
+      "kind": "organization",
+      "organization": {
+        "resourceType": "Organization",
+        "identifier": [{ "system": "http://hl7.org/fhir/sid/us-npi", "value": "123" }]
+      }
+    }
+  ]
+}
 ```
 
 means:
 
-- an `Observation` is authorized only if it matches at least one listed category **and** at least one listed code
-- a `Condition` is authorized by the second rule even though it does not satisfy the `Observation` filters
-
-Separately, a ticket with:
-
-```json
-"data_holder_filter": [
-  { "kind": "jurisdiction", "address": { "state": "CA" } },
-  { "kind": "jurisdiction", "address": { "state": "NY" } },
-  {
-    "kind": "organization",
-    "organization": {
-      "resourceType": "Organization",
-      "identifier": [{ "system": "http://hl7.org/fhir/sid/us-npi", "value": "123" }]
-    }
-  }
-]
-```
-
-means: a Data Holder may answer if it operates in CA, in NY, or matches the organization with NPI 123.
+- only a Data Holder operating in CA, in NY, or matching organization NPI `123` may answer at all
+- at a matching Data Holder, an `Observation` is authorized only if it matches at least one listed category **and** at least one listed code
+- at a matching Data Holder, a `Condition` is authorized by the second rule even though it does not satisfy the `Observation` filters
+- a matching `Observation` from a non-matching Data Holder is still not authorized, because access dimensions are ANDed together
 
 ##### Constraint Semantics
 
