@@ -1,20 +1,14 @@
 import * as fs from "fs";
 import * as path from "path";
 import {
-  ClientAssertionSchema,
   clientAssertionJsonSchema,
   permissionTicketJsonSchema,
   tokenExchangeRequestJsonSchema,
 } from "./permission-ticket-schema";
-import {
-  AnnotatedTicketDocument,
-  JsonObject,
-  JsonValue,
-  readJsonFile,
-  renderAnnotatedTicketHtml,
-} from "./render_annotated_ticket";
 import { USE_CASE_CATALOG } from "./use_case_catalog";
 
+type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+type JsonObject = { [key: string]: JsonValue };
 type JsonArray = JsonValue[];
 
 const ROOT = path.join(__dirname, "..");
@@ -22,7 +16,6 @@ const INCLUDE_ROOT = path.join(ROOT, "input/includes/generated/spec-snippets");
 const JSON_SCHEMA_ROOT = path.join(ROOT, "input/includes/generated/json-schema");
 const TYPESCRIPT_ROOT = path.join(ROOT, "input/includes/generated/typescript");
 const PUBLISHED_ARTIFACT_ROOT = path.join(ROOT, "input/images/generated");
-const ANNOTATED_TICKET_ROOT = path.join(__dirname, "annotated-ticket-source");
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
@@ -64,6 +57,39 @@ function renderJsonFence(value: JsonValue): string {
   return `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``;
 }
 
+function renderJsValue(value: JsonValue, continuationIndent: string): string {
+  return JSON.stringify(value, null, 2)
+    .split("\n")
+    .map((line, index) => (index === 0 ? line : `${continuationIndent}${line}`))
+    .join("\n");
+}
+
+function renderArtifactExampleJs(ticket: JsonObject): string {
+  return [
+    "```js",
+    "const ticket = {",
+    "  // Standard JWT envelope: who minted the ticket, who may redeem it, and when it expires.",
+    `  iss: ${JSON.stringify(ticket.iss)},`,
+    `  aud: ${JSON.stringify(ticket.aud)},`,
+    `  exp: ${JSON.stringify(ticket.exp)},`,
+    `  jti: ${JSON.stringify(ticket.jti)},`,
+    "",
+    "  // Profile selector: tells the Data Holder which validation and access rules apply.",
+    `  ticket_type: ${JSON.stringify(ticket.ticket_type)},`,
+    "",
+    "  // Presenter binding: redemption is limited to the client holding this key thumbprint.",
+    `  presenter_binding: ${renderJsValue(ticket.presenter_binding as JsonValue, "  ")},`,
+    "",
+    "  // Subject: identifies whose data this ticket is about.",
+    `  subject: ${renderJsValue(ticket.subject as JsonValue, "  ")},`,
+    "",
+    "  // Access: defines what the client may read or search once the ticket is redeemed.",
+    `  access: ${renderJsValue(ticket.access as JsonValue, "  ")}`,
+    "};",
+    "```",
+  ].join("\n");
+}
+
 function renderUseCaseProfileRegistryTable(): string {
   const rows = USE_CASE_CATALOG.map(
     (entry) =>
@@ -82,12 +108,35 @@ function renderUseCaseProfileRegistryTable(): string {
 }
 
 function buildIndexSnippets(): void {
-  const artifactExample = readJsonFile<JsonObject>(
-    path.join(ANNOTATED_TICKET_ROOT, "ticket.json")
-  );
-  const artifactAnnotations = readJsonFile<AnnotatedTicketDocument>(
-    path.join(ANNOTATED_TICKET_ROOT, "ticket-annotations.json")
-  );
+  const artifactExample: JsonObject = {
+    iss: "https://trusted-issuer.org",
+    aud: "https://network.org",
+    exp: 1735689600,
+    jti: "ticket-example-001",
+    ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
+    presenter_binding: {
+      method: "jkt",
+      jkt: "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I",
+    },
+    subject: {
+      patient: {
+        resourceType: "Patient",
+        name: [{ family: "Smith", given: ["John"] }],
+        birthDate: "1980-01-01",
+        identifier: [{ system: "http://hospital.example.org/mrn", value: "A12345" }],
+      },
+    },
+    access: {
+      permissions: [
+        { kind: "data", resource_type: "Immunization", interactions: ["read", "search"] },
+        {
+          kind: "data",
+          resource_type: "AllergyIntolerance",
+          interactions: ["read", "search"],
+        },
+      ],
+    },
+  };
 
   const accessExample: JsonObject = {
     access: {
@@ -156,11 +205,8 @@ function buildIndexSnippets(): void {
     bits: "H4sIAAAAAAAA/2NgYGBgBGIOAwA+T46LBQAAAA",
   };
 
+  writeInclude("index/artifact-ticket.js.md", renderArtifactExampleJs(artifactExample));
   writeInclude("index/artifact-ticket.json.md", renderJsonFence(artifactExample));
-  writeInclude(
-    "index/artifact-ticket.annotated.html",
-    renderAnnotatedTicketHtml(artifactExample, artifactAnnotations)
-  );
   writeInclude("index/access-example.json.md", renderJsonFence(accessExample));
   writeInclude(
     "index/aud-enumerated.json.md",
