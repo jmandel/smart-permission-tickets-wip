@@ -23,6 +23,11 @@
           "generation": "markdown"
         },
         {
+          "nameUrl": "typescript-definitions.html",
+          "title": "TypeScript Definitions",
+          "generation": "markdown"
+        },
+        {
           "nameUrl": "oidf-issuers.html",
           "title": "OpenID Federation Issuers",
           "generation": "markdown"

@@ -11,6 +11,8 @@ releaseLabel: ci-build
 pages:
   index.md:
     title: Permission Ticket Architecture
+  typescript-definitions.md:
+    title: TypeScript Definitions
   oidf-issuers.md:
     title: OpenID Federation Issuers
   downloads.md:
@@ -18,6 +20,7 @@ pages:
 
 menu:
   IG Home: index.html
+  TypeScript Definitions: typescript-definitions.html
   OpenID Federation: oidf-issuers.html
   Downloads: downloads.html
   Artifacts: artifacts.html

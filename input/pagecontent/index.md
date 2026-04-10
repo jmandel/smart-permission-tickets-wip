@@ -825,11 +825,11 @@ The table below summarizes required and optional fields for each ticket type:
 
 #### TypeScript Types
 
-The following TypeScript definitions are maintained alongside the canonical Zod schema using lightweight FHIR aliases, then copied into the IG include path during snippet sync.
+The published TypeScript definitions are maintained alongside the canonical Zod schema using lightweight FHIR aliases, then copied into the IG include path during snippet sync.
 
-```typescript
-{% include generated/typescript/permission-ticket-types.ts %}
-```
+They are published on a dedicated page to keep this main architecture page lighter:
+
+* [TypeScript Definitions](typescript-definitions.html)
 
 #### Signing Algorithm
 
