@@ -23,6 +23,11 @@
           "generation": "markdown"
         },
         {
+          "nameUrl": "use-case-catalog.html",
+          "title": "Use Case Catalog",
+          "generation": "markdown"
+        },
+        {
           "nameUrl": "typescript-definitions.html",
           "title": "TypeScript Definitions",
           "generation": "markdown"

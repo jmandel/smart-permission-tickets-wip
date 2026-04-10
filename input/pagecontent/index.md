@@ -634,7 +634,7 @@ Data Holders SHALL reject tickets where `aud` validation fails with error `inval
 
 Each use case maps to a `ticket_type` URI that identifies the ticket's schema and processing rules:
 
-{% include generated/spec-snippets/index/use-case-profile-map.md %}
+* [Use Case Catalog](use-case-catalog.html)
 
 Data Holders advertise which `ticket_type` URIs they support via `smart_permission_ticket_types_supported` in their `.well-known/smart-configuration`. Unknown `ticket_type` values SHALL be rejected with `invalid_grant`.
 

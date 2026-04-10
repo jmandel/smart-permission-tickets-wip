@@ -11,6 +11,8 @@ releaseLabel: ci-build
 pages:
   index.md:
     title: Permission Ticket Architecture
+  use-case-catalog.md:
+    title: Use Case Catalog
   typescript-definitions.md:
     title: TypeScript Definitions
   oidf-issuers.md:
@@ -20,6 +22,7 @@ pages:
 
 menu:
   IG Home: index.html
+  Use Case Catalog: use-case-catalog.html
   TypeScript Definitions: typescript-definitions.html
   OpenID Federation: oidf-issuers.html
   Downloads: downloads.html
