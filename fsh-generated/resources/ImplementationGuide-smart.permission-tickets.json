@@ -28,13 +28,13 @@
           "generation": "markdown"
         },
         {
-          "nameUrl": "typescript-definitions.html",
-          "title": "TypeScript Definitions",
+          "nameUrl": "oidf-issuers.html",
+          "title": "OpenID Federation Issuers",
           "generation": "markdown"
         },
         {
-          "nameUrl": "oidf-issuers.html",
-          "title": "OpenID Federation Issuers",
+          "nameUrl": "typescript-definitions.html",
+          "title": "TypeScript Definitions",
           "generation": "markdown"
         },
         {
