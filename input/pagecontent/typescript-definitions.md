@@ -1,5 +1,3 @@
-# TypeScript Definitions
-
 The following TypeScript definitions are maintained alongside the canonical Zod schema using lightweight FHIR aliases, then copied into the IG include path during snippet sync.
 
 Source files:
