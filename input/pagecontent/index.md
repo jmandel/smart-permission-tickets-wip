@@ -188,7 +188,7 @@ The ticket payload is a JWT. It carries top-level `subject`, `access`, optional 
 
 {% include generated/spec-snippets/index/artifact-ticket.json.md %}
 
-See the [Logical Model](StructureDefinition-PermissionTicket.html) for formal definitions.
+See the JSON Schema and generated TypeScript definitions below for formal structural definitions.
 
 Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. The Data Holder uses `ticket_type` to select validation and access logic.
 
@@ -956,4 +956,4 @@ For well-known clients, that Client ID URL is the deterministic identifier `well
 ### Downloads
 
 *   **[Source Code & Examples (ZIP)](source-code.zip)**: Includes TypeScript scripts for key generation, ticket signing, and example generation.
-*   **[Permission Ticket Logical Model](StructureDefinition-PermissionTicket.html)** for formal definitions.
+*   **Permission Ticket JSON Schema** and **generated TypeScript types** in the Developer Reference section for formal structural definitions.

@@ -78,7 +78,6 @@ The payload separates concerns deliberately. A small **portable kernel** carries
 input/
   pagecontent/index.md          Normative specification prose (the spec)
   pagecontent/downloads.md      Downloads page surfaced in the IG
-  fsh/PermissionTicket.fsh      FSH logical model for the JWT payload
   examples/                     Signed example tickets surfaced in the IG
   includes/generated/           Snippets and signed JWT artifacts the prose embeds
 scripts/
@@ -120,13 +119,12 @@ CI mirrors this pipeline: [`.github/workflows/build-and-deploy.yml`](.github/wor
 ## Where the spec lives
 
 - Normative prose: [input/pagecontent/index.md](input/pagecontent/index.md).
-- Logical model for the JWT payload: [input/fsh/PermissionTicket.fsh](input/fsh/PermissionTicket.fsh).
 - Canonical Zod schema: [scripts/permission-ticket-schema.ts](scripts/permission-ticket-schema.ts).
 - Generated TypeScript type output: [input/includes/generated/typescript/permission-ticket-types.ts](input/includes/generated/typescript/permission-ticket-types.ts).
 - Use-case catalog: [scripts/use_case_catalog.ts](scripts/use_case_catalog.ts).
 - IG configuration (id, canonical URL, version, FHIR version, status): [sushi-config.yaml](sushi-config.yaml).
 
-The canonical URL of the IG is `http://smarthealthit.org/ig/permission-tickets` (from [sushi-config.yaml](sushi-config.yaml)). The logical model renders as `StructureDefinition-PermissionTicket.html` in the rendered IG.
+The canonical URL of the IG is `http://smarthealthit.org/ig/permission-tickets` (from [sushi-config.yaml](sushi-config.yaml)).
 
 ## Status
 

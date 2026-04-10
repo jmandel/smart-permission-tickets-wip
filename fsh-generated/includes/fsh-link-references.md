@@ -1,1 +1,0 @@
-[PermissionTicket]: StructureDefinition-PermissionTicket.html
