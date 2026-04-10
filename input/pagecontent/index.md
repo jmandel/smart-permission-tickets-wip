@@ -119,17 +119,12 @@ This specification is designed so that **client identity does not need to be uni
 
 Many client identity approaches are compatible with this architecture. The same approach typically appears in two contexts: **registration** (how a Data Holder learns the client's keys) and **ticket binding** (how a ticket constrains which client may redeem it). These are related but not identical: for example, a manually registered unaffiliated client may still be bound by key thumbprint if the issuer knows the exact client key, or may be left unbound if the issuer does not know which client will redeem the ticket. The table below summarizes a few common examples; it is illustrative, not exhaustive, and other trust frameworks fit the same pattern.
 
-**Manual / Unaffiliated**
-: Client registers directly with each Data Holder, exchanging public keys out of band. Ticket uses `jkt` binding when the issuer knows the exact client key, or omits `presenter_binding` when the issuer does not know which client will redeem. Keys are pre-registered (JWK or JWKS).
-
-**Well-Known JWKS**
-: Client publishes keys at `{entity_uri}/.well-known/jwks.json`; trust frameworks list recognized entities in published directories. Ticket uses `framework_client` binding with `framework_type: "well-known"` and `entity_uri` matching the client's URL identity. Keys are fetched from the well-known endpoint.
-
-**OpenID Federation**
-: Client includes a `trust_chain` in its `client_assertion` header; Data Holder validates via a common Trust Anchor. Ticket uses `framework_client` binding with the appropriate `framework` and `entity_uri`. Keys are resolved from the federation `trust_chain`.
-
-**UDAP**
-: Client presents an X.509 certificate chain from a trusted CA. Ticket uses `framework_client` binding with `framework_type: "udap"` and `entity_uri` matching the certificate SAN. Keys come from the `x5c` header of the `client_assertion`.
+| Approach | Registration | Binding | Key Discovery |
+|----------|-------------|---------|---------------|
+| **Manual** | Direct key exchange with each Data Holder | `jkt` or none | Pre-registered JWK/JWKS |
+| **Well-Known JWKS** | Keys at `{entity_uri}/.well-known/jwks.json`; trust frameworks list recognized entities | `framework_client` | Fetched from well-known endpoint |
+| **OpenID Federation** | `trust_chain` in `client_assertion` header; validated via common Trust Anchor | `framework_client` | Resolved from `trust_chain` |
+| **UDAP** | X.509 certificate chain from a trusted CA | `framework_client` | `x5c` header of `client_assertion` |
 
 Client ID format and registration details are determined by the chosen approach. Client-to-Issuer issuance protocol details are out of scope for this specification; profile-specific guides may define them.
 
@@ -221,27 +216,22 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
 
 ##### Binding Modes
 
-**Key-bound** (`method: "jkt"`)
-: Data Holder computes the JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the `client_assertion` signing key and compares it to `presenter_binding.jkt`. Reject on mismatch.
-
-**Framework-bound** (`method: "framework_client"`)
-: Data Holder confirms the presenting client matches `presenter_binding.entity_uri` within `presenter_binding.framework`, using that framework's native client authentication. Typical patterns:
-  - **UDAP** (`framework_type: "udap"`): the client's X.509 certificate SAN URI matches `entity_uri` and chains to a trust anchor for the framework.
-  - **Well-known** (`framework_type: "well-known"`): the Data Holder fetches `{entity_uri}/.well-known/jwks.json` and verifies the `client_assertion` against that key set.
-
-**No binding** (claim absent)
-: Ticket does not constrain which client may redeem it. Any authenticated client in the ticket's `aud` may present it.
+| Mode | `method` | Verification |
+|------|----------|--------------|
+| **Key-bound** | `"jkt"` | Data Holder computes the JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the `client_assertion` signing key and compares it to `presenter_binding.jkt`. Reject on mismatch. |
+| **Framework-bound** | `"framework_client"` | Data Holder confirms the client matches `entity_uri` within the named `framework`. For UDAP: certificate SAN matches `entity_uri`. For well-known: fetch `{entity_uri}/.well-known/jwks.json` and verify `client_assertion`. |
+| **No binding** | *(absent)* | Any authenticated client in the ticket's `aud` may redeem it. |
 
 In all modes, the Data Holder authenticates the presenting client through its standard mechanism. Presenter binding adds a constraint on top of that authentication, not in place of it.
 
 ##### Presenter Binding per Ticket Type
 
-`presenter_binding` is OPTIONAL. Some deployments will require it by local policy or narrower profiles, but the base model permits unbound tickets.
+`presenter_binding` is REQUIRED for individual-access use cases (UC1, UC2) and OPTIONAL for B2B use cases. Some deployments will require it more broadly by local policy or narrower profiles.
 
 | Ticket Type | `presenter_binding` | Rationale |
 |-------------|---------------------|-----------|
-| UC1: Patient Access | Optional | Issuer may know the exact app key, but need not |
-| UC2: Authorized Rep | Optional | Issuer may know the presenting client, but need not |
+| UC1: Patient Access | Required | Individual access; ticket must be bound to the presenting client |
+| UC2: Authorized Rep | Required | Authorized representative; ticket must be bound to the presenting client |
 | UC3: Public Health | Optional | B2B; `aud` + client auth sufficient |
 | UC4: Social Care | Optional | B2B; `aud` + client auth sufficient |
 | UC5: Payer Claims | Optional | B2B; `aud` + client auth sufficient |
