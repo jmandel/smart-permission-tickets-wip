@@ -1,22 +1,22 @@
 ```js
-const ticket = {
+{
   // Standard JWT envelope: who minted the ticket, who may redeem it, and when it expires.
-  iss: "https://trusted-issuer.org",
-  aud: "https://network.org",
-  exp: 1735689600,
-  jti: "ticket-example-001",
+  "iss": "https://trusted-issuer.org",
+  "aud": "https://network.org",
+  "exp": 1735689600,
+  "jti": "ticket-example-001",
 
   // Profile selector: tells the Data Holder which validation and access rules apply.
-  ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
 
   // Presenter binding: redemption is limited to the client holding this key thumbprint.
-  presenter_binding: {
+  "presenter_binding": {
     "method": "jkt",
     "jkt": "0ZcOCORZNYy-DWpqq30jZyJGHTN0d2HglBV3uiguA4I"
   },
 
   // Subject: identifies whose data this ticket is about.
-  subject: {
+  "subject": {
     "patient": {
       "resourceType": "Patient",
       "name": [
@@ -38,7 +38,7 @@ const ticket = {
   },
 
   // Access: defines what the client may read or search once the ticket is redeemed.
-  access: {
+  "access": {
     "permissions": [
       {
         "kind": "data",
@@ -58,5 +58,5 @@ const ticket = {
       }
     ]
   }
-};
+}
 ```

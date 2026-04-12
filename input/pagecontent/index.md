@@ -176,7 +176,7 @@ Client authentication and authorization are separated:
 The ticket's `presenter_binding` claim determines how tightly the ticket is bound to a specific client. There are three modes:
 
 1. **Key-bound** (`presenter_binding.method = "jkt"`): the ticket can only be redeemed by the client whose key matches the bound thumbprint.
-2. **Framework-bound** (`presenter_binding.method = "framework_client"`): the ticket can only be redeemed by a client whose trust-framework identity matches the bound entity.
+2. **Framework-bound** (`presenter_binding.method = "framework_client"`): the ticket can only be redeemed by a client whose framework-recognized identity matches the bound entity (for example `well-known`, `oidf`, or `udap`).
 3. **No binding** (`presenter_binding` absent): any authenticated client in the ticket's `aud` may redeem it.
 
 In all three modes, the Data Holder authenticates the client through its standard mechanism (e.g., `client_assertion` JWT). The binding claims add constraints on top of that authentication, not in place of it. See [Presenter Binding](#presenter-binding) below for full verification rules.
@@ -207,7 +207,7 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
   {
     "method": "framework_client",
     "framework": "<framework id>",
-    "framework_type": "<udap | well-known>",
+    "framework_type": "<udap | well-known | oidf>",
     "entity_uri": "<client entity URI>"
   }
   ```
@@ -219,7 +219,7 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
 | Mode | `method` | Verification |
 |------|----------|--------------|
 | **Key-bound** | `"jkt"` | Data Holder computes the JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the `client_assertion` signing key and compares it to `presenter_binding.jkt`. Reject on mismatch. |
-| **Framework-bound** | `"framework_client"` | Data Holder confirms the client matches `entity_uri` within the named `framework`. For UDAP: certificate SAN matches `entity_uri`. For well-known: fetch `{entity_uri}/.well-known/jwks.json` and verify `client_assertion`. |
+| **Framework-bound** | `"framework_client"` | Data Holder confirms the client matches `entity_uri` within the named `framework`. For UDAP: certificate SAN matches `entity_uri`. For well-known: fetch `{entity_uri}/.well-known/jwks.json` and verify `client_assertion`. For OIDF: validate the client's federation material for `entity_uri` under the named framework and verify the presented `client_assertion` keys through that federation trust chain. |
 | **No binding** | *(absent)* | Any authenticated client in the ticket's `aud` may redeem it. |
 
 In all modes, the Data Holder authenticates the presenting client through its standard mechanism. Presenter binding adds a constraint on top of that authentication, not in place of it.
