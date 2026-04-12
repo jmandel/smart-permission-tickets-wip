@@ -159,16 +159,16 @@ export const KeyBindingSchema = z.object({
   jkt: NonEmptyStringSchema,
 }).strict();
 
-export const FrameworkClientBindingSchema = z.object({
-  method: z.literal("framework_client"),
-  framework: UriSchema,
+export const TrustFrameworkClientBindingSchema = z.object({
+  method: z.literal("trust_framework_client"),
+  trust_framework: UriSchema,
   framework_type: FrameworkTypeSchema,
   entity_uri: UriSchema,
 }).strict();
 
 export const PresenterBindingSchema = z.discriminatedUnion("method", [
   KeyBindingSchema,
-  FrameworkClientBindingSchema,
+  TrustFrameworkClientBindingSchema,
 ]);
 
 export const RevocationSchema = z.object({
@@ -419,7 +419,7 @@ export type FHIRReference = z.infer<typeof FHIRReferenceSchema>;
 export type FHIRAddress = z.infer<typeof FHIRAddressSchema>;
 export type FHIRResource = z.infer<typeof FHIRResourceSchema>;
 export type KeyBinding = z.infer<typeof KeyBindingSchema>;
-export type FrameworkClientBinding = z.infer<typeof FrameworkClientBindingSchema>;
+export type TrustFrameworkClientBinding = z.infer<typeof TrustFrameworkClientBindingSchema>;
 export type PresenterBinding = z.infer<typeof PresenterBindingSchema>;
 export type Subject = z.infer<typeof SubjectSchema>;
 export type Requester = z.infer<typeof RequesterSchema>;

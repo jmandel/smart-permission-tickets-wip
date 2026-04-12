@@ -122,9 +122,9 @@ Many client identity approaches are compatible with this architecture. The same 
 | Approach | Registration | Binding | Key Discovery |
 |----------|-------------|---------|---------------|
 | **Manual** | Direct key exchange with each Data Holder | `jkt` or none | Pre-registered JWK/JWKS |
-| **Well-Known JWKS** | Keys at `{entity_uri}/.well-known/jwks.json`; trust frameworks list recognized entities | `framework_client` | Fetched from well-known endpoint |
-| **OpenID Federation** | `trust_chain` in `client_assertion` header; validated via common Trust Anchor | `framework_client` | Resolved from `trust_chain` |
-| **UDAP** | X.509 certificate chain from a trusted CA | `framework_client` | `x5c` header of `client_assertion` |
+| **Well-Known JWKS** | Keys at `{entity_uri}/.well-known/jwks.json`; trust frameworks list recognized entities | `trust_framework_client` | Fetched from well-known endpoint |
+| **OpenID Federation** | `trust_chain` in `client_assertion` header; validated via common Trust Anchor | `trust_framework_client` | Resolved from `trust_chain` |
+| **UDAP** | X.509 certificate chain from a trusted CA | `trust_framework_client` | `x5c` header of `client_assertion` |
 
 Client ID format and registration details are determined by the chosen approach. Client-to-Issuer issuance protocol details are out of scope for this specification; profile-specific guides may define them.
 
@@ -176,7 +176,7 @@ Client authentication and authorization are separated:
 The ticket's `presenter_binding` claim determines how tightly the ticket is bound to a specific client. There are three modes:
 
 1. **Key-bound** (`presenter_binding.method = "jkt"`): the ticket can only be redeemed by the client whose key matches the bound thumbprint.
-2. **Framework-bound** (`presenter_binding.method = "framework_client"`): the ticket can only be redeemed by a client whose framework-recognized identity matches the bound entity (for example `well-known`, `oidf`, or `udap`).
+2. **Framework-bound** (`presenter_binding.method = "trust_framework_client"`): the ticket can only be redeemed by a client whose trust-framework-recognized identity matches the bound entity (for example `well-known`, `oidf`, or `udap`).
 3. **No binding** (`presenter_binding` absent): any authenticated client in the ticket's `aud` may redeem it.
 
 In all three modes, the Data Holder authenticates the client through its standard mechanism (e.g., `client_assertion` JWT). The binding claims add constraints on top of that authentication, not in place of it. See [Presenter Binding](#presenter-binding) below for full verification rules.
@@ -205,8 +205,8 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
 - **Framework binding**:
   ```json
   {
-    "method": "framework_client",
-    "framework": "<framework id>",
+    "method": "trust_framework_client",
+    "trust_framework": "<trust framework id>",
     "framework_type": "<udap | well-known | oidf>",
     "entity_uri": "<client entity URI>"
   }
@@ -219,7 +219,7 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
 | Mode | `method` | Verification |
 |------|----------|--------------|
 | **Key-bound** | `"jkt"` | Data Holder computes the JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the `client_assertion` signing key and compares it to `presenter_binding.jkt`. Reject on mismatch. |
-| **Framework-bound** | `"framework_client"` | Data Holder confirms the client matches `entity_uri` within the named `framework`. For UDAP: certificate SAN matches `entity_uri`. For well-known: fetch `{entity_uri}/.well-known/jwks.json` and verify `client_assertion`. For OIDF: validate the client's federation material for `entity_uri` under the named framework and verify the presented `client_assertion` keys through that federation trust chain. |
+| **Framework-bound** | `"trust_framework_client"` | Data Holder confirms the client matches `entity_uri` within the named `trust_framework`. For UDAP: certificate SAN matches `entity_uri`. For well-known: fetch `{entity_uri}/.well-known/jwks.json` and verify `client_assertion`. For OIDF: validate the client's federation material for `entity_uri` under the named trust framework and verify the presented `client_assertion` keys through that federation trust chain. |
 | **No binding** | *(absent)* | Any authenticated client in the ticket's `aud` may redeem it. |
 
 In all modes, the Data Holder authenticates the presenting client through its standard mechanism. Presenter binding adds a constraint on top of that authentication, not in place of it.
@@ -742,7 +742,7 @@ They are published on a dedicated page to keep this main architecture page light
 *   **Roles:**
     *   The **issuer** signs the `PermissionTicket`.
     *   The **client** signs the `ClientAssertion` it presents to the Data Holder.
-*   **Binding:** When present, `presenter_binding.method = "jkt"` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). `presenter_binding.method = "framework_client"` binds redemption to a framework-recognized entity. When `presenter_binding` is absent, `aud` + client authentication provide the trust boundary.
+*   **Binding:** When present, `presenter_binding.method = "jkt"` binds redemption to a specific client key via its JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)). `presenter_binding.method = "trust_framework_client"` binds redemption to a trust-framework-recognized entity. When `presenter_binding` is absent, `aud` + client authentication provide the trust boundary.
 
 For where issuer and client signing keys are published and discovered, see [Issuer Key Publication](#issuer-key-publication) and [Client Key Publication](#client-key-publication) below.
 
@@ -776,7 +776,7 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 | Issuer not trusted | `invalid_grant` | "Ticket issuer not trusted: {iss}" |
 | Issuer JWKS unavailable | `invalid_grant` | "Unable to retrieve issuer keys" |
 | Ticket expired | `invalid_grant` | "Ticket expired" |
-| Presenter binding mismatch (key or framework) | `invalid_grant` | "Ticket presenter binding mismatch" |
+| Presenter binding mismatch (key or trust framework) | `invalid_grant` | "Ticket presenter binding mismatch" |
 | `aud` mismatch | `invalid_grant` | "Ticket not valid for this server" |
 | Unknown `ticket_type` | `invalid_grant` | "Unsupported ticket type" |
 | Unrecognized `must_understand` entry | `invalid_grant` | "Unrecognized must_understand claim: {name}" |
@@ -845,7 +845,7 @@ For well-known clients, that Client ID URL is the deterministic identifier `well
 **SHALL:**
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
 - Include claims: `iss`, `aud`, `exp`, `jti`, `ticket_type`, `subject`, `access`, and `context` when the ticket type defines context fields
-- When using `presenter_binding`, bind the ticket appropriately with one method (`jkt` or `framework_client`)
+- When using `presenter_binding`, bind the ticket appropriately with one method (`jkt` or `trust_framework_client`)
 - If `revocation` is present, publish the status list at the URL specified in tickets
 
 **SHOULD:**

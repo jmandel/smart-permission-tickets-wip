@@ -71,9 +71,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -92,7 +92,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -662,9 +662,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -683,7 +683,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -1366,9 +1366,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -1387,7 +1387,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -2045,9 +2045,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -2066,7 +2066,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -2790,9 +2790,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -2811,7 +2811,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -3535,9 +3535,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -3556,7 +3556,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -4250,9 +4250,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -4271,7 +4271,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],

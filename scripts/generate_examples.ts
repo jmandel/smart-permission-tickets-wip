@@ -127,8 +127,8 @@ const uc3_payload: PermissionTicket = {
     jti: "uc3-16ff62cf-2d2d-4b30-8c86-6a13d7ab7d16",
     ticket_type: PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
     presenter_binding: {
-        method: "framework_client",
-        framework: "https://state.example.gov/trust-framework/public-health",
+        method: "trust_framework_client",
+        trust_framework: "https://state.example.gov/trust-framework/public-health",
         framework_type: "udap",
         entity_uri: "https://state.example.gov/organizations/epi-unit"
     },
@@ -171,8 +171,8 @@ const uc4_payload: PermissionTicket = {
     jti: "uc4-0d0f7272-2d85-49ef-8c39-d4a8e8d8a7f2",
     ticket_type: SOCIAL_CARE_REFERRAL_TICKET_TYPE,
     presenter_binding: {
-        method: "framework_client",
-        framework: "https://smarthealthit.org/trust-frameworks/reference-demo-well-known",
+        method: "trust_framework_client",
+        trust_framework: "https://smarthealthit.org/trust-frameworks/reference-demo-well-known",
         framework_type: "well-known",
         entity_uri: "https://aco.example.org/entities/social-care-hub"
     },
@@ -219,8 +219,8 @@ const uc5_payload: PermissionTicket = {
     jti: "uc5-9096d8d2-3627-45ee-8ea2-5e5a0ab51b7b",
     ticket_type: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
     presenter_binding: {
-        method: "framework_client",
-        framework: "https://payer.example.org/trust-framework",
+        method: "trust_framework_client",
+        trust_framework: "https://payer.example.org/trust-framework",
         framework_type: "udap",
         entity_uri: "https://payer.example.org/entities/claims-ops"
     },
@@ -276,8 +276,8 @@ const uc6_payload: PermissionTicket = {
     jti: "uc6-b5774e14-a020-46f2-94d3-2bb95b7ac4af",
     ticket_type: RESEARCH_STUDY_ACCESS_TICKET_TYPE,
     presenter_binding: {
-        method: "framework_client",
-        framework: "https://research.example.org/trust-framework",
+        method: "trust_framework_client",
+        trust_framework: "https://research.example.org/trust-framework",
         framework_type: "udap",
         entity_uri: "https://research.example.org/entities/study-team-204"
     },
@@ -321,8 +321,8 @@ const uc7_payload: PermissionTicket = {
     jti: "uc7-d6927f7f-74c8-4b1b-a7a5-7f4e6d99390a",
     ticket_type: PROVIDER_CONSULT_TICKET_TYPE,
     presenter_binding: {
-        method: "framework_client",
-        framework: "https://smarthealthit.org/trust-frameworks/reference-demo-well-known",
+        method: "trust_framework_client",
+        trust_framework: "https://smarthealthit.org/trust-frameworks/reference-demo-well-known",
         framework_type: "well-known",
         entity_uri: "https://hospital.example.org/entities/cardiology-group"
     },

@@ -51,14 +51,14 @@ export type KeyBinding = {
   jkt: string;
 };
 
-export type FrameworkClientBinding = {
-  method: "framework_client";
-  framework: Uri;
+export type TrustFrameworkClientBinding = {
+  method: "trust_framework_client";
+  trust_framework: Uri;
   framework_type: FrameworkType;
   entity_uri: Uri;
 };
 
-export type PresenterBinding = KeyBinding | FrameworkClientBinding;
+export type PresenterBinding = KeyBinding | TrustFrameworkClientBinding;
 
 export type Revocation = {
   url: Uri;
