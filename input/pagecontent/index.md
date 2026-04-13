@@ -328,20 +328,38 @@ Constraints combine as follows:
     {
       "kind": "data",
       "resource_type": "Observation",
-      "interactions": ["read", "search"],
+      "interactions": [
+        "read",
+        "search"
+      ],
       "category_any_of": [
-        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory" },
-        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs" }
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory"
+        },
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "vital-signs"
+        }
       ],
       "code_any_of": [
-        { "system": "http://loinc.org", "code": "718-7" },
-        { "system": "http://loinc.org", "code": "4548-4" }
+        {
+          "system": "http://loinc.org",
+          "code": "718-7"
+        },
+        {
+          "system": "http://loinc.org",
+          "code": "4548-4"
+        }
       ]
     },
     {
       "kind": "data",
       "resource_type": "Condition",
-      "interactions": ["read", "search"]
+      "interactions": [
+        "read",
+        "search"
+      ]
     }
   ],
   "data_period": {
@@ -349,13 +367,28 @@ Constraints combine as follows:
     "end": "2024-12-31"
   },
   "data_holder_filter": [
-    { "kind": "jurisdiction", "address": { "state": "CA" } },
-    { "kind": "jurisdiction", "address": { "state": "NY" } },
+    {
+      "kind": "jurisdiction",
+      "address": {
+        "state": "CA"
+      }
+    },
+    {
+      "kind": "jurisdiction",
+      "address": {
+        "state": "NY"
+      }
+    },
     {
       "kind": "organization",
       "organization": {
         "resourceType": "Organization",
-        "identifier": [{ "system": "http://hl7.org/fhir/sid/us-npi", "value": "123" }]
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "123"
+          }
+        ]
       }
     }
   ],
@@ -406,7 +439,7 @@ Because `data_holder_filter.organization` evaluates whether the Data Holder *as 
 
 Ticket Issuers SHOULD, where such information is available, use directory or network information (for example, published endpoint networks, trust framework directories, or SMART Brands data) to clarify when a selected facility or organization is actually served through a broader shared Data Holder. Exact topology is not always knowable in advance, and this specification does not require the Issuer to resolve it perfectly before minting a ticket.
 
-If the Issuer can determine that a selected facility or organization is served through a broader shared Data Holder, it should say so explicitly. If it cannot determine that precisely, it should warn more generically that the resulting disclosure boundary may be broader than the patient-facing site or clinic label suggests.
+If the Issuer can determine that a selected facility or organization is served through a broader shared Data Holder, it should say so explicitly. If it cannot determine that precisely, it should warn more generically that the resulting disclosure boundary may be broader than the patient-facing site or clinic label suggests. Future versions may explore optional ways to communicate finer disclosure-boundary hints, but this specification does not define them.
 
 </div>
 
@@ -423,9 +456,6 @@ If the Issuer can determine that a selected facility or organization is served t
 * A Data Holder may answer if it matches the named organization or is authorized to answer on that organization's behalf.
 * This filter is endpoint-agnostic. If a Data Holder operates multiple technical endpoints, a single organization filter authorizes access through any endpoint by which that organization is authorized to answer and that supports the Permission Ticket grant type.
 * Data Holders that manage integrated records across multiple facilities evaluate this filter at the Data Holder level, not as a resource-by-resource clinical data filter.
-
-> **Open Question (OQ-4): Sub-Endpoint Filtering.** Many health systems operate a single FHIR endpoint that serves data from multiple hospitals, clinics, and care settings — including specialized sites (e.g., behavioral health, reproductive health) that a patient may want to exclude from sharing. Because data within a single endpoint is often not attributed to individual facilities, a patient who deselects a specific site in a consent UI may not get the expected result if that site shares a FHIR endpoint with other facilities. This specification currently operates at the Data Holder level and does not require sub-Data-Holder or sub-endpoint filtering. The working group is seeking input on whether future versions should define a mechanism for finer-grained data attribution. Some existing infrastructure (for example, FHIR Organization references on clinical resources or Provenance records) may help in isolated deployments, but these signals are not uniformly, reliably, or commonly populated enough to serve as the basis of the overall design today.
-{: .callout .callout-open-question #oq-4}
 
 #### Token-Time and Resource-Time Enforcement
 
@@ -530,10 +560,31 @@ R5 explicitly added the legal authority codes to the RelatedPerson relationship 
 "requester": {
   "resourceType": "RelatedPerson",
   "relationship": [
-    { "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "code": "DAU" }] },
-    { "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "code": "HPOWATT" }] }
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+          "code": "DAU"
+        }
+      ]
+    },
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+          "code": "HPOWATT"
+        }
+      ]
+    }
   ],
-  "name": [{ "family": "Reyes", "given": ["Elena"] }]
+  "name": [
+    {
+      "family": "Reyes",
+      "given": [
+        "Elena"
+      ]
+    }
+  ]
 }
 ```
 
@@ -665,8 +716,8 @@ The issuer mints a ticket with extended validity (weeks to months) and supports 
 - Access may need to be terminated before natural expiration
 - The cost of re-issuance (user time, verification fees) is prohibitive
 
-> **Open Question (OQ-5): Tickets as Refresh Credentials.** For long-lived access, a promising pattern may eliminate dedicated refresh tokens entirely. A long-lived revocable ticket with presenter binding serves as the refresh credential: the client re-presents the ticket whenever it needs a fresh short-lived access token. The Data Holder validates the ticket (including a revocation check against the status list) and issues a new access token without maintaining dedicated refresh-token state. This provides single-point revocation — one bit flip in the issuer's status list terminates access everywhere — and can avoid per-session refresh-token state at the Data Holder. Open operational questions: revocation-check latency and status-list caching strategy. The working group is seeking input on whether this pattern should be developed into normative guidance.
-{: .callout .callout-open-question #oq-5}
+> **Open Question (OQ-4): Tickets as Refresh Credentials.** For long-lived access, a promising pattern may eliminate dedicated refresh tokens entirely. A long-lived revocable ticket with presenter binding serves as the refresh credential: the client re-presents the ticket whenever it needs a fresh short-lived access token. The Data Holder validates the ticket (including a revocation check against the status list) and issues a new access token without maintaining dedicated refresh-token state. This provides single-point revocation — one bit flip in the issuer's status list terminates access everywhere — and can avoid per-session refresh-token state at the Data Holder. Open operational questions: revocation-check latency and status-list caching strategy. The working group is seeking input on whether this pattern should be developed into normative guidance.
+{: .callout .callout-open-question #oq-4}
 
 #### Revocation
 
