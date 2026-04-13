@@ -3,9 +3,9 @@ output/
 temp/
 template/
 txCache/
-input-cache/
 publisher.jar
 fhir-ig-publisher.jar
+fsh-generated/
 
 # Node modules
 node_modules/

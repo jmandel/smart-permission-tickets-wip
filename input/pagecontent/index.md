@@ -836,7 +836,6 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 | Subject not resolvable | `invalid_grant` | "Unable to resolve ticket subject" |
 | Ambiguous subject match | `invalid_grant` | "Ambiguous ticket subject match" |
 | Ticket revoked | `invalid_grant` | "Ticket has been revoked" |
-| Revocable ticket missing `jti` | `invalid_grant` | "Revocable ticket missing jti" |
 | Unsupported constraint | `invalid_grant` | "Unsupported access constraint: {field}" |
 | No valid scopes after intersection | `invalid_scope` | "No authorized scopes" |
 
@@ -875,13 +874,16 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Support trust framework audience validation
 - Use `subject.recipient_record` as a hint for faster patient resolution
 
+
+The OAuth `error` codes above are normative. The `error_description` values are representative examples; implementations may use different wording while conveying the same failure.
+
 #### Client Requirements
 
 **SHALL:**
 - Use `grant_type=urn:ietf:params:oauth:grant-type:token-exchange`
 - Include the Permission Ticket as `subject_token` with `subject_token_type=https://smarthealthit.org/token-type/permission-ticket`
-- Sign client assertion with registered or federated key
-- Use identical value for `iss` and `sub` in client assertion (the Client ID URL)
+- Authenticate to the token endpoint using a Data Holder-supported OAuth client-authentication mechanism
+- When using a JWT client assertion, use identical value for `iss` and `sub` in that assertion (the Client ID URL)
 
 For well-known clients, that Client ID URL is the deterministic identifier `well-known:{entity_uri}` rather than a Data Holder-assigned registration identifier.
 
@@ -889,9 +891,8 @@ For well-known clients, that Client ID URL is the deterministic identifier `well
 - Check `smart_permission_ticket_types_supported` in the Data Holder's `.well-known/smart-configuration` before presenting a ticket
 - Request only scopes authorized by held tickets
 - For single-patient ticket types, request SMART v2 CRUDS suffix scopes (for example `patient/Observation.rs`)
-- Include `jti` in client assertion for replay protection
+- When using a JWT client assertion, include `jti` in that assertion for replay protection
 - Refresh tickets before expiration for continued access
-
 #### Issuer Requirements
 
 **SHALL:**
