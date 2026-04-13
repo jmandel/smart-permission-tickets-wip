@@ -4,15 +4,35 @@
     "permissions": [
       {
         "kind": "data",
-        "resource_type": "Condition",
+        "resource_type": "Observation",
         "interactions": [
           "read",
           "search"
+        ],
+        "category_any_of": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "laboratory"
+          },
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs"
+          }
+        ],
+        "code_any_of": [
+          {
+            "system": "http://loinc.org",
+            "code": "718-7"
+          },
+          {
+            "system": "http://loinc.org",
+            "code": "4548-4"
+          }
         ]
       },
       {
         "kind": "data",
-        "resource_type": "Procedure",
+        "resource_type": "Condition",
         "interactions": [
           "read",
           "search"
@@ -23,7 +43,7 @@
       "start": "2023-01-01",
       "end": "2024-12-31"
     },
-    "responder_filter": [
+    "data_holder_filter": [
       {
         "kind": "jurisdiction",
         "address": {
@@ -45,10 +65,9 @@
           "identifier": [
             {
               "system": "http://hl7.org/fhir/sid/us-npi",
-              "value": "1234567890"
+              "value": "123"
             }
-          ],
-          "name": "General Hospital"
+          ]
         }
       }
     ],

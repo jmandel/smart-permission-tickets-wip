@@ -1,0 +1,180 @@
+:root {
+  --page: #f6f2ea;
+  --ink: #241c15;
+  --muted: #6f6257;
+  --code-bg: #fbf8f2;
+  --line: rgba(120, 100, 82, 0.2);
+  --envelope: #cc6b2c;
+  --binding: #2063b8;
+  --subject: #2c8a57;
+  --access: #8e3d52;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+}
+
+code, .json-code {
+  font-family: "Berkeley Mono", "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+}
+
+.page-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+/* -- Hero -- */
+.hero {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* -- Ticket code canvas -- */
+.ticket-view {
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px 0;
+  overflow-x: auto;
+}
+
+/* -- Section banners -- */
+.section-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 8px 0 2px;
+  padding: 8px 20px 8px 17px;
+  border-left: 3px solid transparent;
+  background: rgba(0, 0, 0, 0.025);
+}
+
+.section-banner:first-child {
+  margin-top: 0;
+}
+
+.section-banner--envelope { border-left-color: var(--envelope); }
+.section-banner--binding  { border-left-color: var(--binding); }
+.section-banner--subject  { border-left-color: var(--subject); }
+.section-banner--access   { border-left-color: var(--access); }
+
+.section-banner__title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.section-banner--envelope .section-banner__title { color: var(--envelope); }
+.section-banner--binding  .section-banner__title { color: var(--binding); }
+.section-banner--subject  .section-banner__title { color: var(--subject); }
+.section-banner--access   .section-banner__title { color: var(--access); }
+
+.section-banner__body {
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* -- JSON rows -- */
+.json-row {
+  padding: 0 20px 0 20px;
+  min-height: 1.7em;
+}
+
+.json-row--envelope,
+.json-row--binding,
+.json-row--subject,
+.json-row--access {
+  border-left: 3px solid transparent;
+  padding-left: 17px;
+}
+
+.json-row--envelope { border-left-color: var(--envelope); }
+.json-row--binding  { border-left-color: var(--binding); }
+.json-row--subject  { border-left-color: var(--subject); }
+.json-row--access   { border-left-color: var(--access); }
+
+/* -- Code element -- */
+.json-code {
+  white-space: pre;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+/* -- Comment-style hints (above their line) -- */
+.json-hint-row {
+  min-height: auto;
+}
+
+.json-hint {
+  white-space: pre;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted);
+  font-family: "Berkeley Mono", "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+}
+
+/* Syntax colors */
+.json-indent,
+.json-punct  { color: #8a7e72; }
+.json-key    { color: #6844b8; }
+.json-string { color: #b5440a; }
+.json-number { color: #1860b8; }
+.json-boolean,
+.json-null   { color: #258050; }
+
+/* -- Error -- */
+.error-card {
+  margin: 16px 20px;
+  padding: 14px 16px;
+  border-radius: 6px;
+  background: #fff7f4;
+  border: 1px solid rgba(180, 80, 50, 0.25);
+}
+
+.error-card h2 { margin: 0 0 6px; font-size: 1rem; }
+.error-card p   { margin: 0; }
+
+/* -- Responsive -- */
+@media (max-width: 700px) {
+  .json-row { padding: 0 12px 0 12px; }
+  .json-row--envelope,
+  .json-row--binding,
+  .json-row--subject,
+  .json-row--access { padding-left: 9px; }
+  .section-banner { padding-left: 9px; }
+}

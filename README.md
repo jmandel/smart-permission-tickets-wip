@@ -45,12 +45,12 @@ The signed payload has a small, fixed shape:
 +---------------------------------------------------------------+
 | access:        permissions[] (DataPermission | Operation)     |  what and how much
 |                data_period?                                   |
-|                responder_filter?                              |
+|                data_holder_filter?                            |
 |                sensitive_data?                                |
 +---------------------------------------------------------------+
 | context?       ticket-type-specific workflow facts            |  why
 +---------------------------------------------------------------+
-| presenter_binding?   jkt | framework_client                   |  who may redeem
+| presenter_binding?   jkt | trust_framework_client             |  who may redeem
 | revocation?          { url, index }                           |  status pointer
 | must_understand?     [ extension claim names ]                |  fail-closed gate
 +---------------------------------------------------------------+
@@ -67,7 +67,7 @@ The payload separates concerns deliberately. A small **portable kernel** carries
 - **Token exchange transport ([RFC 8693](https://www.rfc-editor.org/rfc/rfc8693)), not a custom redemption endpoint.** The ticket rides as a `subject_token` under `grant_type=urn:ietf:params:oauth:grant-type:token-exchange` with `subject_token_type=https://smarthealthit.org/token-type/permission-ticket`. Client authentication is a separate `client_assertion` (standard SMART Backend Services, [RFC 7523](https://www.rfc-editor.org/rfc/rfc7523)), so authorization (the ticket) and authentication (the assertion) stay cleanly separated. A Data Holder that does not implement the spec rejects with `unsupported_grant_type` rather than silently ignoring the ticket.
 - **Portable kernel, not per-holder vocabularies.** Every ticket is built from the same fixed kernel; only the optional `context` varies by `ticket_type`. Issuers do not learn each Data Holder's local schema, and Data Holders do not learn each issuer's bespoke ticket shape. Profile extensions live as new top-level claims, never as mutations of kernel structures.
 - **Discovery via SMART configuration.** Data Holders advertise support by including the token-exchange grant in `grant_types_supported` and listing accepted ticket-type URIs in `smart_permission_ticket_types_supported` in `.well-known/smart-configuration`. Clients consult this list before presenting a ticket; unknown `ticket_type` values are rejected with `invalid_grant`.
-- **Optional, layered presenter binding.** A `presenter_binding` claim binds redemption to a specific client either by `method = "jkt"` (JWK Thumbprint, [RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) or by `method = "framework_client"` (a UDAP or well-known framework entity). When `presenter_binding` is absent, `aud` plus standard client authentication is the trust boundary. Binding is a constraint **on top of** client authentication, never a substitute.
+- **Optional, layered presenter binding.** A `presenter_binding` claim binds redemption to a specific client either by `method = "jkt"` (JWK Thumbprint, [RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) or by `method = "trust_framework_client"` (a UDAP, OIDF, or well-known trust-framework entity). When `presenter_binding` is absent, `aud` plus standard client authentication is the trust boundary. Binding is a constraint **on top of** client authentication, never a substitute.
 - **Issuer attests, recipient enforces.** `requester`, `context`, and the legal basis for access are issuer attestations: the Data Holder consumes them for local policy and audit but does not re-verify the requester's identity, delegation relationship, consent, or contract. The recipient's job is resolving the subject, validating the cryptographic envelope, intersecting access, and enforcing the constraints it was given.
 - **Must-understand extensibility, fail-closed.** Every kernel field present in a ticket is must-understand: a recipient that cannot enforce one rejects with `invalid_grant`. Profile extensions are new top-level claims; an issuer that requires recognition lists the claim name in `must_understand`, and unaware recipients reject rather than silently ignore. Inspired by JWS `crit` ([RFC 7515 §4.1.11](https://www.rfc-editor.org/rfc/rfc7515)), applied to payload claims.
 - **Seven use-case ticket types, not a universal schema.** Patient Self Access, Patient-Delegated Access, Public Health Investigation, Social Care (CBO) Referral, Payer Claims Adjudication, Research Study, and Provider-to-Provider Consult, registered in [scripts/use_case_catalog.ts](scripts/use_case_catalog.ts). Each use case maps to exactly one `ticket_type` URI that selects its context schema and processing rules.
@@ -78,7 +78,6 @@ The payload separates concerns deliberately. A small **portable kernel** carries
 input/
   pagecontent/index.md          Normative specification prose (the spec)
   pagecontent/downloads.md      Downloads page surfaced in the IG
-  fsh/PermissionTicket.fsh      FSH logical model for the JWT payload
   examples/                     Signed example tickets surfaced in the IG
   includes/generated/           Snippets and signed JWT artifacts the prose embeds
 scripts/
@@ -94,24 +93,24 @@ _genonce.sh                     One-shot SUSHI + IG Publisher build script
 _updatePublisher.sh             Downloads the IG Publisher jar on demand
 ```
 
-The canonical TypeScript and Zod definitions consumed by both the spec scripts and the reference implementation live in [reference-implementation/shared/permission-ticket-schema.ts](reference-implementation/shared/permission-ticket-schema.ts) — a single source of truth so the published spec, the example generator, and the runtime validator cannot drift.
+The canonical Zod schema for the specification lives in [scripts/permission-ticket-schema.ts](scripts/permission-ticket-schema.ts). A compact, human-readable TypeScript view of the same model lives beside it in [scripts/permission-ticket-types.ts](scripts/permission-ticket-types.ts). The sync script copies that TypeScript file into the IG include path and regenerates the JSON Schemas, snippet includes, and signed example tickets.
 
 ## Building the IG
 
-Prerequisites: Node.js, Java 17 (for the IG Publisher), [SUSHI](https://fshschool.org/docs/sushi/) (`fsh-sushi`, installed by `npm install` at the root), and Ruby 3.3 with `jekyll` (for the IG template). The build script downloads the IG Publisher jar on first run.
+Prerequisites: Bun (for all local scripts and dependency installs), Java 17 (for the IG Publisher), [SUSHI](https://fshschool.org/docs/sushi/) (`fsh-sushi`, installed by `bun install` at the root), and Ruby 3.3 with `jekyll` (for the IG template). The build script downloads the IG Publisher jar on first run.
 
 ```bash
 # Install spec dependencies (fsh-sushi, zod)
-npm install
+bun install
 
 # Install the helpers under scripts/ (snippet sync, example signing)
-npm --prefix scripts install
+(cd scripts && bun install)
 
 # Regenerate snippets, run SUSHI, and run the IG Publisher in one shot
 ./_genonce.sh
 ```
 
-`./_genonce.sh` runs `npm --prefix scripts run sync-spec-snippets` — which regenerates the JSON snippets embedded in the prose from the canonical TypeScript/Zod schema and re-signs the example tickets — then `sushi .`, then `./_updatePublisher.sh` (which fetches `input-cache/publisher.jar` if missing), and finally `java -jar input-cache/publisher.jar -ig .`. The rendered IG is written to `output/`.
+`./_genonce.sh` runs `(cd scripts && bun run sync-spec-snippets)` to regenerate the prose snippets, JSON Schemas, and copied TypeScript include file, then `(cd scripts && bun run generate)` to re-sign the example tickets and refresh their published includes, then `sushi .`, then `./_updatePublisher.sh` (which fetches `input-cache/publisher.jar` if missing), and finally `java -jar input-cache/publisher.jar -ig .`. The rendered IG is written to `output/`.
 
 Continuous build preview: **<https://build.fhir.org/ig/jmandel/smart-permission-tickets-wip/>**.
 
@@ -120,12 +119,13 @@ CI mirrors this pipeline: [`.github/workflows/build-and-deploy.yml`](.github/wor
 ## Where the spec lives
 
 - Normative prose: [input/pagecontent/index.md](input/pagecontent/index.md).
-- Logical model for the JWT payload: [input/fsh/PermissionTicket.fsh](input/fsh/PermissionTicket.fsh).
-- Canonical Zod schema and ticket-type URI registry: [reference-implementation/shared/permission-ticket-schema.ts](reference-implementation/shared/permission-ticket-schema.ts).
+- Canonical Zod schema: [scripts/permission-ticket-schema.ts](scripts/permission-ticket-schema.ts).
+- Hand-authored TypeScript definitions: [scripts/permission-ticket-types.ts](scripts/permission-ticket-types.ts).
+- IG-published TypeScript include: [input/includes/generated/typescript/permission-ticket-types.ts](input/includes/generated/typescript/permission-ticket-types.ts).
 - Use-case catalog: [scripts/use_case_catalog.ts](scripts/use_case_catalog.ts).
 - IG configuration (id, canonical URL, version, FHIR version, status): [sushi-config.yaml](sushi-config.yaml).
 
-The canonical URL of the IG is `http://smarthealthit.org/ig/permission-tickets` (from [sushi-config.yaml](sushi-config.yaml)). The logical model renders as `StructureDefinition-PermissionTicket.html` in the rendered IG.
+The canonical URL of the IG is `http://smarthealthit.org/ig/permission-tickets` (from [sushi-config.yaml](sushi-config.yaml)).
 
 ## Status
 

@@ -8,7 +8,6 @@
         "skipLibCheck": true
     },
     "include": [
-        "./**/*.ts",
-        "../reference-implementation/shared/**/*.ts"
+        "./**/*.ts"
     ]
 }

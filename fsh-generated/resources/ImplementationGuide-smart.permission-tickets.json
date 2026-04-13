@@ -16,8 +16,8 @@
         "reference": {
           "reference": "StructureDefinition/PermissionTicket"
         },
-        "name": "Permission Ticket (JWT Payload)",
-        "description": "Portable kernel of a Permission Ticket. Includes the JWT security envelope, subject identification, optional requester, access grant semantics, ticket-type-specific context, optional presenter binding, optional revocation, and optional must-understand extensibility.",
+        "name": "Permission Ticket (Non-Normative Logical Model)",
+        "description": "Non-normative, best-effort logical model placeholder. The normative wire model is defined by the specification prose and canonical Zod schema. This logical model is intentionally minimal and will only be populated after the specification stabilizes, to avoid drift across multiple sources of truth.",
         "exampleBoolean": false
       }
     ],
@@ -29,6 +29,21 @@
         {
           "nameUrl": "index.html",
           "title": "Permission Ticket Architecture",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "use-case-catalog.html",
+          "title": "Use Case Catalog",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "oidf-issuers.html",
+          "title": "OpenID Federation Issuers",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "typescript-definitions.html",
+          "title": "TypeScript Definitions",
           "generation": "markdown"
         },
         {

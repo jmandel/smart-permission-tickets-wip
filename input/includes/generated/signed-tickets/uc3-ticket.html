@@ -17,12 +17,12 @@
             style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
   "iss": "https://issuer.state.example.gov",
   "aud": "https://network.org",
-  "exp": 1775576085,
+  "exp": 1775957430,
   "jti": "uc3-16ff62cf-2d2d-4b30-8c86-6a13d7ab7d16",
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1",
   "presenter_binding": {
-    "method": "framework_client",
-    "framework": "https://state.example.gov/trust-framework/public-health",
+    "method": "trust_framework_client",
+    "trust_framework": "https://state.example.gov/trust-framework/public-health",
     "framework_type": "udap",
     "entity_uri": "https://state.example.gov/organizations/epi-unit"
   },
@@ -87,7 +87,7 @@
       "start": "2025-12-01",
       "end": "2026-06-01"
     },
-    "responder_filter": [
+    "data_holder_filter": [
       {
         "kind": "jurisdiction",
         "address": {
@@ -109,13 +109,13 @@
       ]
     }
   },
-  "iat": 1775572485
+  "iat": 1775953830
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2lzc3Vlci5zdGF0ZS5leGFtcGxlLmdvdiIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3NzU1NzYwODUsImp0aSI6InVjMy0xNmZmNjJjZi0yZDJkLTRiMzAtOGM4Ni02YTEzZDdhYjdkMTYiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wdWJsaWMtaGVhbHRoLWludmVzdGlnYXRpb24tdjEiLCJwcmVzZW50ZXJfYmluZGluZyI6eyJtZXRob2QiOiJmcmFtZXdvcmtfY2xpZW50IiwiZnJhbWV3b3JrIjoiaHR0cHM6Ly9zdGF0ZS5leGFtcGxlLmdvdi90cnVzdC1mcmFtZXdvcmsvcHVibGljLWhlYWx0aCIsImZyYW1ld29ya190eXBlIjoidWRhcCIsImVudGl0eV91cmkiOiJodHRwczovL3N0YXRlLmV4YW1wbGUuZ292L29yZ2FuaXphdGlvbnMvZXBpLXVuaXQifSwic3ViamVjdCI6eyJwYXRpZW50Ijp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaG9zcGl0YWwuZXhhbXBsZS5vcmcvbXJuIiwidmFsdWUiOiJNNDQ1NTY2In1dLCJiaXJ0aERhdGUiOiIxOTc4LTAyLTIxIiwibmFtZSI6W3siZmFtaWx5IjoiQ2FydGVyIiwiZ2l2ZW4iOlsiTW9uaWNhIl19XX19LCJyZXF1ZXN0ZXIiOnsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoidXJuOmlldGY6cmZjOjM5ODYiLCJ2YWx1ZSI6Imh0dHBzOi8vc3RhdGUuZXhhbXBsZS5nb3Yvb3JnYW5pemF0aW9ucy9lcGktdW5pdCJ9XSwibmFtZSI6IlN0YXRlIEVwaWRlbWlvbG9neSBVbml0In0sImFjY2VzcyI6eyJwZXJtaXNzaW9ucyI6W3sia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiQ29uZGl0aW9uIiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX0seyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJPYnNlcnZhdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiRGlhZ25vc3RpY1JlcG9ydCIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19XSwiZGF0YV9wZXJpb2QiOnsic3RhcnQiOiIyMDI1LTEyLTAxIiwiZW5kIjoiMjAyNi0wNi0wMSJ9LCJyZXNwb25kZXJfZmlsdGVyIjpbeyJraW5kIjoianVyaXNkaWN0aW9uIiwiYWRkcmVzcyI6eyJjb3VudHJ5IjoiVVMiLCJzdGF0ZSI6IlRYIn19XSwic2Vuc2l0aXZlX2RhdGEiOiJpbmNsdWRlIn0sImNvbnRleHQiOnsicmVwb3J0YWJsZV9jb25kaXRpb24iOnsiY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwOi8vc25vbWVkLmluZm8vc2N0IiwiY29kZSI6Ijg0MDUzOTAwNiIsImRpc3BsYXkiOiJEaXNlYXNlIGNhdXNlZCBieSBzZXZlcmUgYWN1dGUgcmVzcGlyYXRvcnkgc3luZHJvbWUgY29yb25hdmlydXMgMiAoZGlzb3JkZXIpIn1dfX0sImlhdCI6MTc3NTU3MjQ4NX0.XbZDti0VeGx5ynuvplCMgeNE4xUH1m7qPnZDz9ahoh992qpRLyWrzaG44CGWdyf9Rlh9-PhZGw87CkjttuTPnQ</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2lzc3Vlci5zdGF0ZS5leGFtcGxlLmdvdiIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3NzU5NTc0MzAsImp0aSI6InVjMy0xNmZmNjJjZi0yZDJkLTRiMzAtOGM4Ni02YTEzZDdhYjdkMTYiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wdWJsaWMtaGVhbHRoLWludmVzdGlnYXRpb24tdjEiLCJwcmVzZW50ZXJfYmluZGluZyI6eyJtZXRob2QiOiJ0cnVzdF9mcmFtZXdvcmtfY2xpZW50IiwidHJ1c3RfZnJhbWV3b3JrIjoiaHR0cHM6Ly9zdGF0ZS5leGFtcGxlLmdvdi90cnVzdC1mcmFtZXdvcmsvcHVibGljLWhlYWx0aCIsImZyYW1ld29ya190eXBlIjoidWRhcCIsImVudGl0eV91cmkiOiJodHRwczovL3N0YXRlLmV4YW1wbGUuZ292L29yZ2FuaXphdGlvbnMvZXBpLXVuaXQifSwic3ViamVjdCI6eyJwYXRpZW50Ijp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaG9zcGl0YWwuZXhhbXBsZS5vcmcvbXJuIiwidmFsdWUiOiJNNDQ1NTY2In1dLCJiaXJ0aERhdGUiOiIxOTc4LTAyLTIxIiwibmFtZSI6W3siZmFtaWx5IjoiQ2FydGVyIiwiZ2l2ZW4iOlsiTW9uaWNhIl19XX19LCJyZXF1ZXN0ZXIiOnsicmVzb3VyY2VUeXBlIjoiT3JnYW5pemF0aW9uIiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoidXJuOmlldGY6cmZjOjM5ODYiLCJ2YWx1ZSI6Imh0dHBzOi8vc3RhdGUuZXhhbXBsZS5nb3Yvb3JnYW5pemF0aW9ucy9lcGktdW5pdCJ9XSwibmFtZSI6IlN0YXRlIEVwaWRlbWlvbG9neSBVbml0In0sImFjY2VzcyI6eyJwZXJtaXNzaW9ucyI6W3sia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiQ29uZGl0aW9uIiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX0seyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJPYnNlcnZhdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiRGlhZ25vc3RpY1JlcG9ydCIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19XSwiZGF0YV9wZXJpb2QiOnsic3RhcnQiOiIyMDI1LTEyLTAxIiwiZW5kIjoiMjAyNi0wNi0wMSJ9LCJkYXRhX2hvbGRlcl9maWx0ZXIiOlt7ImtpbmQiOiJqdXJpc2RpY3Rpb24iLCJhZGRyZXNzIjp7ImNvdW50cnkiOiJVUyIsInN0YXRlIjoiVFgifX1dLCJzZW5zaXRpdmVfZGF0YSI6ImluY2x1ZGUifSwiY29udGV4dCI6eyJyZXBvcnRhYmxlX2NvbmRpdGlvbiI6eyJjb2RpbmciOlt7InN5c3RlbSI6Imh0dHA6Ly9zbm9tZWQuaW5mby9zY3QiLCJjb2RlIjoiODQwNTM5MDA2IiwiZGlzcGxheSI6IkRpc2Vhc2UgY2F1c2VkIGJ5IHNldmVyZSBhY3V0ZSByZXNwaXJhdG9yeSBzeW5kcm9tZSBjb3JvbmF2aXJ1cyAyIChkaXNvcmRlcikifV19fSwiaWF0IjoxNzc1OTUzODMwfQ.M_viuaqcGdIVyRfrdXaWZ6-HIFkDMEKStxbXJoz_is1CJwHKmLwbwzrGUemAqxRk99ryTjQwl5RLJVarS-GpaQ</code></pre>
         </details>
     </div>
 </div>

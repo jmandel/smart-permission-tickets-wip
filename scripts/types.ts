@@ -1,1 +1,1 @@
-export * from "../reference-implementation/shared/permission-ticket-schema";
+export * from "./permission-ticket-schema";

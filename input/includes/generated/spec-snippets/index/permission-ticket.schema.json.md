@@ -25,6 +25,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -64,9 +71,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -85,7 +92,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -446,7 +453,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -609,6 +616,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -648,9 +662,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -669,7 +683,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -1142,7 +1156,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -1306,6 +1320,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -1345,9 +1366,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -1366,7 +1387,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -1782,7 +1803,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -1978,6 +1999,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -2017,9 +2045,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -2038,7 +2066,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -2454,7 +2482,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -2716,6 +2744,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -2755,9 +2790,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -2776,7 +2811,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -3192,7 +3227,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -3454,6 +3489,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -3493,9 +3535,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -3514,7 +3556,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -3930,7 +3972,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {
@@ -4162,6 +4204,13 @@
             }
           ]
         },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
         "exp": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -4201,9 +4250,9 @@
               "properties": {
                 "method": {
                   "type": "string",
-                  "const": "framework_client"
+                  "const": "trust_framework_client"
                 },
-                "framework": {
+                "trust_framework": {
                   "type": "string",
                   "minLength": 1
                 },
@@ -4222,7 +4271,7 @@
               },
               "required": [
                 "method",
-                "framework",
+                "trust_framework",
                 "framework_type",
                 "entity_uri"
               ],
@@ -4665,7 +4714,7 @@
               },
               "additionalProperties": {}
             },
-            "responder_filter": {
+            "data_holder_filter": {
               "minItems": 1,
               "type": "array",
               "items": {

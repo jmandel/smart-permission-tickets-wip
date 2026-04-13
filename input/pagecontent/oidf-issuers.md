@@ -1,5 +1,3 @@
-# OpenID Federation for Permission Ticket Issuers
-
 This page details how `PermissionTicket` issuers participate in [OpenID Federation 1.0](https://openid.net/specs/openid-federation-1_0.html) to publish their ticket-signing keys, and how Data Holders consume that publication when verifying tickets. It builds on the issuer key publication requirements in the [main specification](index.html#issuer-key-publication).
 
 ## Issuer Leaf Entity Configuration
