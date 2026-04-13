@@ -11,7 +11,16 @@
     "4.0.1"
   ],
   "definition": {
-    "resource": [],
+    "resource": [
+      {
+        "reference": {
+          "reference": "StructureDefinition/PermissionTicket"
+        },
+        "name": "Permission Ticket (Non-Normative Logical Model)",
+        "description": "Non-normative, best-effort logical model placeholder. The normative wire model is defined by the specification prose and canonical Zod schema. This logical model is intentionally minimal and will only be populated after the specification stabilizes, to avoid drift across multiple sources of truth.",
+        "exampleBoolean": false
+      }
+    ],
     "page": {
       "nameUrl": "toc.html",
       "title": "Table of Contents",

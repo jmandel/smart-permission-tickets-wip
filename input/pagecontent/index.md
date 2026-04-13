@@ -30,8 +30,8 @@ When present, `presenter_binding` cryptographically binds the ticket to the pres
 - A universal schema for all possible use cases (ticket types define use-case-specific constraints)
 - Constraints on downstream data use, retention, or re-disclosure by the client after data has been received; these are governed by the trust framework under which the client operates and applicable law
 
-> **Open Question (OQ-2): Consent Beyond Ticket Fields.** What concrete use cases would require a FHIR Consent reference that the current ticket fields cannot express? The ticket's explicit fields — `access.permissions`, `data_period`, `data_holder_filter`, `sensitive_data` — already model a substantial portion of what patients and authorizing parties want to express about data sharing. If specific scenarios surface where these fields are insufficient, the specification would need a mechanism to embed or reference a FHIR Consent resource within the ticket. The working group is seeking concrete scenarios rather than theoretical ones.
-{: .callout .callout-open-question #oq-2}
+> **Open Question (OQ-1): Consent Beyond Ticket Fields.** What concrete use cases would require a FHIR Consent reference that the current ticket fields cannot express? The ticket's explicit fields — `access.permissions`, `data_period`, `data_holder_filter`, `sensitive_data` — already model a substantial portion of what patients and authorizing parties want to express about data sharing. If specific scenarios surface where these fields are insufficient, the specification would need a mechanism to embed or reference a FHIR Consent resource within the ticket. The working group is seeking concrete scenarios rather than theoretical ones.
+{: .callout .callout-open-question #oq-1}
 
 ### Terms and Roles
 
@@ -297,7 +297,8 @@ For example, a permission `{ kind: "data", resource_type: "Observation", interac
 
 `OperationPermission` rules (e.g., `$everything`, `$export`) do not have a direct SMART scope equivalent; Data Holders should map these to appropriate local operation-level authorization.
 
-> **Open Question (OQ-5): Ticket-Level Scope Mode for Future Non-Patient Subjects.** The current base kernel always includes `subject.patient`, so current tickets naturally project to patient-level semantics even when redeemed by backend clients. If future use cases introduce a different subject shape (for example, `Group`) or no subject at all, the working group may need an explicit ticket-level scope mode (for example, `patient` vs `system`) or a profile rule that changes SMART scope projection. This question is only relevant if future use cases require non-individual or subjectless tickets.
+> **Open Question (OQ-2): Ticket-Level Scope Mode for Future Non-Patient Subjects.** The current base kernel always includes `subject.patient`, so current tickets naturally project to patient-level semantics even when redeemed by backend clients. If future use cases introduce a different subject shape (for example, `Group`) or no subject at all, the working group may need an explicit ticket-level scope mode (for example, `patient` vs `system`) or a profile rule that changes SMART scope projection. This question is only relevant if future use cases require non-individual or subjectless tickets.
+{: .callout .callout-open-question #oq-2}
 
 #### Access Constraints
 
@@ -380,8 +381,8 @@ Data Holders that cannot enforce a presented constraint SHALL reject the ticket 
 * If `sensitive_data` is absent, Data Holders apply their own default policy.
 * If classification is unknown and the ticket says `"exclude"`, Data Holders should default conservatively.
 
-> **Open Question (OQ-1): Sensitive Data Granularity.** The current two-value model (`"exclude"` / `"include"`) is intentionally coarse. Real-world patient preferences often involve specific categories — for example, sharing general medical data but excluding substance use treatment records, reproductive health history, or behavioral health records. Future versions of this specification may define a richer vocabulary of sensitive-data categories. The working group is seeking feedback on whether a categorical model is operationalizable given the current state of data tagging in production systems, and whether a middle ground exists between a single boolean and a full sensitivity taxonomy.
-{: .callout .callout-open-question #oq-1}
+> **Open Question (OQ-3): Sensitive Data Granularity.** The current two-value model (`"exclude"` / `"include"`) is intentionally coarse. Real-world patient preferences often involve specific categories — for example, sharing general medical data but excluding substance use treatment records, reproductive health history, or behavioral health records. Future versions of this specification may define a richer vocabulary of sensitive-data categories. The working group is seeking feedback on whether a categorical model is operationalizable given the current state of data tagging in production systems, and whether a middle ground exists between a single boolean and a full sensitivity taxonomy.
+{: .callout .callout-open-question #oq-3}
 
 #### Data Holder Filters
 
@@ -664,8 +665,8 @@ The issuer mints a ticket with extended validity (weeks to months) and supports 
 - Access may need to be terminated before natural expiration
 - The cost of re-issuance (user time, verification fees) is prohibitive
 
-> **Open Question (OQ-3): Tickets as Refresh Credentials.** For long-lived access, a promising pattern may eliminate dedicated refresh tokens entirely. A long-lived revocable ticket with presenter binding serves as the refresh credential: the client re-presents the ticket whenever it needs a fresh short-lived access token. The Data Holder validates the ticket (including a revocation check against the status list) and issues a new access token without maintaining dedicated refresh-token state. This provides single-point revocation — one bit flip in the issuer's status list terminates access everywhere — and can avoid per-session refresh-token state at the Data Holder. Open operational questions: revocation-check latency and status-list caching strategy. The working group is seeking input on whether this pattern should be developed into normative guidance.
-{: .callout .callout-open-question #oq-3}
+> **Open Question (OQ-5): Tickets as Refresh Credentials.** For long-lived access, a promising pattern may eliminate dedicated refresh tokens entirely. A long-lived revocable ticket with presenter binding serves as the refresh credential: the client re-presents the ticket whenever it needs a fresh short-lived access token. The Data Holder validates the ticket (including a revocation check against the status list) and issues a new access token without maintaining dedicated refresh-token state. This provides single-point revocation — one bit flip in the issuer's status list terminates access everywhere — and can avoid per-session refresh-token state at the Data Holder. Open operational questions: revocation-check latency and status-list caching strategy. The working group is seeking input on whether this pattern should be developed into normative guidance.
+{: .callout .callout-open-question #oq-5}
 
 #### Revocation
 
