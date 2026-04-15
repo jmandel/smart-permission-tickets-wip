@@ -19,11 +19,15 @@ pages:
     title: TypeScript Definitions
   downloads.md:
     title: Downloads
+  proposal-001-authz-code-fallback.md:
+    title: "Proposal 001: Authz Code Fallback"
 
 menu:
   IG Home: index.html
   Use Case Catalog: use-case-catalog.html
   OpenID Federation: oidf-issuers.html
   TypeScript Definitions: typescript-definitions.html
+  Proposals:
+    "001: Authz Code Fallback": proposal-001-authz-code-fallback.html
   Downloads: downloads.html
   Artifacts: artifacts.html
