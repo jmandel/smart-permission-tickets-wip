@@ -804,7 +804,7 @@ Every Permission Ticket issuer SHALL publish its verification keys as a JWK Set 
 
 Issuers that participate in a trust framework MAY additionally publish through that framework's native discovery format. The Data Holder MAY use the baseline JWKS path, a framework-native mechanism, or both, according to its own configured trust policy.
 
-*   **OpenID Federation** — the issuer publishes its leaf entity configuration at `${iss}/.well-known/openid-federation`. See [OpenID Federation for Permission Ticket Issuers](oidf-issuers.html) for the metadata layout, the structural binding between `iss` and the OIDF leaf entity ID, the federation-signing vs ticket-signing key separation, and the verifier pipeline.
+*   **OpenID Federation** — the issuer publishes its leaf entity configuration at `${iss}/.well-known/openid-federation`. See [OpenID Federation for Permission Ticket Issuers](proposal-002-oidf-issuers.html) for the metadata layout, the structural binding between `iss` and the OIDF leaf entity ID, the federation-signing vs ticket-signing key separation, and the verifier pipeline.
 *   **UDAP** — discovery begins from `${iss}/.well-known/udap`.
 
 Implementations that publish the same issuer through multiple mechanisms SHOULD keep any shared `kid` values aligned across those publication surfaces. This is an interoperability recommendation, not a token-time validation requirement.

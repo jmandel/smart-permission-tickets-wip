@@ -13,21 +13,21 @@ pages:
     title: Permission Ticket Architecture
   use-case-catalog.md:
     title: Use Case Catalog
-  oidf-issuers.md:
-    title: OpenID Federation Issuers
   typescript-definitions.md:
     title: TypeScript Definitions
   downloads.md:
     title: Downloads
   proposal-001-authz-code-fallback.md:
     title: "Proposal 001: Authz Code Fallback"
+  proposal-002-oidf-issuers.md:
+    title: "Proposal 002: OpenID Federation Issuers"
 
 menu:
   IG Home: index.html
   Use Case Catalog: use-case-catalog.html
-  OpenID Federation: oidf-issuers.html
   TypeScript Definitions: typescript-definitions.html
   Proposals:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html
+    "002: OpenID Federation Issuers": proposal-002-oidf-issuers.html
   Downloads: downloads.html
   Artifacts: artifacts.html
