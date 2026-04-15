@@ -4,7 +4,7 @@
 
 ### Summary
 
-The current spec defines backend token exchange as the sole redemption path for permission tickets. This proposal adds an optional fallback where a Data Holder can signal that it needs direct patient interaction before issuing an access token, triggering a standard SMART App Launch flow. The fallback reuses existing SMART infrastructure entirely — no new client capabilities required. Backend token exchange remains the primary path; the fallback is an escape valve for edge cases, not an alternative default.
+The current spec defines backend token exchange as the sole redemption path for permission tickets. This proposal adds an optional fallback where a Data Holder can signal that it needs direct patient interaction before issuing an access token, triggering a standard SMART App Launch flow. The fallback leverages SMART App Launch's "EHR Launch" flow.
 
 ### Motivation
 
@@ -13,9 +13,9 @@ Permission tickets are designed so the patient authorizes once, with the issuer,
 However, there are cases where the information in the ticket is genuinely insufficient for the Data Holder to complete the request silently:
 
 - **Patient identity could not be resolved.** The ticket's `subject.patient` demographics do not match any local record, or match multiple candidates with insufficient confidence to select one. The patient needs to help the Data Holder identify the right record.
-- **Local record state requires patient involvement.** The Data Holder has information about the patient's local record that affects what can be released, but that information isn't available to the ticket issuer. For example, the patient may have previously placed a restriction on their record at this specific Data Holder, or there may be a safety-related flag (such as an active protective order) that requires the Data Holder to verify it is interacting with the actual patient before releasing location-bearing data.
+- **TODO: Other cases?**
 
-In both cases, the gap is between what the ticket carries and what the Data Holder needs to proceed. The ticket still carries the full authorization context; the interactive step fills a specific informational gap that only the patient (or the patient's local record) can resolve.
+The ticket still carries the full authorization context; the interactive step fills a specific informational gap that only the patient can resolve.
 
 Today, the Data Holder's only option in these cases is to reject the token exchange with `invalid_grant`, which gives the client no path forward. The patient's authorization intent (captured in the ticket) is lost.
 
@@ -86,9 +86,3 @@ For B2B ticket types (UC3–UC7), `interaction_required` SHOULD NOT be returned.
 
 *Relationship to presenter binding.* For UC1/UC2, `presenter_binding` is required. The ticket is cryptographically bound to the client's key regardless of whether redemption goes through token exchange or the SMART Launch fallback. The security properties hold in both paths.
 
-*Relationship to tickets-as-refresh-credentials (OQ-4).* If the group adopts the pattern where long-lived tickets replace refresh tokens, the interaction-caching behavior (item 5) becomes important. The Data Holder remembers it already resolved the local gap for this ticket, so subsequent re-presentations go through silently.
-
-### Open Questions
-
-> **Open Question (P001-OQ-1): Require `error_description`?** Should the spec require that the `interaction_required` response include an `error_description` explaining why interaction is needed (e.g., "Unable to resolve ticket subject to a unique local record"), or is the error code alone sufficient given that the Data Holder controls the interactive experience after the redirect?
-{: .callout .callout-open-question #p001-oq-1}
