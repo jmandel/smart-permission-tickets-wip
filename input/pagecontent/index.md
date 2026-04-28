@@ -716,7 +716,43 @@ The issuer mints a ticket with extended validity (weeks to months) and supports 
 - Access may need to be terminated before natural expiration
 - The cost of re-issuance (user time, verification fees) is prohibitive
 
-> **Open Question (OQ-4): Tickets as Refresh Credentials.** For long-lived access, a promising pattern may eliminate dedicated refresh tokens entirely. A long-lived revocable ticket with presenter binding serves as the refresh credential: the client re-presents the ticket whenever it needs a fresh short-lived access token. The Data Holder validates the ticket (including a revocation check against the status list) and issues a new access token without maintaining dedicated refresh-token state. This provides single-point revocation — one bit flip in the issuer's status list terminates access everywhere — and can avoid per-session refresh-token state at the Data Holder. Open operational questions: revocation-check latency and status-list caching strategy. The working group is seeking input on whether this pattern should be developed into normative guidance.
+> **Proposed Resolution (OQ-4): Tickets and Continuation Credentials.** Permission Tickets, access tokens, and refresh tokens play distinct roles. A Permission Ticket is the portable, issuer-signed authorization grant. A Data Holder access token is the short-lived local bearer token issued after successful ticket redemption. A Data Holder refresh token, if issued, is a local continuation credential derived from that accepted grant.
+>
+> The recommendations below are intended to preserve the following goals:
+>
+> - Preserve the meaning of ticket `exp`: expiration controls when the ticket can be used for new token exchange redemption.
+> - Preserve issuer intent: Data Holders do not create longer-lived access unless the ticket permits it.
+> - Keep derived credentials bounded: a local refresh token can narrow access but cannot broaden the effective grant.
+> - Keep the stateless path simple: re-presenting a valid, unrevoked, presenter-bound ticket remains the baseline way to obtain fresh short-lived access tokens.
+> - Allow Data Holder optimization: local refresh tokens remain available for rotation, replay detection, cached patient matching, and other local session-management needs.
+> - Keep revocation effective: long-lived continuation cannot bypass ticket revocation.
+> - Keep the protocol small: the ticket states continuation limits; it does not define a portable refresh-token format or a second authorization artifact.
+>
+> To support these goals, this specification defines an optional top-level `continuation` claim in the base Permission Ticket claims set. The claim bounds Data Holder-issued continuation credentials:
+>
+> ```json
+> {
+>   "exp": 1777478400,
+>   "jti": "ticket-123",
+>   "continuation": {
+>     "refresh_token": {
+>       "allowed": true,
+>       "not_after": 1780160400,
+>       "revocation_check": "required"
+>     }
+>   }
+> }
+> ```
+>
+> Draft requirements:
+>
+> - If `continuation` is absent, Data Holders SHALL NOT issue refresh tokens that remain usable after the ticket's `exp`.
+> - If `continuation.refresh_token.allowed` is `true`, a Data Holder MAY issue a refresh token derived from successful ticket redemption.
+> - A derived refresh token SHALL NOT authorize access broader than the effective grant computed from the ticket, requested scopes, client registration, and local policy.
+> - A derived refresh token SHALL NOT be honored after `continuation.refresh_token.not_after`.
+> - If `continuation.refresh_token.revocation_check` is `required`, the Data Holder SHALL check the source ticket's revocation status before honoring the derived refresh token.
+> - When a ticket permits derived refresh tokens beyond ticket `exp`, the ticket's revocation status remains authoritative for those derived refresh tokens until `continuation.refresh_token.not_after`.
+> - Issuers that permit continuation beyond `exp` SHALL maintain ticket revocation status until at least `continuation.refresh_token.not_after`.
 {: .callout .callout-open-question #oq-4}
 
 #### Revocation
