@@ -2,81 +2,123 @@
 
 **Status:** Draft for discussion | **Author:** Josh Mandel | **Date:** April 30, 2026
 
-### Summary
+### The Idea
 
-This proposal defines an app-issued ticket profile for patient self-access. It allows a trusted app to sign its own Permission Ticket after an IAL2 identity proofing event, while still supporting the pattern where a third-party identity/permission service signs the ticket and binds it to the app.
+An app should be able to generate a Permission Ticket that a network or Data Holder can trust.
 
-A Permission Ticket continues to carry a FHIR-normalized `subject.patient` for matching and audit, and adds `subject_identity_evidence` as the high-assurance evidence backing that subject claim.
+The app does not get this trust just by saying "trust me." It needs three things:
 
-The first supported evidence form is an embedded OIDC ID token:
+1. The network recognizes the app as an entity that is allowed to issue this kind of ticket.
+2. The app can show that the patient completed a high-assurance identity proofing event.
+3. The ticket is signed by the app and redeemed by that same app.
+
+This proposal shows how that works for patient self-access. The patient uses an app, completes an IAL2 identity proofing flow, and the app signs a Permission Ticket authorizing itself to request the patient's data across a network.
+
+### What The Ticket Proves
+
+For a Data Holder, the app-issued ticket answers five practical questions:
+
+| Question | Where the answer appears |
+|---|---|
+| Who signed this authorization? | `iss` and the ticket signature |
+| Which Data Holders or network is it for? | `aud` and `aud_type` |
+| Which patient is it about? | `subject.patient` |
+| What identity proofing backs that patient claim? | `subject_identity_evidence` |
+| Which app may redeem it? | the authenticated presenter, and optionally `presenter_binding` |
+
+For app-issued patient self-access, the app is both the ticket issuer and the presenter. That means `presenter_binding` can be omitted: the Data Holder requires the authenticated presenting client to be the same entity as `iss`.
+
+### Cast Of Characters
+
+In the main example:
+
+* **Dorothy** is the patient.
+* **Health Wallet App** is the app Dorothy chose.
+* **ID Proofing Provider** verifies Dorothy at IAL2 and issues an ID token.
+* **Health Wallet App** signs the Permission Ticket.
+* **Community Health Network** is the network named in the ticket audience.
+* **Hospital A** is a Data Holder in that network.
+
+The app is not asking Hospital A to trust an arbitrary self-declared patient. It is asking Hospital A to trust a signed Permission Ticket from a recognized app issuer, backed by a signed ID token from an identity provider.
+
+### End-To-End Walkthrough
+
+#### 1. Dorothy Chooses The App
+
+Dorothy opens Health Wallet App and asks it to gather her records from the Community Health Network.
+
+The app knows it is allowed to issue patient self-access tickets in that network. It has an entity identifier and signing keys that Data Holders can verify through the network's trust framework or local configuration.
+
+```text
+app entity: https://wallet.example.org
+ticket signing keys: published for https://wallet.example.org
+network audience: https://community-network.example.org
+```
+
+#### 2. Dorothy Completes Identity Proofing
+
+The app sends Dorothy through an IAL2 identity proofing flow.
+
+The identity provider returns an ID token to the app. The important point is that the ID token's audience identifies the app as the relying party:
+
+```text
+id_token.iss = https://idp.example.org
+id_token.aud = https://wallet.example.org
+id_token.acr = IAL2-equivalent assurance value
+```
+
+The ID token is not meant to be an access token for Hospital A. It is evidence that Dorothy proved her identity to the app.
+
+#### 3. The App Builds A FHIR Patient
+
+The app creates the ticket's `subject.patient` as a FHIR Patient fragment:
+
+```json
+{
+  "resourceType": "Patient",
+  "identifier": [
+    {
+      "system": "urn:oid:2.16.840.1.113883.4.1",
+      "value": "999-99-9999"
+    }
+  ],
+  "name": [
+    {
+      "family": "Reyes",
+      "given": ["Dorothy"]
+    }
+  ],
+  "birthDate": "1952-04-12"
+}
+```
+
+This FHIR representation remains important. It is what Data Holders use for patient matching and audit. It may be normalized or enriched by the app from verified identity claims or other trusted sources.
+
+#### 4. The App Embeds The Identity Evidence
+
+The app puts the ID token into `subject_identity_evidence`:
 
 ```json
 {
   "source": "embedded",
   "token_type": "id_token",
-  "jwt": "eyJhbGciOi..."
+  "jwt": "eyJhbGciOi...ID_TOKEN_FOR_WALLET_APP..."
 }
 ```
 
-The embedded ID token is verified independently by the Data Holder. It is not trusted merely because the Permission Ticket contains it.
+The embedded ID token backs the `subject.patient` claim. It does not replace `subject.patient`, and the Data Holder still verifies the ID token independently.
 
-### Problem
+#### 5. The App Signs The Permission Ticket
 
-Patient self-access needs two things at once:
-
-1. A FHIR-shaped patient representation that Data Holders can match against local records.
-2. Evidence that the ticket issuer actually identity-proofed the person represented by that FHIR `Patient`.
-
-The base `subject.patient` claim solves the first problem. It gives the Data Holder an interoperable FHIR object with names, identifiers, birth date, and other matchable facts. But `subject.patient` by itself is an issuer assertion. For IAL2-style use cases, the Data Holder also needs to know what identity proofing event backs that assertion.
-
-This proposal supplies that evidence without replacing `subject.patient` and without requiring an additional token-exchange parameter. It also defines how presenter binding works when the app itself is the Permission Ticket issuer.
-
-### Proposal
-
-For the UC1 patient self-access profile:
-
-* `subject.patient` remains required.
-* `requester` remains absent. The ticket type means the requester is the subject.
-* `subject_identity_evidence` is required.
-* `subject_identity_evidence.source` is `embedded`.
-* `subject_identity_evidence.token_type` is `id_token`.
-* `subject_identity_evidence.jwt` contains the compact serialized ID token.
-
-The ticket issuer is responsible for constructing the FHIR-normalized `subject.patient` from the identity event, issuer-side records, user-provided consent context, or other verified sources allowed by the profile. The Data Holder uses `subject.patient` as the primary matching input and uses the embedded ID token as evidence backing the subject claim.
-
-When the app is the ticket issuer, `presenter_binding` is omitted and the authenticated presenter must be the same entity as the Permission Ticket issuer. When a third-party service is the ticket issuer, the ticket uses `presenter_binding` to constrain redemption to the app.
-
-### Walkthrough
-
-Dorothy uses a consumer app to gather her records across a network.
-
-1. Dorothy completes an IAL2 identity proofing flow with an identity provider.
-2. The identity provider returns an ID token whose `aud` identifies the Permission Ticket issuer as the relying party.
-3. The ticket issuer builds a FHIR `Patient` representation for Dorothy.
-4. The ticket issuer embeds the ID token in `subject_identity_evidence`.
-5. The ticket issuer signs a Permission Ticket whose `aud` targets the Data Holder or network.
-6. The app presents the Permission Ticket to a Data Holder token endpoint using the existing Permission Ticket token-exchange flow.
-
-The ID token audience and the Permission Ticket audience intentionally differ:
-
-```text
-embedded_id_token.aud = Permission Ticket issuer
-permission_ticket.aud = Data Holder or network
-```
-
-The Data Holder is not accepting the ID token as an access token for itself. It is using the ID token as evidence that the trusted ticket issuer was the relying party for Dorothy's identity proofing event.
-
-### Ticket Shape
-
-The following decoded payload shows the app-issued pattern. The app is both the Permission Ticket issuer and the presenting client, so `presenter_binding` is omitted under this UC1 profile.
+The app signs a Permission Ticket. A decoded payload looks like this:
 
 ```json
 {
-  "iss": "https://app.example.org",
-  "aud": "https://network.example.org",
+  "iss": "https://wallet.example.org",
+  "aud": "https://community-network.example.org",
   "aud_type": "trust_framework",
   "exp": 1777584000,
-  "jti": "dorothy-self-access-001",
+  "jti": "dorothy-wallet-001",
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
   "subject": {
     "patient": {
@@ -99,7 +141,7 @@ The following decoded payload shows the app-issued pattern. The app is both the 
   "subject_identity_evidence": {
     "source": "embedded",
     "token_type": "id_token",
-    "jwt": "eyJhbGciOi...ID_TOKEN_FOR_APP..."
+    "jwt": "eyJhbGciOi...ID_TOKEN_FOR_WALLET_APP..."
   },
   "access": {
     "permissions": [
@@ -122,112 +164,89 @@ The following decoded payload shows the app-issued pattern. The app is both the 
 }
 ```
 
-### Issuer Patterns
+There is no `requester` because this is self-access. The patient described by `subject.patient` is the person requesting access.
 
-#### App-Issued Ticket
+There is no `presenter_binding` because the app is issuing the ticket for its own presentation. In this profile, absence of `presenter_binding` has a strict meaning: the client presenting the ticket must be the same entity as `iss`.
 
-In this pattern, the app is trusted as a Permission Ticket issuer and signs its own tickets.
+#### 6. The App Presents The Ticket
 
-```text
-embedded_id_token.aud = https://app.example.org
-permission_ticket.iss = https://app.example.org
-permission_ticket.aud = https://network.example.org
-permission_ticket.presenter_binding = absent
-authenticated presenter = https://app.example.org
+The app calls Hospital A's token endpoint using the normal Permission Ticket token exchange:
+
+```http
+POST /token HTTP/1.1
+Host: fhir.hospital-a.example.org
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+&subject_token=eyJhbGciOi...PERMISSION_TICKET...
+&subject_token_type=https://smarthealthit.org/token-type/permission-ticket
+&scope=patient/Observation.rs patient/MedicationRequest.rs
+&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+&client_assertion=eyJhbGciOi...CLIENT_ASSERTION_FROM_WALLET_APP...
 ```
 
-For this UC1 profile, absent `presenter_binding` does not mean any authenticated client may redeem the ticket. It means the authenticated presenter must be the Permission Ticket issuer.
+The Permission Ticket is the authorization grant. The `client_assertion` authenticates the app that is presenting it.
 
-#### Third-Party Ticket Issuer
+### What Hospital A Checks
 
-In this pattern, a trusted identity/permission service handles the identity proofing ceremony and signs the Permission Ticket for an app.
+Hospital A can evaluate the request without sending Dorothy through another login flow.
+
+It checks:
+
+1. The app's `client_assertion` authenticates as `https://wallet.example.org`.
+2. The Permission Ticket signature verifies under keys for `https://wallet.example.org`.
+3. The ticket `aud` covers Hospital A, either directly or through `https://community-network.example.org`.
+4. The ticket has not expired.
+5. The ticket type is patient self-access.
+6. Because `presenter_binding` is absent, the authenticated presenter must equal the ticket issuer.
+7. The embedded ID token signature verifies under the identity provider's keys.
+8. The embedded ID token says its relying party audience is `https://wallet.example.org`.
+9. The embedded ID token satisfies the profile's assurance and freshness requirements.
+10. `subject.patient` resolves to one local patient record.
+11. The requested scopes fit inside the ticket's `access` block.
+
+If those checks pass, Hospital A issues a scoped access token to the app.
+
+### Why The ID Token Audience Matters
+
+The embedded ID token must have been issued to the ticket issuer as the relying party:
 
 ```text
-embedded_id_token.aud = https://issuer.example.org
+id_token.aud = permission_ticket.iss
+```
+
+That rule is what links the identity proofing event to the entity that signed the ticket.
+
+If the ID token audience were an opaque value such as `abc123`, Hospital A would usually have no way to know whether `abc123` is really the same entity as `https://wallet.example.org`. A profile can allow a different audience identifier only when Hospital A can verify the mapping through public trust-framework metadata or local configuration.
+
+### When A Third Party Issues The Ticket
+
+Some apps will not sign their own tickets. Instead, an identity or permission service may run the identity proofing and sign the ticket for the app.
+
+That is still compatible with this model, but the roles change:
+
+```text
+id_token.aud = https://issuer.example.org
 permission_ticket.iss = https://issuer.example.org
-permission_ticket.aud = https://network.example.org
-permission_ticket.presenter_binding = app client key or app entity
-authenticated presenter = app
+authenticated presenter = https://wallet.example.org
+permission_ticket.presenter_binding = wallet app key or entity
 ```
 
-The third-party issuer is the relying party for the ID token. The app is only the presenter, so the ticket uses `presenter_binding` to constrain redemption to that app.
+Here the third-party service is the ticket issuer and the ID token relying party. The app is only the presenter, so the ticket needs explicit `presenter_binding` to make sure only that app can redeem it.
 
-The decoded ticket differs only in the issuer and binding claims:
+The key distinction is:
 
-```json
-{
-  "iss": "https://issuer.example.org",
-  "aud": "https://network.example.org",
-  "aud_type": "trust_framework",
-  "exp": 1777584000,
-  "jti": "dorothy-third-party-001",
-  "ticket_type": "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
-  "presenter_binding": {
-    "method": "jkt",
-    "jkt": "base64url-jwk-thumbprint-of-app-key"
-  },
-  "subject": {
-    "patient": {
-      "resourceType": "Patient",
-      "name": [
-        {
-          "family": "Reyes",
-          "given": ["Dorothy"]
-        }
-      ],
-      "birthDate": "1952-04-12"
-    }
-  },
-  "subject_identity_evidence": {
-    "source": "embedded",
-    "token_type": "id_token",
-    "jwt": "eyJhbGciOi...ID_TOKEN_FOR_ISSUER..."
-  },
-  "access": {
-    "permissions": [
-      {
-        "kind": "data",
-        "resource_type": "Observation",
-        "interactions": ["read", "search"]
-      }
-    ]
-  }
-}
-```
+| Pattern | Ticket issuer | ID token audience | Presenter rule |
+|---|---|---|---|
+| App-issued ticket | App | App | Presenter must equal ticket issuer |
+| Third-party-issued ticket | Service | Service | Presenter must match `presenter_binding` |
 
-### Audience Rule
+This proposal is mainly about the first row: making the app-issued pattern concrete enough that networks and Data Holders can evaluate it consistently.
 
-The embedded ID token's `aud` value MUST identify the Permission Ticket issuer as the relying party.
+### Notes For Implementers
 
-The most interoperable form is exact equality:
+App-issued tickets make the app a real trust participant. Data Holders need a way to discover or configure the app's issuer identity and ticket-signing keys.
 
-```text
-embedded_id_token.aud = permission_ticket.iss
-```
+The embedded ID token may contain sensitive identity information. Implementations should treat Permission Tickets containing `subject_identity_evidence` as identity-bearing artifacts for logging, storage, and retention purposes.
 
-The profile can allow a non-identical value only when the Data Holder can verify that the value maps to the same entity as `permission_ticket.iss` through public trust-framework metadata or local configuration.
-
-An opaque identity-provider-local client ID is not sufficient for portable verification. For example, if `embedded_id_token.aud = "abc123"`, an outside Data Holder usually has no reliable way to know that `abc123` is the same entity as `permission_ticket.iss`.
-
-### Verification
-
-For UC1 embedded identity evidence, the Data Holder verifies:
-
-1. The Permission Ticket `aud` covers this Data Holder directly or through a trust framework.
-2. The Permission Ticket `iss` is a trusted Permission Ticket issuer.
-3. The Permission Ticket signature, `exp`, `jti`, `ticket_type`, and access constraints are valid.
-4. The presenting client authenticates normally.
-5. If `presenter_binding` is present, the presenting client matches it.
-6. If `presenter_binding` is absent, the presenting client is the Permission Ticket issuer.
-7. `subject_identity_evidence.source` is `embedded` and `token_type` is `id_token`.
-8. The embedded ID token signature is valid under a trusted identity issuer.
-9. The embedded ID token satisfies profile requirements such as IAL2 `acr`, acceptable `auth_time`, and required identity claims.
-10. The embedded ID token audience identifies the Permission Ticket issuer as the relying party.
-11. The Data Holder resolves the patient using `subject.patient`, optionally supplemented by embedded ID token claims.
-12. If overlapping facts from `subject.patient` and the embedded ID token materially conflict, the Data Holder rejects the exchange unless a narrower profile defines a reconciliation rule.
-
-### Why Embed First
-
-Embedding keeps the token exchange simple: the Permission Ticket remains the sole `subject_token`, and the Data Holder receives one signed authorization artifact containing both the FHIR-normalized subject and the identity evidence.
-
-The tradeoff is that tickets now carry identity PII and a nested JWT. Implementations need care around logging, storage, retention, and token lifetimes. Future profiles may define detached evidence if those tradeoffs become unacceptable, but this proposal starts with one shape to avoid mode explosion.
+The FHIR `subject.patient` and embedded ID token should not materially conflict. If they do, the Data Holder should reject the exchange unless a narrower profile defines a reconciliation rule.
