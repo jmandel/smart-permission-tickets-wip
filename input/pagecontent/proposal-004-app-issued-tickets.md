@@ -112,7 +112,7 @@ The Data Holder verifies this ID token independently. If `subject.patient` is om
 
 #### 5. The App Signs The Permission Ticket
 
-The app signs a Permission Ticket. A decoded payload looks like this:
+The app signs a Permission Ticket. This example intentionally omits `subject.patient`; the verified ID token is the patient-resolution input.
 
 ```json
 {
@@ -150,7 +150,7 @@ The app signs a Permission Ticket. A decoded payload looks like this:
 
 There is no `requester` because this is self-access. The person identified by `subject_identity_evidence` is the patient and requester.
 
-There is also no `subject.patient` in this example because it would only duplicate the ID token's identity claims. A ticket can still include `subject.patient` when the FHIR representation adds useful matching detail.
+There is also no `subject.patient` in this example. A ticket can still include `subject.patient` when the FHIR representation adds useful matching detail, but this omitted form avoids adjudicating differences between duplicated patient facts.
 
 There is no `presenter_binding` because the app is issuing the ticket for its own presentation. In this profile, absence of `presenter_binding` has a strict meaning: the client presenting the ticket must be the same entity as `iss`.
 
