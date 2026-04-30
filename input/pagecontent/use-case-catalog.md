@@ -20,7 +20,7 @@ The table below summarizes required and optional fields for each ticket type:
 *A patient uses a high-assurance Digital ID wallet to authorize an app to fetch their data from multiple hospitals.*
 
 ##### Ticket Schema
-*   **Subject:** `Patient` (matched by demographics: Name, DOB, Identifier).
+*   **Subject:** `Patient` (matched by demographics) or profile-defined `subject_identity_evidence`.
 *   **Requester:** None (self-access).
 *   **Identity evidence:** Profiles may require `subject_identity_evidence`; see [Proposal 004](proposal-004-app-issued-tickets.html) for app-issued tickets with embedded IAL2 evidence.
 *   **Context:** *(none; `context` may be omitted or empty for this ticket type)*.

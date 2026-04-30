@@ -154,7 +154,7 @@ export type PermissionTicketBase = {
   requester_identity_evidence?: IdentityEvidence;
   revocation?: Revocation;
   must_understand?: NonEmptyArray<string>;
-  subject: Subject;
+  subject?: Subject;
   requester?: Requester;
   access: AccessGrant;
   context?: TicketContext;
