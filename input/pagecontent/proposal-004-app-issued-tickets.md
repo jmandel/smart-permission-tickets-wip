@@ -23,7 +23,7 @@ For a Data Holder, the app-issued ticket answers five practical questions:
 | Who signed this authorization? | `iss` and the ticket signature |
 | Which Data Holders or network is it for? | `aud` and `aud_type` |
 | Which patient is it about? | `subject.patient` |
-| What identity proofing backs that patient claim? | `subject_identity_evidence` |
+| What identity proofing evidence is included? | `subject_identity_evidence` |
 | Which app may redeem it? | the authenticated presenter, and optionally `presenter_binding` |
 
 For app-issued patient self-access, the app is both the ticket issuer and the presenter. That means `presenter_binding` can be omitted: the Data Holder requires the authenticated presenting client to be the same entity as `iss`.
@@ -39,7 +39,7 @@ In the main example:
 * **Community Health Network** is the network named in the ticket audience.
 * **Hospital A** is a Data Holder in that network.
 
-The app is not asking Hospital A to trust an arbitrary self-declared patient. It is asking Hospital A to trust a signed Permission Ticket from a recognized app issuer, backed by a signed ID token from an identity provider.
+The app is not asking Hospital A to trust an arbitrary self-declared patient. It is asking Hospital A to evaluate a signed Permission Ticket from a recognized app issuer, plus a signed ID token from an identity provider.
 
 ### End-To-End Walkthrough
 
@@ -106,7 +106,7 @@ The app puts the ID token into `subject_identity_evidence`:
 }
 ```
 
-The embedded ID token backs the `subject.patient` claim. It does not replace `subject.patient`, and the Data Holder still verifies the ID token independently.
+The Data Holder verifies this ID token independently. `subject.patient` remains the FHIR representation used for matching.
 
 #### 5. The App Signs The Permission Ticket
 
@@ -218,6 +218,39 @@ id_token.aud = permission_ticket.iss
 That rule is what links the identity proofing event to the entity that signed the ticket.
 
 If the ID token audience were an opaque value such as `abc123`, Hospital A would usually have no way to know whether `abc123` is really the same entity as `https://wallet.example.org`. A profile can allow a different audience identifier only when Hospital A can verify the mapping through public trust-framework metadata or local configuration.
+
+### If App Identity Comes From A Trusted App Library
+
+If a CMS Trusted App Library, or a similar app registry, publishes stable identifiers for participating apps, that identifier becomes the shared anchor for this flow.
+
+For example, the library might publish:
+
+```text
+app identifier: https://wallet.example.org
+app name: Health Wallet App
+allowed ticket types: patient-self-access-v1
+signing keys: https://wallet.example.org/.well-known/jwks.json
+status: active
+```
+
+Then the app-issued ticket uses that same identifier consistently:
+
+```text
+client_assertion.iss = https://wallet.example.org
+client_assertion.sub = https://wallet.example.org
+permission_ticket.iss = https://wallet.example.org
+embedded_id_token.aud = https://wallet.example.org
+```
+
+This makes the Data Holder's job more mechanical:
+
+1. Look up `https://wallet.example.org` in the trusted app library.
+2. Confirm the app is active and allowed to issue patient self-access tickets.
+3. Verify the app's client authentication.
+4. Verify the Permission Ticket signature using keys associated with that app identifier.
+5. Verify the embedded ID token was issued to that same app identifier as the relying party.
+
+With this model, the Data Holder does not need a private mapping from an opaque identity-provider client ID to the app. The registry-published app identifier is the value that appears in the app authentication, the ticket issuer claim, and the ID token audience.
 
 ### When A Third Party Issues The Ticket
 
