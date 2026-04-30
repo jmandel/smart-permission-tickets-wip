@@ -166,7 +166,7 @@ For patient access use cases (UC1/UC2), `presenter_binding` is REQUIRED per the 
 
 ### Design Rationale
 
-*Why SMART App Launch rather than a new custom issuance API?* Because nothing about ticket issuance is genuinely new. The issuer needs to authenticate a user, run consent, and return an authorization artifact — that is exactly what an authorization server does. Reusing SMART App Launch means zero new client code, zero new server code, and zero new specifications for the happy path. The only additions are two discovery fields and two token response fields.
+*Why SMART App Launch rather than a new custom issuance API?* Because the control flow for ticket issuance is not new. The issuer needs to authenticate a user, run consent, and return an authorization artifact — that is exactly what an authorization server does. Reusing SMART App Launch lets implementations keep the existing launch, redirect, and token exchange mechanics, while adding the ticket-specific behavior this proposal defines. The specification additions are limited to two discovery fields and two token response fields.
 
 *Why put tickets in the token response rather than behind a separate fetch?* Because the access_token and the tickets represent the same authorization event and should be delivered atomically. A separate fetch would need its own auth, its own cache semantics, and its own failure modes — all for a value that is already known at token-issuance time.
 
