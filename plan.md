@@ -155,13 +155,13 @@ The core specification should not make `id_token.aud == permission_ticket.iss` a
 
 ## Proposal Page
 
-Create a concrete proposal page, likely:
+Create a concrete proposal page:
 
 ```text
-input/pagecontent/proposal-004-embedded-identity-evidence.md
+input/pagecontent/proposal-004-app-issued-tickets.md
 ```
 
-The page should show how embedded identity evidence works end to end for real individual self-access. It should be narrative and example-driven rather than just field definitions.
+The page should show how app-issued tickets work end to end for real individual self-access, with embedded identity evidence as the mechanism that backs the FHIR subject. It should be narrative and example-driven rather than just field definitions.
 
 Suggested structure:
 

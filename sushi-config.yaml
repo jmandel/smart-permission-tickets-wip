@@ -23,8 +23,8 @@ pages:
     title: "Proposal 002: OpenID Federation Issuers"
   proposal-003-smart-launch-issuance.md:
     title: "Proposal 003: SMART Launch Issuance"
-  proposal-004-embedded-identity-evidence.md:
-    title: "Proposal 004: Embedded Identity Evidence"
+  proposal-004-app-issued-tickets.md:
+    title: "Proposal 004: App-Issued Tickets"
 
 menu:
   IG Home: index.html
@@ -34,6 +34,6 @@ menu:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html
     "002: OpenID Federation Issuers": proposal-002-oidf-issuers.html
     "003: SMART Launch Issuance": proposal-003-smart-launch-issuance.html
-    "004: Embedded Identity Evidence": proposal-004-embedded-identity-evidence.html
+    "004: App-Issued Tickets": proposal-004-app-issued-tickets.html
   Downloads: downloads.html
   Artifacts: artifacts.html

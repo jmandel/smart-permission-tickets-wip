@@ -4,7 +4,9 @@
 
 ### Summary
 
-This proposal defines an embedded identity-evidence profile for patient self-access tickets. A Permission Ticket continues to carry a FHIR-normalized `subject.patient` for matching and audit, and adds `subject_identity_evidence` as the high-assurance evidence backing that subject claim.
+This proposal defines an app-issued ticket profile for patient self-access. It allows a trusted app to sign its own Permission Ticket after an IAL2 identity proofing event, while still supporting the pattern where a third-party identity/permission service signs the ticket and binds it to the app.
+
+A Permission Ticket continues to carry a FHIR-normalized `subject.patient` for matching and audit, and adds `subject_identity_evidence` as the high-assurance evidence backing that subject claim.
 
 The first supported evidence form is an embedded OIDC ID token:
 
@@ -27,7 +29,7 @@ Patient self-access needs two things at once:
 
 The base `subject.patient` claim solves the first problem. It gives the Data Holder an interoperable FHIR object with names, identifiers, birth date, and other matchable facts. But `subject.patient` by itself is an issuer assertion. For IAL2-style use cases, the Data Holder also needs to know what identity proofing event backs that assertion.
 
-This proposal supplies that evidence without replacing `subject.patient` and without requiring an additional token-exchange parameter.
+This proposal supplies that evidence without replacing `subject.patient` and without requiring an additional token-exchange parameter. It also defines how presenter binding works when the app itself is the Permission Ticket issuer.
 
 ### Proposal
 
@@ -41,6 +43,8 @@ For the UC1 patient self-access profile:
 * `subject_identity_evidence.jwt` contains the compact serialized ID token.
 
 The ticket issuer is responsible for constructing the FHIR-normalized `subject.patient` from the identity event, issuer-side records, user-provided consent context, or other verified sources allowed by the profile. The Data Holder uses `subject.patient` as the primary matching input and uses the embedded ID token as evidence backing the subject claim.
+
+When the app is the ticket issuer, `presenter_binding` is omitted and the authenticated presenter must be the same entity as the Permission Ticket issuer. When a third-party service is the ticket issuer, the ticket uses `presenter_binding` to constrain redemption to the app.
 
 ### Walkthrough
 
@@ -64,7 +68,7 @@ The Data Holder is not accepting the ID token as an access token for itself. It 
 
 ### Ticket Shape
 
-The following decoded payload shows the app self-issued pattern. The app is both the Permission Ticket issuer and the presenting client, so `presenter_binding` is omitted under this UC1 profile.
+The following decoded payload shows the app-issued pattern. The app is both the Permission Ticket issuer and the presenting client, so `presenter_binding` is omitted under this UC1 profile.
 
 ```json
 {
@@ -120,7 +124,7 @@ The following decoded payload shows the app self-issued pattern. The app is both
 
 ### Issuer Patterns
 
-#### App Self-Issued Ticket
+#### App-Issued Ticket
 
 In this pattern, the app is trusted as a Permission Ticket issuer and signs its own tickets.
 
@@ -227,4 +231,3 @@ For UC1 embedded identity evidence, the Data Holder verifies:
 Embedding keeps the token exchange simple: the Permission Ticket remains the sole `subject_token`, and the Data Holder receives one signed authorization artifact containing both the FHIR-normalized subject and the identity evidence.
 
 The tradeoff is that tickets now carry identity PII and a nested JWT. Implementations need care around logging, storage, retention, and token lifetimes. Future profiles may define detached evidence if those tradeoffs become unacceptable, but this proposal starts with one shape to avoid mode explosion.
-

@@ -22,7 +22,7 @@ The table below summarizes required and optional fields for each ticket type:
 ##### Ticket Schema
 *   **Subject:** `Patient` (matched by demographics: Name, DOB, Identifier).
 *   **Requester:** None (self-access).
-*   **Identity evidence:** Profiles may require `subject_identity_evidence`; see [Proposal 004](proposal-004-embedded-identity-evidence.html) for embedded IAL2 evidence.
+*   **Identity evidence:** Profiles may require `subject_identity_evidence`; see [Proposal 004](proposal-004-app-issued-tickets.html) for app-issued tickets with embedded IAL2 evidence.
 *   **Context:** *(none; `context` may be omitted or empty for this ticket type)*.
 *   **Access:** `permissions` with specific resource types and interactions.
 
