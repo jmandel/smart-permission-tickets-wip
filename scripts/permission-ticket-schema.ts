@@ -171,6 +171,14 @@ export const PresenterBindingSchema = z.discriminatedUnion("method", [
   TrustFrameworkClientBindingSchema,
 ]);
 
+export const EmbeddedIdentityEvidenceSchema = z.object({
+  source: z.literal("embedded"),
+  token_type: z.literal("id_token"),
+  jwt: NonEmptyStringSchema,
+}).strict();
+
+export const IdentityEvidenceSchema = EmbeddedIdentityEvidenceSchema;
+
 export const RevocationSchema = z.object({
   url: UriSchema,
   index: z.number().int().nonnegative(),
@@ -283,6 +291,8 @@ const BaseKernelTopLevelClaimNames = new Set([
   "ticket_type",
   "aud_type",
   "presenter_binding",
+  "subject_identity_evidence",
+  "requester_identity_evidence",
   "revocation",
   "must_understand",
   "subject",
@@ -301,6 +311,8 @@ const TicketBaseSchema = z.object({
   iat: z.number().int().optional(),
   jti: NonEmptyStringSchema,
   presenter_binding: PresenterBindingSchema.optional(),
+  subject_identity_evidence: IdentityEvidenceSchema.optional(),
+  requester_identity_evidence: IdentityEvidenceSchema.optional(),
   revocation: RevocationSchema.optional(),
   must_understand: z.array(MustUnderstandClaimNameSchema).min(1).optional(),
   subject: SubjectSchema,
@@ -421,6 +433,8 @@ export type FHIRResource = z.infer<typeof FHIRResourceSchema>;
 export type KeyBinding = z.infer<typeof KeyBindingSchema>;
 export type TrustFrameworkClientBinding = z.infer<typeof TrustFrameworkClientBindingSchema>;
 export type PresenterBinding = z.infer<typeof PresenterBindingSchema>;
+export type EmbeddedIdentityEvidence = z.infer<typeof EmbeddedIdentityEvidenceSchema>;
+export type IdentityEvidence = z.infer<typeof IdentityEvidenceSchema>;
 export type Subject = z.infer<typeof SubjectSchema>;
 export type Requester = z.infer<typeof RequesterSchema>;
 export type SensitiveDataPolicy = z.infer<typeof SensitiveDataPolicySchema>;

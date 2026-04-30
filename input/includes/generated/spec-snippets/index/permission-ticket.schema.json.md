@@ -100,6 +100,52 @@
             }
           ]
         },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
         "revocation": {
           "type": "object",
           "properties": {
@@ -690,6 +736,52 @@
               "additionalProperties": false
             }
           ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
         },
         "revocation": {
           "type": "object",
@@ -1395,6 +1487,52 @@
             }
           ]
         },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
         "revocation": {
           "type": "object",
           "properties": {
@@ -2073,6 +2211,52 @@
               "additionalProperties": false
             }
           ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
         },
         "revocation": {
           "type": "object",
@@ -2819,6 +3003,52 @@
             }
           ]
         },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
         "revocation": {
           "type": "object",
           "properties": {
@@ -3564,6 +3794,52 @@
             }
           ]
         },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
         "revocation": {
           "type": "object",
           "properties": {
@@ -4278,6 +4554,52 @@
               "additionalProperties": false
             }
           ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
         },
         "revocation": {
           "type": "object",

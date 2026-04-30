@@ -60,6 +60,14 @@ export type TrustFrameworkClientBinding = {
 
 export type PresenterBinding = KeyBinding | TrustFrameworkClientBinding;
 
+export type EmbeddedIdentityEvidence = {
+  source: "embedded";
+  token_type: "id_token";
+  jwt: string;
+};
+
+export type IdentityEvidence = EmbeddedIdentityEvidence;
+
 export type Revocation = {
   url: Uri;
   index: number;
@@ -142,6 +150,8 @@ export type PermissionTicketBase = {
   jti: string;
   ticket_type: PermissionTicketType;
   presenter_binding?: PresenterBinding;
+  subject_identity_evidence?: IdentityEvidence;
+  requester_identity_evidence?: IdentityEvidence;
   revocation?: Revocation;
   must_understand?: NonEmptyArray<string>;
   subject: Subject;
