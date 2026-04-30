@@ -22,7 +22,7 @@ For a Data Holder, the app-issued ticket answers five practical questions:
 |---|---|
 | Who signed this authorization? | `iss` and the ticket signature |
 | Which Data Holders or network is it for? | `aud` and `aud_type` |
-| Which patient is it about? | `subject.patient` |
+| Which patient is it about? | `subject_identity_evidence`, optionally supplemented by `subject.patient` |
 | What identity proofing evidence is included? | `subject_identity_evidence` |
 | Which app may redeem it? | the authenticated presenter, and optionally `presenter_binding` |
 
@@ -69,9 +69,9 @@ id_token.acr = IAL2-equivalent assurance value
 
 The ID token is not meant to be an access token for Hospital A. It is evidence that Dorothy proved her identity to the app.
 
-#### 3. The App Builds A FHIR Patient
+#### 3. The App Decides Whether To Include A FHIR Patient
 
-The app creates the ticket's `subject.patient` as a FHIR Patient fragment:
+If the app can add a useful FHIR-normalized patient representation, it includes `subject.patient` as a FHIR Patient fragment:
 
 ```json
 {
@@ -92,7 +92,9 @@ The app creates the ticket's `subject.patient` as a FHIR Patient fragment:
 }
 ```
 
-This FHIR representation remains important. It is what Data Holders use for patient matching and audit. It may be normalized or enriched by the app from verified identity claims or other trusted sources.
+This FHIR representation is useful when it adds matchable identifiers, normalized demographics, or other details that Data Holders can process consistently.
+
+If the FHIR representation would only restate the same facts already present in the embedded ID token, this profile allows the app to omit `subject.patient`. In that case, the Data Holder uses the verified ID token claims for patient resolution. Omitting redundant FHIR data avoids forcing Data Holders to adjudicate harmless differences between two representations of the same identity event.
 
 #### 4. The App Embeds The Identity Evidence
 
@@ -106,7 +108,7 @@ The app puts the ID token into `subject_identity_evidence`:
 }
 ```
 
-The Data Holder verifies this ID token independently. `subject.patient` remains the FHIR representation used for matching.
+The Data Holder verifies this ID token independently. If `subject.patient` is omitted, the ID token is the patient-resolution input for this profile.
 
 #### 5. The App Signs The Permission Ticket
 
@@ -120,24 +122,6 @@ The app signs a Permission Ticket. A decoded payload looks like this:
   "exp": 1777584000,
   "jti": "dorothy-wallet-001",
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
-  "subject": {
-    "patient": {
-      "resourceType": "Patient",
-      "identifier": [
-        {
-          "system": "urn:oid:2.16.840.1.113883.4.1",
-          "value": "999-99-9999"
-        }
-      ],
-      "name": [
-        {
-          "family": "Reyes",
-          "given": ["Dorothy"]
-        }
-      ],
-      "birthDate": "1952-04-12"
-    }
-  },
   "subject_identity_evidence": {
     "source": "embedded",
     "token_type": "id_token",
@@ -164,7 +148,9 @@ The app signs a Permission Ticket. A decoded payload looks like this:
 }
 ```
 
-There is no `requester` because this is self-access. The patient described by `subject.patient` is the person requesting access.
+There is no `requester` because this is self-access. The person identified by `subject_identity_evidence` is the patient and requester.
+
+There is also no `subject.patient` in this example because it would only duplicate the ID token's identity claims. A ticket can still include `subject.patient` when the FHIR representation adds useful matching detail.
 
 There is no `presenter_binding` because the app is issuing the ticket for its own presentation. In this profile, absence of `presenter_binding` has a strict meaning: the client presenting the ticket must be the same entity as `iss`.
 
@@ -202,7 +188,7 @@ It checks:
 7. The embedded ID token signature verifies under the identity provider's keys.
 8. The embedded ID token says its relying party audience is `https://wallet.example.org`.
 9. The embedded ID token satisfies the profile's assurance and freshness requirements.
-10. `subject.patient` resolves to one local patient record.
+10. The patient resolves to one local record, using `subject.patient` when present and otherwise using the verified ID token claims.
 11. The requested scopes fit inside the ticket's `access` block.
 
 If those checks pass, Hospital A issues a scoped access token to the app.
@@ -219,11 +205,11 @@ That rule is what links the identity proofing event to the entity that signed th
 
 If the ID token audience were an opaque value such as `abc123`, Hospital A would usually have no way to know whether `abc123` is really the same entity as `https://wallet.example.org`. A profile can allow a different audience identifier only when Hospital A can verify the mapping through public trust-framework metadata or local configuration.
 
-### If App Identity Comes From A Trusted App Library
+### If App Identity Comes From The CMS Trusted App Library
 
-If a CMS Trusted App Library, or a similar app registry, publishes stable identifiers for participating apps, that identifier becomes the shared anchor for this flow.
+If the CMS Trusted App Library publishes stable identifiers for participating apps, that identifier becomes the shared anchor for this flow.
 
-For example, the library might publish:
+For example, the CMS Trusted App Library might publish:
 
 ```text
 app identifier: https://wallet.example.org
@@ -244,7 +230,7 @@ embedded_id_token.aud = https://wallet.example.org
 
 This makes the Data Holder's job more mechanical:
 
-1. Look up `https://wallet.example.org` in the trusted app library.
+1. Look up `https://wallet.example.org` in the CMS Trusted App Library.
 2. Confirm the app is active and allowed to issue patient self-access tickets.
 3. Verify the app's client authentication.
 4. Verify the Permission Ticket signature using keys associated with that app identifier.
@@ -282,4 +268,4 @@ App-issued tickets make the app a real trust participant. Data Holders need a wa
 
 The embedded ID token may contain sensitive identity information. Implementations should treat Permission Tickets containing `subject_identity_evidence` as identity-bearing artifacts for logging, storage, and retention purposes.
 
-The FHIR `subject.patient` and embedded ID token should not materially conflict. If they do, the Data Holder should reject the exchange unless a narrower profile defines a reconciliation rule.
+When `subject.patient` is present, it should not materially conflict with the embedded ID token. If it does, the Data Holder should reject the exchange unless a narrower profile defines a reconciliation rule. Apps can avoid unnecessary conflicts by omitting `subject.patient` when it would only duplicate the ID token.
