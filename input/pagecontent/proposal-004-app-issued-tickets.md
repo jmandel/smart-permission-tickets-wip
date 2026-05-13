@@ -25,7 +25,7 @@ For a Data Holder, the app-issued ticket answers four practical questions:
 | Which patient is it about? | embedded ID token in `subject_identity_evidence` |
 | Which app may redeem it? | authenticated presenter must equal `iss` |
 
-For app-issued patient self-access, the app is both the ticket issuer and the presenter. That means `presenter_binding` can be omitted: the Data Holder requires the authenticated presenting client to be the same entity as `iss`.
+For app-issued patient self-access, the app is both the ticket issuer and the presenter. This profile therefore defines an equivalent presenter constraint: `presenter_binding` can be omitted only because the Data Holder requires the authenticated presenting client to be the same entity as `iss`.
 
 ### Cast Of Characters
 
@@ -122,7 +122,7 @@ The app signs a Permission Ticket. The verified ID token is the patient-resoluti
 
 There is no `requester` because this is self-access. The person identified by `subject_identity_evidence` is the patient and requester.
 
-There is no `presenter_binding` because the app is issuing the ticket for its own presentation. In this profile, absence of `presenter_binding` has a strict meaning: the client presenting the ticket must be the same entity as `iss`.
+There is no `presenter_binding` because the app is issuing the ticket for its own presentation. Under this narrower self-issued profile, the selected ticket type supplies the stricter presenter rule: the client presenting the ticket must be the same entity as `iss`.
 
 #### 5. The App Presents The Ticket
 
@@ -154,7 +154,7 @@ It checks:
 3. The ticket `aud` covers Hospital A, either directly or through `https://community-network.example.org`.
 4. The ticket has not expired.
 5. The ticket type is patient self-access.
-6. Because `presenter_binding` is absent, the authenticated presenter must equal the ticket issuer.
+6. Because this self-issued profile omits `presenter_binding` only under its presenter-equals-issuer rule, the authenticated presenter must equal the ticket issuer.
 7. The embedded ID token signature verifies under the identity provider's keys.
 8. The embedded ID token says its relying party audience is `https://wallet.example.org`.
 9. The embedded ID token satisfies the profile's assurance and freshness requirements.
