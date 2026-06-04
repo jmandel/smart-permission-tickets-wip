@@ -87,6 +87,16 @@ One policy applies here: the Data Holder's patient self-access policy — the pa
 
 {% include generated/signed-tickets/uc1-ticket.html %}
 
+##### Variant: with identity evidence
+
+The same ticket carrying `subject_identity_evidence`. The embedded ID token's demographics match `subject.patient`, its `aud` names the ticket issuer's client at the evidence issuer, and the ticket includes `iat` (required when evidence is present):
+
+{% include generated/signed-tickets/uc1-evidence-ticket.html %}
+
+The embedded ID token decodes to:
+
+{% include generated/signed-tickets/uc1-evidence-id-token.html %}
+
 ---
 
 ### Use Case 2: Patient-Delegated Access

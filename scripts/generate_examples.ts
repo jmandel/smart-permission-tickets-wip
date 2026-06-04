@@ -84,6 +84,18 @@ const uc1_payload: PermissionTicket = {
     }
 };
 
+// ─── UC1 variant: Patient Self Access with identity evidence ─────────────────
+// The embedded id_token is minted at generation time (see generate()) and its
+// demographics match subject.patient. The token's aud names the ticket issuer's
+// client at the evidence issuer, per the base audience-binding rule.
+
+const uc1_evidence_payload: PermissionTicket = {
+    ...uc1_payload,
+    jti: "uc1-ev-9f1c2b6a-3a77-4d09-9c4e-5a0d2f81c3b7",
+    presenter_binding: { method: "jkt", jkt: "" },
+    subject_identity_evidence: { source: "embedded", token_type: "id_token", jwt: "(populated at generation time)" }
+};
+
 // ─── UC2: Patient-Delegated Access ──────────────────────────────────────────
 
 const uc2_payload: PermissionTicket = {
@@ -373,18 +385,40 @@ async function generate() {
     console.log("Generating signed examples...");
 
     const ISSUER_KEY = await loadKey('issuer.private.json');
+    const EVIDENCE_KEY = await loadKey('evidence-issuer.private.json');
     const clientJkt = await clientJktPromise;
 
     // Populate computed JWK Thumbprint into key-bound payloads
-    for (const payload of [uc1_payload, uc2_payload]) {
+    for (const payload of [uc1_payload, uc1_evidence_payload, uc2_payload]) {
         if (payload.presenter_binding?.method !== "jkt") {
             throw new Error("Expected key-bound example payload");
         }
         payload.presenter_binding.jkt = clientJkt;
     }
 
+    // Mint the embedded id_token for the UC1 evidence variant. Its demographics
+    // match subject.patient; its aud is the ticket issuer's client at the
+    // evidence issuer; the ticket's iat falls within the token's validity.
+    const evidenceNow = Math.floor(Date.now() / 1000);
+    const idToken = await new jose.SignJWT({
+        iss: "https://id.example-csp.org",
+        aud: "trusted-issuer-app",
+        sub: "csp-user-7d2f0a44",
+        given_name: "Elena",
+        family_name: "Reyes",
+        birthdate: "1989-09-14",
+        acr: "https://id.example-csp.org/assurance/ial2",
+        iat: evidenceNow,
+        exp: evidenceNow + 300
+    }).setProtectedHeader({ alg: 'ES256', kid: EVIDENCE_KEY.kid }).sign(EVIDENCE_KEY);
+    uc1_evidence_payload.subject_identity_evidence = { source: "embedded", token_type: "id_token", jwt: idToken };
+    uc1_evidence_payload.iat = evidenceNow;
+    fs.writeFileSync(path.join(OUTPUT_DIR, 'uc1-evidence-id-token.jwt'), idToken);
+    await saveDecodedJWT(path.join(OUTPUT_DIR, 'uc1-evidence-id-token.jwt'), "Embedded ID Token (identity evidence)");
+
     const tickets = [
         { name: 'uc1-ticket.jwt', payload: uc1_payload },
+        { name: 'uc1-evidence-ticket.jwt', payload: uc1_evidence_payload },
         { name: 'uc2-ticket.jwt', payload: uc2_payload },
         { name: 'uc3-ticket.jwt', payload: uc3_payload },
         { name: 'uc4-ticket.jwt', payload: uc4_payload },

@@ -1,0 +1,101 @@
+<!-- Static JWT Viewer - No JavaScript -->
+<div class="jwt-artifact"
+    style="margin: 20px 0; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; font-family: sans-serif;">
+    <h4 style="margin: 0; padding: 12px; background: #e8e8e8; border-bottom: 1px solid #ddd;">Permission Ticket Artifact
+    </h4>
+
+    <div style="padding: 15px;">
+        <h5 style="margin-top: 0;">Header</h5>
+        <pre
+            style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
+  "alg": "ES256",
+  "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+}</code></pre>
+
+        <h5>Payload (Claims)</h5>
+        <pre
+            style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
+  "iss": "https://trusted-issuer.org",
+  "aud": "https://network.org",
+  "exp": 1780611184,
+  "jti": "uc1-ev-9f1c2b6a-3a77-4d09-9c4e-5a0d2f81c3b7",
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
+  "presenter_binding": {
+    "method": "jkt",
+    "jkt": "JuI6ibZHcMPQICaIZ55PbXpnsudQmKt00D0BiEXNrMc"
+  },
+  "subject": {
+    "patient": {
+      "resourceType": "Patient",
+      "identifier": [
+        {
+          "system": "http://hospital.example.org/mrn",
+          "value": "A12345"
+        }
+      ],
+      "birthDate": "1989-09-14",
+      "name": [
+        {
+          "family": "Reyes",
+          "given": [
+            "Elena"
+          ]
+        }
+      ]
+    }
+  },
+  "access": {
+    "permissions": [
+      {
+        "kind": "data",
+        "resource_type": "AllergyIntolerance",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      },
+      {
+        "kind": "data",
+        "resource_type": "Condition",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      },
+      {
+        "kind": "data",
+        "resource_type": "Observation",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      },
+      {
+        "kind": "data",
+        "resource_type": "MedicationRequest",
+        "interactions": [
+          "read",
+          "search"
+        ]
+      }
+    ],
+    "data_period": {
+      "start": "2021-01-01",
+      "end": "2026-01-01"
+    }
+  },
+  "subject_identity_evidence": {
+    "source": "embedded",
+    "token_type": "id_token",
+    "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImYtU1NKamJDV1BJMnJtU2hXSjUwNHpLQy1Mb01tWGlyVnV0SWtrcmxuZmcifQ.eyJpc3MiOiJodHRwczovL2lkLmV4YW1wbGUtY3NwLm9yZyIsImF1ZCI6InRydXN0ZWQtaXNzdWVyLWFwcCIsInN1YiI6ImNzcC11c2VyLTdkMmYwYTQ0IiwiZ2l2ZW5fbmFtZSI6IkVsZW5hIiwiZmFtaWx5X25hbWUiOiJSZXllcyIsImJpcnRoZGF0ZSI6IjE5ODktMDktMTQiLCJhY3IiOiJodHRwczovL2lkLmV4YW1wbGUtY3NwLm9yZy9hc3N1cmFuY2UvaWFsMiIsImlhdCI6MTc4MDYwNzU4NCwiZXhwIjoxNzgwNjA3ODg0fQ.Ow4Z4KMQEb9PA1uizvpxqNFxn__fgRCqxm-GDTS_XjFA8jclGq5KlBRmFABgeqGRLHdOIuWJP3JF9Mq_vVoYdA"
+  },
+  "iat": 1780607584
+}</code></pre>
+
+        <details open style="margin-top: 15px;">
+            <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
+            <pre
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0ZWQtaXNzdWVyLm9yZyIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJleHAiOjE3ODA2MTExODQsImp0aSI6InVjMS1ldi05ZjFjMmI2YS0zYTc3LTRkMDktOWM0ZS01YTBkMmY4MWMzYjciLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wYXRpZW50LXNlbGYtYWNjZXNzLXYxIiwicHJlc2VudGVyX2JpbmRpbmciOnsibWV0aG9kIjoiamt0Iiwiamt0IjoiSnVJNmliWkhjTVBRSUNhSVo1NVBiWHBuc3VkUW1LdDAwRDBCaUVYTnJNYyJ9LCJzdWJqZWN0Ijp7InBhdGllbnQiOnsicmVzb3VyY2VUeXBlIjoiUGF0aWVudCIsImlkZW50aWZpZXIiOlt7InN5c3RlbSI6Imh0dHA6Ly9ob3NwaXRhbC5leGFtcGxlLm9yZy9tcm4iLCJ2YWx1ZSI6IkExMjM0NSJ9XSwiYmlydGhEYXRlIjoiMTk4OS0wOS0xNCIsIm5hbWUiOlt7ImZhbWlseSI6IlJleWVzIiwiZ2l2ZW4iOlsiRWxlbmEiXX1dfX0sImFjY2VzcyI6eyJwZXJtaXNzaW9ucyI6W3sia2luZCI6ImRhdGEiLCJyZXNvdXJjZV90eXBlIjoiQWxsZXJneUludG9sZXJhbmNlIiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX0seyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJDb25kaXRpb24iLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfSx7ImtpbmQiOiJkYXRhIiwicmVzb3VyY2VfdHlwZSI6Ik9ic2VydmF0aW9uIiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX0seyJraW5kIjoiZGF0YSIsInJlc291cmNlX3R5cGUiOiJNZWRpY2F0aW9uUmVxdWVzdCIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19XSwiZGF0YV9wZXJpb2QiOnsic3RhcnQiOiIyMDIxLTAxLTAxIiwiZW5kIjoiMjAyNi0wMS0wMSJ9fSwic3ViamVjdF9pZGVudGl0eV9ldmlkZW5jZSI6eyJzb3VyY2UiOiJlbWJlZGRlZCIsInRva2VuX3R5cGUiOiJpZF90b2tlbiIsImp3dCI6ImV5SmhiR2NpT2lKRlV6STFOaUlzSW10cFpDSTZJbVl0VTFOS2FtSkRWMUJKTW5KdFUyaFhTalV3TkhwTFF5MU1iMDF0V0dseVZuVjBTV3RyY214dVptY2lmUS5leUpwYzNNaU9pSm9kSFJ3Y3pvdkwybGtMbVY0WVcxd2JHVXRZM053TG05eVp5SXNJbUYxWkNJNkluUnlkWE4wWldRdGFYTnpkV1Z5TFdGd2NDSXNJbk4xWWlJNkltTnpjQzExYzJWeUxUZGtNbVl3WVRRMElpd2laMmwyWlc1ZmJtRnRaU0k2SWtWc1pXNWhJaXdpWm1GdGFXeDVYMjVoYldVaU9pSlNaWGxsY3lJc0ltSnBjblJvWkdGMFpTSTZJakU1T0RrdE1Ea3RNVFFpTENKaFkzSWlPaUpvZEhSd2N6b3ZMMmxrTG1WNFlXMXdiR1V0WTNOd0xtOXlaeTloYzNOMWNtRnVZMlV2YVdGc01pSXNJbWxoZENJNk1UYzRNRFl3TnpVNE5Dd2laWGh3SWpveE56Z3dOakEzT0RnMGZRLk93NFo0S01RRWI5UEExdWl6dnB4cU5GeG5fX2ZnUkNxeG0tR0RUU19YakZBOGpjbEdxNUtsQlJtRkFCZ2VxR1JMSGRPSXVXSlAzSkY5TXFfdlZvWWRBIn0sImlhdCI6MTc4MDYwNzU4NH0.tKH0PybJkdAQKLl4FAajQCp43lX43pdZ_Tu70NaNFv2uEwxgIKWSv1v6th_ci_5R86yPnwL4Byl8xg7XVWK2Ew</code></pre>
+        </details>
+    </div>
+</div>

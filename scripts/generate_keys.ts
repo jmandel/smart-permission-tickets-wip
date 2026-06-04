@@ -9,6 +9,10 @@ if (!fs.existsSync(KEYS_DIR)) {
 }
 
 async function generateAndSaveKey(alg: string, filename: string) {
+    if (fs.existsSync(path.join(KEYS_DIR, `${filename}.private.json`))) {
+        console.log(`Keys for ${filename} already exist; skipping`);
+        return;
+    }
     const { privateKey, publicKey } = await jose.generateKeyPair(alg, { extractable: true });
     const privateJwk = await jose.exportJWK(privateKey);
     const publicJwk = await jose.exportJWK(publicKey);
@@ -25,6 +29,7 @@ async function generateAndSaveKey(alg: string, filename: string) {
 async function main() {
     await generateAndSaveKey('ES256', 'issuer');
     await generateAndSaveKey('RS256', 'client');
+    await generateAndSaveKey('ES256', 'evidence-issuer');
 }
 
 main().catch(console.error);
