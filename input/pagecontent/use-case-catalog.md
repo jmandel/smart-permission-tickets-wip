@@ -91,7 +91,7 @@ There is essentially one policy bucket here: the Data Holder's patient self-acce
 
 ### Use Case 2: Patient-Delegated Access
 
-**Status:** Modeled — no real-world deployments of this flow yet
+**Status:** Modeled
 
 #### Purpose
 
@@ -159,7 +159,7 @@ See the [per-ticket verification class open question](index.html#oq-verification
 
 ### Use Case 3: Public Health Investigation
 
-**Status:** Modeled — no real-world deployments of this flow yet
+**Status:** Modeled
 
 #### Purpose
 
