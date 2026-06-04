@@ -19,7 +19,7 @@ The ticket still carries the full authorization context; the interactive step fi
 
 Today, the Data Holder's only option in these cases is to reject the token exchange with `invalid_grant`, which gives the client no path forward. The patient's authorization intent (captured in the ticket) is lost.
 
-> **What this fallback is not for.** The `interaction_required` response is not an invitation to impose additional consent capture ceremonies, step-up authentication, first-time disclosure agreements, or other friction beyond what the ticket and issuer trust already provide. If a Data Holder does not trust the issuer's verification, it should reject the ticket with `invalid_grant`. The fallback exists for cases where the Data Holder trusts the ticket but cannot act on it without the patient's help resolving a specific local gap.
+> **What this fallback is not for.** The `interaction_required` response is not an invitation to impose additional consent capture ceremonies, step-up authentication, first-time disclosure agreements, or other friction beyond what the ticket and issuer trust already provide. If a Data Holder does not trust the issuer for the presented ticket type, does not support the ticket type, or cannot process the request under local policy, it should reject the token exchange with `invalid_grant` rather than fall back to interaction. The fallback exists for cases where the Data Holder trusts the ticket but cannot act on it without the patient's help resolving a specific local gap — for example, subject disambiguation or local account binding. It does not change the ticket's access constraints.
 {: .callout .callout-info}
 
 ### Proposal

@@ -40,14 +40,16 @@ The `sensitivity_policy` claim is an object with the following fields:
 | Field | Type | Description |
 |-------|------|-------------|
 | `withhold` | Coding[] | Sensitivity categories that SHALL be withheld if matched. |
-| `authorized` | Coding[] | Sensitivity categories that the issuer attests are within the authorization scope, subject to Data Holder policy and law. |
-| `unlisted_sensitive_data` | `"local_policy"` \| `"withhold"` \| `"authorized"` | How to treat locally classified sensitive data that does not match an `authorized` or `withhold` entry. Defaults to `"local_policy"` if absent. |
+| `release_authorized` | Coding[] | Sensitivity categories that the issuer attests are within the authorization scope, subject to Data Holder policy and law. |
+| `unlisted_sensitive_data` | `"local_policy"` \| `"withhold"` \| `"release_authorized"` | How to treat locally classified sensitive data that does not match a `release_authorized` or `withhold` entry. Defaults to `"local_policy"` if absent. |
 
-At least one of `withhold`, `authorized`, or `unlisted_sensitive_data` SHALL be present. If `unlisted_sensitive_data` is `"withhold"`, the ticket requires withholding all locally classified sensitive data except categories explicitly listed in `authorized`. If `unlisted_sensitive_data` is `"authorized"`, the issuer is attesting that all locally classified sensitive data is within the authorization scope except categories explicitly listed in `withhold`.
+At least one of `withhold`, `release_authorized`, or `unlisted_sensitive_data` SHALL be present. If `unlisted_sensitive_data` is `"withhold"`, the ticket requires withholding all locally classified sensitive data except categories explicitly listed in `release_authorized`. If `unlisted_sensitive_data` is `"release_authorized"`, the issuer is attesting that all locally classified sensitive data is within the authorization scope except categories explicitly listed in `withhold`.
 
-`unlisted_sensitive_data: "authorized"` is the broadest and highest-risk mode. It SHOULD only be used when the selected ticket-type profile or trust framework permits it and the issuer's authorization ceremony covers all locally classified sensitive data not otherwise withheld.
+`unlisted_sensitive_data: "release_authorized"` is the broadest and highest-risk mode. It SHOULD only be used when the selected ticket-type profile or trust framework permits it and the issuer's authorization ceremony covers all locally classified sensitive data not otherwise withheld.
 
-Each entry in `withhold` or `authorized` is a FHIR `Coding`:
+`withhold` serves two directions of intent: the patient's or issuer's exclusion choices, and the recipient's own data minimization. A client that does not want sensitive categories — for example, to insulate itself from special handling obligations — can request tickets that withhold them, and a Data Holder can honor that exclusion confidently because it only ever narrows release.
+
+Each entry in `withhold` or `release_authorized` is a FHIR `Coding`:
 
 ```json
 {
@@ -84,7 +86,7 @@ This ticket says HIV/AIDS-sensitive information is within the authorization scop
 {
   "must_understand": ["sensitivity_policy"],
   "sensitivity_policy": {
-    "authorized": [
+    "release_authorized": [
       {
         "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
         "code": "HIV",
@@ -96,7 +98,7 @@ This ticket says HIV/AIDS-sensitive information is within the authorization scop
 }
 ```
 
-The `authorized` entry does not force disclosure. It means the issuer has attested that this sensitivity category is not outside the ticket's authorization scope. The Data Holder still applies local law, local policy, patient matching, resource-level authorization, and technical enforceability checks.
+The `release_authorized` entry does not force disclosure. It means the issuer has attested that this sensitivity category is not outside the ticket's authorization scope. The Data Holder still applies local law, local policy, patient matching, resource-level authorization, and technical enforceability checks.
 
 ### Vocabulary Starting Points
 
@@ -115,12 +117,12 @@ The v3 Information Sensitivity Policy value set includes sensitivity categories 
 Data Holders implementing this profile SHALL apply the following rules:
 
 1. If `sensitivity_policy` is present, verify that `must_understand` includes `sensitivity_policy`.
-2. Evaluate `withhold` before `authorized`. If data matches both, `withhold` wins.
+2. Evaluate `withhold` before `release_authorized`. If data matches both, `withhold` wins.
 3. If data matches a `withhold` category, withhold it.
-4. If data matches an `authorized` category, treat that category as within the ticket's authorization scope, but release only if all other Data Holder policy, law, patient matching, and technical constraints permit release.
-5. If `unlisted_sensitive_data` is `"withhold"`, withhold locally classified sensitive data that does not match an `authorized` entry.
-6. If `unlisted_sensitive_data` is `"authorized"`, treat locally classified sensitive data that does not match a `withhold` entry as within the ticket's authorization scope, but release only if all other Data Holder policy, law, patient matching, and technical constraints permit release.
-7. If `unlisted_sensitive_data` is absent or `"local_policy"`, apply local policy for locally classified sensitive data that is not otherwise matched by `withhold` or `authorized`.
+4. If data matches an `release_authorized` category, treat that category as within the ticket's authorization scope, but release only if all other Data Holder policy, law, patient matching, and technical constraints permit release.
+5. If `unlisted_sensitive_data` is `"withhold"`, withhold locally classified sensitive data that does not match an `release_authorized` entry.
+6. If `unlisted_sensitive_data` is `"release_authorized"`, treat locally classified sensitive data that does not match a `withhold` entry as within the ticket's authorization scope, but release only if all other Data Holder policy, law, patient matching, and technical constraints permit release.
+7. If `unlisted_sensitive_data` is absent or `"local_policy"`, apply local policy for locally classified sensitive data that is not otherwise matched by `withhold` or `release_authorized`.
 8. If the Data Holder cannot enforce a presented must-understand sensitivity rule, reject with `invalid_grant` and an appropriate `error_description`.
 
 This profile does not require Data Holders to reveal whether withheld sensitive data exists. Error descriptions and audit entries should be designed so they do not create impermissible disclosure leakage.
@@ -152,7 +154,7 @@ Data Holders supporting this profile SHALL:
 
 - Recognize `sensitivity_policy` as a must-understand top-level claim.
 - Enforce `withhold` and `unlisted_sensitive_data: "withhold"` when they are present.
-- Treat `authorized` and `unlisted_sensitive_data: "authorized"` as permission to include a category, not as a mandate to release it.
+- Treat `release_authorized` and `unlisted_sensitive_data: "release_authorized"` as permission to include a category, not as a mandate to release it.
 - Reject when they cannot enforce a must-understand sensitivity rule.
 - Apply local law and local policy even when a category is authorized by the ticket.
 - Avoid responses that reveal the existence of withheld sensitive data when non-disclosure is required.
@@ -164,7 +166,7 @@ Trust frameworks or ticket-type profiles incorporating this profile should defin
 - Which issuers may use `sensitivity_policy`.
 - Which ticket types may carry it.
 - Which code systems and codes are accepted.
-- What patient or requester authorization ceremony is required before an issuer may populate `authorized` or `unlisted_sensitive_data: "authorized"`.
+- What patient or requester authorization ceremony is required before an issuer may populate `release_authorized` or `unlisted_sensitive_data: "release_authorized"`.
 - Whether `withhold` rules may be client-requested, patient-requested, issuer-imposed, or trust-framework-imposed.
 - What evidence the issuer must retain.
 - How responders may audit issuer compliance.
@@ -186,7 +188,7 @@ The following fragment shows the claim in context. It is not a complete ticket:
         "display": "substance abuse information sensitivity"
       }
     ],
-    "authorized": [
+    "release_authorized": [
       {
         "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
         "code": "HIV",

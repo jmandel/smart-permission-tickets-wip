@@ -6,7 +6,7 @@
 
 Current spec treats ticket issuance — how a client actually obtains a Permission Ticket from a trusted issuer — as out of scope. This proposal fills that gap with a concrete, deployable kickoff: the client performs a standard SMART App Launch against the issuer's SMART on FHIR endpoint, and the resulting token response carries an array of freshly minted Permission Tickets alongside a list of FHIR endpoint hints where the network expects those tickets to be usable.
 
-By reusing SMART App Launch verbatim, every conformant SMART client already knows how to start the flow, and every issuer already has the building blocks (authorize endpoint, token endpoint, discovery document, consent UX) to operate as a ticket minter.
+By reusing SMART App Launch verbatim, every conformant SMART client already knows how to start the flow, and every issuer already has the building blocks (authorize endpoint, token endpoint, discovery document, user-facing approval workflow) to operate as a ticket minter.
 
 ### Motivation
 
@@ -15,7 +15,7 @@ The main specification leaves "how does the client get the ticket" unspecified. 
 SMART App Launch is already the universal authorization kickoff in the SMART ecosystem:
 
 - Every SMART client knows how to discover `.well-known/smart-configuration`, run an authorization code flow with PKCE, and parse a token response.
-- Every SMART-capable server already knows how to run a consent UX, authenticate a user, and return an access token.
+- Every SMART-capable server already knows how to run an approval workflow, authenticate a user, and return an access token.
 - Identity proofing, multi-factor auth, delegation capture, and other sharing preferences — all the hard UX that an issuer needs to run before minting a ticket — map cleanly onto an authorization flow that a patient (or other authorizing party) already understands.
 
 An issuer that adopts this proposal becomes, from the client's perspective, a SMART on FHIR endpoint whose token response happens to carry Permission Tickets.
@@ -73,15 +73,15 @@ GET /authorize?
 The client includes:
 
 - `permission_ticket` — a new marker scope indicating that the client expects Permission Tickets in the token response. An issuer that does not mint tickets for this client (e.g., the user declined, or the requested ticket type is unsupported) SHALL NOT include this scope in the granted `scope` value.
-- **Desired SMART scopes for the ticket(s)** — e.g., `patient/Observation.rs`. These are the scopes the client wants the resulting tickets to authorize at Data Holders, not scopes used at the issuer itself. The issuer's consent UX frames them to the user as the sharing scope.
+- **Desired SMART scopes for the ticket(s)** — e.g., `patient/Observation.rs`. These are the scopes the client wants the resulting tickets to authorize at Data Holders, not scopes used at the issuer itself. The issuer's approval workflow frames them to the user as the sharing scope, where a user-facing ceremony applies.
 - `openid` and `fhirUser` if the client wants an `id_token` identifying the authorizing party.
 - `offline_access` if the client wants a refresh token for later re-issuance.
 
-#### 3. Issuer runs its consent UX and mints tickets
+#### 3. Issuer runs its issuance workflow and mints tickets
 
-Between authorize and redirect, the issuer runs whatever real-world verification and consent UX it operates — identity proofing via a digital ID wallet, delegation capture for UC2, and other sharing preferences. This is the same UX the issuer would run under any other kickoff mechanism; SMART App Launch just wraps it.
+Between authorize and redirect, the issuer runs whatever verification and approval workflow the selected ticket type requires. For patient-facing use cases, this may include sign-in, identity proofing via a digital ID wallet, delegation capture for UC2, and user approval of sharing preferences. For B2B use cases, issuance generally rests on case, claim, referral, study, directory, or participation checks rather than a user-facing approval ceremony (and may use a different kickoff than the user-facing launch described here). This is the same workflow the issuer would run under any other kickoff mechanism; SMART App Launch just wraps it.
 
-At the end of consent, the issuer mints one or more Permission Tickets. The issuer chooses ticket `aud` and `data_holder_filter` based on the network it operates within and the user's selections. It chooses `ticket_type` based on the relationship expressed during consent (self-access vs delegation, and so on).
+At the end of the workflow, the issuer mints one or more Permission Tickets. The issuer chooses ticket `aud` and `data_holder_filter` based on the network it operates within and the user's selections. It chooses `ticket_type` based on the relationship expressed during the workflow (self-access vs delegation, and so on).
 
 #### 4. Token response carries tickets and endpoint hints
 
@@ -153,7 +153,7 @@ Once the client holds the tickets, it presents them at Data Holder token endpoin
 
 #### 6. Re-issuance via refresh token
 
-When the client requested `offline_access`, the issuer's token response includes a refresh token. Presenting that refresh token at the issuer's token endpoint returns a new token response with a fresh `smart_permission_ticket` array. This lets long-lived clients rotate tickets without re-running the full consent UX. Refresh-token rotation, revocation, and lifetime follow standard OAuth behavior.
+When the client requested `offline_access`, the issuer's token response includes a refresh token. Presenting that refresh token at the issuer's token endpoint returns a new token response with a fresh `smart_permission_ticket` array. This lets long-lived clients rotate tickets without re-running the full issuance workflow. Refresh-token rotation, revocation, and lifetime follow standard OAuth behavior.
 
 #### 7. Presenter binding
 
@@ -166,7 +166,7 @@ For patient access use cases (UC1/UC2), `presenter_binding` is REQUIRED per the 
 
 ### Design Rationale
 
-*Why SMART App Launch rather than a new custom issuance API?* Because the control flow for ticket issuance is not new. The issuer needs to authenticate a user, run consent, and return an authorization artifact — that is exactly what an authorization server does. Reusing SMART App Launch lets implementations keep the existing launch, redirect, and token exchange mechanics, while adding the ticket-specific behavior this proposal defines. The specification additions are limited to two discovery fields and two token response fields.
+*Why SMART App Launch rather than a new custom issuance API?* Because the control flow for ticket issuance is not new. The issuer needs to authenticate a user, run its verification and approval workflow, and return an authorization artifact — that is exactly what an authorization server does. Reusing SMART App Launch lets implementations keep the existing launch, redirect, and token exchange mechanics, while adding the ticket-specific behavior this proposal defines. The specification additions are limited to two discovery fields and two token response fields.
 
 *Why put tickets in the token response rather than behind a separate fetch?* Because the access_token and the tickets represent the same authorization event and should be delivered atomically. A separate fetch would need its own auth, its own cache semantics, and its own failure modes — all for a value that is already known at token-issuance time.
 
