@@ -55,7 +55,7 @@ Unless otherwise stated, this specification uses **Data Holder** as the primary 
 
 ### Where Things Belong
 
-The architecture distributes responsibility deliberately. A quick map of where each kind of information lives:
+Different facts live in different places, on purpose. A quick map:
 
 | Information | Usually belongs in |
 |-------------|--------------------|
@@ -281,7 +281,7 @@ The Data Holder SHALL perform a two-layer validation:
 
 Every ticket SHALL include `subject.patient`, a FHIR Patient resource carrying the demographic facts needed for matching (name, date of birth, identifiers). The patient may be thin — it only needs enough information for the Data Holder to resolve to a local record. Keeping the FHIR shape in every ticket means all tickets parse consistently, and relying parties that accept the issuer's attestation directly can work from `subject.patient` alone.
 
-`subject_identity_evidence` (see [Identity Evidence](#identity-evidence)), when present, supplements `subject.patient` with upstream-verifiable demographics: the Data Holder can verify the evidence token independently of its trust in the ticket issuer. Ticket-type profiles MAY require it. The issuer SHALL keep `subject.patient` consistent with the verified evidence claims; a Data Holder MAY treat material inconsistency between them as grounds for rejection.
+`subject_identity_evidence` (see [Identity Evidence](#identity-evidence)), when present, supplements `subject.patient` with demographics the Data Holder can verify itself, independently of its trust in the ticket issuer. Ticket-type profiles MAY require it. The issuer SHALL keep `subject.patient` consistent with the verified evidence claims; a Data Holder MAY treat material inconsistency between them as grounds for rejection.
 
 `subject.recipient_record` may provide a direct-target optimization: a FHIR Reference that can carry a `.reference` (literal resource URL), a `.identifier` (business identifier such as an MRN at the target Data Holder), or both. When `recipient_record` is present, the Data Holder SHOULD use it as a hint for faster resolution, falling back to demographic matching on `subject.patient` if the reference does not resolve.
 
@@ -318,9 +318,9 @@ The embedded ID token's `aud` therefore never names the Data Holder itself — D
 
 Future versions may define additional identity-evidence token types, such as mobile driver's license (mDL) or other verifiable credential formats.
 
-Identity evidence supplements — it does not replace — the FHIR-normalized party representations. `subject.patient` is always present, keeping parsing consistent and serving relying parties that accept issuer attestation directly; evidence adds independent upstream verifiability for Data Holders and profiles that require it. The issuer SHALL keep the FHIR representations consistent with the verified evidence claims; a Data Holder MAY treat material inconsistency as grounds for rejection.
+Identity evidence supplements — it does not replace — the FHIR party representations (see [Subject Resolution](#subject-resolution)). The same rule applies on the requester side: `requester` stays present, and the issuer SHALL keep it consistent with any `requester_identity_evidence`.
 
-*Design note:* evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. It is protocol-layer material verified with JOSE/OIDC machinery at the token endpoint, top-level claims are the unit of this specification's must-understand and extension semantics, and sibling slots keep `subject_identity_evidence` and `requester_identity_evidence` identical in shape. Binding is unambiguous because a ticket names exactly one subject and at most one requester.
+*Design note:* evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. The evidence is a JWT verified with OIDC machinery at the token endpoint, not clinical content; top-level claims are how this specification handles must-understand and extensions; and sibling slots keep the two evidence claims identical in shape. There is no ambiguity about who the evidence describes, because a ticket names exactly one subject and at most one requester.
 
 #### Issuer-Attested Claims
 
@@ -347,6 +347,7 @@ The Data Holder calculates granted access through the **intersection** of:
 The `access` object describes the maximum access the issuer is asking the Data Holder to consider. It is a limit, not a promise: the Data Holder is not required to grant all listed access, and may narrow the grant according to local policy and technical capability.
 
 If the intersection yields no valid access, return `invalid_scope` error.
+
 Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on ticket type. The `patient/*` versus `system/*` scope prefix reflects the OAuth client/access mode at the Data Holder, not whether the ticket is single-patient or population-level. In the current base kernel, every ticket identifies a single patient via `subject.patient`. For single-patient ticket types, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
 
 #### SMART Scope Projection
@@ -595,12 +596,11 @@ Extensions should be modeled as new top-level claims rather than injecting field
 
 `requester` is an **issuer-attested claim** about the real-world party for whom the grant exists. It is distinct from the presenting software client (the presenter authenticates via `client_assertion` and optional `presenter_binding`).
 
-* Absent for self-access. For self-access, the patient's identity is already represented by `subject.patient` (optionally corroborated by `subject_identity_evidence`); a separate `requester` would be redundant.
+* Absent for self-access. For self-access, the patient's identity is already represented by `subject.patient`; a separate `requester` would be redundant.
 * Present for proxy, organizational, clinician, or other non-self use cases.
-* The Data Holder relies on the issuer's attestation per its configured trust policy; it does **not** independently verify the requester's identity against the client authentication event.
-* `requester` is not how the presenting client authenticates — the client authenticates separately. However, `requester` is often part of the ticket-type access decision: the Data Holder may use requester type, identity, role, and relationship to decide whether the ticket can be accepted and what access can be granted.
-* The **authentication gate** for ticket redemption remains: issuer trust, ticket signature, presenter binding, and audience validation. `requester` sits above that gate, as a policy-selection input.
-* The level of real-world verification the issuer performed before attesting to the requester varies by use case. For delegation, the issuer typically identity-proofed the requester and confirmed the patient's intent to delegate. For B2B use cases (public health, payer, consult), the issuer has institutional knowledge of the requesting organization rather than individual identity proofing.
+* The Data Holder relies on the issuer's attestation; it does **not** independently verify the requester's identity.
+* `requester` plays no part in authentication — the client authenticates separately, and redemption is gated by issuer trust, ticket signature, presenter binding, and audience checks. It does play a part in the access decision: the Data Holder uses requester type, identity, and authority to decide whether to accept the ticket and what to grant.
+* How much verification stands behind the attestation varies by use case. For delegation, the issuer identity-proofed the requester and confirmed the patient's delegation. For B2B use cases (public health, payer, consult), the issuer knows the requesting organization institutionally rather than identity-proofing an individual.
 
 #### Relationship between `presenter_binding` and `requester`
 
@@ -608,7 +608,7 @@ The `requester` and `presenter_binding` will often identify the same organizatio
 
 #### Delegation and RelatedPerson.relationship
 
-For delegated access, the `requester` is a `RelatedPerson`, and `RelatedPerson.relationship` carries **exactly one coding**: the requester's authority — why they are permitted to ask. A family relationship is deliberately not part of the model: "daughter" or "spouse" is not an authority assertion, and no Data Holder policy class we have identified routes on it — proxy policy classes key on the authority type plus subject demographics (minor vs. adolescent vs. adult). The requester's display identity is carried by `name`.
+For delegated access, the `requester` is a `RelatedPerson`, and `RelatedPerson.relationship` carries **exactly one coding**: the requester's authority — why they are permitted to ask. Family relationship ("daughter," "spouse") is deliberately left out: it is not an authority assertion, and no Data Holder policy we have identified depends on it — proxy policies turn on the authority type and the patient's age. The requester's `name` covers display.
 
 The authority coding comes from a **closed, curated value set** of [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts: codes qualify only if their formal definition asserts delegated or conferred authority, never by connotation. The value set covers the mutually exclusive sources of authority:
 
@@ -620,7 +620,7 @@ The authority coding comes from a **closed, curated value set** of [v3-RoleCode]
 
 All codes are existing v3-RoleCode concepts.
 
-Authority validity is enforced through the ticket envelope, not through nested fields: the issuer SHALL NOT set ticket `exp` later than the verified end of the requester's authority, and handles earlier termination through [revocation](#revocation). `RelatedPerson.period` MAY additionally record the verified validity bound for audit and display.
+The ticket SHALL expire (`exp`) no later than the requester's verified authority ends. If the authority ends early, the issuer revokes the ticket (see [Revocation](#revocation)). `RelatedPerson.period` MAY record the authority's validity dates for audit; Data Holders do not need to check it separately.
 
 Ticket types that support delegated access (see [UC2](use-case-catalog.html#use-case-2-patient-delegated-access)) define per-code issuer verification obligations — what the issuer must have verified before asserting each code.
 
@@ -649,9 +649,9 @@ Ticket types that support delegated access (see [UC2](use-case-catalog.html#use-
 }
 ```
 
-This tells the Data Holder: "the patient designated Elena Reyes as a delegate through the issuer's verified workflow, valid through the end of 2026." The Data Holder routes to its corresponding local policy class (e.g., different rules for a guardian vs. a POA holder vs. a patient-designated delegate). The actual POA document or delegation record, if needed for audit or dispute review, stays with the issuer — the ticket `jti` anchors reconstruction from issuer records.
+This tells the Data Holder: "the patient designated Elena Reyes as a delegate through the issuer's verified workflow, valid through the end of 2026." The Data Holder applies its matching local policy (different rules for a guardian vs. a POA holder vs. a patient-designated delegate). The issuer keeps the delegation record or instrument; if a dispute arises later, the ticket's `jti` lets auditors pull the issuer's records for that grant.
 
-> **Open Question: Per-Ticket Verification Class.** The authority coding tells the Data Holder which policy bucket applies; per-code issuer obligations (defined by the ticket-type profile) tell it what verification backs the assertion. Do Data Holders additionally need a per-ticket signal of *how* the issuer verified the authority (e.g., portal delegation record vs. examined instrument vs. court order) — a step toward evidence-in-ticket — or are per-code obligations plus trust-framework audit sufficient? The working group plans to validate this with health-system authorization and release-of-information experts.
+> **Open Question: Per-Ticket Verification Class.** Should each ticket also say *how* the issuer verified the authority (portal delegation record, examined instrument, court order)? Or is it enough that each code carries defined issuer obligations, audited through the trust framework? The working group plans to review this with health-system authorization and release-of-information experts.
 {: .callout .callout-open-question #oq-verification-class}
 
 ---
@@ -663,7 +663,7 @@ The issuer does all real-world verification. The ticket carries only what the Da
 #### What the Issuer Verifies Before Minting
 
 * Patient identity (via digital ID, in-person verification, portal authentication, etc.)
-* Requester identity and relationship to patient (for delegation: POA, guardianship, parental authority; for B2B: organizational identity)
+* Requester identity and authority (for delegation: patient designation, POA, guardianship; for B2B: organizational identity)
 * Legal/regulatory basis for access (consent obtained, mandate exists, contract in force, care relationship established)
 * Scope appropriateness (the requested access is within the delegation scope, study protocol, mandate authority, etc.)
 * Any jurisdiction-specific requirements
@@ -674,7 +674,7 @@ The issuer does all real-world verification. The ticket carries only what the Da
 * **For cryptographic validation**: signature, `iss` (issuer trust), `exp`, `aud`, `presenter_binding`
 * **For identity evidence validation**: `subject_identity_evidence` and `requester_identity_evidence`, whenever present — base verification rules plus profile-defined parameters
 * **For access filtering**: `access.permissions`, `data_period`, `data_holder_filter`
-* **For local policy selection**: `requester` (type, identity, relationship), `ticket_type`, `context` — the Data Holder may apply different local policies based on these (e.g., broader release for a public health investigation than for a payer claim)
+* **For local policy selection**: `requester` (type, identity, authority), `ticket_type`, `context` — the Data Holder may apply different local policies based on these (e.g., broader release for a public health investigation than for a payer claim)
 * **For audit**: all of the above
 
 #### What the Data Holder Is Not Expected to Do
@@ -689,7 +689,7 @@ When its configured trust policy permits reliance on the issuer for the presente
 
 ### Context (Ticket-Type-Specific Semantics)
 
-The `context` claim carries ticket-type-specific mandatory workflow semantics. `ticket_type` is the sole discriminator; there is no separate `context.kind`.
+The `context` claim carries the facts a specific ticket type requires. `ticket_type` alone determines the context schema; there is no separate `context.kind`.
 
 A fact belongs in `context` if every instance of that ticket type needs it for the Data Holder to say yes or no, but other ticket types do not.
 
@@ -889,7 +889,7 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 | Unsupported constraint | `invalid_grant` | "Unsupported access constraint: {field}" |
 | No valid scopes after intersection | `invalid_scope` | "No authorized scopes" |
 
-A Data Holder MAY use a general `error_description` when a more specific explanation would reveal sensitive information, confidential policy, or the possible existence of withheld data.
+The OAuth `error` codes above are normative. The `error_description` values are representative examples; implementations may use different wording while conveying the same failure. A Data Holder MAY use a general `error_description` when a more specific explanation would reveal sensitive information, confidential policy, or the possible existence of withheld data.
 
 ---
 
@@ -912,7 +912,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Process `must_understand`: reject with `invalid_grant` if any listed claim name is unrecognized
 - Reject with `invalid_grant` if any present kernel field cannot be enforced
 - Resolve the ticket subject to a local patient record using `subject.patient`, corroborated by verified `subject_identity_evidence` when present; reject if zero or ambiguous matches
-- Calculate granted access as intersection of requested scopes, ticket `access.permissions`, and client registration
+- Calculate granted access per [Access Calculation](#access-calculation): the intersection of requested scopes, ticket access, client eligibility, ticket-type rules, and local policy and capability
 - Enforce all presented `access` constraints (`permissions`, `data_period`, `data_holder_filter`) or reject with `invalid_grant`
 - Enforce subset constraints at the appropriate layer (token endpoint, resource server, or both)
 - If `revocation` is present, perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request
@@ -926,9 +926,6 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 **MAY:**
 - Support trust framework audience validation
 - Use `subject.recipient_record` as a hint for faster patient resolution
-
-
-The OAuth `error` codes above are normative. The `error_description` values are representative examples; implementations may use different wording while conveying the same failure.
 
 #### Client Requirements
 
@@ -946,13 +943,14 @@ For well-known clients, that Client ID URL is the deterministic identifier `well
 - For single-patient ticket types, request SMART v2 CRUDS suffix scopes (for example `patient/Observation.rs`)
 - When using a JWT client assertion, include `jti` in that assertion for replay protection
 - Refresh tickets before expiration for continued access
+
 #### Issuer Requirements
 
 **SHALL:**
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
-- Include claims: `iss`, `aud`, `exp`, `jti`, `ticket_type`, `subject`, and `access`; include `subject_identity_evidence` when the ticket type requires upstream-verifiable subject identity; include `context` when the ticket type defines context fields
+- Include claims: `iss`, `aud`, `exp`, `jti`, `ticket_type`, `subject`, and `access`; include `context` when the ticket type defines context fields
 - When using `presenter_binding`, bind the ticket appropriately with one method (`jkt` or `trust_framework_client`)
-- When a ticket-type profile requires identity evidence, include the applicable `subject_identity_evidence` or `requester_identity_evidence`
+- When the ticket type requires identity evidence, include the applicable `subject_identity_evidence` or `requester_identity_evidence`
 - If `revocation` is present, publish the status list at the URL specified in tickets
 
 **SHOULD:**
