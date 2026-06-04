@@ -632,7 +632,7 @@ Ticket types that support delegated access (see [UC2](use-case-catalog.html#use-
       "coding": [
         {
           "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
-          "code": "HPOWATT"
+          "code": "DELEGATEE"
         }
       ]
     }
@@ -649,7 +649,7 @@ Ticket types that support delegated access (see [UC2](use-case-catalog.html#use-
 }
 ```
 
-This tells the Data Holder: "Elena Reyes holds healthcare power of attorney for the subject, verified through the end of 2026." The Data Holder routes to its corresponding local policy class (e.g., different rules for a guardian vs. a POA holder vs. a patient-designated delegate). The actual POA document or delegation record, if needed for audit or dispute review, stays with the issuer — the ticket `jti` anchors reconstruction from issuer records.
+This tells the Data Holder: "the patient designated Elena Reyes as a delegate through the issuer's verified workflow, valid through the end of 2026." The Data Holder routes to its corresponding local policy class (e.g., different rules for a guardian vs. a POA holder vs. a patient-designated delegate). The actual POA document or delegation record, if needed for audit or dispute review, stays with the issuer — the ticket `jti` anchors reconstruction from issuer records.
 
 > **Open Question: Per-Ticket Verification Class.** The authority coding tells the Data Holder which policy bucket applies; per-code issuer obligations (defined by the ticket-type profile) tell it what verification backs the assertion. Do Data Holders additionally need a per-ticket signal of *how* the issuer verified the authority (e.g., portal delegation record vs. examined instrument vs. court order) — a step toward evidence-in-ticket — or are per-code obligations plus trust-framework audit sufficient? The working group plans to validate this with health-system authorization and release-of-information experts.
 {: .callout .callout-open-question #oq-verification-class}

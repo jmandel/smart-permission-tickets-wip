@@ -104,7 +104,7 @@ const uc2_payload: PermissionTicket = {
     requester: {
         resourceType: "RelatedPerson",
         relationship: [
-            { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-RoleCode", code: "HPOWATT", display: "healthcare power of attorney" }] }
+            { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-RoleCode", code: "DELEGATEE", display: "delegatee" }] }
         ],
         period: { end: "2026-12-31" },
         name: [{ family: "Reyes", given: ["Elena"] }]
