@@ -309,9 +309,10 @@ The base evidence shape is an embedded OpenID Connect ID token:
 * Parse the embedded JWT and verify its signature against the evidence issuer's published keys (for example, via OpenID Connect discovery from the token's `iss`).
 * Confirm the evidence issuer is accepted for identity evidence under the Data Holder's configured trust policy. Evidence-issuer trust is configured separately from ticket-issuer trust.
 * Confirm the evidence was temporally valid when the ticket was issued — the evidence records a verification event at issuance time, not a live authentication at redemption time.
+* Confirm the evidence was issued to the right party: the token's `aud` (and `azp`, when present) SHALL identify a client that the Data Holder's trust policy associates with the ticket issuer. This establishes that the authentication event happened at the ticket issuer, rather than the token being harvested from an unrelated application's sign-in. A ticket-type profile MAY designate a different expected audience — for example, a profile for client-issued tickets binds the expected audience to the presenter-bound client.
 * Use the token's standard OpenID Connect claims (for example `given_name`, `family_name`, `birthdate`) as verified demographics: for subject resolution when carried in `subject_identity_evidence`, or to corroborate `requester` when carried in `requester_identity_evidence`.
 
-The embedded ID token's `aud` names the client of the original authentication event (typically the ticket issuer or its application), not the Data Holder. Data Holders SHALL NOT expect their own identifier in the evidence `aud`.
+The embedded ID token's `aud` therefore never names the Data Holder itself — Data Holders SHALL NOT expect their own identifier in the evidence `aud`. How a Data Holder learns which client identifiers belong to a ticket issuer at each acceptable evidence issuer is deployment configuration: issuer metadata, a trust-framework directory, or direct configuration alongside the issuer trust policy.
 
 **Profile parameters.** Ticket-type profiles and trust frameworks configure the parameters of this base machinery: which evidence issuers are acceptable, required assurance (for example, IAL2 or specific `acr` values), required claims, and any freshness window tighter than the base rule.
 
