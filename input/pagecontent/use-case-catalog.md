@@ -119,10 +119,24 @@ Requester completes identity verification with the issuer → issuer verifies th
 
 #### Requester and Authority
 
-The `requester.relationship` codings carry two distinct kinds of facts:
+The `requester.relationship` codings carry two distinct layers of fact (see [Delegation and RelatedPerson.relationship](index.html#delegation-and-relatedpersonrelationship) in the base specification):
 
-* **Personal relationship** (for example `DAU`, `MTH`, `SPS`) — who the requester is to the patient. Useful for display, audit, and policy routing alongside subject demographics (for example, distinguishing parent-of-minor from parent-of-adolescent policy classes).
-* **Legal authority** (for example `GUARD`, `HPOWATT`) — why the requester is permitted to ask. See [Requester Semantics](index.html#requester-semantics) in the base specification.
+* **Familial/personal codings** (for example `DAU`, `MTH`, `SPS`) — who the requester is to the patient. Useful for display, audit, and policy routing alongside subject demographics (for example, distinguishing parent-of-minor from parent-of-adolescent policy classes). Zero or more may appear.
+* **Authority coding** — why the requester is permitted to ask. **Exactly one** SHALL appear, from the closed authority value set: `DELEGATEE`, `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT`, `GUARD` (all from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html)).
+
+`RelatedPerson.period`, when present, bounds the validity of the relationship and authority. Data Holders SHALL treat an expired `period.end` as invalidating the authority assertion regardless of the ticket's `exp`.
+
+##### Issuer Verification Obligations
+
+Before asserting an authority coding, the issuer SHALL have completed the corresponding verification:
+
+| Authority coding | The issuer verified that… |
+|------------------|---------------------------|
+| `DELEGATEE` | The patient was authenticated and competent at grant time and designated this requester through the issuer's delegation workflow |
+| `HPOWATT` / `DPOWATT` / `POWATT` / `SPOWATT` | A power-of-attorney-class instrument of the corresponding type was examined and covers the requested access |
+| `GUARD` | Guardianship, parental authority, or court-ordered custody/access was verified — including, for parental assertions over a minor, that no known order restricts the requester's access |
+
+The underlying source documents and verification records stay with the issuer; the ticket `jti` anchors audit and dispute reconstruction from issuer records. Trust frameworks may audit issuer compliance with these obligations.
 
 #### Policy Selection Inputs
 
@@ -131,7 +145,8 @@ The `requester.relationship` codings carry two distinct kinds of facts:
 | Ticket type | `ticket_type` | Proxy/delegated-access policy classes (vs. self-access) |
 | Subject age and demographics | `subject.patient` | Minor vs. adolescent vs. adult subject policy classes |
 | Personal relationship | `requester.relationship` (familial codings) | Parent / spouse / other-adult routing |
-| Legal authority | `requester.relationship` (authority codings) | Delegation vs. guardianship vs. power-of-attorney policy buckets |
+| Authority | `requester.relationship` (authority coding) | Patient-delegate vs. guardianship vs. power-of-attorney policy buckets |
+| Authority validity | `requester.period` | Whether the authority assertion is current |
 
 #### Data Holder Processing
 
@@ -146,7 +161,7 @@ The `requester.relationship` codings carry two distinct kinds of facts:
 
 #### Open Questions
 
-See the delegation authority basis open question in the [base specification](index.html#requester-semantics): how the authority basis for delegated access should be represented is under active review.
+See the [per-ticket verification class open question](index.html#oq-verification-class) in the base specification: whether Data Holders need a per-ticket signal of how the issuer verified the authority, beyond the per-code obligations above. Planned for review with health-system authorization and release-of-information experts.
 
 #### Example
 

@@ -596,14 +596,24 @@ The `requester` and `presenter_binding` will often identify the same organizatio
 
 #### Delegation and RelatedPerson.relationship
 
-For delegated access, the `requester` is a `RelatedPerson`. FHIR's `RelatedPerson.relationship` field (0..* CodeableConcept, Preferred binding) can express both the personal relationship **and** the legal authority type using stacked codings from v3-RoleCode:
+For delegated access, the `requester` is a `RelatedPerson`. FHIR's `RelatedPerson.relationship` field (0..* CodeableConcept) carries two distinct layers of fact, both as codings from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html):
 
-* Familial: `DAU` (daughter), `MTH` (mother), `SPS` (spouse), etc.
-* Legal authority: `GUARD` (guardian), `HPOWATT` (healthcare power of attorney), `DPOWATT` (durable POA), `POWATT` (power of attorney), `SPOWATT` (special POA)
+* **Familial/personal codings** (`DAU`, `MTH`, `SPS`, …) — who the requester is to the patient. Display, audit, matching, and one input to policy routing (for example, distinguishing parent-of-minor from other-adult policy classes alongside subject demographics).
+* **Authority codings** — why the requester is permitted to ask. A bare family relationship is not an authority assertion: "parent" does not, by itself, establish access (custody may be restricted; the patient may be an adult).
 
-For delegated access, a bare family relationship is usually not enough. The issuer is attesting that the requester relationship and the applicable authorization basis together support the grant. That basis may come from patient delegation, state law, guardianship, custody, court order, power of attorney, or another ticket-type-specific authority. The base kernel represents this today through the requester resource and the issuer's attestation; narrower profiles may define additional evidence or a dedicated top-level authorization-basis claim if Data Holders need a more explicit selector.
+Authority codings come from a **closed, curated value set**: codes qualify only if their formal definition asserts delegated or conferred authority, never by connotation. The value set covers the mutually exclusive sources of authority:
 
-R5 explicitly added the legal authority codes to the RelatedPerson relationship value set. A single `requester` can carry both:
+| Source of authority | Code(s) | Meaning |
+|---------------------|---------|---------|
+| Patient-granted, informal | `DELEGATEE` | The patient (delegator) granted this person access through the issuer's verified workflow |
+| Patient-granted, formal instrument | `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT` | The patient executed a power-of-attorney-class instrument |
+| Law- or court-conferred | `GUARD` | Natural (parental), appointed, or court-ordered guardianship or custody |
+
+All codes are existing v3-RoleCode concepts. `RelatedPerson.period` bounds the validity of the relationship and authority, when known.
+
+Ticket types that support delegated access (see [UC2](use-case-catalog.html#use-case-2-patient-delegated-access)) require exactly one authority coding alongside any familial codings, and define per-code issuer verification obligations — what the issuer must have verified before asserting each code.
+
+A single `requester` carries both layers:
 
 ```json
 "requester": {
@@ -626,6 +636,7 @@ R5 explicitly added the legal authority codes to the RelatedPerson relationship 
       ]
     }
   ],
+  "period": { "end": "2026-12-31" },
   "name": [
     {
       "family": "Reyes",
@@ -637,10 +648,10 @@ R5 explicitly added the legal authority codes to the RelatedPerson relationship 
 }
 ```
 
-This tells the Data Holder: "the requester is the patient's daughter and holds healthcare power of attorney." The Data Holder can use this for local policy decisions (e.g., applying different rules for a guardian vs. a POA holder). The actual POA document, if needed for audit or review, is outside the base ticket kernel.
+This tells the Data Holder: "the requester is the patient's daughter and holds healthcare power of attorney, verified through the end of 2026." The Data Holder routes to its corresponding local policy class (e.g., different rules for a guardian vs. a POA holder vs. a patient-designated delegate). The actual POA document or delegation record, if needed for audit or dispute review, stays with the issuer — the ticket `jti` anchors reconstruction from issuer records.
 
-> **Open Question: Delegation Authorization Basis.** Some Data Holders may need a machine-readable signal for what grants delegated access, separate from the requester's relationship code. Candidate shapes include a profile-specific top-level claim, evidence-in-ticket for later review, or keeping the basis entirely within issuer verification and trust-framework policy. The working group should validate this with health-system authorization and release-of-information experts before adding a base-kernel field.
-{: .callout .callout-open-question #oq-4-delegation-basis}
+> **Open Question: Per-Ticket Verification Class.** The authority coding tells the Data Holder which policy bucket applies; per-code issuer obligations (defined by the ticket-type profile) tell it what verification backs the assertion. Do Data Holders additionally need a per-ticket signal of *how* the issuer verified the authority (e.g., portal delegation record vs. examined instrument vs. court order) — a step toward evidence-in-ticket — or are per-code obligations plus trust-framework audit sufficient? The working group plans to validate this with health-system authorization and release-of-information experts.
+{: .callout .callout-open-question #oq-verification-class}
 
 ---
 

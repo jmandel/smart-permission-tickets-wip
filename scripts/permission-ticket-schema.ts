@@ -119,6 +119,7 @@ export const RelatedPersonSchema = z.object({
   relationship: z.array(FHIRCodeableConceptSchema).optional(),
   name: z.array(FHIRHumanNameSchema).optional(),
   identifier: z.array(FHIRIdentifierSchema).optional(),
+  period: FHIRPeriodSchema.optional(),
 }).catchall(z.unknown());
 
 export const PractitionerSchema = z.object({

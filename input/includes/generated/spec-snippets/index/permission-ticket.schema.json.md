@@ -1065,6 +1065,18 @@
                 },
                 "additionalProperties": {}
               }
+            },
+            "period": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "string"
+                },
+                "end": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": {}
             }
           },
           "required": [
