@@ -134,9 +134,9 @@ Data Holders that support Permission Tickets SHALL advertise this in their `.wel
 
 ##### Trust and Client Registration
 
-This specification does not require a single global client registry. The Permission Ticket carries the ticket details; the client separately authenticates to the Data Holder and, when presenter binding is present, proves it is the client allowed to redeem the ticket. A Data Holder still authenticates every presenting client and may require the client to be recognized through local registration, well-known keys, UDAP, OpenID Federation, or another accepted trust-framework mechanism.
+This specification does not require a global client registry. Every Data Holder authenticates every presenting client — through local registration, well-known keys, UDAP, OpenID Federation, or another trust-framework mechanism it accepts. When the ticket carries `presenter_binding`, the client must also prove it is the specific client allowed to redeem that ticket.
 
-Many client identity approaches are compatible with this architecture. The same approach typically appears in two contexts: **registration** (how a Data Holder learns the client's keys) and **ticket binding** (how a ticket constrains which client may redeem it). These are related but not identical: for example, a manually registered unaffiliated client may still be bound by key thumbprint if the issuer knows the exact client key, or may be left unbound if the issuer does not know which client will redeem the ticket. The table below summarizes a few common examples; it is illustrative, not exhaustive, and other trust frameworks fit the same pattern.
+Client identity shows up in two places: **registration** (how a Data Holder learns the client's keys) and **ticket binding** (how a ticket limits which client may redeem it). These are related but independent: a manually registered client may be key-bound if the issuer knows its key, or left unbound if the issuer does not know which client will redeem the ticket. The table shows common examples; other trust frameworks fit the same pattern.
 
 | Approach | Registration | Binding | Key Discovery |
 |----------|-------------|---------|---------------|
@@ -147,13 +147,7 @@ Many client identity approaches are compatible with this architecture. The same 
 
 Client ID format and registration details are determined by the chosen approach. Client-to-Issuer issuance protocol details are out of scope for this specification; profile-specific guides may define them.
 
-For the **Well-Known JWKS** approach, this specification uses a deterministic client identifier convention:
-
-- the client's stable identifier is `well-known:{entity_uri}`
-- `entity_uri` is the HTTPS URL identity of the client
-- the same `entity_uri` yields the same `client_id` at every Data Holder, so no per-holder registration-assigned identifier is needed for this class of client
-
-This is how a set of independently operated Data Holders can recognize the same well-known client consistently. The `well-known:` prefix indicates that the remainder of the `client_id` is an entity URL whose keys are published at `{entity_uri}/.well-known/jwks.json`. When a client presents a `client_assertion` with `iss = sub = well-known:{entity_uri}`, the Data Holder strips the prefix, resolves the JWKS from the entity's well-known location, verifies the signature, and then applies any relevant trust-framework checks for that entity.
+For the **Well-Known JWKS** approach, the client's identifier is `well-known:{entity_uri}`, where `entity_uri` is an HTTPS URL the client controls and its keys are published at `{entity_uri}/.well-known/jwks.json`. The same `entity_uri` yields the same `client_id` at every Data Holder — no per-holder registration identifier is needed. When a client presents a `client_assertion` with `iss = sub = well-known:{entity_uri}`, the Data Holder strips the prefix, fetches the JWKS from the well-known location, verifies the signature, and applies any trust-framework checks for that entity.
 
 **The Request:**
 ```http
@@ -309,10 +303,10 @@ The base evidence shape is an embedded OpenID Connect ID token:
 * Parse the embedded JWT and verify its signature against the evidence issuer's published keys (for example, via OpenID Connect discovery from the token's `iss`).
 * Confirm the evidence issuer is accepted for identity evidence under the Data Holder's configured trust policy. Evidence-issuer trust is configured separately from ticket-issuer trust.
 * Confirm the evidence was temporally valid when the ticket was issued — the evidence records a verification event at issuance time, not a live authentication at redemption time.
-* Confirm the evidence was issued to a party in this ticket's chain: the token's `aud` (and `azp`, when present) SHALL identify either a client the Data Holder's trust policy associates with the ticket issuer, or the presenting client itself (as authenticated, and as bound by `presenter_binding` when present). This establishes that the authentication event belongs to this ticket's issuance or presentation — not a token harvested from an unrelated application's sign-in. Ticket-type profiles MAY narrow which of these audiences is acceptable.
+* Confirm who the evidence was issued to: the token's `aud` (and `azp`, when present) SHALL identify either the ticket issuer (via a client identifier the Data Holder's trust policy associates with it) or the presenting client itself. This proves the sign-in happened as part of issuing or presenting this ticket — not harvested from some other application's sign-in. Profiles MAY allow only one of these.
 * Use the token's standard OpenID Connect claims (for example `given_name`, `family_name`, `birthdate`) as verified demographics: for subject resolution when carried in `subject_identity_evidence`, or to corroborate `requester` when carried in `requester_identity_evidence`.
 
-The embedded ID token's `aud` therefore never names the Data Holder itself — Data Holders SHALL NOT expect their own identifier in the evidence `aud`. How a Data Holder learns which client identifiers belong to a ticket issuer at each acceptable evidence issuer is deployment configuration: issuer metadata, a trust-framework directory, or direct configuration alongside the issuer trust policy.
+The evidence `aud` never names the Data Holder itself — Data Holders SHALL NOT expect their own identifier there. How a Data Holder learns which client identifiers belong to a ticket issuer is deployment configuration: issuer metadata, a trust-framework directory, or direct configuration.
 
 **Profile parameters.** Ticket-type profiles and trust frameworks configure the parameters of this base machinery: which evidence issuers are acceptable, required assurance (for example, IAL2 or specific `acr` values), required claims, and any freshness window tighter than the base rule.
 
