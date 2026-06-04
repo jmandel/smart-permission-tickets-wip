@@ -2,9 +2,11 @@
 
 ### Introduction
 
-A Permission Ticket is an issuer-signed JWT presented to a Data Holder's token endpoint via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). It allows a client to redeem a portable authorization grant at any Data Holder that falls within the ticket's intended audience and satisfies its constraints, without requiring the issuer to know where the subject has received care.
+A Permission Ticket is a **signed access ticket**: an issuer-signed JWT that a client presents to a Data Holder's token endpoint via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). It lets a client ask a Data Holder for a local access token without repeating the whole authorization or verification workflow at every Data Holder. The ticket is portable: the same ticket can be presented at any Data Holder within its intended audience, without requiring the issuer to know where the subject has received care.
 
 The ticket is built around a **portable kernel**: only the signed fields that a Data Holder plausibly needs in order to say yes or no to a request live in the common shell. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), an **access** grant (what resources and constraints), and an optional **context** object whose schema is selected by `ticket_type`.
+
+These fields are **policy-selection inputs**. Data Holders already maintain internal access policies — for self-access, proxy classes, B2B disclosure, and more. The ticket carries enough issuer-verified facts about who is asking, about whom, and why, for the Data Holder to select the correct local policy, even for a requester it has never seen. The ticket selects among the Data Holder's policies; it does not rewrite them. If the Data Holder accepts the ticket, it issues a local access token scoped by the ticket, the client's request and eligibility, the selected ticket type, and the Data Holder's own policies and technical capabilities.
 
 When present, `presenter_binding` cryptographically binds the ticket to the presenting client's key and/or trust-framework identity. A Data Holder authenticates the client, verifies the ticket signature against the issuer's published keys, enforces presenter binding if present, and grants access scoped to the intersection of requested and authorized access. No user login is required at the Data Holder.
 
@@ -28,10 +30,11 @@ When present, `presenter_binding` cryptographically binds the ticket to the pres
 - User-facing consent or authorization UX
 - Ticket issuance protocols between clients and issuers
 - A universal schema for all possible use cases (ticket types define use-case-specific constraints)
+- A general consent record, legal authorization document, or jurisdiction-specific representation model. A ticket type may reference profile-defined supporting records where needed, but the base ticket does not attempt to encode every legal, policy, or workflow requirement behind a data request
+- Jurisdiction-specific consent, authorization, representation, disclosure, or data-minimization rules; these are handled by applicable law, local policy, trust frameworks, contracts, and ticket-type profiles
 - Constraints on downstream data use, retention, or re-disclosure by the client after data has been received; these are governed by the trust framework under which the client operates and applicable law
 
-> **Open Question (OQ-1): Consent Beyond Ticket Fields.** What concrete use cases would require a FHIR Consent reference that the current ticket fields cannot express? The ticket's explicit fields — `access.permissions`, `data_period`, and `data_holder_filter` — already model a substantial portion of what patients and authorizing parties want to express about data sharing. If specific scenarios surface where these fields are insufficient, the specification would need a mechanism to embed or reference a FHIR Consent resource within the ticket. The working group is seeking concrete scenarios rather than theoretical ones.
-{: .callout .callout-open-question #oq-1}
+Requested scopes, ticket access constraints, and granted scopes are technical access boundaries. They can support data minimization, but they do not represent the full set of obligations that may apply to the requester, client, issuer, Data Holder, or recipient after data is received.
 
 ### Terms and Roles
 
@@ -49,6 +52,22 @@ This specification uses the following role terms consistently:
 * **Trust Framework** or **Network** — a broader participant set used in framework-style audience validation.
 
 Unless otherwise stated, this specification uses **Data Holder** as the primary receiving-side role term and **Client** as the primary software actor term. Terms like **site** or clinic labels may appear in examples or user-interface discussion, but they are not normative protocol terms unless explicitly identified as such.
+
+### Where Things Belong
+
+The architecture distributes responsibility deliberately. A quick map of where each kind of information lives:
+
+| Information | Usually belongs in |
+|-------------|--------------------|
+| Who signed the ticket | Ticket (`iss`, signature) |
+| Who the data is about | Ticket (`subject`, identity evidence) |
+| Who is asking, and why they can ask | Ticket (`requester`, ticket type, context) |
+| The underlying source document or verification record | Issuer records, not the ticket |
+| Detailed jurisdiction-specific rules | Ticket-type profile, trust framework, or Data Holder policy |
+| Final release/token decision | Data Holder |
+| Downstream use obligations | Trust framework, contract, applicable law, recipient policy |
+| Sensitive-data category rules | Optional profile ([Proposal 005](proposal-005-sensitive-data-modeling.html)), not the base ticket |
+| Full audit trail | Issuer and Data Holder logs, anchored by ticket `jti` |
 
 ### Protocol Overview
 
@@ -115,7 +134,7 @@ Data Holders that support Permission Tickets SHALL advertise this in their `.wel
 
 ##### Trust and Client Registration
 
-This specification is designed so that **client identity does not need to be universally understood**. The Permission Ticket carries the authorization context; the client only needs to prove it holds the key bound to the ticket (or satisfies the framework binding). Data Holders need to authenticate clients, but do not need to maintain a shared global client registry.
+This specification does not require a single global client registry. The Permission Ticket carries the ticket details; the client separately authenticates to the Data Holder and, when presenter binding is present, proves it is the client allowed to redeem the ticket. A Data Holder still authenticates every presenting client and may require the client to be recognized through local registration, well-known keys, UDAP, OpenID Federation, or another accepted trust-framework mechanism.
 
 Many client identity approaches are compatible with this architecture. The same approach typically appears in two contexts: **registration** (how a Data Holder learns the client's keys) and **ticket binding** (how a ticket constrains which client may redeem it). These are related but not identical: for example, a manually registered unaffiliated client may still be bound by key thumbprint if the issuer knows the exact client key, or may be left unbound if the issuer does not know which client will redeem the ticket. The table below summarizes a few common examples; it is illustrative, not exhaustive, and other trust frameworks fit the same pattern.
 
@@ -255,7 +274,7 @@ The Data Holder SHALL perform a two-layer validation:
     *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`.
     *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it according to the selected ticket-type profile's rules.
     *   **Check `must_understand`:** If `must_understand` is present, verify the Data Holder recognizes every listed claim name. Reject with `invalid_grant` if any entry is unrecognized.
-    *   **Enforce Kernel Fields:** Every kernel field present in the ticket is must-understand. If the Data Holder encounters a kernel field it cannot enforce, it SHALL reject with `invalid_grant`.
+    *   **Process Kernel Fields:** Every kernel field present in the ticket is must-understand. Constraint fields SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Must-Understand Semantics](#must-understand-semantics).
     *   **Grant Access:** If valid, grant the requested scopes *constrained* by the ticket's `access` rules.
 
 #### Subject Resolution
@@ -293,7 +312,9 @@ When `subject.patient` is present, it remains the FHIR-normalized subject repres
 
 #### Issuer-Attested Claims
 
-`requester` and `context` are issuer-attested facts. The Data Holder uses them for local policy evaluation and audit. The Data Holder does NOT independently re-verify the requester's identity, delegation relationship, consent, mandate, or contract — the issuer's reputation and trust-framework membership back that trust.
+`requester` and `context` are issuer-attested facts. The Data Holder uses them for local policy evaluation and audit. The Data Holder is not expected to repeat upstream verification steps — requester identity, delegation relationship, consent, mandate, contract — when its configured trust policy permits reliance on the issuer. It may still deny, narrow, require a supported fallback, or route to review when required by local policy, the selected ticket type, the subject match result, or technical capability.
+
+Trust in an issuer is specific to the ticket type and trust framework. A Data Holder might trust one issuer for patient self-access but not for delegated access, research, payer, public health, or provider-consult tickets.
 
 If `requester` is absent, the ticket does not assert a separate third-party requester (i.e., it is self-access by the patient identified through `subject.patient` or `subject_identity_evidence`). This does not mean anonymous access — the presenting client is still authenticated by the outer `client_assertion`.
 
@@ -307,7 +328,11 @@ The Data Holder calculates granted access through the **intersection** of:
 
 1. **Requested Scopes**: The `scope` parameter in the token request
 2. **Ticket Access**: Constraints from `access`
-3. **Client Registration**: Scopes the client is permitted to request
+3. **Client Eligibility**: Scopes the client is permitted to request under its registration or trust-framework recognition
+4. **Ticket-Type Rules**: Requirements and limits defined by the selected `ticket_type` profile
+5. **Data Holder Policy and Capability**: The Data Holder's local policies and what its systems can technically enforce
+
+The `access` object describes the maximum access the issuer is asking the Data Holder to consider. It is a limit, not a promise: the Data Holder is not required to grant all listed access, and may narrow the grant according to local policy and technical capability.
 
 If the intersection yields no valid access, return `invalid_scope` error.
 Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on ticket type. The `patient/*` versus `system/*` scope prefix reflects the OAuth client/access mode at the Data Holder, not whether the ticket is single-patient or population-level. In the current base kernel, every ticket still identifies a single patient via `subject.patient` or `subject_identity_evidence`. For single-patient ticket types, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
@@ -439,14 +464,13 @@ Sensitivity controls are handled through profile-level claims rather than the ba
 
 #### Data Holder Filters
 
-* `data_holder_filter` restricts which Data Holders may respond to the ticket.
+`data_holder_filter` determines which Data Holders may answer. It is not a promise that returned data can be filtered by facility, department, custodian, endpoint, or resource provenance: a Data Holder that accepts the ticket returns data according to its actual legal, operational, and technical response boundary.
+
 * Each entry is one of:
   * `{ kind: "jurisdiction", address }`
   * `{ kind: "organization", organization }`
-* The filter gates the responding Data Holder, not individual clinical resources.
+* The filter gates the responding Data Holder, not individual clinical resources. Matching is one-hop against the responding Data Holder, not a provenance chain.
 * `aud` identifies the coarse intended Data Holder audience for the ticket; `data_holder_filter` narrows within that audience.
-* Endpoints are technical response surfaces, not the scoped object. A ticket does not fundamentally scope one specific FHIR endpoint, DICOMweb endpoint, or other API URL.
-* Matching is one-hop against the responding Data Holder, not a provenance chain.
 * Multiple filter entries are ORed together.
 
 <div class="callout callout-info" markdown="1">
@@ -497,19 +521,21 @@ This pattern also applies when one set of intended permissions simply does not f
 
 #### Base Must-Understand Set
 
-Every field defined in the kernel is must-understand when present. If a Data Holder receives a ticket containing a kernel field it cannot enforce, it SHALL reject with `invalid_grant`. The base must-understand set includes:
+Every field defined in the kernel is must-understand when present, but fields differ in what "understanding" requires:
 
-* JWT envelope: `iss`, `aud`, `exp`, `jti`, `ticket_type`
-* `presenter_binding`
-* `subject` (`subject.patient` and optional `subject.recipient_record`), when present
-* `subject_identity_evidence`
-* `requester`
-* `requester_identity_evidence`
-* `access.permissions`
-* `access.data_period`
-* `access.data_holder_filter`
-* `context`
-* `revocation`
+* **Constraint fields** SHALL be enforced. If the Data Holder cannot enforce a present constraint, it SHALL reject with `invalid_grant`:
+  * JWT envelope: `iss`, `aud`, `exp`, `jti`, `ticket_type`
+  * `presenter_binding`
+  * `access.permissions`
+  * `access.data_period`
+  * `access.data_holder_filter`
+  * `revocation`
+* **Policy-selection fields** SHALL be processed: the Data Holder must understand the field well enough to apply the selected ticket type and its own local policy. If it cannot safely interpret a field the selected ticket type requires, it SHALL reject with `invalid_grant`:
+  * `subject` (`subject.patient` and optional `subject.recipient_record`), when present
+  * `subject_identity_evidence`
+  * `requester`
+  * `requester_identity_evidence`
+  * `context`
 
 #### `must_understand` for Extensions
 
@@ -559,9 +585,9 @@ Extensions should be modeled as new top-level claims rather than injecting field
 
 * Absent for self-access. For self-access, the patient's identity is already represented by `subject.patient` or `subject_identity_evidence`; a separate `requester` would be redundant.
 * Present for proxy, organizational, clinician, or other non-self use cases.
-* The Data Holder trusts the issuer's attestation; it does **not** independently verify the requester's identity against the client authentication event.
-* The Data Holder **may use `requester` for local policy decisions** — scoping data, applying sensitivity rules, choosing which local access-control policies apply, audit logging, etc.
-* The **security gate** for ticket redemption remains: issuer trust, ticket signature, presenter binding, and audience validation. `requester` is not part of that gate.
+* The Data Holder relies on the issuer's attestation per its configured trust policy; it does **not** independently verify the requester's identity against the client authentication event.
+* `requester` is not how the presenting client authenticates — the client authenticates separately. However, `requester` is often part of the ticket-type access decision: the Data Holder may use requester type, identity, role, and relationship to decide whether the ticket can be accepted and what access can be granted.
+* The **authentication gate** for ticket redemption remains: issuer trust, ticket signature, presenter binding, and audience validation. `requester` sits above that gate, as a policy-selection input.
 * The level of real-world verification the issuer performed before attesting to the requester varies by use case. For delegation, the issuer typically identity-proofed the requester and confirmed the patient's intent to delegate. For B2B use cases (public health, payer, consult), the issuer has institutional knowledge of the requesting organization rather than individual identity proofing.
 
 #### Relationship between `presenter_binding` and `requester`
@@ -639,13 +665,13 @@ The issuer does all real-world verification. The ticket carries only what the Da
 * **For local policy selection**: `requester` (type, identity, relationship), `ticket_type`, `context` — the Data Holder may apply different local policies based on these (e.g., broader release for a public health investigation than for a payer claim)
 * **For audit**: all of the above
 
-#### What the Data Holder Does NOT Do
+#### What the Data Holder Is Not Expected to Do
 
-* Re-verify the delegation relationship, consent, mandate, or contract
+* Repeat the issuer's verification of the delegation relationship, consent, mandate, or contract
 * Independently authenticate the requester's identity (the client is authenticated; the requester is an issuer attestation)
 * Require off-ticket supporting documents to say yes or no (unless a narrower profile says otherwise)
 
-The Data Holder trusts the issuer for all real-world verification. The issuer's reputation and trust-framework membership back that trust.
+When its configured trust policy permits reliance on the issuer for the presented ticket type, the Data Holder relies on the issuer for real-world verification; the issuer's accountability under the trust framework backs that reliance. Reliance is not blind: the Data Holder retains its own patient matching, local policy, sensitivity handling, and technical enforceability checks.
 
 ---
 
@@ -726,17 +752,11 @@ Data Holders advertise which `ticket_type` URIs they support via `smart_permissi
 | Batch processing | 24 hours |
 | Standing authorization | Up to 1 year (with revocation) |
 
-#### Long-Lived Access
+#### Long-Lived Access and Continuation
 
-For scenarios requiring access beyond a single session (e.g., ongoing care relationships, research studies), two approaches are supported within the base specification: the client periodically obtains fresh tickets from the issuer (suitable when issuer interaction is low-friction), or the issuer mints a ticket with extended validity and supports revocation (suitable when re-issuance is high-friction or costly).
+For access beyond a single session, the baseline is ticket-based: the client re-presents a still-valid ticket, or obtains a fresh one from the issuer. Issuers may mint longer-lived revocable tickets when re-issuance is costly.
 
-#### Continuation Credentials
-
-The base specification does not define portable continuation credentials and does not require Data Holders to issue refresh tokens after ticket redemption.
-
-A Data Holder MAY issue local access tokens according to its normal token lifetime policies. If a Data Holder issues a local continuation credential (such as a refresh token), that credential SHALL NOT authorize access broader than the effective grant computed at ticket redemption, and SHALL NOT remain usable after the ticket's `exp` unless an adopted extension defines otherwise.
-
-Draft semantics for issuer-bounded continuation credentials — including a `continuation` claim, lifetime bounds, and revocation linkage — are defined in [Proposal 004: Continuation Credentials](proposal-004-continuation-credentials.html).
+Data Holders are not required to issue refresh tokens after ticket redemption. Any local continuation credential a Data Holder does issue is bounded by the effective grant computed at redemption. [Proposal 004: Continuation Credentials](proposal-004-continuation-credentials.html) defines draft `continuation` claim semantics for issuer-bounded continuation beyond ticket `exp`.
 
 #### Revocation
 
@@ -788,9 +808,7 @@ A ticket may be presented any number of times during its validity period, to the
 
 ### Catalog of Use Cases
 
-Here are seven scenarios demonstrating how Permission Tickets model diverse authorization needs. Each use case maps to a single `ticket_type`.
-
-The detailed registry, per-profile constraint matrix, and worked examples now live on the dedicated catalog page:
+Seven use cases demonstrate how Permission Tickets model diverse authorization needs. Each maps to a single `ticket_type` with its own status, required claims, policy-selection inputs, and worked example:
 
 * [Use Case Catalog](use-case-catalog.html)
 
@@ -858,6 +876,8 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 | Ticket revoked | `invalid_grant` | "Ticket has been revoked" |
 | Unsupported constraint | `invalid_grant` | "Unsupported access constraint: {field}" |
 | No valid scopes after intersection | `invalid_scope` | "No authorized scopes" |
+
+A Data Holder MAY use a general `error_description` when a more specific explanation would reveal sensitive information, confidential policy, or the possible existence of withheld data.
 
 ---
 
