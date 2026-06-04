@@ -238,17 +238,7 @@ In all modes, the Data Holder authenticates the presenting client through its st
 
 ##### Presenter Binding per Ticket Type
 
-`presenter_binding` is REQUIRED for individual-access use cases (UC1, UC2) and OPTIONAL for B2B use cases. Some deployments will require it more broadly by local policy or narrower profiles.
-
-| Ticket Type | `presenter_binding` | Rationale |
-|-------------|---------------------|-----------|
-| UC1: Patient Self Access | Required | Individual access; ticket must be bound to the presenting client |
-| UC2: Patient-Delegated Access | Required | Individual access; ticket must be bound to the presenting client |
-| UC3: Public Health | Optional | B2B; `aud` + client auth sufficient |
-| UC4: Social Care | Optional | B2B; `aud` + client auth sufficient |
-| UC5: Payer Claims | Optional | B2B; `aud` + client auth sufficient |
-| UC6: Research | Optional | Issuer may use binding, but base model does not require it |
-| UC7: Provider Consult | Optional | B2B; `aud` + client auth sufficient |
+Whether `presenter_binding` is required is a ticket-type rule: individual-access types (UC1, UC2) require it; B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
 
 #### Server-Side Validation
 The Data Holder SHALL perform a two-layer validation:
@@ -262,14 +252,16 @@ The Data Holder SHALL perform a two-layer validation:
     *   Verify the `subject_token_type` is `https://smarthealthit.org/token-type/permission-ticket`.
     *   Parse the `subject_token` as a JWT.
     *   **Verify Signature:** Use the `iss` (Trusted Issuer) public key.
-    *   **Verify Trust:** Is this `iss` accepted under the Data Holder's locally configured trust policy?
     *   **Verify Type:** `ticket_type` SHALL be present and recognized. The Data Holder SHALL verify the `ticket_type` is listed in its `smart_permission_ticket_types_supported`.
+    *   **Select Profile Rules:** The recognized `ticket_type` selects the profile rules applied in the remaining steps — which claims are required (presenter binding, identity evidence, requester shape, context fields), evidence parameters, and ticket-type access limits. This is the single hook point for use-case specifics; every other step is the same for all tickets.
+    *   **Verify Trust:** Is this `iss` accepted under the Data Holder's locally configured trust policy *for this ticket type*?
     *   **Verify Envelope:** Confirm `exp` has not passed and `aud` matches this Data Holder (see [Ticket Audience](#ticket-audience-aud-and-effective-eligible-data-holder-set)).
     *   **Check Revocation:** If `revocation` is present, check the ticket's revocation status; if status cannot be determined, reject (see [Revocation](#revocation)).
-    *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`.
-    *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per [Identity Evidence](#identity-evidence) — signature, evidence-issuer trust, temporal validity, audience — plus any profile-defined assurance and claim requirements.
+    *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`. If the selected ticket type requires binding and it is absent, reject.
+    *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per [Identity Evidence](#identity-evidence) — signature, evidence-issuer trust, temporal validity, audience — plus the selected profile's assurance and claim parameters.
     *   **Check `must_understand`:** If `must_understand` is present, verify the Data Holder recognizes every listed claim name. Reject with `invalid_grant` if any entry is unrecognized.
     *   **Process Kernel Fields:** Every kernel field present in the ticket is must-understand. Constraint fields SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Must-Understand Semantics](#must-understand-semantics).
+    *   **Verify Required Claims:** Confirm every claim the selected ticket type requires is present and well-formed (for example, required context fields, or UC2's authority coding); reject with `invalid_grant` if missing.
     *   **Resolve Subject:** Resolve the subject to a unique local patient record; reject on zero or ambiguous matches (see [Subject Resolution](#subject-resolution)).
     *   **Grant Access:** If valid, grant access per [Access Calculation](#access-calculation).
 
