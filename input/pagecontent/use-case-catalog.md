@@ -123,7 +123,15 @@ Requester completes identity verification with the issuer → issuer verifies th
 
 #### Requester and Authority
 
-`requester.relationship` SHALL contain **exactly one coding**: the requester's authority — why they are permitted to ask — from the closed value set `DELEGATEE`, `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT`, `GUARD` (all from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html); see [the base specification](index.html#delegation-and-relatedpersonrelationship)). Family relationship (daughter, spouse) is deliberately left out: proxy policies turn on the authority type and the patient's age, not kinship, and the requester's `name` covers display.
+`requester.relationship` SHALL contain **exactly one coding**: the requester's authority — why they are permitted to ask. Family relationship (daughter, spouse) is deliberately left out: proxy policies turn on the authority type and the patient's age, not kinship, and the requester's `name` covers display.
+
+The authority coding comes from a closed value set of existing [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts, covering the mutually exclusive sources of authority:
+
+| Source of authority | Code(s) | Meaning |
+|---------------------|---------|---------|
+| Patient-granted, informal | `DELEGATEE` | The patient (delegator) granted this person access through the issuer's verified workflow |
+| Patient-granted, formal instrument | `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT` | The patient executed a power-of-attorney-class instrument |
+| Law- or court-conferred | `GUARD` | Natural (parental), appointed, or court-ordered guardianship or custody |
 
 The ticket SHALL expire (`exp`) no later than the requester's verified authority ends. If the authority ends early, the issuer revokes the ticket. `RelatedPerson.period` MAY record the authority's validity dates for audit; Data Holders do not need to check it separately.
 
@@ -159,7 +167,8 @@ The issuer keeps the source documents (POA instruments, delegation records, cour
 
 #### Open Questions
 
-Should each ticket also say *how* the issuer verified the authority (portal delegation, examined instrument, court order), or is the per-code table above enough? See the [open question](index.html#oq-verification-class) in the base specification — planned for review with health-system authorization and release-of-information experts.
+> **Open Question: Per-Ticket Verification Class.** Should each ticket also say *how* the issuer verified the authority (portal delegation record, examined instrument, court order)? Or is it enough that each code carries defined issuer obligations, audited through the trust framework? The working group plans to review this with health-system authorization and release-of-information experts.
+{: .callout .callout-open-question #oq-verification-class}
 
 #### Example
 

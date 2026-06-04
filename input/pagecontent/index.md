@@ -476,15 +476,13 @@ Sensitivity controls are handled through profile-level claims rather than the ba
 
 <div class="callout callout-info" markdown="1">
 
-**Implementation Note: An organization filter may authorize a broader shared Data Holder.**
+**Implementation Note: Picking a clinic does not always limit data to that clinic.**
 
-In the real-world ecosystem, a single Data Holder frequently serves multiple independent physical clinics, hospitals, and sometimes entirely distinct organizations through one or more shared technical endpoints. Within these shared systems, clinical data such as Allergies, Problems, and Medications is integrated into a unified patient chart and often cannot be reliably attributed to or filtered by a specific leaf-node facility.
+One Data Holder often serves many clinics, hospitals, and even legally separate organizations through a single shared system. Inside that system, allergies, problems, and medications live in one combined patient chart that cannot reliably be split apart by facility.
 
-Because `data_holder_filter.organization` evaluates whether the Data Holder *as a whole* is authorized to answer, a Data Holder that accepts a ticket will typically return the integrated patient record it holds, subject to the ticket's other constraints. This specification does not guarantee that a patient-facing site or clinic selection maps to a separately enforceable technical boundary.
+The organization filter decides whether the Data Holder *as a whole* may answer. A Data Holder that accepts the ticket will typically return the combined record it holds, subject to the ticket's other constraints. A site or clinic selection on an authorization screen does not guarantee the response is limited to that site's data.
 
-Ticket Issuers SHOULD, where such information is available, use directory or network information (for example, published endpoint networks, trust framework directories, or SMART Brands data) to clarify when a selected facility or organization is actually served through a broader shared Data Holder. Exact topology is not always knowable in advance, and this specification does not require the Issuer to resolve it perfectly before minting a ticket.
-
-If the Issuer can determine that a selected facility or organization is served through a broader shared Data Holder, it should say so explicitly. If it cannot determine that precisely, it should warn more generically that the resulting disclosure boundary may be broader than the patient-facing site or clinic label suggests. Future versions may explore optional ways to communicate finer disclosure-boundary hints, but this specification does not define them.
+Issuers SHOULD use directory or network information (published endpoint networks, trust-framework directories, SMART Brands data) to detect when a selected facility is served through a broader shared system, and tell the authorizing person so. When the issuer cannot tell, it should warn generically that more data may flow than the site label suggests. Future versions may define finer disclosure-boundary hints; this one does not.
 
 </div>
 
@@ -596,51 +594,9 @@ The `requester` and `presenter_binding` will often identify the same organizatio
 
 #### Delegation and RelatedPerson.relationship
 
-For delegated access, the `requester` is a `RelatedPerson`, and `RelatedPerson.relationship` carries **exactly one coding**: the requester's authority — why they are permitted to ask. Family relationship ("daughter," "spouse") is deliberately left out: it is not an authority assertion, and no Data Holder policy identified so far depends on it — proxy policies turn on the authority type and the patient's age. The requester's `name` covers display.
+For delegated access, the `requester` is a `RelatedPerson` carrying **exactly one** relationship coding: the requester's authority — why they are permitted to ask — from a closed value set of existing [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts. Family relationship ("daughter," "spouse") is deliberately not modeled: it is not an authority assertion, and proxy policies turn on the authority type and the patient's age; the requester's `name` covers display.
 
-The authority coding comes from a **closed, curated value set** of [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts: codes qualify only if their formal definition asserts delegated or conferred authority, never by connotation. The value set covers the mutually exclusive sources of authority:
-
-| Source of authority | Code(s) | Meaning |
-|---------------------|---------|---------|
-| Patient-granted, informal | `DELEGATEE` | The patient (delegator) granted this person access through the issuer's verified workflow |
-| Patient-granted, formal instrument | `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT` | The patient executed a power-of-attorney-class instrument |
-| Law- or court-conferred | `GUARD` | Natural (parental), appointed, or court-ordered guardianship or custody |
-
-All codes are existing v3-RoleCode concepts.
-
-The ticket SHALL expire (`exp`) no later than the requester's verified authority ends. If the authority ends early, the issuer revokes the ticket (see [Revocation](#revocation)). `RelatedPerson.period` MAY record the authority's validity dates for audit; Data Holders do not need to check it separately.
-
-Ticket types that support delegated access (see [UC2](use-case-catalog.html#use-case-2-patient-delegated-access)) define per-code issuer verification obligations — what the issuer must have verified before asserting each code.
-
-```json
-"requester": {
-  "resourceType": "RelatedPerson",
-  "relationship": [
-    {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
-          "code": "DELEGATEE"
-        }
-      ]
-    }
-  ],
-  "period": { "end": "2026-12-31" },
-  "name": [
-    {
-      "family": "Reyes",
-      "given": [
-        "Elena"
-      ]
-    }
-  ]
-}
-```
-
-This tells the Data Holder: "the patient designated Elena Reyes as a delegate through the issuer's verified workflow, valid through the end of 2026." The Data Holder applies its matching local policy (different rules for a guardian vs. a POA holder vs. a patient-designated delegate). The issuer keeps the delegation record or instrument; if a dispute arises later, the ticket's `jti` lets auditors pull the issuer's records for that grant.
-
-> **Open Question: Per-Ticket Verification Class.** Should each ticket also say *how* the issuer verified the authority (portal delegation record, examined instrument, court order)? Or is it enough that each code carries defined issuer obligations, audited through the trust framework? The working group plans to review this with health-system authorization and release-of-information experts.
-{: .callout .callout-open-question #oq-verification-class}
+The value set, per-code issuer verification obligations, validity rules, and a worked example are defined by [UC2: Patient-Delegated Access](use-case-catalog.html#use-case-2-patient-delegated-access).
 
 ---
 
