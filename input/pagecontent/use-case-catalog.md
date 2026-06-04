@@ -351,7 +351,7 @@ No separate authority coding is needed for this profile: the care relationship *
 
 #### Open Questions
 
-> **Open Question: Core UC7 Design.** Three foundational questions are unresolved. **Requester shape:** referral handoffs are usually org-to-org, and the receiving practitioner is often unknown at issuance — should the requester be an `Organization` rather than (or in addition to) a `PractitionerRole`? **Issuance topology:** the natural issuer is the referring provider's system, which is also the Data Holder being queried — when issuer and Data Holder coincide, what does a portable signed artifact add over a direct local grant, and what do the multi-holder or cross-network flows look like? **Policy routing:** applying treatment/consult disclosure policy to an external clinician with no local user account is a capability EHR vendors report they largely lack today.
+> **Open Question: Core UC7 Design.** Three basics are unsettled. **Who is the requester?** Referrals usually go to an organization, and nobody knows which specialist will pick up the consult at the time the ticket would be minted — so maybe the requester should be an `Organization`, not a `PractitionerRole`. **Who mints the ticket?** The obvious issuer is the referring provider's system — but that is the same system the specialist will query, and it could just grant access directly. It is not clear when a signed ticket adds value here. **Can EHRs apply the right policy?** An outside specialist has no user account at the referring system, and vendors say they treat that case as generic B2B trust today.
 {: .callout .callout-open-question #oq-uc7-design}
 
 #### Example
