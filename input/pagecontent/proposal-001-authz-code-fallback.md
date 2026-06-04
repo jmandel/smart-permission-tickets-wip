@@ -66,7 +66,7 @@ The Data Holder resolves the `launch` parameter to the cached permission ticket 
 
 #### 4. Sign-in MAY be required
 
-When the Data Holder cannot resolve the patient from the ticket's `subject.patient` claims alone, sign-in may be required. The ticket still carries the full authorization context (scopes, data period, data holder filters, sensitive data policy, requester, presenter binding). Sign-in supplements identity resolution. The patient does not need to re-express any sharing preferences; those are already captured in the ticket.
+When the Data Holder cannot resolve the patient from the ticket's `subject.patient` claims alone, sign-in may be required. The ticket still carries the full authorization context (scopes, data period, Data Holder filters, requester, presenter binding). Sign-in supplements identity resolution. The patient does not need to re-express any sharing preferences already captured in the ticket.
 
 #### 5. Data Holders SHOULD cache resolved interactions
 
@@ -85,4 +85,3 @@ For B2B ticket types (UC3–UC7), `interaction_required` SHOULD NOT be returned.
 *Why is sign-in acceptable in the fallback?* The primary flow succeeds when the ticket's `subject.patient` demographics are sufficient for the Data Holder to resolve to a unique local record. When they're not — multiple candidates, no match with sufficient confidence — someone has to disambiguate. The ticket carried the authorization; sign-in fills the identity gap. The patient benefits from the ticket because they don't need to re-authorize; they just need to help the Data Holder find the right record.
 
 *Relationship to presenter binding.* For UC1/UC2, `presenter_binding` is required. The ticket is cryptographically bound to the client's key regardless of whether redemption goes through token exchange or the SMART Launch fallback. The security properties hold in both paths.
-

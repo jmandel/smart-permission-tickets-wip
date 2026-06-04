@@ -23,7 +23,6 @@ export type RestInteraction =
   | "patch"
   | "delete";
 
-export type SensitiveDataPolicy = "exclude" | "include";
 export type TicketAudienceType = "data_holder_url" | "trust_framework";
 export type FrameworkType = "well-known" | "udap" | "oidf";
 
@@ -59,6 +58,14 @@ export type TrustFrameworkClientBinding = {
 };
 
 export type PresenterBinding = KeyBinding | TrustFrameworkClientBinding;
+
+export type EmbeddedIdentityEvidence = {
+  source: "embedded";
+  token_type: "id_token";
+  jwt: string;
+};
+
+export type IdentityEvidence = EmbeddedIdentityEvidence;
 
 export type Revocation = {
   url: Uri;
@@ -97,7 +104,6 @@ export type AccessGrant = {
   permissions: NonEmptyArray<PermissionRule>;
   data_period?: FHIRPeriod;
   data_holder_filter?: NonEmptyArray<DataHolderFilter>;
-  sensitive_data?: SensitiveDataPolicy;
 };
 
 export type PatientAccessContext = Record<string, never>;
@@ -142,9 +148,11 @@ export type PermissionTicketBase = {
   jti: string;
   ticket_type: PermissionTicketType;
   presenter_binding?: PresenterBinding;
+  subject_identity_evidence?: IdentityEvidence;
+  requester_identity_evidence?: IdentityEvidence;
   revocation?: Revocation;
   must_understand?: NonEmptyArray<string>;
-  subject: Subject;
+  subject?: Subject;
   requester?: Requester;
   access: AccessGrant;
   context?: TicketContext;

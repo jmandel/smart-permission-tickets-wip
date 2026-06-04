@@ -16,7 +16,7 @@ SMART App Launch is already the universal authorization kickoff in the SMART eco
 
 - Every SMART client knows how to discover `.well-known/smart-configuration`, run an authorization code flow with PKCE, and parse a token response.
 - Every SMART-capable server already knows how to run a consent UX, authenticate a user, and return an access token.
-- Identity proofing, multi-factor auth, delegation capture, sensitive-data preferences — all the hard UX that an issuer needs to run before minting a ticket — map cleanly onto an authorization flow that a patient (or other authorizing party) already understands.
+- Identity proofing, multi-factor auth, delegation capture, and other sharing preferences — all the hard UX that an issuer needs to run before minting a ticket — map cleanly onto an authorization flow that a patient (or other authorizing party) already understands.
 
 An issuer that adopts this proposal becomes, from the client's perspective, a SMART on FHIR endpoint whose token response happens to carry Permission Tickets.
 
@@ -79,7 +79,7 @@ The client includes:
 
 #### 3. Issuer runs its consent UX and mints tickets
 
-Between authorize and redirect, the issuer runs whatever real-world verification and consent UX it operates — identity proofing via a digital ID wallet, delegation capture for UC2, sensitive-data handling preferences, and so on. This is the same UX the issuer would run under any other kickoff mechanism; SMART App Launch just wraps it.
+Between authorize and redirect, the issuer runs whatever real-world verification and consent UX it operates — identity proofing via a digital ID wallet, delegation capture for UC2, and other sharing preferences. This is the same UX the issuer would run under any other kickoff mechanism; SMART App Launch just wraps it.
 
 At the end of consent, the issuer mints one or more Permission Tickets. The issuer chooses ticket `aud` and `data_holder_filter` based on the network it operates within and the user's selections. It chooses `ticket_type` based on the relationship expressed during consent (self-access vs delegation, and so on).
 

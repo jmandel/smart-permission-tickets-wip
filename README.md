@@ -46,7 +46,6 @@ The signed payload has a small, fixed shape:
 | access:        permissions[] (DataPermission | Operation)     |  what and how much
 |                data_period?                                   |
 |                data_holder_filter?                            |
-|                sensitive_data?                                |
 +---------------------------------------------------------------+
 | context?       ticket-type-specific workflow facts            |  why
 +---------------------------------------------------------------+

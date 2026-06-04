@@ -38,7 +38,6 @@ export const RestInteractionValues = [
 ] as const;
 
 export const RestInteractionSchema = z.enum(RestInteractionValues);
-export const SensitiveDataPolicySchema = z.enum(["exclude", "include"]);
 export const FrameworkTypeSchema = z.enum(["well-known", "udap", "oidf"]);
 
 const NonEmptyStringSchema = z.string().min(1);
@@ -171,6 +170,14 @@ export const PresenterBindingSchema = z.discriminatedUnion("method", [
   TrustFrameworkClientBindingSchema,
 ]);
 
+export const EmbeddedIdentityEvidenceSchema = z.object({
+  source: z.literal("embedded"),
+  token_type: z.literal("id_token"),
+  jwt: NonEmptyStringSchema,
+}).strict();
+
+export const IdentityEvidenceSchema = EmbeddedIdentityEvidenceSchema;
+
 export const RevocationSchema = z.object({
   url: UriSchema,
   index: z.number().int().nonnegative(),
@@ -214,7 +221,6 @@ export const AccessGrantSchema = z.object({
   permissions: z.array(PermissionRuleSchema).min(1),
   data_period: FHIRPeriodSchema.optional(),
   data_holder_filter: z.array(DataHolderFilterSchema).min(1).optional(),
-  sensitive_data: SensitiveDataPolicySchema.optional(),
 }).strict();
 
 const EmptyContextSchema = z.object({}).strict();
@@ -283,6 +289,8 @@ const BaseKernelTopLevelClaimNames = new Set([
   "ticket_type",
   "aud_type",
   "presenter_binding",
+  "subject_identity_evidence",
+  "requester_identity_evidence",
   "revocation",
   "must_understand",
   "subject",
@@ -301,9 +309,11 @@ const TicketBaseSchema = z.object({
   iat: z.number().int().optional(),
   jti: NonEmptyStringSchema,
   presenter_binding: PresenterBindingSchema.optional(),
+  subject_identity_evidence: IdentityEvidenceSchema.optional(),
+  requester_identity_evidence: IdentityEvidenceSchema.optional(),
   revocation: RevocationSchema.optional(),
   must_understand: z.array(MustUnderstandClaimNameSchema).min(1).optional(),
-  subject: SubjectSchema,
+  subject: SubjectSchema.optional(),
   requester: RequesterSchema.optional(),
   access: AccessGrantSchema,
 }).catchall(z.unknown());
@@ -359,6 +369,14 @@ export const PermissionTicketSchema = z.discriminatedUnion("ticket_type", [
   ResearchStudyTicketSchema,
   ProviderConsultTicketSchema,
 ]).superRefine((ticket, ctx) => {
+  if (!ticket.subject && !ticket.subject_identity_evidence) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Permission Ticket must include either subject or subject_identity_evidence.",
+      path: ["subject"],
+    });
+  }
+
   if (!ticket.must_understand) return;
 
   const duplicates = new Set<string>();
@@ -421,9 +439,10 @@ export type FHIRResource = z.infer<typeof FHIRResourceSchema>;
 export type KeyBinding = z.infer<typeof KeyBindingSchema>;
 export type TrustFrameworkClientBinding = z.infer<typeof TrustFrameworkClientBindingSchema>;
 export type PresenterBinding = z.infer<typeof PresenterBindingSchema>;
+export type EmbeddedIdentityEvidence = z.infer<typeof EmbeddedIdentityEvidenceSchema>;
+export type IdentityEvidence = z.infer<typeof IdentityEvidenceSchema>;
 export type Subject = z.infer<typeof SubjectSchema>;
 export type Requester = z.infer<typeof RequesterSchema>;
-export type SensitiveDataPolicy = z.infer<typeof SensitiveDataPolicySchema>;
 export type RestInteraction = z.infer<typeof RestInteractionSchema>;
 export type DataPermission = z.infer<typeof DataPermissionSchema>;
 export type OperationPermission = z.infer<typeof OperationPermissionSchema>;

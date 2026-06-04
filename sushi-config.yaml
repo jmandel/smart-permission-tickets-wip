@@ -23,6 +23,8 @@ pages:
     title: "Proposal 002: OpenID Federation Issuers"
   proposal-003-smart-launch-issuance.md:
     title: "Proposal 003: SMART Launch Issuance"
+  proposal-005-sensitive-data-modeling.md:
+    title: "Proposal 005: Sensitive Data Profile"
 
 menu:
   IG Home: index.html
@@ -32,5 +34,6 @@ menu:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html
     "002: OpenID Federation Issuers": proposal-002-oidf-issuers.html
     "003: SMART Launch Issuance": proposal-003-smart-launch-issuance.html
+    "005: Sensitive Data Profile": proposal-005-sensitive-data-modeling.html
   Downloads: downloads.html
   Artifacts: artifacts.html

@@ -152,8 +152,7 @@ const uc3_payload: PermissionTicket = {
             { kind: "data", resource_type: "DiagnosticReport", interactions: ["read", "search"] }
         ],
         data_period: { start: "2025-12-01", end: "2026-06-01" },
-        data_holder_filter: [{ kind: "jurisdiction", address: { country: "US", state: "TX" } }],
-        sensitive_data: "include"
+        data_holder_filter: [{ kind: "jurisdiction", address: { country: "US", state: "TX" } }]
     },
     context: {
         reportable_condition: {
@@ -194,8 +193,7 @@ const uc4_payload: PermissionTicket = {
             { kind: "data", resource_type: "ServiceRequest", interactions: ["read", "search"] },
             { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
             { kind: "data", resource_type: "Observation", interactions: ["read", "search"] }
-        ],
-        sensitive_data: "exclude"
+        ]
     },
     context: {
         concern: {
@@ -251,8 +249,7 @@ const uc5_payload: PermissionTicket = {
                 identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1234567893" }],
                 name: "General Hospital"
             }
-        }],
-        sensitive_data: "exclude"
+        }]
     },
     context: {
         service: {
@@ -299,8 +296,7 @@ const uc6_payload: PermissionTicket = {
             { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
             { kind: "data", resource_type: "Observation", interactions: ["read", "search"] }
         ],
-        data_period: { start: "2024-01-01", end: "2026-12-31" },
-        sensitive_data: "exclude"
+        data_period: { start: "2024-01-01", end: "2026-12-31" }
     },
     context: {
         study: {
@@ -343,8 +339,7 @@ const uc7_payload: PermissionTicket = {
             { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
             { kind: "data", resource_type: "Observation", interactions: ["read", "search"] },
             { kind: "data", resource_type: "DiagnosticReport", interactions: ["read", "search"] }
-        ],
-        sensitive_data: "exclude"
+        ]
     },
     context: {
         reason: {

@@ -7,9 +7,9 @@ This page lists the current `ticket_type` registry for the seven core Permission
 The table below summarizes required and optional fields for each ticket type:
 
 | Use Case | `presenter_binding` | Requester | Context Fields | Access Dimensions |
-|----------|---------------------|-----------|--------------|-------------------|-------------------|
-| UC1: Patient Self Access | Optional | — | *(none)* | `permissions` (required) |
-| UC2: Patient-Delegated Access | Optional | `RelatedPerson` (required) | *(none)* | `permissions` (required) |
+|----------|---------------------|-----------|----------------|-------------------|
+| UC1: Patient Self Access | Required | — | *(none)* | `permissions` (required) |
+| UC2: Patient-Delegated Access | Required | `RelatedPerson` (required) | *(none)* | `permissions` (required) |
 | UC3: Public Health | Optional | `Organization` (required) | `reportable_condition` | `permissions`, `data_period`, `data_holder_filter` |
 | UC4: Social Care | Optional | `Organization` (required) | `concern`, `referral` | `permissions` |
 | UC5: Payer Claims | Optional | `Organization` (required) | `service`, `claim` | `permissions`, `data_period`, `data_holder_filter` |
@@ -22,6 +22,7 @@ The table below summarizes required and optional fields for each ticket type:
 ##### Ticket Schema
 *   **Subject:** `Patient` (matched by demographics: Name, DOB, Identifier).
 *   **Requester:** None (self-access).
+*   **Identity evidence:** Profiles may use `subject_identity_evidence` when an embedded IAL2 identity token carries the patient-resolution facts.
 *   **Context:** *(none; `context` may be omitted or empty for this ticket type)*.
 *   **Access:** `permissions` with specific resource types and interactions.
 
@@ -45,7 +46,7 @@ The table below summarizes required and optional fields for each ticket type:
 *   **Subject:** `Patient` (matched by demographics or identifier).
 *   **Requester:** `Organization` (public health agency).
 *   **Context:** `reportable_condition` (coded condition).
-*   **Access:** `permissions`, optional `data_period`, `data_holder_filter`, `sensitive_data`.
+*   **Access:** `permissions`, optional `data_period`, `data_holder_filter`.
 
 {% include generated/signed-tickets/uc3-ticket.html %}
 
@@ -78,7 +79,7 @@ The table below summarizes required and optional fields for each ticket type:
 *   **Subject:** `Patient` (matched by demographics or identifier).
 *   **Requester:** `Organization` (research institute).
 *   **Context:** `study` (ResearchStudy resource).
-*   **Access:** `permissions`, optional `data_period`, `sensitive_data`.
+*   **Access:** `permissions`, optional `data_period`.
 
 {% include generated/signed-tickets/uc6-ticket.html %}
 

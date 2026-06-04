@@ -70,8 +70,7 @@
           ]
         }
       }
-    ],
-    "sensitive_data": "exclude"
+    ]
   }
 }
 ```

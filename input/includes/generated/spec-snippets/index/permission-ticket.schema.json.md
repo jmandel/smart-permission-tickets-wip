@@ -100,6 +100,52 @@
             }
           ]
         },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
         "revocation": {
           "type": "object",
           "properties": {
@@ -558,13 +604,6 @@
                   }
                 ]
               }
-            },
-            "sensitive_data": {
-              "type": "string",
-              "enum": [
-                "exclude",
-                "include"
-              ]
             }
           },
           "required": [
@@ -587,7 +626,6 @@
         "aud",
         "exp",
         "jti",
-        "subject",
         "access",
         "ticket_type"
       ],
@@ -690,6 +728,52 @@
               "additionalProperties": false
             }
           ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
         },
         "revocation": {
           "type": "object",
@@ -1261,13 +1345,6 @@
                   }
                 ]
               }
-            },
-            "sensitive_data": {
-              "type": "string",
-              "enum": [
-                "exclude",
-                "include"
-              ]
             }
           },
           "required": [
@@ -1290,7 +1367,6 @@
         "aud",
         "exp",
         "jti",
-        "subject",
         "requester",
         "access",
         "ticket_type"
@@ -1394,6 +1470,52 @@
               "additionalProperties": false
             }
           ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
         },
         "revocation": {
           "type": "object",
@@ -1908,13 +2030,6 @@
                   }
                 ]
               }
-            },
-            "sensitive_data": {
-              "type": "string",
-              "enum": [
-                "exclude",
-                "include"
-              ]
             }
           },
           "required": [
@@ -1968,7 +2083,6 @@
         "aud",
         "exp",
         "jti",
-        "subject",
         "requester",
         "access",
         "ticket_type",
@@ -2074,6 +2188,52 @@
             }
           ]
         },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
         "revocation": {
           "type": "object",
           "properties": {
@@ -2587,13 +2747,6 @@
                   }
                 ]
               }
-            },
-            "sensitive_data": {
-              "type": "string",
-              "enum": [
-                "exclude",
-                "include"
-              ]
             }
           },
           "required": [
@@ -2713,7 +2866,6 @@
         "aud",
         "exp",
         "jti",
-        "subject",
         "requester",
         "access",
         "ticket_type",
@@ -2818,6 +2970,52 @@
               "additionalProperties": false
             }
           ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
         },
         "revocation": {
           "type": "object",
@@ -3332,13 +3530,6 @@
                   }
                 ]
               }
-            },
-            "sensitive_data": {
-              "type": "string",
-              "enum": [
-                "exclude",
-                "include"
-              ]
             }
           },
           "required": [
@@ -3458,7 +3649,6 @@
         "aud",
         "exp",
         "jti",
-        "subject",
         "requester",
         "access",
         "ticket_type",
@@ -3563,6 +3753,52 @@
               "additionalProperties": false
             }
           ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
         },
         "revocation": {
           "type": "object",
@@ -4077,13 +4313,6 @@
                   }
                 ]
               }
-            },
-            "sensitive_data": {
-              "type": "string",
-              "enum": [
-                "exclude",
-                "include"
-              ]
             }
           },
           "required": [
@@ -4173,7 +4402,6 @@
         "aud",
         "exp",
         "jti",
-        "subject",
         "requester",
         "access",
         "ticket_type",
@@ -4278,6 +4506,52 @@
               "additionalProperties": false
             }
           ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
         },
         "revocation": {
           "type": "object",
@@ -4819,13 +5093,6 @@
                   }
                 ]
               }
-            },
-            "sensitive_data": {
-              "type": "string",
-              "enum": [
-                "exclude",
-                "include"
-              ]
             }
           },
           "required": [
@@ -4945,7 +5212,6 @@
         "aud",
         "exp",
         "jti",
-        "subject",
         "requester",
         "access",
         "ticket_type",

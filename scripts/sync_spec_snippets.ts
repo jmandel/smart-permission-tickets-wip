@@ -174,7 +174,6 @@ function buildIndexSnippets(): void {
           },
         },
       ],
-      sensitive_data: "exclude",
     },
   };
 

@@ -26,3 +26,8 @@ scripts/node_modules/
 
 # Nested repo kept separate on purpose
 reference-implementation/
+ux/
+
+# Local working materials kept out of git
+calls/
+ux-variant-*/
