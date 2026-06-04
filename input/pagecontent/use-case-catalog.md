@@ -38,7 +38,7 @@ The table below summarizes required and optional fields for each ticket type:
 | UC6: Research | Optional | `Organization` (required) | `study` | `permissions`, `data_period` |
 | UC7: Provider Consult | Optional | `PractitionerRole` (required) | `reason`, `consult_request` | `permissions` |
 
-Each use case section below follows a common template, including **Policy Selection Inputs**: `ticket_type` selects which family of Data Holder policy applies (self-access, proxy, public-health disclosure, …); the inputs listed per use case are the ticket fields that discriminate *within* that family — which variant of the Data Holder's own policy governs this request. Permission Tickets supply policy-selection inputs; they do not rewrite or replace the Data Holder's policies.
+Each use case section below follows a common template, including **Policy Selection Inputs**. `ticket_type` tells the Data Holder what kind of request this is (self-access, proxy access, public health, …); the inputs listed per use case are the ticket fields that help it pick the right one of its own internal policies for this specific request. Tickets help the Data Holder pick a policy; they do not create new policies or override existing ones.
 
 ---
 
@@ -50,7 +50,7 @@ Each use case section below follows a common template, including **Policy Select
 
 *A patient uses a high-assurance Digital ID wallet to authorize an app to fetch their data from multiple hospitals.*
 
-The patient authorizes once, with the issuer, and the ticket carries that authorization to many Data Holders — including Data Holders where the patient has never created a portal account. This is the simplest ticket type: no third-party requester, no context fields, and the most direct Data Holder decision.
+The patient authorizes once, with the issuer, and the ticket carries that authorization to many Data Holders — including Data Holders where the patient has never created a portal account. This is the simplest ticket type: no third-party requester and no context fields.
 
 #### Typical Flow
 
@@ -58,7 +58,7 @@ Patient completes identity verification and authorization with the issuer → is
 
 #### Required Claims
 
-* **Subject:** `Patient` (matched by demographics: name, DOB, identifiers), optionally supplemented by `subject_identity_evidence` carrying an embedded identity token for upstream verification.
+* **Subject:** `Patient` (matched by demographics: name, DOB, identifiers), optionally accompanied by `subject_identity_evidence` — an embedded identity token the Data Holder can verify itself.
 * **Requester:** None (self-access). The absence of `requester` is what marks the ticket as self-access.
 * **Context:** *(none; `context` may be omitted or empty)*
 * **Access:** `permissions` with specific resource types and interactions.
@@ -66,16 +66,16 @@ Patient completes identity verification and authorization with the issuer → is
 
 #### Identity Evidence
 
-This is the ticket type where `subject_identity_evidence` matters most: an issuer that relied on a high-assurance identity token (for example, an IAL2 ID token) can embed it alongside `subject.patient` so the Data Holder can verify the identity claims upstream — independently of its trust in the ticket issuer. Base verification mechanics (signature, evidence-issuer trust, temporal validity) are defined in the [base specification](index.html#identity-evidence); this profile's parameters are the expected assurance level (IAL2-grade) and demographics sufficient for matching. Deployments MAY require evidence for this ticket type; `subject.patient` is present either way.
+If the issuer verified the patient with a high-assurance identity token (for example, an IAL2 ID token), it can embed that token in the ticket. The Data Holder can then check the identity claims itself instead of taking the issuer's word for them. How to verify the embedded token is defined in the [base specification](index.html#identity-evidence); this profile expects IAL2-grade assurance and enough demographics to match the patient. Deployments MAY require the embedded token; `subject.patient` is present either way.
 
 #### Policy Selection Inputs
 
-There is essentially one policy bucket here: the Data Holder's patient self-access policy — the patient sees what they would see through the Data Holder's own patient-facing access. No ticket field selects among variants; the only graded input is subject-resolution confidence (`subject.patient`, strengthened by `subject_identity_evidence` when present).
+One policy applies here: the Data Holder's patient self-access policy — the patient sees what they would see through the Data Holder's own patient-facing access. The only question the ticket fields answer is whether the Data Holder can confidently match the patient (`subject.patient`, strengthened by `subject_identity_evidence` when present).
 
 #### Data Holder Processing
 
 * Resolve the subject to a local patient record; reject with `invalid_grant` on zero or ambiguous matches. Deployments that support an interactive fallback for subject disambiguation may use [Proposal 001](proposal-001-authz-code-fallback.html).
-* Local policies continue to apply below the ticket: result-release holds, portal access restrictions, and similar internal rules are not overridden by a valid ticket.
+* A valid ticket does not override local rules such as result-release holds or portal access restrictions.
 * Grant access scoped by the intersection rules of the base specification.
 
 #### What This Ticket Does Not Prove
@@ -97,7 +97,7 @@ There is essentially one policy bucket here: the Data Holder's patient self-acce
 
 *An adult daughter accesses her elderly mother's records. The relationship is verified by a Trusted Issuer, not the Hospital.*
 
-Delegated access is where Data Holder policy routing is richest: organizations maintain distinct policy classes for adult-to-adult delegation, parents of minors, parents of adolescents, guardians, agents under healthcare power of attorney, and more. The ticket's job is to carry enough verified facts to select the right class — even for a requester the Data Holder has never seen.
+Health systems maintain many distinct proxy policies: adult-to-adult delegation, parents of minors, parents of adolescents, guardians, agents under healthcare power of attorney, and more. The ticket's job is to carry enough verified facts for the Data Holder to pick the right one — even for a requester it has never seen.
 
 #### Typical Flow
 
@@ -113,9 +113,9 @@ Requester completes identity verification with the issuer → issuer verifies th
 
 #### Requester and Authority
 
-`requester.relationship` SHALL contain **exactly one coding**: the requester's authority — why they are permitted to ask — from the closed value set `DELEGATEE`, `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT`, `GUARD` (all from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html); see [the base specification](index.html#delegation-and-relatedpersonrelationship)). Family relationship is deliberately not modeled: proxy policy classes route on authority type plus subject demographics, and the requester's display identity is carried by `name`.
+`requester.relationship` SHALL contain **exactly one coding**: the requester's authority — why they are permitted to ask — from the closed value set `DELEGATEE`, `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT`, `GUARD` (all from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html); see [the base specification](index.html#delegation-and-relatedpersonrelationship)). Family relationship (daughter, spouse) is deliberately left out: proxy policies turn on the authority type and the patient's age, not kinship, and the requester's `name` covers display.
 
-Authority validity is enforced through the ticket envelope: the issuer SHALL NOT set ticket `exp` later than the verified end of the requester's authority, and handles earlier termination through revocation. `RelatedPerson.period` MAY additionally record the verified validity bound for audit and display; Data Holders do not need a separate period check.
+The ticket SHALL expire (`exp`) no later than the requester's verified authority ends. If the authority ends early, the issuer revokes the ticket. `RelatedPerson.period` MAY record the authority's validity dates for audit; Data Holders do not need to check it separately.
 
 ##### Issuer Verification Obligations
 
@@ -127,14 +127,14 @@ Before asserting an authority coding, the issuer SHALL have completed the corres
 | `HPOWATT` / `DPOWATT` / `POWATT` / `SPOWATT` | A power-of-attorney-class instrument of the corresponding type was examined and covers the requested access |
 | `GUARD` | Guardianship, parental authority, or court-ordered custody/access was verified — including, for parental assertions over a minor, that no known order restricts the requester's access |
 
-The underlying source documents and verification records stay with the issuer; the ticket `jti` anchors audit and dispute reconstruction from issuer records. Trust frameworks may audit issuer compliance with these obligations.
+The issuer keeps the source documents (POA instruments, delegation records, court orders). If a dispute arises later, the ticket's `jti` lets auditors pull the issuer's records for that grant. Trust frameworks may audit issuer compliance with these obligations.
 
 #### Policy Selection Inputs
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Subject age and demographics | `subject.patient` | Minor vs. adolescent vs. adult subject policy classes |
-| Authority | `requester.relationship` | Patient-delegate vs. guardianship vs. power-of-attorney policy buckets |
+| Subject age and demographics | `subject.patient` | Policies for minors vs. adolescents vs. adults |
+| Authority | `requester.relationship` | Policies for delegates vs. guardians vs. POA agents |
 
 #### Data Holder Processing
 
@@ -144,12 +144,12 @@ The underlying source documents and verification records stay with the issuer; t
 
 #### What This Ticket Does Not Prove
 
-* That the requester's authority extends to every category of the subject's data; local policy governs category-level release for each requester class.
+* That the requester may see every category of the patient's data; local policy decides what each kind of proxy can see.
 * That the authority remains valid indefinitely; the ticket's validity window and revocation status bound reliance.
 
 #### Open Questions
 
-See the [per-ticket verification class open question](index.html#oq-verification-class) in the base specification: whether Data Holders need a per-ticket signal of how the issuer verified the authority, beyond the per-code obligations above. Planned for review with health-system authorization and release-of-information experts.
+Should each ticket also say *how* the issuer verified the authority (portal delegation, examined instrument, court order), or is the per-code table above enough? See the [open question](index.html#oq-verification-class) in the base specification — planned for review with health-system authorization and release-of-information experts.
 
 #### Example
 
@@ -165,7 +165,7 @@ See the [per-ticket verification class open question](index.html#oq-verification
 
 *A Hospital creates a Case Report. The Public Health Agency (PHA) uses a ticket to query for follow-up data.*
 
-Public health follow-up is well suited to ticket-based exchange: the requester is an organization, the request is tied to a concrete triggering event (a reportable condition), and the Data Holder decision can be profile-driven rather than user-driven.
+Public health follow-up is well suited to ticket-based exchange: the requester is an organization, the request is tied to a concrete triggering event (a reportable condition), and the Data Holder can decide from the ticket alone — no user needs to sign in.
 
 #### Typical Flow
 
@@ -175,7 +175,7 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 
 * **Subject:** `Patient` (matched by demographics or identifier).
 * **Requester:** `Organization` (public health agency), identified well enough for directory matching (name, identifiers).
-* **Context:** `reportable_condition` (coded condition) — establishes what investigation the request belongs to and bounds its scope.
+* **Context:** `reportable_condition` (coded condition) — says which investigation the request belongs to and bounds it.
 * **Access:** `permissions`; optional `data_period` and `data_holder_filter`.
 * **Presenter binding:** Optional (B2B; `aud` + client authentication generally suffice).
 
@@ -183,14 +183,14 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Requesting agency | `requester` (Organization identifiers) | Known-agency directory matching; per-agency arrangements |
-| Reportable condition | `context.reportable_condition` | Scope of the investigation; which data classes are responsive |
+| Requesting agency | `requester` (Organization identifiers) | Whether the agency is known (directory match); any per-agency arrangements |
+| Reportable condition | `context.reportable_condition` | What the investigation covers; which kinds of data to release |
 
 #### Data Holder Processing
 
 * Verify issuer trust for this ticket type — trusting an issuer for patient self-access does not imply trusting it for public health tickets.
 * Match the requesting organization against directory or trust-framework information.
-* Apply local public-health disclosure policy; narrow or reject where the request exceeds what the condition context supports.
+* Apply local public-health disclosure policy; narrow or reject requests that go beyond the named condition.
 
 #### What This Ticket Does Not Prove
 
@@ -211,7 +211,7 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 
 *A community-based organization needs to access referral-related data. A Food Bank volunteer needs to update a referral status.*
 
-This use case is recorded to map the design space. It is the least mature profile: community-based organizations vary widely in technical capability and trust-framework participation, and the write-access pattern (updating referral status) raises questions no other profile raises.
+This is the least mature profile: community-based organizations vary widely in technical capability and trust-framework participation, and the write-access pattern (updating referral status) raises questions no other profile does.
 
 #### Required Claims
 
@@ -225,8 +225,8 @@ This use case is recorded to map the design space. It is the least mature profil
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Requesting organization | `requester` | Known-partner vs. unknown-CBO handling |
-| Referral context | `context.referral`, `context.concern` | Scope-of-referral narrowing |
+| Requesting organization | `requester` | Whether the organization is a known partner |
+| Referral context | `context.referral`, `context.concern` | Which data relate to this referral |
 
 #### What This Ticket Does Not Prove
 
@@ -234,7 +234,7 @@ This use case is recorded to map the design space. It is the least mature profil
 
 #### Open Questions
 
-> **Open Question: Social Care Write Access.** Should write access (for example, updating referral status) be modeled in this profile at all, or split into a separate, narrower ticket type? Write semantics interact with local clinical-data governance in ways read-only profiles do not.
+> **Open Question: Social Care Write Access.** Should write access (for example, updating referral status) be modeled in this profile at all, or split into a separate, narrower ticket type? Letting an outside organization write into the record raises governance questions that read-only access does not.
 {: .callout .callout-open-question #oq-uc4-write}
 
 #### Example
@@ -251,7 +251,7 @@ This use case is recorded to map the design space. It is the least mature profil
 
 *A Payer requests clinical documents to support a specific claim.*
 
-This profile is viable when scoped to a concrete claim or service: the context identifies the claim, the access constraints narrow to the relevant records and period, and the Data Holder can evaluate the request against its payer-disclosure policies. Broad payer access not tied to a concrete request is intentionally out of scope.
+Each ticket covers one concrete claim or service: the context identifies the claim, and the access constraints narrow the request to the relevant records and period. Broad payer access not tied to a concrete request is intentionally out of scope.
 
 #### Required Claims
 
@@ -265,13 +265,13 @@ This profile is viable when scoped to a concrete claim or service: the context i
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Requesting payer | `requester` | Trading-partner recognition; per-payer arrangements |
-| Claim context | `context.claim`, `context.service` | Which records are responsive to the adjudication |
+| Requesting payer | `requester` | Whether the payer is a known trading partner; any per-payer arrangements |
+| Claim context | `context.claim`, `context.service` | Which records relate to this claim |
 
 #### What This Ticket Does Not Prove
 
 * Coverage, payment obligation, or the merits of the claim — only that the issuer verified the request context.
-* Authority for population-level or ongoing access; this profile is per-request.
+* Ongoing or population-level access; each ticket covers one request.
 
 #### Example
 
@@ -287,7 +287,7 @@ This profile is viable when scoped to a concrete claim or service: the context i
 
 *A research organization retrieves records for a study participant without the researcher becoming a "user" at the hospital.*
 
-The ticket carries issuer-verified study access details: the study identity, the requesting organization, and profile-defined verification that the required study workflow was completed. Whether that workflow is participant consent, an approved waiver, or another governance path is defined by the specific profile and the trust framework — the base ticket does not define a universal research authorization model. This use case is most viable where study governance is concrete and verifiable.
+The ticket says which study this is, who is asking, and that the issuer verified the study's required workflow was completed. What that workflow is — participant consent, an approved waiver, something else — depends on the study and the trust framework. The base ticket does not try to model research authorization in general. This use case is most viable where study governance is concrete and verifiable.
 
 #### Required Claims
 
@@ -301,12 +301,12 @@ The ticket carries issuer-verified study access details: the study identity, the
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Requesting organization | `requester` | Known research partner handling |
-| Study identity | `context.study` | Study-specific arrangements, data-use agreements |
+| Requesting organization | `requester` | Whether the organization is a known research partner |
+| Study identity | `context.study` | Study-specific arrangements and data-use agreements |
 
 #### What This Ticket Does Not Prove
 
-* A universal consent status. The ticket attests that the issuer verified the profile-defined study workflow; what that workflow legally establishes is profile- and framework-specific.
+* That the patient consented, in any general sense. The ticket says the issuer verified the study's workflow; what that means legally depends on the study and the framework.
 * That the subject remains an active participant at redemption time, unless the profile defines a freshness rule.
 
 #### Example
@@ -335,14 +335,14 @@ The care relationship here is concrete and recent (the referral), and the contex
 
 #### Requester and Authority
 
-No separate authority coding is needed for this profile: the care relationship *is* the authority basis, and it is evidenced by `context.consult_request`. The issuer attests that the consult request is genuine and current.
+No authority coding is needed here: the referral itself is why the specialist may ask, and it is right there in `context.consult_request`. The issuer attests that the consult request is genuine and current.
 
 #### Policy Selection Inputs
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Requesting role and organization | `requester` | Known-partner vs. unknown-requester handling; audit identity |
-| Consult context | `context.consult_request`, `context.reason` | Scope-of-consult narrowing; review triggers |
+| Requesting role and organization | `requester` | Whether the requester is a known partner; who to record in the audit log |
+| Consult context | `context.consult_request`, `context.reason` | Which data relate to this consult; when to flag for manual review |
 
 #### What This Ticket Does Not Prove
 
