@@ -106,17 +106,14 @@ Requester completes identity verification with the issuer → issuer verifies th
 #### Required Claims
 
 * **Subject:** `Patient` (matched by demographics or identifier).
-* **Requester:** `RelatedPerson` (required) with relationship codings expressing both the personal relationship and the legal authority type.
+* **Requester:** `RelatedPerson` (required) with exactly one relationship coding: the requester's authority.
 * **Context:** *(none — delegation is expressed by the presence and type of `requester`)*
 * **Access:** `permissions` with specific resource types and interactions.
 * **Presenter binding:** Required.
 
 #### Requester and Authority
 
-The `requester.relationship` codings carry two distinct layers of fact (see [Delegation and RelatedPerson.relationship](index.html#delegation-and-relatedpersonrelationship) in the base specification):
-
-* **Familial/personal codings** (for example `DAU`, `MTH`, `SPS`) — who the requester is to the patient. Useful for display, audit, and policy routing alongside subject demographics (for example, distinguishing parent-of-minor from parent-of-adolescent policy classes). Zero or more may appear.
-* **Authority coding** — why the requester is permitted to ask. **Exactly one** SHALL appear, from the closed authority value set: `DELEGATEE`, `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT`, `GUARD` (all from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html)).
+`requester.relationship` SHALL contain **exactly one coding**: the requester's authority — why they are permitted to ask — from the closed value set `DELEGATEE`, `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT`, `GUARD` (all from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html); see [the base specification](index.html#delegation-and-relatedpersonrelationship)). Family relationship is deliberately not modeled: proxy policy classes route on authority type plus subject demographics, and the requester's display identity is carried by `name`.
 
 Authority validity is enforced through the ticket envelope: the issuer SHALL NOT set ticket `exp` later than the verified end of the requester's authority, and handles earlier termination through revocation. `RelatedPerson.period` MAY additionally record the verified validity bound for audit and display; Data Holders do not need a separate period check.
 
@@ -137,8 +134,7 @@ The underlying source documents and verification records stay with the issuer; t
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
 | Subject age and demographics | `subject.patient` | Minor vs. adolescent vs. adult subject policy classes |
-| Personal relationship | `requester.relationship` (familial codings) | Parent / spouse / other-adult routing |
-| Authority | `requester.relationship` (authority coding) | Patient-delegate vs. guardianship vs. power-of-attorney policy buckets |
+| Authority | `requester.relationship` | Patient-delegate vs. guardianship vs. power-of-attorney policy buckets |
 
 #### Data Holder Processing
 

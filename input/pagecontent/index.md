@@ -309,7 +309,7 @@ The base evidence shape is an embedded OpenID Connect ID token:
 * Parse the embedded JWT and verify its signature against the evidence issuer's published keys (for example, via OpenID Connect discovery from the token's `iss`).
 * Confirm the evidence issuer is accepted for identity evidence under the Data Holder's configured trust policy. Evidence-issuer trust is configured separately from ticket-issuer trust.
 * Confirm the evidence was temporally valid when the ticket was issued — the evidence records a verification event at issuance time, not a live authentication at redemption time.
-* Confirm the evidence was issued to the right party: the token's `aud` (and `azp`, when present) SHALL identify a client that the Data Holder's trust policy associates with the ticket issuer. This establishes that the authentication event happened at the ticket issuer, rather than the token being harvested from an unrelated application's sign-in. A ticket-type profile MAY designate a different expected audience — for example, a profile for client-issued tickets binds the expected audience to the presenter-bound client.
+* Confirm the evidence was issued to a party in this ticket's chain: the token's `aud` (and `azp`, when present) SHALL identify either a client the Data Holder's trust policy associates with the ticket issuer, or the presenting client itself (as authenticated, and as bound by `presenter_binding` when present). This establishes that the authentication event belongs to this ticket's issuance or presentation — not a token harvested from an unrelated application's sign-in. Ticket-type profiles MAY narrow which of these audiences is acceptable.
 * Use the token's standard OpenID Connect claims (for example `given_name`, `family_name`, `birthdate`) as verified demographics: for subject resolution when carried in `subject_identity_evidence`, or to corroborate `requester` when carried in `requester_identity_evidence`.
 
 The embedded ID token's `aud` therefore never names the Data Holder itself — Data Holders SHALL NOT expect their own identifier in the evidence `aud`. How a Data Holder learns which client identifiers belong to a ticket issuer at each acceptable evidence issuer is deployment configuration: issuer metadata, a trust-framework directory, or direct configuration alongside the issuer trust policy.
@@ -608,12 +608,9 @@ The `requester` and `presenter_binding` will often identify the same organizatio
 
 #### Delegation and RelatedPerson.relationship
 
-For delegated access, the `requester` is a `RelatedPerson`. FHIR's `RelatedPerson.relationship` field (0..* CodeableConcept) carries two distinct layers of fact, both as codings from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html):
+For delegated access, the `requester` is a `RelatedPerson`, and `RelatedPerson.relationship` carries **exactly one coding**: the requester's authority — why they are permitted to ask. A family relationship is deliberately not part of the model: "daughter" or "spouse" is not an authority assertion, and no Data Holder policy class we have identified routes on it — proxy policy classes key on the authority type plus subject demographics (minor vs. adolescent vs. adult). The requester's display identity is carried by `name`.
 
-* **Familial/personal codings** (`DAU`, `MTH`, `SPS`, …) — who the requester is to the patient. Display, audit, matching, and one input to policy routing (for example, distinguishing parent-of-minor from other-adult policy classes alongside subject demographics).
-* **Authority codings** — why the requester is permitted to ask. A bare family relationship is not an authority assertion: "parent" does not, by itself, establish access (custody may be restricted; the patient may be an adult).
-
-Authority codings come from a **closed, curated value set**: codes qualify only if their formal definition asserts delegated or conferred authority, never by connotation. The value set covers the mutually exclusive sources of authority:
+The authority coding comes from a **closed, curated value set** of [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts: codes qualify only if their formal definition asserts delegated or conferred authority, never by connotation. The value set covers the mutually exclusive sources of authority:
 
 | Source of authority | Code(s) | Meaning |
 |---------------------|---------|---------|
@@ -625,22 +622,12 @@ All codes are existing v3-RoleCode concepts.
 
 Authority validity is enforced through the ticket envelope, not through nested fields: the issuer SHALL NOT set ticket `exp` later than the verified end of the requester's authority, and handles earlier termination through [revocation](#revocation). `RelatedPerson.period` MAY additionally record the verified validity bound for audit and display.
 
-Ticket types that support delegated access (see [UC2](use-case-catalog.html#use-case-2-patient-delegated-access)) require exactly one authority coding alongside any familial codings, and define per-code issuer verification obligations — what the issuer must have verified before asserting each code.
-
-A single `requester` carries both layers:
+Ticket types that support delegated access (see [UC2](use-case-catalog.html#use-case-2-patient-delegated-access)) define per-code issuer verification obligations — what the issuer must have verified before asserting each code.
 
 ```json
 "requester": {
   "resourceType": "RelatedPerson",
   "relationship": [
-    {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
-          "code": "DAU"
-        }
-      ]
-    },
     {
       "coding": [
         {
@@ -662,7 +649,7 @@ A single `requester` carries both layers:
 }
 ```
 
-This tells the Data Holder: "the requester is the patient's daughter and holds healthcare power of attorney, verified through the end of 2026." The Data Holder routes to its corresponding local policy class (e.g., different rules for a guardian vs. a POA holder vs. a patient-designated delegate). The actual POA document or delegation record, if needed for audit or dispute review, stays with the issuer — the ticket `jti` anchors reconstruction from issuer records.
+This tells the Data Holder: "Elena Reyes holds healthcare power of attorney for the subject, verified through the end of 2026." The Data Holder routes to its corresponding local policy class (e.g., different rules for a guardian vs. a POA holder vs. a patient-designated delegate). The actual POA document or delegation record, if needed for audit or dispute review, stays with the issuer — the ticket `jti` anchors reconstruction from issuer records.
 
 > **Open Question: Per-Ticket Verification Class.** The authority coding tells the Data Holder which policy bucket applies; per-code issuer obligations (defined by the ticket-type profile) tell it what verification backs the assertion. Do Data Holders additionally need a per-ticket signal of *how* the issuer verified the authority (e.g., portal delegation record vs. examined instrument vs. court order) — a step toward evidence-in-ticket — or are per-code obligations plus trust-framework audit sufficient? The working group plans to validate this with health-system authorization and release-of-information experts.
 {: .callout .callout-open-question #oq-verification-class}
