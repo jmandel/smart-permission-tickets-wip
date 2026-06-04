@@ -323,11 +323,7 @@ The ticket carries issuer-verified study access details: the study identity, the
 
 *A Specialist (Practitioner) requests data from a Referring Provider.*
 
-The care relationship here is concrete and recent (the referral), and the context is operationally meaningful (the consult request).
-
-#### Typical Flow
-
-A referral or consult request is created → the issuer mints a ticket naming the consulting practitioner role and referencing the consult request → the specialist's system presents the ticket at the referring provider's Data Holder → the Data Holder evaluates the request against its treatment/consult disclosure policies.
+The care relationship here is concrete and recent (the referral), and the context is operationally meaningful (the consult request). Little design work has happened beyond this sketch — see the open questions below.
 
 #### Required Claims
 
@@ -355,8 +351,8 @@ No separate authority coding is needed for this profile: the care relationship *
 
 #### Open Questions
 
-> **Open Question: Organization-Level Consult Requesters.** Referral handoffs are often made to an organization rather than a named practitioner. Should this profile also permit an `Organization` requester when the receiving practitioner is not known at issuance time?
-{: .callout .callout-open-question #oq-uc7-org-requester}
+> **Open Question: Core UC7 Design.** Three foundational questions are unresolved. **Requester shape:** referral handoffs are usually org-to-org, and the receiving practitioner is often unknown at issuance — should the requester be an `Organization` rather than (or in addition to) a `PractitionerRole`? **Issuance topology:** the natural issuer is the referring provider's system, which is also the Data Holder being queried — when issuer and Data Holder coincide, what does a portable signed artifact add over a direct local grant, and what do the multi-holder or cross-network flows look like? **Policy routing:** applying treatment/consult disclosure policy to an external clinician with no local user account is a capability EHR vendors report they largely lack today.
+{: .callout .callout-open-question #oq-uc7-design}
 
 #### Example
 
