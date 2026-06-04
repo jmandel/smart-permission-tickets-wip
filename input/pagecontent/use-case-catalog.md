@@ -101,7 +101,7 @@ Delegated access is where Data Holder policy routing is richest: organizations m
 
 #### Typical Flow
 
-Requester completes identity verification with the issuer → issuer verifies the relationship and the authority basis for access → issuer mints a presenter-bound ticket naming both subject and requester → the requester's app presents the ticket → the Data Holder resolves the patient, evaluates the requester facts against its local proxy-access policies, and issues a scoped token.
+Requester completes identity verification with the issuer → issuer verifies the requester's authority for access → issuer mints a presenter-bound ticket naming both subject and requester → the requester's app presents the ticket → the Data Holder resolves the patient, evaluates the requester facts against its local proxy-access policies, and issues a scoped token.
 
 #### Required Claims
 
@@ -139,13 +139,13 @@ The underlying source documents and verification records stay with the issuer; t
 #### Data Holder Processing
 
 * Resolve the subject as in UC1.
-* Evaluate requester facts against local proxy-access policies. The Data Holder relies on the issuer's verification of identity and relationship per its configured trust policy; it applies its own rules for what each requester class may see.
+* Evaluate requester facts against local proxy-access policies. The Data Holder relies on the issuer's verification of identity and authority per its configured trust policy; it applies its own rules for what each requester class may see.
 * Local sensitivity and adolescent-privacy rules continue to apply below the ticket.
 
 #### What This Ticket Does Not Prove
 
 * That the requester's authority extends to every category of the subject's data; local policy governs category-level release for each requester class.
-* That the relationship remains valid indefinitely; the ticket's validity window and revocation status bound reliance.
+* That the authority remains valid indefinitely; the ticket's validity window and revocation status bound reliance.
 
 #### Open Questions
 
@@ -185,7 +185,6 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 |-------|--------------|---------------|
 | Requesting agency | `requester` (Organization identifiers) | Known-agency directory matching; per-agency arrangements |
 | Reportable condition | `context.reportable_condition` | Scope of the investigation; which data classes are responsive |
-| Time and place bounds | `access.data_period`, `access.data_holder_filter` | How much history, which holders answer |
 
 #### Data Holder Processing
 
@@ -268,7 +267,6 @@ This profile is viable when scoped to a concrete claim or service: the context i
 |-------|--------------|---------------|
 | Requesting payer | `requester` | Trading-partner recognition; per-payer arrangements |
 | Claim context | `context.claim`, `context.service` | Which records are responsive to the adjudication |
-| Period bound | `access.data_period` | Service-date-relevant history |
 
 #### What This Ticket Does Not Prove
 
@@ -289,7 +287,7 @@ This profile is viable when scoped to a concrete claim or service: the context i
 
 *A research organization retrieves records for a study participant without the researcher becoming a "user" at the hospital.*
 
-The ticket carries issuer-verified study access details: the study identity, the requesting organization, and profile-defined verification that the required study workflow was completed. Whether that workflow is participant consent, an approved waiver, or another governance path is defined by the specific profile and the trust framework — the base ticket does not define a universal research authorization model. This use case needs more development; it is most viable where study governance is concrete and verifiable.
+The ticket carries issuer-verified study access details: the study identity, the requesting organization, and profile-defined verification that the required study workflow was completed. Whether that workflow is participant consent, an approved waiver, or another governance path is defined by the specific profile and the trust framework — the base ticket does not define a universal research authorization model. This use case is most viable where study governance is concrete and verifiable.
 
 #### Required Claims
 
@@ -325,7 +323,7 @@ The ticket carries issuer-verified study access details: the study identity, the
 
 *A Specialist (Practitioner) requests data from a Referring Provider.*
 
-The care relationship here is concrete and recent (the referral), and the context is operationally meaningful (the consult request) — but this profile needs more development before implementation.
+The care relationship here is concrete and recent (the referral), and the context is operationally meaningful (the consult request).
 
 #### Typical Flow
 
