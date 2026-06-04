@@ -314,7 +314,7 @@ const TicketBaseSchema = z.object({
   requester_identity_evidence: IdentityEvidenceSchema.optional(),
   revocation: RevocationSchema.optional(),
   must_understand: z.array(MustUnderstandClaimNameSchema).min(1).optional(),
-  subject: SubjectSchema.optional(),
+  subject: SubjectSchema,
   requester: RequesterSchema.optional(),
   access: AccessGrantSchema,
 }).catchall(z.unknown());
@@ -370,14 +370,6 @@ export const PermissionTicketSchema = z.discriminatedUnion("ticket_type", [
   ResearchStudyTicketSchema,
   ProviderConsultTicketSchema,
 ]).superRefine((ticket, ctx) => {
-  if (!ticket.subject && !ticket.subject_identity_evidence) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Permission Ticket must include either subject or subject_identity_evidence.",
-      path: ["subject"],
-    });
-  }
-
   if (!ticket.must_understand) return;
 
   const duplicates = new Set<string>();

@@ -59,7 +59,7 @@ Patient completes identity verification and authorization with the issuer → is
 
 #### Required Claims
 
-* **Subject:** `Patient` (matched by demographics: name, DOB, identifiers), or profile-permitted `subject_identity_evidence` when an embedded identity token carries the patient-resolution facts.
+* **Subject:** `Patient` (matched by demographics: name, DOB, identifiers), optionally supplemented by `subject_identity_evidence` carrying an embedded identity token for upstream verification.
 * **Requester:** None (self-access). The absence of `requester` is what marks the ticket as self-access.
 * **Context:** *(none; `context` may be omitted or empty)*
 * **Access:** `permissions` with specific resource types and interactions.
@@ -67,7 +67,7 @@ Patient completes identity verification and authorization with the issuer → is
 
 #### Identity Evidence
 
-This is the ticket type where `subject_identity_evidence` matters most: an issuer that relied on a high-assurance identity token (for example, an IAL2 ID token) can embed it so the Data Holder can verify the evidence directly. When the embedded token carries the patient-resolution facts, the profile permits omitting `subject.patient` rather than duplicating them. The Data Holder verifies the evidence issuer, signature, assurance level, and freshness according to its configured trust policy for this profile.
+This is the ticket type where `subject_identity_evidence` matters most: an issuer that relied on a high-assurance identity token (for example, an IAL2 ID token) can embed it alongside `subject.patient` so the Data Holder can verify the identity claims upstream — independently of its trust in the ticket issuer. Base verification mechanics (signature, evidence-issuer trust, temporal validity) are defined in the [base specification](index.html#identity-evidence); this profile's parameters are the expected assurance level (IAL2-grade) and demographics sufficient for matching. Deployments MAY require evidence for this ticket type; `subject.patient` is present either way.
 
 #### Policy Selection Inputs
 
@@ -124,7 +124,7 @@ The `requester.relationship` codings carry two distinct layers of fact (see [Del
 * **Familial/personal codings** (for example `DAU`, `MTH`, `SPS`) — who the requester is to the patient. Useful for display, audit, and policy routing alongside subject demographics (for example, distinguishing parent-of-minor from parent-of-adolescent policy classes). Zero or more may appear.
 * **Authority coding** — why the requester is permitted to ask. **Exactly one** SHALL appear, from the closed authority value set: `DELEGATEE`, `HPOWATT`, `DPOWATT`, `POWATT`, `SPOWATT`, `GUARD` (all from [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html)).
 
-`RelatedPerson.period`, when present, bounds the validity of the relationship and authority. Data Holders SHALL treat an expired `period.end` as invalidating the authority assertion regardless of the ticket's `exp`.
+Authority validity is enforced through the ticket envelope: the issuer SHALL NOT set ticket `exp` later than the verified end of the requester's authority, and handles earlier termination through revocation. `RelatedPerson.period` MAY additionally record the verified validity bound for audit and display; Data Holders do not need a separate period check.
 
 ##### Issuer Verification Obligations
 
@@ -146,7 +146,6 @@ The underlying source documents and verification records stay with the issuer; t
 | Subject age and demographics | `subject.patient` | Minor vs. adolescent vs. adult subject policy classes |
 | Personal relationship | `requester.relationship` (familial codings) | Parent / spouse / other-adult routing |
 | Authority | `requester.relationship` (authority coding) | Patient-delegate vs. guardianship vs. power-of-attorney policy buckets |
-| Authority validity | `requester.period` | Whether the authority assertion is current |
 
 #### Data Holder Processing
 
