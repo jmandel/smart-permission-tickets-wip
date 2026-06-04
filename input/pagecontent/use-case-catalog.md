@@ -4,26 +4,25 @@ This page is the registry of Permission Ticket use cases. Each use case maps to 
 
 {% include generated/spec-snippets/index/use-case-profile-map.md %}
 
-### Status Tiers
+### Status
 
-Use cases carry an explicit maturity status so implementers know which profiles the working group believes are ready to build against and which are still being mapped out:
+Each use case carries one of three statuses:
 
 | Status | Meaning |
 |--------|---------|
-| **Core early candidate** | The workflow, required fields, and Data Holder decision model are well understood. Targeted for first implementations. |
-| **Narrow-profile candidate** | Viable when scoped to a concrete, narrow request pattern; broader variants are not yet modeled. |
-| **Profile-specific** | Viable where the governing workflow is concrete and verifiable; otherwise experimental. |
-| **Experimental** | Recorded to map the design space. Not ready for implementation; expect material change. |
+| **Ready** | The underlying workflow is real today; ready for first implementations. |
+| **Modeled** | Fields and processing rules are drafted in detail, but no real-world deployments exercise this flow yet. |
+| **Needs development** | Not ready; expect material change before implementation. |
 
 | Use Case | Status |
 |----------|--------|
-| UC1: Patient Self Access | Core early candidate |
-| UC2: Patient-Delegated Access | Core early candidate |
-| UC3: Public Health Investigation | Core early candidate (B2B) |
-| UC4: Social Care (CBO) Referral | Experimental |
-| UC5: Payer Claims Adjudication | Narrow-profile candidate |
-| UC6: Research Study | Profile-specific |
-| UC7: Provider-to-Provider Consult | Core early candidate (B2B) |
+| UC1: Patient Self Access | Ready |
+| UC2: Patient-Delegated Access | Modeled |
+| UC3: Public Health Investigation | Modeled |
+| UC4: Social Care (CBO) Referral | Needs development |
+| UC5: Payer Claims Adjudication | Needs development |
+| UC6: Research Study | Needs development |
+| UC7: Provider-to-Provider Consult | Needs development |
 
 ### Per-Profile Constraints
 
@@ -39,13 +38,13 @@ The table below summarizes required and optional fields for each ticket type:
 | UC6: Research | Optional | `Organization` (required) | `study` | `permissions`, `data_period` |
 | UC7: Provider Consult | Optional | `PractitionerRole` (required) | `reason`, `consult_request` | `permissions` |
 
-Each use case section below follows a common template, including a **Policy Selection Inputs** table: the ticket fields a Data Holder uses to select among its existing internal access policies. Permission Tickets supply policy-selection inputs; they do not rewrite or replace the Data Holder's policies.
+Each use case section below follows a common template, including **Policy Selection Inputs**: `ticket_type` selects which family of Data Holder policy applies (self-access, proxy, public-health disclosure, …); the inputs listed per use case are the ticket fields that discriminate *within* that family — which variant of the Data Holder's own policy governs this request. Permission Tickets supply policy-selection inputs; they do not rewrite or replace the Data Holder's policies.
 
 ---
 
 ### Use Case 1: Patient Self Access
 
-**Status:** Core early candidate
+**Status:** Ready
 
 #### Purpose
 
@@ -71,12 +70,7 @@ This is the ticket type where `subject_identity_evidence` matters most: an issue
 
 #### Policy Selection Inputs
 
-| Input | Ticket field | Selects among |
-|-------|--------------|---------------|
-| Ticket type | `ticket_type` | Self-access policy class (vs. proxy or B2B classes) |
-| Subject identity and assurance | `subject` / `subject_identity_evidence` | Match confidence handling; new-patient vs. known-portal-user paths |
-
-This list is deliberately short: self-access is the simplest policy-routing case. The Data Holder's target behavior is that the patient sees what they would see through the Data Holder's own patient-facing access.
+There is essentially one policy bucket here: the Data Holder's patient self-access policy — the patient sees what they would see through the Data Holder's own patient-facing access. No ticket field selects among variants; the only graded input is subject-resolution confidence (`subject.patient`, strengthened by `subject_identity_evidence` when present).
 
 #### Data Holder Processing
 
@@ -97,7 +91,7 @@ This list is deliberately short: self-access is the simplest policy-routing case
 
 ### Use Case 2: Patient-Delegated Access
 
-**Status:** Core early candidate
+**Status:** Modeled — no real-world deployments of this flow yet
 
 #### Purpose
 
@@ -142,7 +136,6 @@ The underlying source documents and verification records stay with the issuer; t
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Ticket type | `ticket_type` | Proxy/delegated-access policy classes (vs. self-access) |
 | Subject age and demographics | `subject.patient` | Minor vs. adolescent vs. adult subject policy classes |
 | Personal relationship | `requester.relationship` (familial codings) | Parent / spouse / other-adult routing |
 | Authority | `requester.relationship` (authority coding) | Patient-delegate vs. guardianship vs. power-of-attorney policy buckets |
@@ -170,13 +163,13 @@ See the [per-ticket verification class open question](index.html#oq-verification
 
 ### Use Case 3: Public Health Investigation
 
-**Status:** Core early candidate (B2B)
+**Status:** Modeled — no real-world deployments of this flow yet
 
 #### Purpose
 
 *A Hospital creates a Case Report. The Public Health Agency (PHA) uses a ticket to query for follow-up data.*
 
-Public health follow-up is a strong early B2B profile: the requester is an organization, the request is tied to a concrete triggering event (a reportable condition), and the Data Holder decision can be profile-driven rather than user-driven.
+Public health follow-up is well suited to ticket-based exchange: the requester is an organization, the request is tied to a concrete triggering event (a reportable condition), and the Data Holder decision can be profile-driven rather than user-driven.
 
 #### Typical Flow
 
@@ -194,7 +187,6 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Ticket type | `ticket_type` | Public-health disclosure policy class |
 | Requesting agency | `requester` (Organization identifiers) | Known-agency directory matching; per-agency arrangements |
 | Reportable condition | `context.reportable_condition` | Scope of the investigation; which data classes are responsive |
 | Time and place bounds | `access.data_period`, `access.data_holder_filter` | How much history, which holders answer |
@@ -218,7 +210,7 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 
 ### Use Case 4: Social Care (CBO) Referral
 
-**Status:** Experimental
+**Status:** Needs development
 
 #### Purpose
 
@@ -238,7 +230,6 @@ This use case is recorded to map the design space. It is the least mature profil
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Ticket type | `ticket_type` | Social-care disclosure policy class |
 | Requesting organization | `requester` | Known-partner vs. unknown-CBO handling |
 | Referral context | `context.referral`, `context.concern` | Scope-of-referral narrowing |
 
@@ -259,7 +250,7 @@ This use case is recorded to map the design space. It is the least mature profil
 
 ### Use Case 5: Payer Claims Adjudication
 
-**Status:** Narrow-profile candidate
+**Status:** Needs development
 
 #### Purpose
 
@@ -279,7 +270,6 @@ This profile is viable when scoped to a concrete claim or service: the context i
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Ticket type | `ticket_type` | Payer-disclosure policy class |
 | Requesting payer | `requester` | Trading-partner recognition; per-payer arrangements |
 | Claim context | `context.claim`, `context.service` | Which records are responsive to the adjudication |
 | Period bound | `access.data_period` | Service-date-relevant history |
@@ -297,13 +287,13 @@ This profile is viable when scoped to a concrete claim or service: the context i
 
 ### Use Case 6: Research Study
 
-**Status:** Profile-specific
+**Status:** Needs development
 
 #### Purpose
 
 *A research organization retrieves records for a study participant without the researcher becoming a "user" at the hospital.*
 
-The ticket carries issuer-verified study access details: the study identity, the requesting organization, and profile-defined verification that the required study workflow was completed. Whether that workflow is participant consent, an approved waiver, or another governance path is defined by the specific profile and the trust framework — the base ticket does not define a universal research authorization model. This use case is a candidate where study governance is concrete and verifiable; otherwise it should be treated as experimental.
+The ticket carries issuer-verified study access details: the study identity, the requesting organization, and profile-defined verification that the required study workflow was completed. Whether that workflow is participant consent, an approved waiver, or another governance path is defined by the specific profile and the trust framework — the base ticket does not define a universal research authorization model. This use case needs more development; it is most viable where study governance is concrete and verifiable.
 
 #### Required Claims
 
@@ -317,7 +307,6 @@ The ticket carries issuer-verified study access details: the study identity, the
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Ticket type | `ticket_type` | Research-disclosure policy class |
 | Requesting organization | `requester` | Known research partner handling |
 | Study identity | `context.study` | Study-specific arrangements, data-use agreements |
 
@@ -334,13 +323,13 @@ The ticket carries issuer-verified study access details: the study identity, the
 
 ### Use Case 7: Provider-to-Provider Consult
 
-**Status:** Core early candidate (B2B)
+**Status:** Needs development
 
 #### Purpose
 
 *A Specialist (Practitioner) requests data from a Referring Provider.*
 
-A strong early B2B profile: the care relationship is concrete and recent (the referral), the context is operationally meaningful (the consult request), and even without key binding the ticket is strictly better than status-quo ad hoc exchange.
+The care relationship here is concrete and recent (the referral), and the context is operationally meaningful (the consult request) — but this profile needs more development before implementation.
 
 #### Typical Flow
 
@@ -362,7 +351,6 @@ No separate authority coding is needed for this profile: the care relationship *
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Ticket type | `ticket_type` | Treatment/consult disclosure policy class |
 | Requesting role and organization | `requester` | Known-partner vs. unknown-requester handling; audit identity |
 | Consult context | `context.consult_request`, `context.reason` | Scope-of-consult narrowing; review triggers |
 
