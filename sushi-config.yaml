@@ -17,8 +17,6 @@ pages:
     title: Use Case Catalog
   future-use-cases.md:
     title: Future Use Cases
-  security-considerations.md:
-    title: Security Considerations
   open-questions.md:
     title: Open Questions
   typescript-definitions.md:
@@ -44,7 +42,6 @@ menu:
   IG Home: index.html
   Quickstart: quickstart.html
   Use Case Catalog: use-case-catalog.html
-  Security Considerations: security-considerations.html
   Open Questions: open-questions.html
   Proposals:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html

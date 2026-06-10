@@ -2,6 +2,7 @@
 output/
 temp/
 template/
+input-cache/
 txCache/
 publisher.jar
 fhir-ig-publisher.jar
