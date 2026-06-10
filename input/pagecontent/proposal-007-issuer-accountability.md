@@ -16,7 +16,7 @@ The base specification says the issuer verifies real-world facts before minting.
 
 ### Record Retention and Audit
 
-Every ticket carries a `jti`. The issuer is the party that can answer "why did this grant exist?"
+Every ticket carries a `jti`. Only the issuer can answer "why did this grant exist?"
 
 - Retain the verification evidence behind each ticket — identity proofing events, delegation records, examined instruments, triggering events — keyed by `jti`, for a framework-defined retention period.
 - Answer audit requests from framework participants within a framework-defined time.

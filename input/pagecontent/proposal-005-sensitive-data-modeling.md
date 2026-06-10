@@ -9,7 +9,7 @@ This proposal defines an experimental Permission Ticket profile for communicatin
 * **Withholding** — do not send data in these categories.
 * **Release authorization** — the issuer attests that these categories are within the authorization scope, subject to Data Holder policy and law.
 
-This profile lives outside the base specification deliberately, and not because it is timid: its job is to lay out the *shape* of sensitive-data handling ahead of what base APIs can do today. The base kernel only carries what every conforming Data Holder can enforce now; this profile models where sensitive-data management needs to go, so that issuers, EHRs, and trust frameworks can build toward one shape instead of inventing several. The claim is must-understand whenever present: a Data Holder that cannot honor the stated rules rejects the ticket rather than silently letting the authorizing person's expectations fail.
+This profile lives outside the base specification deliberately: its job is to lay out the *shape* of sensitive-data handling ahead of what base APIs can do today. The base kernel only carries what every conforming Data Holder can enforce now; this profile models where sensitive-data management needs to go, so that issuers, EHRs, and trust frameworks can build toward one shape instead of inventing several. The claim is must-understand whenever present: a Data Holder that cannot honor the stated rules rejects the ticket rather than silently letting the authorizing person's expectations fail.
 
 ### Motivation
 
@@ -21,7 +21,7 @@ Three parties need these rules:
 
 ### Two Directions, Different Properties
 
-The two rule kinds carry different trust and enforcement properties. The profile states them plainly so trust frameworks can gate accordingly:
+The two rule kinds carry different trust and enforcement properties. Trust frameworks can gate on these differences:
 
 * **Withholding** can be honored without trusting the issuer (a request to send less cannot expand access) and tolerates conservative enforcement — when classification is uncertain, withhold more. But conservative enforcement is not a free pass: a withholding rule the Data Holder cannot evaluate at all is a broken promise to the patient, which is why the claim is must-understand and fail-closed rather than best-effort.
 * **Release authorization** rests on the issuer's authorization ceremony and requires the Data Holder to trust that ceremony for sensitive categories specifically. It cannot be enforced conservatively in either direction: under-release defeats the patient's intent, over-release is a breach. Trust frameworks adopting this profile SHOULD define which issuers may assert `release_authorized`, for which categories, and what ceremony and evidence stand behind it.
@@ -136,7 +136,7 @@ Data Holders implementing this profile SHALL:
 4. Treat data matching a `release_authorized` category as within the ticket's authorization scope, releasing only if Data Holder policy, law, patient matching, and technical constraints permit.
 5. Apply `unlisted_sensitive_data` to locally classified sensitive data matching neither list: `"withhold"` withholds it, `"release_authorized"` treats it per rule 4, absent or `"local_policy"` applies local policy.
 6. When classification is uncertain, enforce `withhold` conservatively (withhold more); never resolve uncertainty in favor of release under rule 4.
-7. If a stated rule cannot be enforced at all, reject with `invalid_grant` and an appropriate `error_description` — silent partial enforcement is what breaks the authorizing person's expectations.
+7. If a stated rule cannot be enforced at all, reject with `invalid_grant` and an appropriate `error_description`.
 
 This profile does not require Data Holders to reveal whether withheld sensitive data exists. Error descriptions and audit entries should not create that disclosure.
 

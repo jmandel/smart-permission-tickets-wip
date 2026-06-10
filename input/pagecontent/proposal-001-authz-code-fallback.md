@@ -4,7 +4,7 @@
 
 ### Summary
 
-The current spec defines backend token exchange as the sole redemption path for permission tickets. This proposal adds an optional fallback where a Data Holder can signal that it needs direct patient interaction before issuing an access token, triggering a standard SMART App Launch flow. The fallback leverages SMART App Launch's "EHR Launch" flow.
+The current spec defines backend token exchange as the sole redemption path for permission tickets. This proposal adds an optional fallback where a Data Holder can signal that it needs direct patient interaction before issuing an access token, triggering a standard SMART App Launch flow. The fallback uses SMART App Launch's "EHR Launch" flow.
 
 ### Motivation
 
@@ -14,7 +14,7 @@ There is exactly one case where the information in the ticket is genuinely insuf
 
 - **Patient identity could not be resolved.** The ticket's `subject.patient` demographics do not match any local record, or match multiple candidates with insufficient confidence to select one. The patient needs to help the Data Holder identify the right record.
 
-This is a closed list of one, on purpose: every additional trigger is an opening for per-site authorization screens to return, which would defeat the point of tickets. The ticket carries the full authorization context; the interactive step fills the one gap only the patient can fill.
+The list stops at one case: every additional trigger is an opening for per-site authorization screens to return, which would defeat the point of tickets. The ticket carries the full authorization context; the interactive step fills the one gap only the patient can fill.
 
 Without the fallback, the Data Holder's only option is to reject the token exchange with `invalid_grant`, which gives the client no path forward. The patient's authorization intent (captured in the ticket) is lost.
 

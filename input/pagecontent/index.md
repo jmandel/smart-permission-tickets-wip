@@ -7,7 +7,7 @@
 
 A Permission Ticket is a **signed access ticket**: an issuer-signed JWT that a client presents to a Data Holder's token endpoint via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). It lets a client ask a Data Holder for a local access token without repeating the whole authorization or verification workflow at every Data Holder. The ticket is portable: the same ticket can be presented at any Data Holder within its intended audience, without requiring the issuer to know where the subject has received care.
 
-The ticket is built around a **portable kernel**: only the signed fields that a Data Holder plausibly needs in order to say yes or no to a request live in the common shell. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), an **access** grant (what resources and constraints), and an optional **context** object whose schema is selected by `ticket_type`.
+The ticket is built around a **portable kernel**: only the signed fields that a Data Holder plausibly needs to say yes or no to a request live in the common shell. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), an **access** grant (what resources and constraints), and an optional **context** object whose schema is selected by `ticket_type`.
 
 These fields are **policy-selection inputs**. Data Holders already maintain internal access policies — for self-access, proxy classes, B2B disclosure, and more. The ticket carries enough issuer-verified facts about who is asking, about whom, and why, for the Data Holder to select the correct local policy, even for a requester it has never seen. The ticket selects among the Data Holder's policies; it does not rewrite them. If the Data Holder accepts the ticket, it issues a local access token scoped by the ticket, the client's request and eligibility, the selected ticket type, and the Data Holder's own policies and technical capabilities.
 
@@ -61,7 +61,7 @@ This specification uses the following role terms consistently:
 * **Issuer** — the party that verifies real-world facts and signs the Permission Ticket.
 * **Client** — the software application that presents a Permission Ticket. When redeeming a particular ticket, this specification may refer to the client as the **presenting client** to emphasize redemption-time behavior.
 * **Data Holder** — the party or system that evaluates the ticket and answers with data.
-* **Authorization Server** — the token endpoint surface operated by or for a Data Holder.
+* **Authorization Server** — the token endpoint operated by or for a Data Holder.
 * **Resource Server** — an API surface that serves data for a Data Holder.
 * **Subject** — the person whose data the ticket concerns.
 * **Requester** — the real-world party for whom the grant exists, as attested by the issuer.
@@ -151,7 +151,7 @@ Client ID format and registration details are determined by the chosen approach.
 
 The **Well-Known JWKS** approach — a deterministic `well-known:{entity_uri}` client identifier resolvable at any Data Holder without per-holder registration — is defined in [Proposal 006: Well-Known JWKS Client Identity](proposal-006-well-known-client-identity.html). It is one option among the registration approaches above, not a base requirement.
 
-**The Request:**
+**Request:**
 ```http
 POST /token HTTP/1.1
 Host: fhir.hospital.com
@@ -227,7 +227,7 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
   }
   ```
 
-**Note on `cnf` (decided).** Standard JWT confirmation uses the `cnf` claim ([RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)). This specification deliberately diverges: both binding modes live in one `presenter_binding` discriminated union rather than splitting key binding into `cnf` and framework binding into a custom claim. The key-binding semantics are exactly `cnf.jkt` — the same RFC 7638 thumbprint comparison, so thumbprint code written for `cnf.jkt` is reusable as-is — and only the claim shape differs. Recorded as a resolved design decision in the [Open Questions registry](open-questions.html).
+**Note on `cnf` (decided).** Standard JWT confirmation uses the `cnf` claim ([RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)). This specification diverges: both binding modes live in one `presenter_binding` discriminated union rather than splitting key binding into `cnf` and framework binding into a custom claim. The key-binding semantics are exactly `cnf.jkt` — the same RFC 7638 thumbprint comparison, so thumbprint code written for `cnf.jkt` is reusable as-is — and only the claim shape differs. Recorded as a resolved design decision in the [Open Questions registry](open-questions.html).
 
 ##### Binding Modes
 
@@ -244,7 +244,7 @@ In all modes, the Data Holder authenticates the presenting client through its st
 Whether `presenter_binding` is required is a ticket-type rule: individual-access types (UC1, UC2) require it; B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
 
 #### Server-Side Validation
-The Data Holder SHALL perform a two-layer validation:
+The Data Holder SHALL validate in two layers:
 
 1.  **Layer 1: Client Authentication (Standard OAuth)**
     *   Validate the client's authentication according to the locally supported OAuth client-authentication mechanism.
@@ -308,13 +308,13 @@ The base evidence shape is an embedded OpenID Connect ID token:
 
 The evidence `aud` never names the Data Holder itself — Data Holders SHALL NOT expect their own identifier there. How a Data Holder learns which client identifiers belong to a ticket issuer is deployment configuration: issuer metadata, a trust-framework directory, or direct configuration.
 
-**Profile parameters.** Ticket-type profiles and trust frameworks configure the parameters of this base machinery: which evidence issuers are acceptable, required assurance (for example, IAL2 or specific `acr` values), required claims, and any freshness window tighter than the base rule.
+**Profile parameters.** Ticket-type profiles and trust frameworks set the parameters of this base verification: which evidence issuers are acceptable, required assurance (for example, IAL2 or specific `acr` values), required claims, and any freshness window tighter than the base rule.
 
 Future versions may define additional identity-evidence token types, such as mobile driver's license (mDL) or other verifiable credential formats.
 
 Identity evidence supplements — it does not replace — the FHIR party representations (see [Subject Resolution](#subject-resolution)). The same rule applies on the requester side: `requester` stays present, and the issuer SHALL keep it consistent with any `requester_identity_evidence`.
 
-*Design note:* evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. The evidence is a JWT verified with OIDC machinery at the token endpoint, not clinical content; top-level claims are how this specification handles must-understand and extensions; and sibling slots keep the two evidence claims identical in shape. There is no ambiguity about who the evidence describes, because a ticket names exactly one subject and at most one requester.
+*Design note:* evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. The evidence is a JWT verified with standard OIDC processing at the token endpoint, not clinical content; top-level claims are how this specification handles must-understand and extensions; and sibling slots keep the two evidence claims identical in shape. There is no ambiguity about who the evidence describes, because a ticket names exactly one subject and at most one requester.
 
 #### Issuer-Attested Claims
 
@@ -355,7 +355,7 @@ For example, a permission `{ kind: "data", resource_type: "Observation", interac
 
 FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base kernel. A future profile may add operation-level permissions when a use case requires them.
 
-> **Open Question (OQ-2): Ticket-Level Scope Mode for Future Non-Patient Subjects.** The current base kernel always identifies a single patient through `subject.patient`, so current tickets naturally project to patient-level semantics even when redeemed by backend clients. If future use cases introduce a different subject shape (for example, `Group`) or no subject at all, the working group may need an explicit ticket-level scope mode (for example, `patient` vs `system`) or a profile rule that changes SMART scope projection. This question is only relevant if future use cases require non-individual or subjectless tickets.
+> **Open Question (OQ-2): Do future non-patient subjects need an explicit ticket-level scope mode?** The current base kernel always identifies a single patient through `subject.patient`, so current tickets naturally project to patient-level semantics even when redeemed by backend clients. If future use cases introduce a different subject shape (for example, `Group`) or no subject at all, the working group may need an explicit ticket-level scope mode (for example, `patient` vs `system`) or a profile rule that changes SMART scope projection. This question is only relevant if future use cases require non-individual or subjectless tickets.
 {: .callout .callout-open-question #oq-2}
 
 #### Access Constraints
@@ -398,7 +398,7 @@ All three dimensions are part of the base kernel: conforming Data Holders SHALL 
 
 For any resource type in neither list, a Data Holder SHALL NOT return resources of that type under a ticket carrying `data_period`, unless the applicable ticket-type profile designates a date parameter for it. This keeps the rule fail-closed without making it vendor-discretionary.
 
-Parameter choices favor reliably populated dates over clinically richer but sparse ones: `recorded-date` rather than `onset-date` for Condition (onset is a choice type, often absent or non-date), `authoredon` for MedicationRequest (the R4 `date` parameter binds to dosing-schedule timing, not order time), `date` rather than `issued` for DiagnosticReport (clinical time, not release time). Note that these dates reflect when content was recorded or performed: a condition recorded last month passes a recent window even if it began years ago.
+Parameter choices favor reliably populated dates over clinically richer but sparse ones: `recorded-date` rather than `onset-date` for Condition (onset is a choice type, often absent or non-date), `authoredon` for MedicationRequest (the R4 `date` parameter binds to dosing-schedule timing, not order time), `date` rather than `issued` for DiagnosticReport (clinical time, not release time). These dates reflect when content was recorded or performed: a condition recorded last month passes a recent window even if it began years ago.
 
 ##### Constraint Algebra
 
@@ -539,7 +539,7 @@ Issuers SHOULD use directory or network information (published endpoint networks
 * Data Holders that manage integrated records across multiple facilities evaluate this filter at the Data Holder level, not as a resource-by-resource clinical data filter.
 * A Data Holder answering on behalf of a named organization that is served through a broader shared system MAY narrow its response to that organization's records, if its architecture supports the attribution. Narrowing is permitted, not promised: the filter still gates who may answer, and acceptance still typically returns the combined record.
 
-> **Open Question: Custodian-Level Targeting.** Should `data_holder_filter` gain an explicit custodian-scoped form — "answer only with this organization's records," enforce-or-reject — once vendors can attribute records to custodian organizations and network directories carry custodian-level identities? Today, narrowing is best-effort (above). Open homework: whether existing network directories model custodian-level entries at all.
+> **Open Question: Custodian-Level Targeting.** Should `data_holder_filter` gain an explicit custodian-scoped form — "answer only with this organization's records," enforce-or-reject — once vendors can attribute records to custodian organizations and network directories carry custodian-level identities? Today, narrowing is best-effort (above). Do existing network directories model custodian-level entries at all?
 {: .callout .callout-open-question #oq-custodian-targeting}
 
 #### Token-Time and Resource-Time Enforcement
@@ -550,11 +550,11 @@ If a component responsible for enforcing a constraint cannot do so, the request 
 
 #### Using Multiple Tickets
 
-A single Permission Ticket confers one set of access constraints that applies uniformly to all Data Holders in its audience. When an authorizing party requires different access constraints for different Data Holders — for example, sharing lab results from one responder but only conditions from another, or using different lifetimes or Data Holder filters — the issuer should mint separate tickets, each with its own `access` block and, optionally, a narrower `aud` or `data_holder_filter`.
+A single Permission Ticket confers one set of access constraints that applies uniformly to all Data Holders in its audience. When the authorizing person requires different access constraints for different Data Holders — for example, sharing lab results from one responder but only conditions from another, or using different lifetimes or Data Holder filters — the issuer should mint separate tickets, each with its own `access` block and, optionally, a narrower `aud` or `data_holder_filter`.
 
 Clients managing multiple tickets present the appropriate ticket in each token exchange request. Since each request carries exactly one `subject_token`, the client selects which ticket to present based on which Data Holder it is connecting to.
 
-This pattern also applies when one set of intended permissions simply does not fit cleanly into one ticket shape. Rather than modeling heterogeneous authorization inside one ticket, issuing a set of tickets keeps each individual ticket simple and its constraints unambiguous.
+This pattern also applies when one set of intended permissions does not fit cleanly into one ticket shape. Rather than modeling heterogeneous authorization inside one ticket, issuing a set of tickets keeps each individual ticket simple and its constraints unambiguous.
 
 ---
 
@@ -614,7 +614,7 @@ A profile adds encounter-class filtering via a new top-level claim and lists it 
 }
 ```
 
-A Data Holder that understands `encounter_class_filter` enforces it. A Data Holder that does not recognize the name rejects the ticket because it appears in `must_understand`. If the issuer had omitted `encounter_class_filter` from `must_understand`, Data Holders that do not recognize it would simply ignore it.
+A Data Holder that understands `encounter_class_filter` enforces it. A Data Holder that does not recognize the name rejects the ticket because it appears in `must_understand`. If the issuer had omitted `encounter_class_filter` from `must_understand`, Data Holders that do not recognize it would ignore it.
 
 Extensions should be modeled as new top-level claims rather than injecting fields into existing kernel structures. This keeps extensions visible and prevents profiles from silently altering the semantics of base claims.
 
@@ -830,7 +830,7 @@ They are published on a dedicated page to keep this main architecture page light
 #### Signing Algorithm
 
 *   **Algorithm:** ES256 (ECDSA using P-256 and SHA-256) is RECOMMENDED. RS256 is also supported.
-*   **JWS Header:** SHALL include `alg` and `kid` (Key ID) to facilitate key rotation.
+*   **JWS Header:** SHALL include `alg` and `kid` (Key ID) to support key rotation.
 *   **Roles:**
     *   The **issuer** signs the `PermissionTicket`.
     *   The **client** signs the `ClientAssertion` it presents to the Data Holder.
@@ -847,7 +847,7 @@ Issuers that participate in a trust framework MAY additionally publish through t
 *   **OpenID Federation** — the issuer publishes its leaf entity configuration at `${iss}/.well-known/openid-federation`. See [OpenID Federation for Permission Ticket Issuers](proposal-002-oidf-issuers.html) for the metadata layout, the structural binding between `iss` and the OIDF leaf entity ID, the federation-signing vs ticket-signing key separation, and the verifier pipeline.
 *   **UDAP** — discovery begins from `${iss}/.well-known/udap`.
 
-Implementations that publish the same issuer through multiple mechanisms SHOULD keep any shared `kid` values aligned across those publication surfaces. This is an interoperability recommendation, not a token-time validation requirement.
+Implementations that publish the same issuer through multiple mechanisms SHOULD keep any shared `kid` values aligned across those mechanisms. This is an interoperability recommendation, not a token-time validation requirement.
 
 #### Client Key Publication
 
