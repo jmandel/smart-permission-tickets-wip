@@ -353,6 +353,8 @@ The `access.permissions` array is the normative authorization model. Each `DataP
 
 For example, a permission `{ kind: "data", resource_type: "Observation", interactions: ["read", "search"] }` projects to a SMART scope such as `patient/Observation.rs` or `system/Observation.rs`, depending on the applicable ticket profile and client mode.
 
+Narrowing filters (`category_any_of`, `code_any_of`) do not project into scope strings. The OAuth scope surface carries the resource-type and interaction grain only; the Data Holder enforces the filters from the ticket itself, at the token endpoint, the resource server, or both.
+
 FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base kernel. A future profile may add operation-level permissions when a use case requires them.
 
 > **Open Question (OQ-2): Do future non-patient subjects need an explicit ticket-level scope mode?** The current base kernel always identifies a single patient through `subject.patient`, so current tickets naturally project to patient-level semantics even when redeemed by backend clients. If future use cases introduce a different subject shape (for example, `Group`) or no subject at all, the working group may need an explicit ticket-level scope mode (for example, `patient` vs `system`) or a profile rule that changes SMART scope projection. This question is only relevant if future use cases require non-individual or subjectless tickets.
@@ -547,6 +549,8 @@ Issuers SHOULD use directory or network information (published endpoint networks
 Some access constraints — especially `data_period` and `data_holder_filter` — may require filtering at the Resource Server rather than at the token endpoint. If a constraint cannot be fully enforced at token issuance, the Authorization Server SHALL carry the normalized constraint set forward in the issued access token (or make it available via token introspection) so the Resource Server can enforce it.
 
 If a component responsible for enforcing a constraint cannot do so, the request SHALL be rejected rather than silently ignoring the constraint.
+
+Access tokens issued after redemption are ordinary OAuth 2.0 bearer tokens, as in SMART Backend Services. `presenter_binding` constrains who may redeem the ticket; it does not sender-constrain the resulting access token. Deployments MAY sender-constrain access tokens using standard mechanisms such as DPoP or mutual-TLS, which this specification does not define.
 
 #### Using Multiple Tickets
 

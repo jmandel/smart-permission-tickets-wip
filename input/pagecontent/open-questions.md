@@ -29,6 +29,8 @@ Every open design question in this specification is listed here with a stable ID
 | RQ-DATA-PERIOD | What does `data_period` enforcement mean concretely? | Each resource type has a designated standard date search parameter; servers behave as if every search carried the corresponding `ge`/`le` constraints. See [Data Period Enforcement](index.html#data-period-enforcement). (June 2026) |
 | RQ-FALLBACK | Which gaps justify the interactive fallback in Proposal 001? | Exactly one: subject resolution failure. Returning `interaction_required` after successful resolution is prohibited. (June 2026) |
 | RQ-SENSITIVE-BASE | Should the base ticket carry a sensitive-data flag? | No. Removed from the base kernel; sensitivity handling lives in the Proposal 005 profile, which models both withholding and release authorization. (May 27, 2026 call) |
+| RQ-BEARER | Are access tokens issued after redemption sender-constrained? | No. They are ordinary OAuth 2.0 bearer tokens; presenter binding constrains ticket redemption only. Deployments may add DPoP or mutual-TLS. (June 2026) |
+| RQ-FILTER-PROJECTION | Do `category_any_of`/`code_any_of` project into SMART scope strings? | No. The scope surface carries resource-type and interaction grain only; Data Holders enforce the filters from the ticket. (June 2026) |
 
 ### Parked
 
