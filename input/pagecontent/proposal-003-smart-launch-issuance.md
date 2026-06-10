@@ -147,6 +147,8 @@ Each `EndpointHint` has:
 
 Endpoint hints are **advisory**. Final eligibility is determined at redemption time by the Data Holder's own validation (issuer trust, ticket `aud`, `data_holder_filter`, etc.). A client MAY also attempt redemption at endpoints not listed if the ticket's `aud` is a trust-framework identifier that covers them.
 
+Endpoint hints disclose where the patient receives care, and a site's name alone can reveal what a withheld category protects: a behavioral health clinic or a women's health center in the list says plenty, even when the site later releases nothing. Issuers SHOULD apply the grant's sharing decisions to the hint list itself — when the authorization withholds sensitive categories, do not name a site whose relationship would reveal them.
+
 #### 5. Client redeems tickets at Data Holders
 
 Once the client holds the tickets, it presents them at Data Holder token endpoints via RFC 8693 token exchange exactly as specified in the main specification. The Data Holder does not know or care that the tickets were obtained via SMART App Launch — from its perspective, each ticket is a signed JWT whose `iss` is a trusted issuer.
