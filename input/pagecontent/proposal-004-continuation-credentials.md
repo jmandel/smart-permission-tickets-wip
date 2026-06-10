@@ -70,6 +70,7 @@ Draft requirements:
 - A derived refresh token SHALL NOT authorize access broader than the effective grant computed from the ticket, requested scopes, client registration, and local policy.
 - A derived refresh token SHALL NOT be honored after `continuation.refresh_token.not_after`.
 - If `continuation.refresh_token.revocation_check` is `required`, the Data Holder SHALL check the source ticket's revocation status before honoring the derived refresh token.
+- A ticket that permits derived refresh tokens usable beyond its `exp` SHALL carry a `revocation` claim, and its `revocation_check` SHALL be `required` — otherwise revoking the ticket could not reach the credentials derived from it.
 - When a ticket permits derived refresh tokens beyond ticket `exp`, the ticket's revocation status remains authoritative for those derived refresh tokens until `continuation.refresh_token.not_after`.
 - Issuers that permit continuation beyond `exp` SHALL maintain ticket revocation status until at least `continuation.refresh_token.not_after`.
 

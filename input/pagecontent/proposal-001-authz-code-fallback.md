@@ -10,16 +10,15 @@ The current spec defines backend token exchange as the sole redemption path for 
 
 Permission tickets are designed so the patient authorizes once, with the issuer, and the ticket carries that authorization forward to many Data Holders without repeating the process. Backend token exchange is the right primary path — it's non-interactive, works for B2B and patient access alike, and scales to many Data Holders without per-site friction.
 
-However, there are cases where the information in the ticket is genuinely insufficient for the Data Holder to complete the request silently:
+There is exactly one case where the information in the ticket is genuinely insufficient for the Data Holder to complete the request silently:
 
 - **Patient identity could not be resolved.** The ticket's `subject.patient` demographics do not match any local record, or match multiple candidates with insufficient confidence to select one. The patient needs to help the Data Holder identify the right record.
-- **TODO: Other cases?**
 
-The ticket still carries the full authorization context; the interactive step fills a specific informational gap that only the patient can resolve.
+This is a closed list of one, on purpose: every additional trigger is an opening for per-site authorization screens to return, which would defeat the point of tickets. The ticket carries the full authorization context; the interactive step fills the one gap only the patient can fill.
 
-Today, the Data Holder's only option in these cases is to reject the token exchange with `invalid_grant`, which gives the client no path forward. The patient's authorization intent (captured in the ticket) is lost.
+Without the fallback, the Data Holder's only option is to reject the token exchange with `invalid_grant`, which gives the client no path forward. The patient's authorization intent (captured in the ticket) is lost.
 
-> **What this fallback is not for.** The `interaction_required` response is not an invitation to impose additional consent capture ceremonies, step-up authentication, first-time disclosure agreements, or other friction beyond what the ticket and issuer trust already provide. If a Data Holder does not trust the issuer for the presented ticket type, does not support the ticket type, or cannot process the request under local policy, it should reject the token exchange with `invalid_grant` rather than fall back to interaction. The fallback exists for cases where the Data Holder trusts the ticket but cannot act on it without the patient's help resolving a specific local gap — for example, subject disambiguation or local account binding. It does not change the ticket's access constraints.
+> **What this fallback is not for.** The `interaction_required` response is not an invitation to impose consent capture ceremonies, step-up authentication, first-time disclosure agreements, or other friction beyond what the ticket and issuer trust already provide. A Data Holder SHALL NOT return `interaction_required` when subject resolution succeeded, and SHALL only return it for a ticket it would otherwise accept — if it does not trust the issuer, does not support the ticket type, or cannot process the request under local policy, the correct response is `invalid_grant`. The fallback does not change the ticket's access constraints. Because silent success and fallback rates are observable, trust frameworks can monitor a Data Holder's `interaction_required` rate as a compliance signal: routing routine traffic through the fallback is visible misbehavior.
 {: .callout .callout-info}
 
 ### Proposal
@@ -46,6 +45,8 @@ Data Holders MAY respond to a token exchange request with `interaction_required`
 
 The Data Holder caches the permission ticket from the failed token exchange and links it to the `launch` value internally. No ticket retransmission is needed in subsequent steps.
 
+The `launch` value is a bearer reference to a pre-authorized ticket and travels in front-channel URLs. Data Holders SHALL make launch values unguessable, single-use, and short-lived, SHALL bind each launch value to the client that received it, and SHALL verify the cached ticket's `presenter_binding` against the client completing the authorization code exchange — the same client-binding guarantees as the silent path, carried through the redirect.
+
 #### 3. Client initiates SMART EHR Launch
 
 The client initiates a standard SMART EHR Launch using the provided `launch` value. The client already knows the Data Holder's authorize endpoint from `.well-known/smart-configuration` discovery.
@@ -66,7 +67,7 @@ The Data Holder resolves the `launch` parameter to the cached permission ticket 
 
 #### 4. Sign-in MAY be required
 
-When the Data Holder cannot resolve the patient from the ticket's `subject.patient` claims alone, sign-in may be required. The ticket still carries the full authorization context (scopes, data period, Data Holder filters, requester, presenter binding). Sign-in supplements identity resolution. The patient does not need to re-express any sharing preferences already captured in the ticket.
+When the Data Holder cannot resolve the patient from the ticket's `subject.patient` claims alone, sign-in may be required. The ticket still carries the full authorization context (scopes, data period, Data Holder filters, requester, presenter binding). Sign-in supplements identity resolution only. The patient does not need to re-express any sharing preferences already captured in the ticket, and the Data Holder SHALL NOT use the interactive step to collect new authorization decisions.
 
 #### 5. Data Holders SHOULD cache resolved interactions
 
