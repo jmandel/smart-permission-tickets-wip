@@ -13,15 +13,15 @@ You are adding one grant type to your existing SMART-on-FHIR token endpoint. No 
 5. **Issue a scoped access token**: the intersection of requested scopes, the ticket's `access`, client eligibility, ticket-type rules, and your own policy. Enforce `data_period` by applying each resource type's designated date search parameter as an implicit filter — searches your server already supports. ([Access Calculation](index.html#access-calculation), [Data Period Enforcement](index.html#data-period-enforcement))
 6. **Configure trusted issuers** per ticket type. Trusting an issuer for patient self-access does not trust it for delegated access.
 
-Start with UC1 (patient self access): it has no requester, no context fields, and a single policy question — can you match the patient. The [conformance section](index.html#data-holder-requirements) is your checklist; the [signed examples](use-case-catalog.html) are your test vectors.
+Start with UC1 (patient self access): it has no requester, no profile claims, and a single policy question — can you match the patient. The [conformance section](index.html#data-holder-requirements) is your checklist; the [signed examples](use-case-catalog.html) are your test vectors.
 
 ### If you want to mint tickets (Issuer)
 
 You verify real-world facts and sign a JWT. The Data Holder relies on your verification, so most requirements are about what you do before signing.
 
 1. **Publish keys** at `{iss}/.well-known/jwks.json`. ([Issuer Key Publication](index.html#issuer-key-publication))
-2. **Run your verification workflow** for the ticket type: identity proofing for the patient (UC1), the patient and the delegate plus delegation authority (UC2), organizational and event context (UC3). What you must verify per type is in the [Use Case Catalog](use-case-catalog.html).
-3. **Mint the ticket** with the required claims (`iss`, `aud`, `exp`, `iat`, `jti`, `ticket_type`, `subject`, `access`), presenter binding for individual-access types, and identity evidence for each person whose verification is the basis of the grant. ([Issuer Requirements](index.html#issuer-requirements))
+2. **Run your verification workflow** for the ticket type: identity proofing for the patient (UC1), the patient and the delegate plus delegation authority (UC2), the linked claim and payer identity (UC5). What you must verify per type is in the [Use Case Catalog](use-case-catalog.html).
+3. **Mint the ticket** with the required claims (`iss`, `aud`, `exp`, `iat`, `jti`, `ticket_type`, `subject`, `access`), presenter binding where the ticket type requires it (UC1, UC2, and UC5 all do), and identity evidence for each person whose verification is the basis of the grant. ([Issuer Requirements](index.html#issuer-requirements))
 4. **Host a revocation status list** for any ticket that outlives a session, and give the authorizing person a revocation URL they can reach later without the app. ([Revocation](index.html#revocation))
 5. **Keep your records.** The ticket carries facts; you keep the evidence behind them, retrievable by `jti`. ([Issuer vs. Data Holder Responsibility](index.html#issuer-vs-data-holder-responsibility), [Proposal 007](proposal-007-issuer-accountability.html))
 

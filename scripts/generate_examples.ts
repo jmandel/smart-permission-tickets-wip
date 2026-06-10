@@ -6,6 +6,7 @@ import {
     ClientAssertionSchema,
     PATIENT_DELEGATED_ACCESS_TICKET_TYPE,
     PATIENT_SELF_ACCESS_TICKET_TYPE,
+    PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
     PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
     type PermissionTicket,
     PermissionTicketSchema
@@ -169,9 +170,59 @@ const uc3_payload: PermissionTicket = {
         data_period: { start: "2025-12-01", end: "2026-06-01" },
         data_holder_filter: [{ kind: "jurisdiction", address: { country: "US", state: "TX" } }]
     },
-    context: {
-        reportable_condition: {
-            coding: [{ system: "http://snomed.info/sct", code: "840539006", display: "Disease caused by severe acute respiratory syndrome coronavirus 2 (disorder)" }]
+    reportable_condition: {
+        coding: [{ system: "http://snomed.info/sct", code: "840539006", display: "Disease caused by severe acute respiratory syndrome coronavirus 2 (disorder)" }]
+    }
+};
+
+// ─── UC5: Payer Claims Adjudication ──────────────────────────────────────────
+// Self-issued: the provider system that submits the claim mints the ticket and
+// later accepts it back at its own token endpoint.
+
+const uc5_payload: PermissionTicket = {
+    iss: "https://fhir.provider.example.org",
+    aud: "https://fhir.provider.example.org",
+    aud_type: "data_holder_url",
+    exp: DEFAULT_IAT + 60 * 86400,
+    iat: DEFAULT_IAT,
+    jti: "uc5-2f9a7c11-5d28-4e6b-9b54-3c1f8a02d977",
+    ticket_type: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
+    presenter_binding: {
+        method: "trust_framework_client",
+        trust_framework: "https://directory.example-network.org",
+        framework_type: "udap",
+        entity_uri: "https://payer.example.com/organizations/claims-review"
+    },
+    subject: {
+        patient: {
+            resourceType: "Patient",
+            identifier: [{ system: "http://fhir.provider.example.org/mrn", value: "B77421" }],
+            birthDate: "1962-03-09",
+            name: [{ family: "Okafor", given: ["Daniel"] }]
+        },
+        recipient_record: { reference: "Patient/B77421", type: "Patient" }
+    },
+    requester: {
+        resourceType: "Organization",
+        identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1093817465" }],
+        name: "Example Health Plan"
+    },
+    access: {
+        permissions: [
+            { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
+            { kind: "data", resource_type: "Observation", interactions: ["read", "search"] },
+            { kind: "data", resource_type: "Procedure", interactions: ["read", "search"] },
+            { kind: "data", resource_type: "DocumentReference", interactions: ["read", "search"] }
+        ],
+        data_period: { start: "2026-04-15", end: "2026-06-15" },
+        claim_linkage: {
+            claim: {
+                resourceType: "Claim",
+                identifier: [{ system: "https://fhir.provider.example.org/claims", value: "CLM-2026-0042" }],
+                status: "active",
+                use: "claim"
+            },
+            encounter: [{ reference: "Encounter/enc-2026-0117" }]
         }
     }
 };
@@ -231,6 +282,7 @@ async function generate() {
         { name: 'uc1-evidence-ticket.jwt', payload: uc1_evidence_payload },
         { name: 'uc2-ticket.jwt', payload: uc2_payload },
         { name: 'uc3-ticket.jwt', payload: uc3_payload },
+        { name: 'uc5-ticket.jwt', payload: uc5_payload },
     ];
 
     for (const t of tickets) {

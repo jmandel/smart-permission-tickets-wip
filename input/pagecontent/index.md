@@ -7,7 +7,7 @@
 
 A Permission Ticket is a **signed access ticket**: an issuer-signed JWT that a client presents to a Data Holder's token endpoint via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). It lets a client ask a Data Holder for a local access token without repeating the whole authorization or verification workflow at every Data Holder. The ticket is portable: the same ticket can be presented at any Data Holder within its intended audience, without requiring the issuer to know where the subject has received care.
 
-The ticket is built around a **portable kernel**: only the signed fields that a Data Holder plausibly needs to say yes or no to a request live in the common shell. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), an **access** grant (what resources and constraints), and an optional **context** object whose schema is selected by `ticket_type`.
+The ticket is built around a **portable kernel**: only the signed fields that a Data Holder plausibly needs to say yes or no to a request live in the common shell. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), and an **access** object holding the ticket's access constraints (what may be released). A ticket type may add top-level profile claims for the facts its use case needs.
 
 These fields are **policy-selection inputs**. Data Holders already maintain internal access policies — for self-access, proxy classes, B2B disclosure, and more. The ticket carries enough issuer-verified facts about who is asking, about whom, and why, for the Data Holder to select the correct local policy, even for a requester it has never seen. The ticket selects among the Data Holder's policies; it does not rewrite them. If the Data Holder accepts the ticket, it issues a local access token scoped by the ticket, the client's request and eligibility, the selected ticket type, and the Data Holder's own policies and technical capabilities.
 
@@ -21,7 +21,8 @@ The ticket carries only what a Data Holder needs at redemption time. This table 
 |-------------|--------------------|
 | Who signed the ticket | Ticket (`iss`, signature) |
 | Who the data is about | Ticket (`subject`, identity evidence) |
-| Who is asking, and why they can ask | Ticket (`requester`, ticket type, context) |
+| Who is asking, and why they can ask | Ticket (`requester`, ticket type, profile claims) |
+| Limits on what may be released | Ticket (`access` constraints) |
 | The underlying source document or verification record | Issuer records, not the ticket |
 | Detailed jurisdiction-specific rules | Ticket-type profile, trust framework, or Data Holder policy |
 | Final release/token decision | Data Holder |
@@ -65,6 +66,7 @@ This specification uses the following role terms consistently:
 * **Resource Server** — an API surface that serves data for a Data Holder.
 * **Subject** — the person whose data the ticket concerns.
 * **Requester** — the real-world party for whom the grant exists, as attested by the issuer.
+* **Authorizing Party** — the person or organization whose sharing decision the ticket encodes: the patient in self-access and delegated access; the organization acting under law, contract, or mandate in B2B ticket types.
 * **Organization** — the organizational identity used in `data_holder_filter.organization`.
 * **Endpoint** — a technical API surface through which a Data Holder answers.
 * **Trust Framework** or **Network** — a broader participant set used in framework-style audience validation.
@@ -124,7 +126,7 @@ Data Holders that support Permission Tickets SHALL advertise this in their `.wel
   ],
   "smart_permission_ticket_types_supported": [
     "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
-    "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1"
+    "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1"
   ]
 }
 ```
@@ -199,7 +201,7 @@ In all three modes, the Data Holder authenticates the client through its standar
 The Data Holder SHALL NOT rely on any cross-party-stable client identifier inside the Permission Ticket itself. Client identity is established by the `client_assertion` (`iss`/`sub`).
 
 #### Artifact: Ticket Structure
-The ticket payload is a JWT. It carries top-level `subject` and `access`, plus optional `requester`, identity-evidence, `presenter_binding`, `revocation`, `must_understand`, and `context` claims alongside the standard JWT envelope. `ticket_type` is the sole discriminator for the context schema and processing rules.
+The ticket payload is a JWT. It carries top-level `subject` and `access`, plus optional `requester`, identity-evidence, `presenter_binding`, `revocation`, and `must_understand` claims alongside the standard JWT envelope. `ticket_type` is the sole discriminator for the processing rules: which claims are required, which profile claims the type defines, and which access constraints its tickets use.
 
 {% include generated/spec-snippets/index/artifact-ticket.js.md %}
 
@@ -241,7 +243,7 @@ In all modes, the Data Holder authenticates the presenting client through its st
 
 ##### Presenter Binding per Ticket Type
 
-Whether `presenter_binding` is required is a ticket-type rule: individual-access types (UC1, UC2) require it; B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
+Whether `presenter_binding` is required is a ticket-type rule: individual-access types (UC1, UC2) require it, and UC5 requires it because the ticket travels through claims-processing infrastructure; other B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
 
 #### Server-Side Validation
 The Data Holder SHALL validate in two layers:
@@ -256,15 +258,15 @@ The Data Holder SHALL validate in two layers:
     *   Parse the `subject_token` as a JWT.
     *   **Verify Signature:** Use the `iss` (Trusted Issuer) public key.
     *   **Verify Type:** `ticket_type` SHALL be present and recognized. The Data Holder SHALL verify the `ticket_type` is listed in its `smart_permission_ticket_types_supported`.
-    *   **Select Profile Rules:** The recognized `ticket_type` selects the profile rules applied in the remaining steps — which claims are required (presenter binding, identity evidence, requester shape, context fields), evidence parameters, and ticket-type access limits. This is the single hook point for use-case specifics; every other step is the same for all tickets.
+    *   **Select Profile Rules:** The recognized `ticket_type` selects the profile rules applied in the remaining steps — which claims are required (presenter binding, identity evidence, requester shape, profile claims), evidence parameters, and ticket-type access limits. This is the single hook point for use-case specifics; every other step is the same for all tickets.
     *   **Verify Trust:** Is this `iss` accepted under the Data Holder's locally configured trust policy *for this ticket type*?
     *   **Verify Envelope:** Confirm `exp` has not passed and `aud` matches this Data Holder (see [Ticket Audience](#ticket-audience-aud-and-effective-eligible-data-holder-set)).
     *   **Check Revocation:** If `revocation` is present, check the ticket's revocation status; if status cannot be determined, reject (see [Revocation](#revocation)).
     *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`. If the selected ticket type requires binding and it is absent, reject.
     *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per [Identity Evidence](#identity-evidence) — signature, evidence-issuer trust, temporal validity, audience, and demographic consistency with the party in that slot — plus the selected profile's assurance and claim parameters.
     *   **Check `must_understand`:** If `must_understand` is present, verify the Data Holder recognizes every listed claim name. Reject with `invalid_grant` if any entry is unrecognized.
-    *   **Process Kernel Fields:** Every kernel field present in the ticket is must-understand. Constraint fields SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Must-Understand Semantics](#must-understand-semantics).
-    *   **Verify Required Claims:** Confirm every claim the selected ticket type requires is present and well-formed (for example, required context fields, or UC2's authority coding); reject with `invalid_grant` if missing.
+    *   **Process Kernel Fields:** Every kernel field present in the ticket is must-understand. Enforced fields — including every member of `access` — SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Must-Understand Semantics](#must-understand-semantics).
+    *   **Verify Required Claims:** Confirm every claim the selected ticket type requires is present and well-formed (for example, UC2's authority coding, or a constraint the type requires such as UC5's `claim_linkage`); reject with `invalid_grant` if missing.
     *   **Resolve Subject:** Resolve the subject to a unique local patient record; reject on zero or ambiguous matches (see [Subject Resolution](#subject-resolution)).
     *   **Grant Access:** If valid, grant access per [Access Calculation](#access-calculation).
 
@@ -325,13 +327,11 @@ Identity evidence supplements — it does not replace — the FHIR party represe
 
 #### Issuer-Attested Claims
 
-`requester` and `context` are issuer-attested facts. The Data Holder uses them for local policy evaluation and audit. The Data Holder is not expected to repeat upstream verification steps — requester identity, delegation relationship, consent, mandate, contract — when its configured trust policy permits reliance on the issuer. It may still deny, narrow, require a supported fallback, or route to review when required by local policy, the selected ticket type, the subject match result, or technical capability.
+`requester` and profile claims are issuer-attested facts. The Data Holder uses them for local policy evaluation and audit. The Data Holder is not expected to repeat upstream verification steps — requester identity, delegation relationship, consent, mandate, contract — when its configured trust policy permits reliance on the issuer. It may still deny, narrow, require a supported fallback, or route to review when required by local policy, the selected ticket type, the subject match result, or technical capability.
 
 Trust in an issuer is specific to the ticket type and trust framework. A Data Holder might trust one issuer for patient self-access but not for delegated access, research, payer, public health, or provider-consult tickets.
 
 If `requester` is absent, the ticket does not assert a separate third-party requester (i.e., it is self-access by the patient identified by `subject.patient`). This does not mean anonymous access — the presenting client is still authenticated by the outer `client_assertion`.
-
-When `ticket_type` defines no context fields, `context` MAY be omitted entirely or be `{}`.
 
 ---
 
@@ -351,7 +351,50 @@ If the intersection yields no valid access, return `invalid_scope` error.
 
 Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on ticket type. The `patient/*` versus `system/*` scope prefix reflects the OAuth client/access mode at the Data Holder, not whether the ticket is single-patient or population-level. In the current base kernel, every ticket identifies a single patient via `subject.patient`. For single-patient ticket types, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
 
-#### SMART Scope Projection
+#### Access Constraints
+
+The `access` object holds the ticket's **access constraints**. Each member of `access` is a named constraint with a published definition — in this specification for the base constraints, or in a ticket-type profile for additional ones. Three rules govern every constraint:
+
+1. **Unrecognized means reject.** A Data Holder SHALL reject a ticket whose `access` contains a member it does not recognize and enforce, with `invalid_grant` and an `error_description` naming the unsupported constraint. There is no issuer opt-in and no capability negotiation: ignoring an access constraint always releases more than the issuer authorized, so unrecognized constraints fail closed.
+2. **Constraints only narrow.** No constraint broadens what another constraint, the requested scopes, the client's eligibility, or the Data Holder's policy would allow. Constraints combine by intersection (see [Constraint Algebra](#constraint-algebra)).
+3. **Limits live here.** Any field whose neglect would widen release belongs in `access`. Facts that inform the Data Holder's policy decision — who is asking, what event the request belongs to — are profile claims, not access constraints (see [Profile Claims](#profile-claims-ticket-type-specific-facts)).
+
+The base constraints are:
+
+| Constraint | Type | Description |
+|-------|------|-------------|
+| `permissions` | DataPermission[] | **Required.** Each DataPermission specifies a `resource_type`, required `interactions`, and optional narrowing filters (`category_any_of`, `code_any_of`). |
+| `data_period` | Period | One coarse timeframe, enforced through each resource type's designated date search parameter. If disjoint windows are needed, mint separate tickets. |
+| `data_holder_filter` | DataHolderFilter[] | Data Holder-side scoping. Each entry is either a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`). A Data Holder may answer if it matches **any** listed filter. |
+
+All three base constraints are part of the base kernel: conforming Data Holders SHALL be able to enforce each of them. Each is defined so enforcement uses machinery FHIR servers already have — `permissions` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
+
+Ticket-type profiles state which constraints their tickets use and may define new ones (see [Defining New Access Constraints](#defining-new-access-constraints)). A ticket that uses only base constraints works at any conforming Data Holder with no pre-coordination.
+
+#### Constraint Template
+
+A constraint definition serves four parties, and it is complete when it answers all four:
+
+| Section | Serves | It states |
+|---------|--------|-----------|
+| **Shape and validity** | Issuer | The wire shape, what values are valid, and how the issuer determines the value from its workflow and records. |
+| **For the authorizing party** | Authorizing party | What sharing decision the constraint encodes, in words an authorization screen can use truthfully. Where enforcement is approximate, the approximation is part of this statement. |
+| **For the client** | Client | What the client can rely on and plan around, and what it must not assume. |
+| **For the Data Holder** | Data Holder | Exactly what is enforced. Enforcement must be determinate: given the Data Holder's facts, two implementations reach the same answer. The facts may be the Data Holder's own — `data_holder_filter` works this way. Any discretion is stated here with its direction: narrowing release is always allowed; anything that widens release must be named and bounded. |
+
+The base constraint definitions below follow this template, and profiles defining new constraints SHALL cover the same four sections. A definition that skips a section surfaces the gap later as a mismatch between what an authorization screen promised and what a server enforced.
+
+#### `permissions`
+
+**Shape and validity.** Required. An array of one or more `DataPermission` entries. Each entry carries `kind: "data"`, a FHIR `resource_type`, one or more `interactions` (`create`, `read`, `update`, `delete`, `search`), and optional narrowing filters `category_any_of` and `code_any_of` (arrays of codings). The issuer derives entries from the authorizing party's sharing decision or from the scope of access the ticket type defines.
+
+**For the authorizing party.** Each entry is a kind of record being shared — immunizations, lab results, conditions. Resource types and category filters are the units an authorization screen can name truthfully; an entry without filters means all records of that type.
+
+**For the client.** `permissions` is the ceiling on what scopes can be granted. Request SMART scopes within it. Narrowing filters apply even though they never appear in scope strings: a granted scope does not mean unfiltered data.
+
+**For the Data Holder.** Enforce resource types and interactions through SMART scope projection (below). Enforce narrowing filters from the ticket itself — at the token endpoint, the resource server, or both. An entry whose `kind` the Data Holder does not recognize is an unrecognized constraint: reject the ticket.
+
+##### SMART Scope Projection
 
 The `access.permissions` array is the normative authorization model. Each `DataPermission` maps to SMART v2 scopes as follows:
 
@@ -367,19 +410,17 @@ FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base ker
 > **Open Question (OQ-2): Do future non-patient subjects need an explicit ticket-level scope mode?** The current base kernel always identifies a single patient through `subject.patient`, so current tickets naturally project to patient-level semantics even when redeemed by backend clients. If future use cases introduce a different subject shape (for example, `Group`) or no subject at all, the working group may need an explicit ticket-level scope mode (for example, `patient` vs `system`) or a profile rule that changes SMART scope projection. This question is only relevant if future use cases require non-individual or subjectless tickets.
 {: .callout .callout-open-question #oq-2}
 
-#### Access Constraints
+#### `data_period`
 
-The `access` object defines what access the ticket authorizes:
+**Shape and validity.** Optional. A FHIR Period with `start` and/or `end`. One coarse window per ticket; if the grant needs disjoint windows, the issuer mints separate tickets.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `permissions` | DataPermission[] | **Required.** Each DataPermission specifies a `resource_type`, required `interactions`, and optional narrowing filters (`category_any_of`, `code_any_of`). |
-| `data_period` | Period | One coarse timeframe, enforced through each resource type's designated date search parameter (see [Data Period Enforcement](#data-period-enforcement)). If disjoint windows are needed, mint separate tickets. |
-| `data_holder_filter` | DataHolderFilter[] | Optional Data Holder-side scoping. Each entry is either a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`). A Data Holder may answer if it matches **any** listed filter. |
+**For the authorizing party.** The window bounds the clinical dates of what is shared: "records from 2023 through 2024." The bound is approximate in exactly one stated way: a Data Holder may also release records it treats as currently clinically relevant — an active allergy recorded years ago — even when their dates fall outside the window. Authorization screens SHOULD present the period as bounding clinical dates, not as a seal.
 
-All three dimensions are part of the base kernel: conforming Data Holders SHALL be able to enforce each of them. Each dimension is defined so enforcement uses machinery FHIR servers already have — `permissions` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
+**For the client.** Resources whose designated dates fall outside the window are excluded, regardless of when they were created or last updated. Absence of a record from a response is not evidence the record does not exist.
 
-#### Data Period Enforcement
+**For the Data Holder.** Enforcement is defined by designated date search parameters, below.
+
+##### Data Period Enforcement
 
 `data_period` is enforced through standard FHIR date search parameters. For each resource type below, the Data Holder SHALL behave **as if every search carried `&{param}=ge{start}&{param}=le{end}`** using the designated parameter, and SHALL apply the same comparison to the designated element on direct reads. FHIR date search semantics apply: period-valued elements match on overlap, and resources with no value in the designated element do not match and are excluded. The designated parameter defines the semantics; a Data Holder may implement the filter internally by any equivalent means and does not need to expose the search parameter to clients.
 
@@ -409,16 +450,69 @@ For any resource type in neither list, a Data Holder SHALL NOT return resources 
 
 Parameter choices favor reliably populated dates over clinically richer but sparse ones: `recorded-date` rather than `onset-date` for Condition (onset is a choice type, often absent or non-date), `authoredon` for MedicationRequest (the R4 `date` parameter binds to dosing-schedule timing, not order time), `date` rather than `issued` for DiagnosticReport (clinical time, not release time). These dates reflect when content was recorded or performed: a condition recorded last month passes a recent window even if it began years ago.
 
-##### Constraint Algebra
+**Bounded discretion (widens release).** A Data Holder MAY release a resource whose designated date falls outside the window when its local policy treats the resource as currently clinically relevant — the standing examples are active allergies and active problem-list items. This is the only discretion this constraint allows beyond ordinary narrowing, and it runs in the widening direction, so the explanation shown to the authorizing party carries it: the window bounds clinical dates, with currently relevant items possibly included regardless.
+
+#### `data_holder_filter`
+
+**Shape and validity.** Optional. An array of entries, each either `{ kind: "jurisdiction", address }` or `{ kind: "organization", organization }`. The issuer derives entries from the authorizing party's selections or the network the ticket is scoped to.
+
+**For the authorizing party.** The filter decides which Data Holders may answer, not which records an answering Data Holder returns. A Data Holder that matches the filter typically returns the combined record it holds; see the implementation note below for what a site selection does and does not limit.
+
+**For the client.** The filter tells the client which Data Holders are worth trying. A rejection for filter mismatch means this Data Holder is outside the ticket's scope, not that the ticket is invalid elsewhere.
+
+**For the Data Holder.** Answer the question "do I match any listed entry?" once, when the ticket is presented. Matching rules follow.
+
+##### Data Holder Filters
+
+`data_holder_filter` determines which Data Holders may answer. It is not a promise that returned data can be filtered by facility, department, custodian, endpoint, or resource provenance: a Data Holder that accepts the ticket returns data according to its actual legal, operational, and technical response boundary.
+
+* Each entry is one of:
+  * `{ kind: "jurisdiction", address }`
+  * `{ kind: "organization", organization }`
+* The filter gates the responding Data Holder, not individual clinical resources. Matching is one-hop against the responding Data Holder, not a provenance chain.
+* `aud` identifies the coarse intended Data Holder audience for the ticket; `data_holder_filter` narrows within that audience.
+* Multiple filter entries are ORed together.
+
+<div class="callout callout-info" markdown="1">
+
+**Implementation Note: Picking a clinic does not always limit data to that clinic.**
+
+One Data Holder often serves many clinics, hospitals, and even legally separate organizations through a single shared system. Inside that system, allergies, problems, and medications live in one combined patient chart that cannot reliably be split apart by facility.
+
+The organization filter decides whether the Data Holder *as a whole* may answer. A Data Holder that accepts the ticket will typically return the combined record it holds, subject to the ticket's other constraints. A site or clinic selection on an authorization screen does not guarantee the response is limited to that site's data.
+
+Issuers SHOULD use directory or network information (published endpoint networks, trust-framework directories, SMART Brands data) to detect when a selected facility is served through a broader shared system, and tell the authorizing person so. When the issuer cannot tell, it should warn generically that more data may flow than the site label suggests. Future versions may define finer disclosure-boundary hints; this one does not.
+
+</div>
+
+##### Jurisdiction Filters
+
+* Jurisdiction filters are modeled with country/state-style values only.
+* A Data Holder checks whether its own jurisdiction matches the listed address.
+* A Data Holder operating in multiple jurisdictions SHOULD answer if any of its jurisdictions match the filter, and MAY apply narrower internal filtering if its architecture supports that attribution.
+
+##### Organization Filters
+
+* Organization filters positively scope which Data Holders may answer.
+* Matching is by organizational identity, typically an NPI carried in `organization.identifier`.
+* A Data Holder may answer if it matches the named organization or is authorized to answer on that organization's behalf.
+* This filter is endpoint-agnostic. If a Data Holder operates multiple technical endpoints, a single organization filter authorizes access through any endpoint by which that organization is authorized to answer and that supports the Permission Ticket grant type.
+* Data Holders that manage integrated records across multiple facilities evaluate this filter at the Data Holder level, not as a resource-by-resource clinical data filter.
+* A Data Holder answering on behalf of a named organization that is served through a broader shared system MAY narrow its response to that organization's records, if its architecture supports the attribution. Narrowing is permitted, not promised: the filter still gates who may answer, and acceptance still typically returns the combined record.
+
+> **Open Question: Custodian-Level Targeting.** Should `data_holder_filter` gain an explicit custodian-scoped form — "answer only with this organization's records," enforce-or-reject — once vendors can attribute records to custodian organizations and network directories carry custodian-level identities? Today, narrowing is best-effort (above). Do existing network directories model custodian-level entries at all?
+{: .callout .callout-open-question #oq-custodian-targeting}
+
+#### Constraint Algebra
 
 Constraints combine as follows:
 
-- **Across dimensions** (AND): returned data must satisfy every present constraint (`permissions`, `data_period`, `data_holder_filter`). An absent dimension means no restriction.
+- **Across constraints** (AND): returned data must satisfy every constraint present in `access`. An absent constraint imposes no restriction.
 - **Across permission entries** (OR): a resource matching any single `DataPermission` rule is authorized.
 - **Within a permission's filters** (AND across groups, OR within): if both `category_any_of` and `code_any_of` are populated, a resource must match at least one category AND at least one code.
 - **Within `data_holder_filter`** (OR): a Data Holder may answer if it matches any listed filter.
 
-##### Example Walkthrough
+#### Example Walkthrough
 
 ```json
 "access": {
@@ -493,63 +587,49 @@ Constraints combine as follows:
 }
 ```
 
-This example applies all three constraint dimensions together:
+This example applies all three base constraints together:
 
 - **`data_holder_filter`** (OR): only a Data Holder operating in CA, in NY, or matching organization NPI `123` may answer at all.
 - **`permissions`** (OR across entries): at a matching Data Holder, an Observation is authorized if it matches at least one listed category AND at least one listed code. A Condition is authorized by the second rule regardless of those filters.
 - **`data_period`**: only resources with clinically relevant dates in 2023–2024 are returned.
 
-Because dimensions are ANDed: a matching Observation from a non-matching Data Holder is still not authorized, and data outside the period is excluded even if it matches a permission rule. If disjoint time windows are needed, mint separate tickets.
+Because constraints are ANDed: a matching Observation from a non-matching Data Holder is still not authorized, and data outside the period is excluded even if it matches a permission rule. If disjoint time windows are needed, mint separate tickets.
 
-Data Holders that cannot enforce a presented constraint SHALL reject the ticket with `invalid_grant` and `error_description` indicating the unsupported constraint.
+#### Defining New Access Constraints
+
+Ticket-type profiles and ecosystem guides MAY define additional access constraints. The rules:
+
+* A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template).
+* Fail-closed behavior comes from the base rule: Data Holders that do not recognize the name reject the ticket. New constraints never need `must_understand`, which is for top-level claims.
+* Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate. A profile may define a constraint only some Data Holders can evaluate; the others reject, which is the correct outcome.
+* Base constraint names are unprefixed. A constraint defined outside this specification SHOULD carry a name that identifies its defining profile, to keep independently developed constraints from colliding.
+* A constraint that proves broadly useful should be proposed for the base set.
+
+For example, a profile that needs encounter-class scoping defines it as a constraint:
+
+```json
+"access": {
+  "permissions": [
+    { "kind": "data", "resource_type": "DocumentReference", "interactions": ["read", "search"] }
+  ],
+  "encounter_class_filter": {
+    "include": [
+      { "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode", "code": "AMB" }
+    ]
+  }
+}
+```
+
+A Data Holder that recognizes `encounter_class_filter` releases only records tied to matching encounters; one that does not recognize it rejects the ticket. The defining profile owes all four template sections — including what an authorization screen may say ("only office-visit records") and how records that link to no encounter at all are handled, since many patient-level resources do not.
 
 #### Sensitive Data Profiles
 
 Sensitivity controls are handled through profile-level claims rather than the base `access` object. Current implementations vary substantially in how they classify restricted or legally protected data, how they expose patient-facing choices, and how those choices map to access-control policy. [Proposal 005](proposal-005-sensitive-data-modeling.html) defines an experimental profile with both directions: withholding categories (which any Data Holder with category labeling can honor, from any issuer) and release authorization (which requires trusting the issuer's authorization ceremony for sensitive categories). The profile is deliberately ahead of what base APIs can enforce today; its job is to give the ecosystem one shape to build toward.
 
+`sensitivity_policy` predates the access constraint model and lives as a top-level claim that the issuer SHALL list in `must_understand` whenever present — which gives it the same fail-closed behavior an access constraint gets automatically. Whether it migrates into `access` is part of OQ-3.
+
 > **Open Question (OQ-3): Sensitive Data Profiles.** Should the Proposal 005 `sensitivity_policy` profile be incorporated into specific ticket types, and what authorization UX, vocabulary constraints, and Data Holder enforcement capabilities does each direction need before implementation? See [Proposal 005: Sensitive Data Profile](proposal-005-sensitive-data-modeling.html).
 {: .callout .callout-open-question #oq-3}
-
-#### Data Holder Filters
-
-`data_holder_filter` determines which Data Holders may answer. It is not a promise that returned data can be filtered by facility, department, custodian, endpoint, or resource provenance: a Data Holder that accepts the ticket returns data according to its actual legal, operational, and technical response boundary.
-
-* Each entry is one of:
-  * `{ kind: "jurisdiction", address }`
-  * `{ kind: "organization", organization }`
-* The filter gates the responding Data Holder, not individual clinical resources. Matching is one-hop against the responding Data Holder, not a provenance chain.
-* `aud` identifies the coarse intended Data Holder audience for the ticket; `data_holder_filter` narrows within that audience.
-* Multiple filter entries are ORed together.
-
-<div class="callout callout-info" markdown="1">
-
-**Implementation Note: Picking a clinic does not always limit data to that clinic.**
-
-One Data Holder often serves many clinics, hospitals, and even legally separate organizations through a single shared system. Inside that system, allergies, problems, and medications live in one combined patient chart that cannot reliably be split apart by facility.
-
-The organization filter decides whether the Data Holder *as a whole* may answer. A Data Holder that accepts the ticket will typically return the combined record it holds, subject to the ticket's other constraints. A site or clinic selection on an authorization screen does not guarantee the response is limited to that site's data.
-
-Issuers SHOULD use directory or network information (published endpoint networks, trust-framework directories, SMART Brands data) to detect when a selected facility is served through a broader shared system, and tell the authorizing person so. When the issuer cannot tell, it should warn generically that more data may flow than the site label suggests. Future versions may define finer disclosure-boundary hints; this one does not.
-
-</div>
-
-#### Jurisdiction Filters
-
-* Jurisdiction filters are modeled with country/state-style values only.
-* A Data Holder checks whether its own jurisdiction matches the listed address.
-* A Data Holder operating in multiple jurisdictions SHOULD answer if any of its jurisdictions match the filter, and MAY apply narrower internal filtering if its architecture supports that attribution.
-
-#### Organization Filters
-
-* Organization filters positively scope which Data Holders may answer.
-* Matching is by organizational identity, typically an NPI carried in `organization.identifier`.
-* A Data Holder may answer if it matches the named organization or is authorized to answer on that organization's behalf.
-* This filter is endpoint-agnostic. If a Data Holder operates multiple technical endpoints, a single organization filter authorizes access through any endpoint by which that organization is authorized to answer and that supports the Permission Ticket grant type.
-* Data Holders that manage integrated records across multiple facilities evaluate this filter at the Data Holder level, not as a resource-by-resource clinical data filter.
-* A Data Holder answering on behalf of a named organization that is served through a broader shared system MAY narrow its response to that organization's records, if its architecture supports the attribution. Narrowing is permitted, not promised: the filter still gates who may answer, and acceptance still typically returns the combined record.
-
-> **Open Question: Custodian-Level Targeting.** Should `data_holder_filter` gain an explicit custodian-scoped form — "answer only with this organization's records," enforce-or-reject — once vendors can attribute records to custodian organizations and network directories carry custodian-level identities? Today, narrowing is best-effort (above). Do existing network directories model custodian-level entries at all?
-{: .callout .callout-open-question #oq-custodian-targeting}
 
 #### Token-Time and Resource-Time Enforcement
 
@@ -575,59 +655,31 @@ This pattern also applies when one set of intended permissions does not fit clea
 
 Every field defined in the kernel is must-understand when present, but fields differ in what "understanding" requires:
 
-* **Constraint fields** SHALL be enforced. If the Data Holder cannot enforce a present constraint, it SHALL reject with `invalid_grant`:
+* **Enforced fields** SHALL be enforced. If the Data Holder cannot enforce a present field, it SHALL reject with `invalid_grant`:
   * JWT envelope: `iss`, `aud`, `exp`, `jti`, `ticket_type`
   * `presenter_binding`
-  * `access.permissions`
-  * `access.data_period`
-  * `access.data_holder_filter`
   * `revocation`
+  * every member of `access` — each access constraint is enforce-or-reject by definition (see [Access Constraints](#access-constraints))
 * **Policy-selection fields** SHALL be processed: the Data Holder must understand the field well enough to apply the selected ticket type and its own local policy. If it cannot safely interpret a field the selected ticket type requires, it SHALL reject with `invalid_grant`:
   * `subject` (`subject.patient` and optional `subject.recipient_record`)
   * `subject_identity_evidence`
   * `requester`
   * `requester_identity_evidence`
-  * `context`
+* **Profile claims required by the selected ticket type** are part of recognizing that type: a Data Holder that lists a `ticket_type` in its supported set understands the claims that type requires (see [Profile Claims](#profile-claims-ticket-type-specific-facts)).
 
 #### `must_understand` for Extensions
 
-Profile-specific claims not in the base set are safe to ignore **unless** the issuer lists them in `must_understand`. A Data Holder that sees a `must_understand` entry it does not recognize SHALL reject the ticket with `invalid_grant`.
+Top-level claims not in the base set and not required by the selected ticket type are safe to ignore **unless** the issuer lists them in `must_understand`. A Data Holder that sees a `must_understand` entry it does not recognize SHALL reject the ticket with `invalid_grant`.
 
 `must_understand` lists **top-level claim names** that the Data Holder MUST understand beyond the base kernel. Each entry is a string matching a top-level claim in the ticket payload. This is inspired by the JWS `crit` header parameter ([RFC 7515](https://www.rfc-editor.org/rfc/rfc7515) Section 4.1.11) but applied to payload claims rather than header parameters.
 
+The two extension surfaces divide by the rule from [Access Constraints](#access-constraints): a field that limits release is a new access constraint, rejected automatically when unrecognized, with no `must_understand` involvement. A field that carries facts is a top-level claim, ignored when unrecognized unless the issuer lists it in `must_understand`. The live example of the second kind is [Proposal 005](proposal-005-sensitive-data-modeling.html)'s `sensitivity_policy`, which the issuer SHALL list in `must_understand` whenever present.
+
 #### Unknown Fields
 
-Fields not in the base kernel, not in `must_understand`, and not recognized by the Data Holder are safe to ignore. This is standard JWT behavior.
+Top-level claims not in the base kernel, not required by the selected ticket type, not in `must_understand`, and not recognized by the Data Holder are safe to ignore. This is standard JWT behavior. Unrecognized members of `access` are the exception: they are rejected, never ignored.
 
-#### Extension Example
-
-A profile adds encounter-class filtering via a new top-level claim and lists it in `must_understand`:
-
-```json
-{
-  "iss": "https://issuer.example.org",
-  "aud": "https://network.example.org/token",
-  "exp": 1775328000,
-  "jti": "ext-example-1",
-  "ticket_type": "https://example.org/ticket-types/encounter-filtered-v1",
-  "must_understand": ["encounter_class_filter"],
-  "encounter_class_filter": {
-    "include": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
-        "code": "AMB"
-      }
-    ]
-  },
-  "subject": { "..." : "..." },
-  "access": { "..." : "..." },
-  "context": {}
-}
-```
-
-A Data Holder that understands `encounter_class_filter` enforces it. A Data Holder that does not recognize the name rejects the ticket because it appears in `must_understand`. If the issuer had omitted `encounter_class_filter` from `must_understand`, Data Holders that do not recognize it would ignore it.
-
-Extensions should be modeled as new top-level claims rather than injecting fields into existing kernel structures. This keeps extensions visible and prevents profiles from silently altering the semantics of base claims.
+Extensions should be modeled as new top-level claims or new access constraints rather than injecting fields into existing kernel structures. This keeps extensions visible and prevents profiles from silently altering the semantics of base claims.
 
 ---
 
@@ -670,8 +722,8 @@ The issuer does all real-world verification. The ticket carries only what the Da
 * **For matching**: `subject.patient`, corroborated by verified `subject_identity_evidence` when present, to resolve to a local patient record
 * **For cryptographic validation**: signature, `iss` (issuer trust), `exp`, `aud`, `presenter_binding`
 * **For identity evidence validation**: `subject_identity_evidence` and `requester_identity_evidence`, whenever present — base verification rules plus profile-defined parameters
-* **For access filtering**: `access.permissions`, `data_period`, `data_holder_filter`
-* **For local policy selection**: `requester` (type, identity, authority), `ticket_type`, `context` — the Data Holder may apply different local policies based on these (e.g., broader release for a public health investigation than for a payer claim)
+* **For access filtering**: every constraint in `access`
+* **For local policy selection**: `requester` (type, identity, authority), `ticket_type`, and the type's profile claims — the Data Holder may apply different local policies based on these (e.g., broader release for a public health investigation than for a payer claim)
 * **For audit**: all of the above
 
 #### What the Data Holder Is Not Expected to Do
@@ -684,22 +736,18 @@ When its configured trust policy permits reliance on the issuer for the presente
 
 ---
 
-### Context (Ticket-Type-Specific Semantics)
+### Profile Claims (Ticket-Type-Specific Facts)
 
-The `context` claim carries the facts a specific ticket type requires. `ticket_type` alone determines the context schema; there is no separate `context.kind`.
+A ticket type may define top-level claims carrying the facts that type needs — which investigation a public-health request belongs to, for example. `ticket_type` alone determines which profile claims are required and what they mean.
 
-A fact belongs in `context` if every instance of that ticket type needs it for the Data Holder to say yes or no, but other ticket types do not.
+The dividing rule, restated from [Access Constraints](#access-constraints): a field whose neglect would widen release is an access constraint and lives in `access`; a fact the Data Holder weighs in its policy decision is a profile claim. Ignoring a profile claim can only lead to less release — a policy that needed the fact does not fire — so profile claims do not need the fail-closed handling constraints get.
 
-| Ticket Type | Required Context Fields |
+| Ticket Type | Required Profile Claims |
 |-------------|------------------------|
-| UC1, UC2 | *(none; `context` may be omitted)* |
-| UC3 | `reportable_condition` |
-| UC4 | `concern`, `referral` |
-| UC5 | `service`, `claim` |
-| UC6 | `study` |
-| UC7 | `reason`, `consult_request` |
+| UC1, UC2 | *(none)* |
+| UC5 | *(none — its claim linkage is an access constraint)* |
 
-UC1 and UC2 intentionally define no context fields. Delegation is expressed by the presence and type of `requester`, not by a context discriminator.
+UC1 and UC2 intentionally define no profile claims; delegation is expressed by the presence and type of `requester`. Ticket types on the [Future Use Cases](future-use-cases.html) page sketch their own profile claims (UC3's `reportable_condition`, for example).
 
 ---
 
@@ -823,8 +871,8 @@ A ticket may be presented any number of times during its validity period, to the
 
 Three use cases are specified, each mapping to a single `ticket_type` with its own status, required claims, policy-selection inputs, and worked example:
 
-* [Use Case Catalog](use-case-catalog.html) — patient self access, patient-delegated access, public health investigation
-* [Future Use Cases](future-use-cases.html) — candidates under discussion, not yet implementable
+* [Use Case Catalog](use-case-catalog.html) — patient self access, patient-delegated access, payer claims adjudication
+* [Future Use Cases](future-use-cases.html) — public health investigation (fully modeled, deferred) and other candidates under discussion
 
 ---
 
@@ -915,7 +963,8 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Reject with `invalid_grant` if any present kernel field cannot be enforced
 - Resolve the ticket subject to a local patient record using `subject.patient`, corroborated by verified `subject_identity_evidence` when present; reject if zero or ambiguous matches
 - Calculate granted access per [Access Calculation](#access-calculation): the intersection of requested scopes, ticket access, client eligibility, ticket-type rules, and local policy and capability
-- Support all three `access` dimensions (`permissions`, `data_period`, `data_holder_filter`) and enforce them per their defined semantics — `data_period` via the designated date search parameters in [Data Period Enforcement](#data-period-enforcement)
+- Support the three base access constraints (`permissions`, `data_period`, `data_holder_filter`) and enforce them per their defined semantics — `data_period` via the designated date search parameters in [Data Period Enforcement](#data-period-enforcement)
+- Reject tickets carrying any `access` member the server does not recognize and enforce
 - Enforce subset constraints at the appropriate layer (token endpoint, resource server, or both)
 - If `revocation` is present, perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request
 - Return appropriate error codes on validation failure
@@ -923,7 +972,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 **SHOULD:**
 - Cache issuer JWKS with appropriate TTL
 - Cache revocation responses per HTTP cache headers
-- Log `requester` and `context` for audit trail
+- Log `requester` and profile claims for audit trail
 
 **MAY:**
 - Support trust framework audience validation
@@ -950,7 +999,7 @@ For clients using the well-known JWKS identity approach, see [Proposal 006](prop
 
 **SHALL:**
 - Sign tickets with keys published at `{iss}/.well-known/jwks.json`
-- Include claims: `iss`, `aud`, `exp`, `iat`, `jti`, `ticket_type`, `subject`, and `access`; include `context` when the ticket type defines context fields
+- Include claims: `iss`, `aud`, `exp`, `iat`, `jti`, `ticket_type`, `subject`, and `access`; include the profile claims and access constraints the ticket type requires
 - Include `aud_type: "trust_framework"` when `aud` identifies a trust framework
 - When using `presenter_binding`, bind the ticket appropriately with one method (`jkt` or `trust_framework_client`)
 - When the ticket type requires identity evidence, include the applicable `subject_identity_evidence` or `requester_identity_evidence`

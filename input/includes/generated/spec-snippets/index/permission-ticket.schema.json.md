@@ -536,11 +536,6 @@
         "ticket_type": {
           "type": "string",
           "const": "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1"
-        },
-        "context": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
         }
       },
       "required": [
@@ -1213,11 +1208,6 @@
         "ticket_type": {
           "type": "string",
           "const": "https://smarthealthit.org/permission-ticket-type/patient-delegated-access-v1"
-        },
-        "context": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
         }
       },
       "required": [
@@ -1823,41 +1813,32 @@
           "type": "string",
           "const": "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1"
         },
-        "context": {
+        "reportable_condition": {
           "type": "object",
           "properties": {
-            "reportable_condition": {
-              "type": "object",
-              "properties": {
-                "coding": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
+            "coding": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "display": {
+                    "type": "string"
                   }
                 },
-                "text": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+                "additionalProperties": {}
+              }
+            },
+            "text": {
+              "type": "string"
             }
           },
-          "required": [
-            "reportable_condition"
-          ],
-          "additionalProperties": false
+          "additionalProperties": {}
         }
       },
       "required": [
@@ -1870,7 +1851,7 @@
         "requester",
         "access",
         "ticket_type",
-        "context"
+        "reportable_condition"
       ],
       "additionalProperties": {}
     },
@@ -2464,107 +2445,97 @@
           "type": "string",
           "const": "https://smarthealthit.org/permission-ticket-type/social-care-referral-v1"
         },
-        "context": {
+        "concern": {
           "type": "object",
           "properties": {
-            "concern": {
-              "type": "object",
-              "properties": {
-                "coding": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
+            "coding": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "display": {
+                    "type": "string"
                   }
                 },
-                "text": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+                "additionalProperties": {}
+              }
             },
-            "referral": {
-              "type": "object",
-              "properties": {
-                "resourceType": {
-                  "type": "string",
-                  "const": "ServiceRequest"
-                },
-                "identifier": {
-                  "type": "array",
-                  "items": {
+            "text": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": {}
+        },
+        "referral": {
+          "type": "object",
+          "properties": {
+            "resourceType": {
+              "type": "string",
+              "const": "ServiceRequest"
+            },
+            "identifier": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "type": {
                     "type": "object",
                     "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "object",
-                        "properties": {
-                          "coding": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "system": {
-                                  "type": "string"
-                                },
-                                "code": {
-                                  "type": "string"
-                                },
-                                "display": {
-                                  "type": "string"
-                                }
-                              },
-                              "additionalProperties": {}
+                      "coding": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "system": {
+                              "type": "string"
+                            },
+                            "code": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
                           },
-                          "text": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": {}
+                          "additionalProperties": {}
+                        }
+                      },
+                      "text": {
+                        "type": "string"
                       }
                     },
                     "additionalProperties": {}
                   }
                 },
-                "status": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "intent": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "resourceType",
-                "status",
-                "intent"
-              ],
-              "additionalProperties": {}
+                "additionalProperties": {}
+              }
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "intent": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
-            "concern",
-            "referral"
+            "resourceType",
+            "status",
+            "intent"
           ],
-          "additionalProperties": false
+          "additionalProperties": {}
         }
       },
       "required": [
@@ -2577,7 +2548,8 @@
         "requester",
         "access",
         "ticket_type",
-        "context"
+        "concern",
+        "referral"
       ],
       "additionalProperties": {}
     },
@@ -3160,32 +3132,124 @@
                   }
                 ]
               }
-            }
-          },
-          "required": [
-            "permissions"
-          ],
-          "additionalProperties": false
-        },
-        "ticket_type": {
-          "type": "string",
-          "const": "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1"
-        },
-        "context": {
-          "type": "object",
-          "properties": {
-            "service": {
+            },
+            "claim_linkage": {
               "type": "object",
               "properties": {
-                "coding": {
+                "claim": {
+                  "type": "object",
+                  "properties": {
+                    "resourceType": {
+                      "type": "string",
+                      "const": "Claim"
+                    },
+                    "identifier": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "system": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "object",
+                            "properties": {
+                              "coding": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "system": {
+                                      "type": "string"
+                                    },
+                                    "code": {
+                                      "type": "string"
+                                    },
+                                    "display": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": {}
+                                }
+                              },
+                              "text": {
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": {}
+                          }
+                        },
+                        "additionalProperties": {}
+                      }
+                    },
+                    "status": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "use": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "resourceType",
+                    "status",
+                    "use"
+                  ],
+                  "additionalProperties": {}
+                },
+                "encounter": {
+                  "minItems": 1,
                   "type": "array",
                   "items": {
                     "type": "object",
                     "properties": {
-                      "system": {
+                      "reference": {
                         "type": "string"
                       },
-                      "code": {
+                      "identifier": {
+                        "type": "object",
+                        "properties": {
+                          "system": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "object",
+                            "properties": {
+                              "coding": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "system": {
+                                      "type": "string"
+                                    },
+                                    "code": {
+                                      "type": "string"
+                                    },
+                                    "display": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": {}
+                                }
+                              },
+                              "text": {
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": {}
+                          }
+                        },
+                        "additionalProperties": {}
+                      },
+                      "type": {
                         "type": "string"
                       },
                       "display": {
@@ -3194,84 +3258,23 @@
                     },
                     "additionalProperties": {}
                   }
-                },
-                "text": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
-            },
-            "claim": {
-              "type": "object",
-              "properties": {
-                "resourceType": {
-                  "type": "string",
-                  "const": "Claim"
-                },
-                "identifier": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "object",
-                        "properties": {
-                          "coding": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "system": {
-                                  "type": "string"
-                                },
-                                "code": {
-                                  "type": "string"
-                                },
-                                "display": {
-                                  "type": "string"
-                                }
-                              },
-                              "additionalProperties": {}
-                            }
-                          },
-                          "text": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "status": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "use": {
-                  "type": "string",
-                  "minLength": 1
                 }
               },
               "required": [
-                "resourceType",
-                "status",
-                "use"
+                "claim"
               ],
-              "additionalProperties": {}
+              "additionalProperties": false
             }
           },
           "required": [
-            "service",
-            "claim"
+            "permissions",
+            "claim_linkage"
           ],
           "additionalProperties": false
+        },
+        "ticket_type": {
+          "type": "string",
+          "const": "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1"
         }
       },
       "required": [
@@ -3283,8 +3286,7 @@
         "subject",
         "requester",
         "access",
-        "ticket_type",
-        "context"
+        "ticket_type"
       ],
       "additionalProperties": {}
     },
@@ -3878,77 +3880,68 @@
           "type": "string",
           "const": "https://smarthealthit.org/permission-ticket-type/research-study-access-v1"
         },
-        "context": {
+        "study": {
           "type": "object",
           "properties": {
-            "study": {
-              "type": "object",
-              "properties": {
-                "resourceType": {
-                  "type": "string",
-                  "const": "ResearchStudy"
-                },
-                "identifier": {
-                  "type": "array",
-                  "items": {
+            "resourceType": {
+              "type": "string",
+              "const": "ResearchStudy"
+            },
+            "identifier": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "type": {
                     "type": "object",
                     "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "object",
-                        "properties": {
-                          "coding": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "system": {
-                                  "type": "string"
-                                },
-                                "code": {
-                                  "type": "string"
-                                },
-                                "display": {
-                                  "type": "string"
-                                }
-                              },
-                              "additionalProperties": {}
+                      "coding": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "system": {
+                              "type": "string"
+                            },
+                            "code": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
                           },
-                          "text": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": {}
+                          "additionalProperties": {}
+                        }
+                      },
+                      "text": {
+                        "type": "string"
                       }
                     },
                     "additionalProperties": {}
                   }
                 },
-                "status": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "title": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "resourceType",
-                "status"
-              ],
-              "additionalProperties": {}
+                "additionalProperties": {}
+              }
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string"
             }
           },
           "required": [
-            "study"
+            "resourceType",
+            "status"
           ],
-          "additionalProperties": false
+          "additionalProperties": {}
         }
       },
       "required": [
@@ -3961,7 +3954,7 @@
         "requester",
         "access",
         "ticket_type",
-        "context"
+        "study"
       ],
       "additionalProperties": {}
     },
@@ -4582,107 +4575,97 @@
           "type": "string",
           "const": "https://smarthealthit.org/permission-ticket-type/provider-consult-v1"
         },
-        "context": {
+        "reason": {
           "type": "object",
           "properties": {
-            "reason": {
-              "type": "object",
-              "properties": {
-                "coding": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
+            "coding": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "display": {
+                    "type": "string"
                   }
                 },
-                "text": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+                "additionalProperties": {}
+              }
             },
-            "consult_request": {
-              "type": "object",
-              "properties": {
-                "resourceType": {
-                  "type": "string",
-                  "const": "ServiceRequest"
-                },
-                "identifier": {
-                  "type": "array",
-                  "items": {
+            "text": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": {}
+        },
+        "consult_request": {
+          "type": "object",
+          "properties": {
+            "resourceType": {
+              "type": "string",
+              "const": "ServiceRequest"
+            },
+            "identifier": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "type": {
                     "type": "object",
                     "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "object",
-                        "properties": {
-                          "coding": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "system": {
-                                  "type": "string"
-                                },
-                                "code": {
-                                  "type": "string"
-                                },
-                                "display": {
-                                  "type": "string"
-                                }
-                              },
-                              "additionalProperties": {}
+                      "coding": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "system": {
+                              "type": "string"
+                            },
+                            "code": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
                           },
-                          "text": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": {}
+                          "additionalProperties": {}
+                        }
+                      },
+                      "text": {
+                        "type": "string"
                       }
                     },
                     "additionalProperties": {}
                   }
                 },
-                "status": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "intent": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "resourceType",
-                "status",
-                "intent"
-              ],
-              "additionalProperties": {}
+                "additionalProperties": {}
+              }
+            },
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "intent": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
-            "reason",
-            "consult_request"
+            "resourceType",
+            "status",
+            "intent"
           ],
-          "additionalProperties": false
+          "additionalProperties": {}
         }
       },
       "required": [
@@ -4695,7 +4678,8 @@
         "requester",
         "access",
         "ticket_type",
-        "context"
+        "reason",
+        "consult_request"
       ],
       "additionalProperties": {}
     }

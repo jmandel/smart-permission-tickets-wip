@@ -211,8 +211,6 @@ export const AccessGrantSchema = z.object({
   data_holder_filter: z.array(DataHolderFilterSchema).min(1).optional(),
 }).strict();
 
-const EmptyContextSchema = z.object({}).strict();
-
 const MinimalServiceRequestSchema = z.object({
   resourceType: z.literal("ServiceRequest"),
   identifier: z.array(FHIRIdentifierSchema).optional(),
@@ -234,39 +232,16 @@ const MinimalResearchStudySchema = z.object({
   title: z.string().optional(),
 }).catchall(z.unknown());
 
-export const PatientAccessContextSchema = EmptyContextSchema;
-
-export const PublicHealthContextSchema = z.object({
-  reportable_condition: FHIRCodeableConceptSchema,
-}).strict();
-
-export const SocialCareReferralContextSchema = z.object({
-  concern: FHIRCodeableConceptSchema,
-  referral: MinimalServiceRequestSchema,
-}).strict();
-
-export const PayerClaimsContextSchema = z.object({
-  service: FHIRCodeableConceptSchema,
+// Profile-grown access constraint defined by UC5: release is limited to records
+// the Data Holder associates with the referenced claim or prior authorization.
+export const ClaimLinkageSchema = z.object({
   claim: MinimalClaimSchema,
+  encounter: z.array(FHIRReferenceSchema).min(1).optional(),
 }).strict();
 
-export const ResearchContextSchema = z.object({
-  study: MinimalResearchStudySchema,
-}).strict();
-
-export const ProviderConsultContextSchema = z.object({
-  reason: FHIRCodeableConceptSchema,
-  consult_request: MinimalServiceRequestSchema,
-}).strict();
-
-export const TicketContextSchema = z.union([
-  PatientAccessContextSchema,
-  PublicHealthContextSchema,
-  SocialCareReferralContextSchema,
-  PayerClaimsContextSchema,
-  ResearchContextSchema,
-  ProviderConsultContextSchema,
-]);
+export const PayerAccessGrantSchema = AccessGrantSchema.extend({
+  claim_linkage: ClaimLinkageSchema,
+});
 
 const BaseKernelTopLevelClaimNames = new Set([
   "iss",
@@ -284,7 +259,6 @@ const BaseKernelTopLevelClaimNames = new Set([
   "subject",
   "requester",
   "access",
-  "context",
 ]);
 
 const MustUnderstandClaimNameSchema = z.string().regex(/^[a-z][a-z0-9_]*$/);
@@ -309,43 +283,43 @@ const TicketBaseSchema = z.object({
 export const PatientSelfAccessTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(PATIENT_SELF_ACCESS_TICKET_TYPE),
   requester: z.never().optional(),
-  context: EmptyContextSchema.optional(),
 });
 
 export const PatientDelegatedAccessTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(PATIENT_DELEGATED_ACCESS_TICKET_TYPE),
   requester: RelatedPersonSchema,
-  context: EmptyContextSchema.optional(),
 });
 
 export const PublicHealthTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE),
   requester: OrganizationSchema,
-  context: PublicHealthContextSchema,
+  reportable_condition: FHIRCodeableConceptSchema,
 });
 
 export const SocialCareReferralTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(SOCIAL_CARE_REFERRAL_TICKET_TYPE),
   requester: OrganizationSchema,
-  context: SocialCareReferralContextSchema,
+  concern: FHIRCodeableConceptSchema,
+  referral: MinimalServiceRequestSchema,
 });
 
 export const PayerClaimsTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE),
   requester: OrganizationSchema,
-  context: PayerClaimsContextSchema,
+  access: PayerAccessGrantSchema,
 });
 
 export const ResearchStudyTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(RESEARCH_STUDY_ACCESS_TICKET_TYPE),
   requester: OrganizationSchema,
-  context: ResearchContextSchema,
+  study: MinimalResearchStudySchema,
 });
 
 export const ProviderConsultTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(PROVIDER_CONSULT_TICKET_TYPE),
   requester: PractitionerRoleSchema,
-  context: ProviderConsultContextSchema,
+  reason: FHIRCodeableConceptSchema,
+  consult_request: MinimalServiceRequestSchema,
 });
 
 export const PermissionTicketSchema = z.discriminatedUnion("ticket_type", [
@@ -430,7 +404,8 @@ export type OrganizationFilter = z.infer<typeof OrganizationFilterSchema>;
 export type DataHolderFilter = z.infer<typeof DataHolderFilterSchema>;
 export type TicketAudienceType = z.infer<typeof TicketAudienceTypeSchema>;
 export type AccessGrant = z.infer<typeof AccessGrantSchema>;
-export type TicketContext = z.infer<typeof TicketContextSchema>;
+export type ClaimLinkage = z.infer<typeof ClaimLinkageSchema>;
+export type PayerAccessGrant = z.infer<typeof PayerAccessGrantSchema>;
 export type PatientSelfAccessTicket = z.infer<typeof PatientSelfAccessTicketSchema>;
 export type PatientDelegatedAccessTicket = z.infer<typeof PatientDelegatedAccessTicketSchema>;
 export type PublicHealthTicket = z.infer<typeof PublicHealthTicketSchema>;

@@ -6,7 +6,7 @@ This specification currently defines three ticket types:
 
 {% include generated/spec-snippets/index/use-case-profile-map.md %}
 
-Additional candidates are tracked on [Future Use Cases](future-use-cases.html). They are not part of the implementable specification.
+Use-case numbers are stable identifiers, not an ordering. UC3 (Public Health Investigation) is fully modeled and lives on [Future Use Cases](future-use-cases.html) since June 2026, alongside the other candidates; the near-term catalog holds the flows implementers on the project are ready to exercise.
 
 ### Status
 
@@ -19,21 +19,21 @@ Additional candidates are tracked on [Future Use Cases](future-use-cases.html). 
 |----------|--------|
 | UC1: Patient Self Access | Ready |
 | UC2: Patient-Delegated Access | Modeled |
-| UC3: Public Health Investigation | Modeled |
+| UC5: Payer Claims Adjudication | Modeled |
 
 ### Per-Profile Constraints
 
-The table below summarizes required and optional fields for each ticket type. All ticket types may use any `access` dimension (`permissions`, `data_period`, `data_holder_filter`); the table notes typical usage.
+The table below summarizes required and optional fields for each ticket type. Each profile pulls in the [access constraints](index.html#access-constraints) it needs; a Constraints section in each profile states how the [constraint template](index.html#constraint-template)'s sections land for that use case.
 
-| Use Case | `presenter_binding` | Requester | Identity Evidence | Context Fields | Access |
-|----------|---------------------|-----------|-------------------|----------------|--------|
-| UC1: Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | *(none)* | `permissions` required; `data_period` optional |
-| UC2: Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | *(none)* | `permissions` required |
-| UC3: Public Health | Optional | `Organization` (required) | — (requester is an organization) | `reportable_condition` | `permissions` required; `data_period`, `data_holder_filter` typical |
+| Use Case | `presenter_binding` | Requester | Identity Evidence | Profile Claims | Access Constraints |
+|----------|---------------------|-----------|-------------------|----------------|--------------------|
+| UC1: Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | *(none)* | `permissions` required; `data_period`, `data_holder_filter` optional |
+| UC2: Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | *(none)* | `permissions` required; `data_period` optional |
+| UC5: Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | *(none)* | `permissions`, `claim_linkage` required; `data_period` recommended |
 
 **Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For UC1 that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For UC2 that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
 
-Each use case section below follows a common template, including **Policy Selection Inputs**. `ticket_type` tells the Data Holder what kind of request this is (self-access, proxy access, public health, …); the inputs listed per use case are the ticket fields that help it pick the right one of its own internal policies for this specific request. Tickets help the Data Holder pick a policy; they do not create new policies or override existing ones.
+Each use case section below follows a common template, including **Policy Selection Inputs**. `ticket_type` tells the Data Holder what kind of request this is (self-access, proxy access, claims review, …); the inputs listed per use case are the ticket fields that help it pick the right one of its own internal policies for this specific request. Tickets help the Data Holder pick a policy; they do not create new policies or override existing ones.
 
 ---
 
@@ -45,7 +45,7 @@ Each use case section below follows a common template, including **Policy Select
 
 *A patient uses a high-assurance Digital ID wallet to authorize an app to fetch their data from multiple hospitals.*
 
-The patient authorizes once, with the issuer, and the ticket carries that authorization to many Data Holders — including Data Holders where the patient has never created a portal account. This is the simplest ticket type: no third-party requester and no context fields.
+The patient authorizes once, with the issuer, and the ticket carries that authorization to many Data Holders — including Data Holders where the patient has never created a portal account. This is the simplest ticket type: no third-party requester and no profile claims.
 
 #### Typical Flow
 
@@ -55,9 +55,15 @@ Patient completes identity verification and authorization with the issuer → is
 
 * **Subject:** `Patient` (matched by demographics: name, DOB, identifiers), with `subject_identity_evidence` SHOULD — an embedded identity token the Data Holder can verify itself.
 * **Requester:** None (self-access). The absence of `requester` is what marks the ticket as self-access. The patient is the requester, so identity is recorded once, on the subject side.
-* **Context:** *(none; `context` may be omitted or empty)*
-* **Access:** `permissions` with specific resource types and interactions; `data_period` optional.
 * **Presenter binding:** Required. Individual-access tickets must be bound to the presenting client.
+
+#### Constraints
+
+The authorizing party is the patient, making sharing choices on the issuer's authorization screen. Each constraint carries one of those choices:
+
+* **`permissions`** (required). The record types the patient chose to share, carried as resource types with optional category and code filters. The screen lists kinds of records ("immunizations," "lab results"); the app receives at most what the patient picked.
+* **`data_period`** (optional). The time limit the patient set ("records since 2021"). The screen presents it as bounding clinical dates, with currently relevant items such as active allergies possibly included regardless — that caveat is part of the promise, not fine print discovered later.
+* **`data_holder_filter`** (optional). The organizations or regions the patient selected. The screen must not promise more than the filter delivers: it gates which Data Holders may answer, and an answering Data Holder typically returns the combined record it holds (see the [implementation note](index.html#data-holder-filters) on shared systems).
 
 #### Identity Evidence
 
@@ -112,11 +118,16 @@ Requester completes identity verification with the issuer → issuer verifies th
 
 * **Subject:** `Patient` (matched by demographics or identifier), with `subject_identity_evidence` SHOULD.
 * **Requester:** `RelatedPerson` (required) with exactly one relationship coding: the requester's authority. `requester_identity_evidence` SHOULD.
-* **Context:** *(none — delegation is expressed by the presence and type of `requester`)*
-* **Access:** `permissions` with specific resource types and interactions.
 * **Presenter binding:** Required.
 
 Both evidence slots apply here because a proper issuer verifies both people: the delegate's identity (they are who they claim) and the patient's identity and wishes (they actually granted this access). Embedding both tokens lets the Data Holder check each independently.
+
+#### Constraints
+
+The authorizing party is the patient — or the instrument that confers authority — not the delegate who presents the ticket. The sharing decision is captured during the delegation ceremony, so that ceremony is where each constraint's explanation is owed:
+
+* **`permissions`** (required). The ceiling on what the delegate's app may receive, set when the patient granted the delegation ("my daughter may see my conditions, medications, and immunizations"). The Data Holder's proxy policy narrows further: a granted scope never overrides what local policy lets this class of requester see, and adolescent-privacy and sensitivity rules continue to apply below the ticket.
+* **`data_period`** (optional). A time bound the patient set when delegating, with the same clinical-dates semantics and currently-relevant caveat as UC1.
 
 #### Requester and Authority
 
@@ -173,48 +184,99 @@ The issuer keeps the source documents (POA instruments, delegation records, cour
 
 ---
 
-### Use Case 3: Public Health Investigation
+### Use Case 5: Payer Claims Adjudication
 
 **Status:** Modeled
 
 #### Purpose
 
-*A Hospital creates a Case Report. The Public Health Agency (PHA) uses a ticket to query for follow-up data.*
+*A provider's system submits a claim and attaches a Permission Ticket. The payer presents the ticket back at the provider's own FHIR endpoint to read clinical data tied to the claim.*
 
-Public health follow-up is well suited to ticket-based exchange: the requester is an organization, the request is tied to a concrete triggering event (a reportable condition), and the Data Holder can decide from the ticket alone — no user needs to sign in.
+When a payer needs more than the claim itself — medical-necessity review, a request for additional information, post-submission documentation — today's path is document exchange: the payer guesses a document code, the provider assembles and pushes attachments. A ticket attached to the claim replaces that follow-up loop with a scoped read. The provider knows at submission time exactly which patient, which encounters, and which period the claim concerns, so it can mint the grant itself.
 
-In many jurisdictions, law already requires providers to respond to these queries. A ticket does not add a new gate on top of that obligation, and its absence does not create a right to refuse a legally mandated query. The ticket's job is to make an automated yes cheaper: it gives the responding system a verifiable, well-scoped request it can act on without a phone call.
+The issuer and the Data Holder are the same party. This is the ticket type with the fewest moving parts — one system mints tickets and later accepts them back — and trust validation is correspondingly simple. The signature still matters: the ticket travels through the payer's claims pipeline, and presenter binding keeps anything else that handles the claim from redeeming it.
+
+CMS's [Interoperability Framework](https://www.cms.gov/health-technology-ecosystem/interoperability-framework) names this flow among its criteria for aligned networks: "Payers, including CMS, can query for relevant data tied to a claim submitted in the last 60 days and receive clinical data for that encounter." The criterion names the goal and leaves the mechanism open; this profile is a candidate mechanism.
 
 #### Typical Flow
 
-A reportable event triggers case reporting → the issuer (which may be the reporting system or network infrastructure) mints a ticket naming the public health agency as requester, with the reportable condition as context → the agency's system presents the ticket during follow-up → the Data Holder evaluates the request against its public-health disclosure policies.
+Provider's system submits a claim (or prior authorization) → mints a ticket naming the payer as requester and linking the claim → the ticket travels with the submission → during adjudication, the payer's system presents the ticket at the provider's token endpoint → the provider validates its own signature, checks presenter binding, and issues an access token limited to records associated with the claim.
 
 #### Required Claims
 
-* **Subject:** `Patient` (matched by demographics or identifier).
-* **Requester:** `Organization` (public health agency), identified well enough for directory matching (name, identifiers).
-* **Context:** `reportable_condition` (coded condition) — says which investigation the request belongs to and bounds it.
-* **Access:** `permissions`; optional `data_period` and `data_holder_filter`.
-* **Presenter binding:** Optional (B2B; `aud` + client authentication generally suffice).
+* **Subject:** `Patient`, with `subject.recipient_record` SHOULD — the issuer is the Data Holder, so it knows its own record identifier and the direct-target hint always resolves.
+* **Requester:** `Organization` (the payer), identified well enough for the provider to match it to the claim's payer.
+* **Presenter binding:** Required — `trust_framework_client` naming the payer organization, or `jkt`.
+* **Expiration:** `exp` SHOULD cover the payer's documented additional-information window for the linked claim. Sixty days from submission matches the CMS criterion; the operational windows underneath run 45–75 days (Medicare ADR, PERM, commercial record-request periods), so the length is a deployment parameter, not a fixed rule.
+
+#### Constraints
+
+This profile pulls in `permissions` and `data_period` from the base set and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
+
+* **`permissions`** (required). The resource types adjudication legitimately needs. Likely broader than US Core for some claim types — see the open question below.
+* **`data_period`** (recommended). A hard outer bound on clinical dates, typically the claim's service period with margin. No association judgment under `claim_linkage` may release anything outside it.
+* **`claim_linkage`** (required). Defined below.
+
+#### `claim_linkage`
+
+**Shape and validity.**
+
+```json
+"claim_linkage": {
+  "claim": {
+    "resourceType": "Claim",
+    "identifier": [{ "system": "https://provider.example.org/claims", "value": "CLM-2026-0042" }],
+    "status": "active",
+    "use": "claim"
+  },
+  "encounter": [{ "reference": "Encounter/enc-2026-0117" }]
+}
+```
+
+`claim` is a minimal FHIR Claim carrying the identifiers both sides use for re-association; `use` distinguishes a claim from a prior authorization. `encounter` optionally names the encounter records the claim covers, using the issuer's own resource references. The issuer mints these values from the claim it is submitting, so validity is checkable against its own records.
+
+**For the authorizing party.** The constraint records what the provider organization decided to disclose: records tied to this claim, for this adjudication, and nothing else. It is the ticket-shaped form of minimum necessary.
+
+**For the client.** The payer learns which claim or prior authorization the ticket belongs to — the re-association that document workflows carry in tracking numbers — and what to expect from redemption: records the provider associates with that claim. The response may be lawfully incomplete; absence of a record is not a representation that it does not exist.
+
+**For the Data Holder.** Release only records you associate with the referenced claim: at minimum the records linked to the named encounters, plus current problems, medications, and allergies; never beyond `data_period` when present. The association is your own — you minted the ticket against your own claim — so enforcement is determinate against your own records. A Data Holder with no association knowledge for the referenced claim cannot enforce this constraint and rejects the ticket. That is the correct outcome, and it is what confines this ticket type to self-issued tickets today.
+
+The enforcement floor names patient-level categories explicitly because encounter linkage in FHIR data is incomplete: the records adjudication needs most — problem list, medications, allergies — typically link to no encounter at all.
+
+#### Restricted Data
+
+* Records restricted from disclosure to the payer are excluded silently. The base rule already covers this — a valid ticket does not override local rules — and the issuer is the Data Holder, which holds its own restriction flags. The leading case is the HIPAA right to restrict ([45 CFR 164.522(a)(1)(vi)](https://www.ecfr.gov/current/title-45/section-164.522)): a provider must honor a patient's request not to disclose to a health plan information about items or services paid out of pocket in full.
+* The payer is told the response may be lawfully incomplete (the client section above). Treating a filtered response as the complete record is the failure that sentence prevents.
+* When the patient has authorized disclosure of restricted items to the plan, the ticket says so explicitly: a `sensitivity_policy` `release_authorized` entry per [Proposal 005](proposal-005-sensitive-data-modeling.html), using the v3-ActCode `HIPAASelfPay` security label policy code — never a silent widening of the default.
 
 #### Policy Selection Inputs
 
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
-| Requesting agency | `requester` (Organization identifiers) | Whether the agency is known (directory match); any per-agency arrangements |
-| Reportable condition | `context.reportable_condition` | What the investigation covers; which kinds of data to release |
+| Requesting payer | `requester` (Organization identifiers) | Whether this is the linked claim's payer; participation arrangements |
+| Linked claim | `access.claim_linkage.claim` | Which adjudication the request belongs to; whether it is still open |
 
 #### Data Holder Processing
 
-* Verify issuer trust for this ticket type — trusting an issuer for patient self-access does not imply trusting it for public health tickets.
-* Match the requesting organization against directory or trust-framework information.
-* Apply local public-health disclosure policy; narrow or reject requests that go beyond the named condition.
+* Verify the ticket signature against this system's own issuing keys — the issuer is the Data Holder.
+* Verify presenter binding: the redeeming client is the payer the ticket names.
+* Resolve the subject; `recipient_record` resolves directly, since the issuer assigned it.
+* Enforce `claim_linkage` against the claim's association records; apply restriction flags before release.
 
 #### What This Ticket Does Not Prove
 
-* The detailed legal mandate behind the investigation. This specification is jurisdiction-neutral; the legal basis for public-health disclosure lives in applicable law, the trust framework, and the Data Holder's policy — not in the base ticket.
-* That every data class is responsive to the named condition; the Data Holder may narrow.
+* That the response is the complete record; restricted data is excluded without notice.
+* That the payer may use the data for anything beyond adjudicating the linked claim; downstream obligations live in law and contract.
+* That this ticket type covers bulk retrieval. Quality-measure and risk-adjustment chart retrieval are population-scale and not claim-linked; element-specific quality queries may become a separate ticket type, and broad chart-chase is out of scope.
+
+#### Open Questions
+
+> **Open Question (OQ-UC5-DATA): Resource types for adjudication.** What does claims review need beyond US Core resource types? Claim, Coverage, and documentation resources are candidates; payer implementers should name the list before this profile advances.
+{: .callout .callout-open-question #oq-uc5-data}
+
+> **Open Question (OQ-UC5-TRANSPORT): How the ticket travels with the claim.** In an X12 275 attachment, in a CDex Task, or by reference from the claim itself? This profile defines the artifact, not the transport; early adopters should converge on one carriage pattern.
+{: .callout .callout-open-question #oq-uc5-transport}
 
 #### Example
 
-{% include generated/signed-tickets/uc3-ticket.html %}
+{% include generated/signed-tickets/uc5-ticket.html %}

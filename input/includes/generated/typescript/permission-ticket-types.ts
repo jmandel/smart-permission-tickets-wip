@@ -96,38 +96,14 @@ export type AccessGrant = {
   data_holder_filter?: NonEmptyArray<DataHolderFilter>;
 };
 
-export type PatientAccessContext = Record<string, never>;
-
-export type PublicHealthContext = {
-  reportable_condition: FHIRCodeableConcept;
-};
-
-export type SocialCareReferralContext = {
-  concern: FHIRCodeableConcept;
-  referral: fhir4.ServiceRequest;
-};
-
-export type PayerClaimsContext = {
-  service: FHIRCodeableConcept;
+export type ClaimLinkage = {
   claim: fhir4.Claim;
+  encounter?: NonEmptyArray<FHIRReference>;
 };
 
-export type ResearchContext = {
-  study: fhir4.ResearchStudy;
+export type PayerAccessGrant = AccessGrant & {
+  claim_linkage: ClaimLinkage;
 };
-
-export type ProviderConsultContext = {
-  reason: FHIRCodeableConcept;
-  consult_request: fhir4.ServiceRequest;
-};
-
-export type TicketContext =
-  | PatientAccessContext
-  | PublicHealthContext
-  | SocialCareReferralContext
-  | PayerClaimsContext
-  | ResearchContext
-  | ProviderConsultContext;
 
 export type PermissionTicketBase = {
   iss: Uri;
@@ -145,49 +121,48 @@ export type PermissionTicketBase = {
   subject: Subject;
   requester?: Requester;
   access: AccessGrant;
-  context?: TicketContext;
 };
 
 export type PatientSelfAccessTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1";
   requester?: never;
-  context?: PatientAccessContext;
 };
 
 export type PatientDelegatedAccessTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-delegated-access-v1";
   requester: fhir4.RelatedPerson;
-  context?: PatientAccessContext;
 };
 
 export type PublicHealthTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/public-health-investigation-v1";
   requester: fhir4.Organization;
-  context: PublicHealthContext;
+  reportable_condition: FHIRCodeableConcept;
 };
 
 export type SocialCareReferralTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/social-care-referral-v1";
   requester: fhir4.Organization;
-  context: SocialCareReferralContext;
+  concern: FHIRCodeableConcept;
+  referral: fhir4.ServiceRequest;
 };
 
 export type PayerClaimsTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1";
   requester: fhir4.Organization;
-  context: PayerClaimsContext;
+  access: PayerAccessGrant;
 };
 
 export type ResearchStudyTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/research-study-access-v1";
   requester: fhir4.Organization;
-  context: ResearchContext;
+  study: fhir4.ResearchStudy;
 };
 
 export type ProviderConsultTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/provider-consult-v1";
   requester: fhir4.PractitionerRole;
-  context: ProviderConsultContext;
+  reason: FHIRCodeableConcept;
+  consult_request: fhir4.ServiceRequest;
 };
 
 export type PermissionTicket =

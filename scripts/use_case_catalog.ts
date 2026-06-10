@@ -30,7 +30,8 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   {
     id: "uc3",
     label: "Use Case 3: Public Health Investigation",
-    ticketTypeUri: PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE
+    ticketTypeUri: PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
+    future: true
   },
   {
     id: "uc4",
@@ -40,9 +41,8 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   },
   {
     id: "uc5",
-    label: "Payer Claims Adjudication",
-    ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
-    future: true
+    label: "Use Case 5: Payer Claims Adjudication",
+    ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE
   },
   {
     id: "uc6",

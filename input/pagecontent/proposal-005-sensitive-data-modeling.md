@@ -126,7 +126,7 @@ These codes identify categories. They do not by themselves define what data fall
 
 ### Processing Semantics
 
-`sensitivity_policy` is an additional access constraint relative to `access`: it never broadens `access.permissions`, `data_period`, `data_holder_filter`, client registration, or what law permits. `release_authorized` operates on the Data Holder's own sensitivity gates — it can satisfy a local rule that conditions release on patient authorization, but it cannot override a rule that does not accept ticket-borne authorization.
+`sensitivity_policy` is an additional limit relative to `access`: it never broadens any access constraint, client registration, or what law permits. `release_authorized` operates on the Data Holder's own sensitivity gates — it can satisfy a local rule that conditions release on patient authorization, but it cannot override a rule that does not accept ticket-borne authorization.
 
 Data Holders implementing this profile SHALL:
 
