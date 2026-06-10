@@ -43,7 +43,7 @@ The signed payload has a small, fixed shape:
 | requester?     RelatedPerson | Practitioner |                 |  on whose behalf
 |                PractitionerRole | Organization                |  (issuer-attested)
 +---------------------------------------------------------------+
-| access:        permissions[] (DataPermission | Operation)     |  what and how much
+| access:        permissions[] (DataPermission)                 |  what and how much
 |                data_period?                                   |
 |                data_holder_filter?                            |
 +---------------------------------------------------------------+
