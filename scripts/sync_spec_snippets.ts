@@ -71,7 +71,9 @@ function renderArtifactExampleJs(ticket: JsonObject): string {
     "  // Standard JWT envelope: who minted the ticket, who may redeem it, and when it expires.",
     `  "iss": ${JSON.stringify(ticket.iss)},`,
     `  "aud": ${JSON.stringify(ticket.aud)},`,
+    `  "aud_type": ${JSON.stringify(ticket.aud_type)},`,
     `  "exp": ${JSON.stringify(ticket.exp)},`,
+    `  "iat": ${JSON.stringify(ticket.iat)},`,
     `  "jti": ${JSON.stringify(ticket.jti)},`,
     "",
     "  // Profile selector: tells the Data Holder which validation and access rules apply.",
@@ -90,11 +92,13 @@ function renderArtifactExampleJs(ticket: JsonObject): string {
   ].join("\n");
 }
 
-function renderUseCaseProfileRegistryTable(): string {
-  const rows = USE_CASE_CATALOG.map(
-    (entry) =>
-      `  <tr><td>${entry.label}</td><td><code>${entry.ticketTypeUri}</code></td></tr>`
-  ).join("\n");
+function renderUseCaseProfileRegistryTable(future: boolean): string {
+  const rows = USE_CASE_CATALOG.filter((entry) => Boolean(entry.future) === future)
+    .map(
+      (entry) =>
+        `  <tr><td>${entry.label}</td><td><code>${entry.ticketTypeUri}</code></td></tr>`
+    )
+    .join("\n");
   return [
     "<table>",
     "  <thead>",
@@ -111,7 +115,9 @@ function buildIndexSnippets(): void {
   const artifactExample: JsonObject = {
     iss: "https://trusted-issuer.org",
     aud: "https://network.org",
+    aud_type: "trust_framework",
     exp: 1735689600,
+    iat: 1735686000,
     jti: "ticket-example-001",
     ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
     presenter_binding: {
@@ -180,7 +186,9 @@ function buildIndexSnippets(): void {
   const revocationTicketExample: JsonObject = {
     iss: "https://trusted-issuer.org",
     aud: "https://tefca.hhs.gov",
+    aud_type: "trust_framework",
     exp: 1735689600,
+    iat: 1735686000,
     jti: "ticket-unique-id",
     ticket_type: "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
     presenter_binding: {
@@ -217,7 +225,8 @@ function buildIndexSnippets(): void {
   );
   writeInclude("index/revocation-ticket.json.md", renderJsonFence(revocationTicketExample));
   writeInclude("index/revocation-list.json.md", renderJsonFence(revocationListExample));
-  writeInclude("index/use-case-profile-map.md", renderUseCaseProfileRegistryTable());
+  writeInclude("index/use-case-profile-map.md", renderUseCaseProfileRegistryTable(false));
+  writeInclude("index/future-use-case-map.md", renderUseCaseProfileRegistryTable(true));
   writeInclude(
     "index/permission-ticket.schema.json.md",
     renderJsonFence(permissionTicketJsonSchema as JsonValue)

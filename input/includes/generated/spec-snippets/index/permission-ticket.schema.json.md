@@ -338,153 +338,75 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "data"
-                      },
-                      "resource_type": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "interactions": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "enum": [
-                            "read",
-                            "search",
-                            "history",
-                            "create",
-                            "update",
-                            "patch",
-                            "delete"
-                          ]
-                        }
-                      },
-                      "category_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      },
-                      "code_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "resource_type",
-                      "interactions"
-                    ],
-                    "additionalProperties": false
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "data"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "operation"
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "reference": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "string"
-                              },
-                              "type": {
-                                "type": "object",
-                                "properties": {
-                                  "coding": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "system": {
-                                          "type": "string"
-                                        },
-                                        "code": {
-                                          "type": "string"
-                                        },
-                                        "display": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "additionalProperties": {}
-                                    }
-                                  },
-                                  "text": {
-                                    "type": "string"
-                                  }
-                                },
-                                "additionalProperties": {}
-                              }
-                            },
-                            "additionalProperties": {}
-                          },
-                          "type": {
-                            "type": "string"
-                          },
-                          "display": {
-                            "type": "string"
-                          }
+                  "resource_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "interactions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "read",
+                        "search",
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    }
+                  },
+                  "category_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
                         },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "code_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
                   }
-                ]
+                },
+                "required": [
+                  "kind",
+                  "resource_type",
+                  "interactions"
+                ],
+                "additionalProperties": false
               }
             },
             "data_period": {
@@ -625,6 +547,7 @@
         "iss",
         "aud",
         "exp",
+        "iat",
         "jti",
         "subject",
         "access",
@@ -1092,153 +1015,75 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "data"
-                      },
-                      "resource_type": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "interactions": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "enum": [
-                            "read",
-                            "search",
-                            "history",
-                            "create",
-                            "update",
-                            "patch",
-                            "delete"
-                          ]
-                        }
-                      },
-                      "category_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      },
-                      "code_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "resource_type",
-                      "interactions"
-                    ],
-                    "additionalProperties": false
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "data"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "operation"
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "reference": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "string"
-                              },
-                              "type": {
-                                "type": "object",
-                                "properties": {
-                                  "coding": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "system": {
-                                          "type": "string"
-                                        },
-                                        "code": {
-                                          "type": "string"
-                                        },
-                                        "display": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "additionalProperties": {}
-                                    }
-                                  },
-                                  "text": {
-                                    "type": "string"
-                                  }
-                                },
-                                "additionalProperties": {}
-                              }
-                            },
-                            "additionalProperties": {}
-                          },
-                          "type": {
-                            "type": "string"
-                          },
-                          "display": {
-                            "type": "string"
-                          }
+                  "resource_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "interactions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "read",
+                        "search",
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    }
+                  },
+                  "category_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
                         },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "code_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
                   }
-                ]
+                },
+                "required": [
+                  "kind",
+                  "resource_type",
+                  "interactions"
+                ],
+                "additionalProperties": false
               }
             },
             "data_period": {
@@ -1379,6 +1224,7 @@
         "iss",
         "aud",
         "exp",
+        "iat",
         "jti",
         "subject",
         "requester",
@@ -1778,153 +1624,75 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "data"
-                      },
-                      "resource_type": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "interactions": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "enum": [
-                            "read",
-                            "search",
-                            "history",
-                            "create",
-                            "update",
-                            "patch",
-                            "delete"
-                          ]
-                        }
-                      },
-                      "category_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      },
-                      "code_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "resource_type",
-                      "interactions"
-                    ],
-                    "additionalProperties": false
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "data"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "operation"
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "reference": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "string"
-                              },
-                              "type": {
-                                "type": "object",
-                                "properties": {
-                                  "coding": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "system": {
-                                          "type": "string"
-                                        },
-                                        "code": {
-                                          "type": "string"
-                                        },
-                                        "display": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "additionalProperties": {}
-                                    }
-                                  },
-                                  "text": {
-                                    "type": "string"
-                                  }
-                                },
-                                "additionalProperties": {}
-                              }
-                            },
-                            "additionalProperties": {}
-                          },
-                          "type": {
-                            "type": "string"
-                          },
-                          "display": {
-                            "type": "string"
-                          }
+                  "resource_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "interactions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "read",
+                        "search",
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    }
+                  },
+                  "category_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
                         },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "code_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
                   }
-                ]
+                },
+                "required": [
+                  "kind",
+                  "resource_type",
+                  "interactions"
+                ],
+                "additionalProperties": false
               }
             },
             "data_period": {
@@ -2096,6 +1864,7 @@
         "iss",
         "aud",
         "exp",
+        "iat",
         "jti",
         "subject",
         "requester",
@@ -2496,153 +2265,75 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "data"
-                      },
-                      "resource_type": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "interactions": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "enum": [
-                            "read",
-                            "search",
-                            "history",
-                            "create",
-                            "update",
-                            "patch",
-                            "delete"
-                          ]
-                        }
-                      },
-                      "category_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      },
-                      "code_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "resource_type",
-                      "interactions"
-                    ],
-                    "additionalProperties": false
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "data"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "operation"
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "reference": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "string"
-                              },
-                              "type": {
-                                "type": "object",
-                                "properties": {
-                                  "coding": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "system": {
-                                          "type": "string"
-                                        },
-                                        "code": {
-                                          "type": "string"
-                                        },
-                                        "display": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "additionalProperties": {}
-                                    }
-                                  },
-                                  "text": {
-                                    "type": "string"
-                                  }
-                                },
-                                "additionalProperties": {}
-                              }
-                            },
-                            "additionalProperties": {}
-                          },
-                          "type": {
-                            "type": "string"
-                          },
-                          "display": {
-                            "type": "string"
-                          }
+                  "resource_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "interactions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "read",
+                        "search",
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    }
+                  },
+                  "category_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
                         },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "code_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
                   }
-                ]
+                },
+                "required": [
+                  "kind",
+                  "resource_type",
+                  "interactions"
+                ],
+                "additionalProperties": false
               }
             },
             "data_period": {
@@ -2880,6 +2571,7 @@
         "iss",
         "aud",
         "exp",
+        "iat",
         "jti",
         "subject",
         "requester",
@@ -3280,153 +2972,75 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "data"
-                      },
-                      "resource_type": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "interactions": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "enum": [
-                            "read",
-                            "search",
-                            "history",
-                            "create",
-                            "update",
-                            "patch",
-                            "delete"
-                          ]
-                        }
-                      },
-                      "category_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      },
-                      "code_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "resource_type",
-                      "interactions"
-                    ],
-                    "additionalProperties": false
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "data"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "operation"
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "reference": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "string"
-                              },
-                              "type": {
-                                "type": "object",
-                                "properties": {
-                                  "coding": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "system": {
-                                          "type": "string"
-                                        },
-                                        "code": {
-                                          "type": "string"
-                                        },
-                                        "display": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "additionalProperties": {}
-                                    }
-                                  },
-                                  "text": {
-                                    "type": "string"
-                                  }
-                                },
-                                "additionalProperties": {}
-                              }
-                            },
-                            "additionalProperties": {}
-                          },
-                          "type": {
-                            "type": "string"
-                          },
-                          "display": {
-                            "type": "string"
-                          }
+                  "resource_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "interactions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "read",
+                        "search",
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    }
+                  },
+                  "category_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
                         },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "code_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
                   }
-                ]
+                },
+                "required": [
+                  "kind",
+                  "resource_type",
+                  "interactions"
+                ],
+                "additionalProperties": false
               }
             },
             "data_period": {
@@ -3664,6 +3278,7 @@
         "iss",
         "aud",
         "exp",
+        "iat",
         "jti",
         "subject",
         "requester",
@@ -4064,153 +3679,75 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "data"
-                      },
-                      "resource_type": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "interactions": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "enum": [
-                            "read",
-                            "search",
-                            "history",
-                            "create",
-                            "update",
-                            "patch",
-                            "delete"
-                          ]
-                        }
-                      },
-                      "category_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      },
-                      "code_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "resource_type",
-                      "interactions"
-                    ],
-                    "additionalProperties": false
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "data"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "operation"
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "reference": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "string"
-                              },
-                              "type": {
-                                "type": "object",
-                                "properties": {
-                                  "coding": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "system": {
-                                          "type": "string"
-                                        },
-                                        "code": {
-                                          "type": "string"
-                                        },
-                                        "display": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "additionalProperties": {}
-                                    }
-                                  },
-                                  "text": {
-                                    "type": "string"
-                                  }
-                                },
-                                "additionalProperties": {}
-                              }
-                            },
-                            "additionalProperties": {}
-                          },
-                          "type": {
-                            "type": "string"
-                          },
-                          "display": {
-                            "type": "string"
-                          }
+                  "resource_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "interactions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "read",
+                        "search",
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    }
+                  },
+                  "category_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
                         },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "code_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
                   }
-                ]
+                },
+                "required": [
+                  "kind",
+                  "resource_type",
+                  "interactions"
+                ],
+                "additionalProperties": false
               }
             },
             "data_period": {
@@ -4418,6 +3955,7 @@
         "iss",
         "aud",
         "exp",
+        "iat",
         "jti",
         "subject",
         "requester",
@@ -4845,153 +4383,75 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "data"
-                      },
-                      "resource_type": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "interactions": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "enum": [
-                            "read",
-                            "search",
-                            "history",
-                            "create",
-                            "update",
-                            "patch",
-                            "delete"
-                          ]
-                        }
-                      },
-                      "category_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      },
-                      "code_any_of": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "system": {
-                              "type": "string"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "display": {
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": {}
-                        }
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "resource_type",
-                      "interactions"
-                    ],
-                    "additionalProperties": false
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "data"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "kind": {
-                        "type": "string",
-                        "const": "operation"
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "reference": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "string"
-                              },
-                              "type": {
-                                "type": "object",
-                                "properties": {
-                                  "coding": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "system": {
-                                          "type": "string"
-                                        },
-                                        "code": {
-                                          "type": "string"
-                                        },
-                                        "display": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "additionalProperties": {}
-                                    }
-                                  },
-                                  "text": {
-                                    "type": "string"
-                                  }
-                                },
-                                "additionalProperties": {}
-                              }
-                            },
-                            "additionalProperties": {}
-                          },
-                          "type": {
-                            "type": "string"
-                          },
-                          "display": {
-                            "type": "string"
-                          }
+                  "resource_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "interactions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "read",
+                        "search",
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    }
+                  },
+                  "category_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
                         },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "code_any_of": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
                   }
-                ]
+                },
+                "required": [
+                  "kind",
+                  "resource_type",
+                  "interactions"
+                ],
+                "additionalProperties": false
               }
             },
             "data_period": {
@@ -5229,6 +4689,7 @@
         "iss",
         "aud",
         "exp",
+        "iat",
         "jti",
         "subject",
         "requester",

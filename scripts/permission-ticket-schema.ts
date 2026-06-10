@@ -30,10 +30,8 @@ export const PermissionTicketTypeSchema = z.enum(PermissionTicketTypeValues);
 export const RestInteractionValues = [
   "read",
   "search",
-  "history",
   "create",
   "update",
-  "patch",
   "delete",
 ] as const;
 
@@ -192,17 +190,6 @@ export const DataPermissionSchema = z.object({
   code_any_of: z.array(FHIRCodingSchema).min(1).optional(),
 }).strict();
 
-export const OperationPermissionSchema = z.object({
-  kind: z.literal("operation"),
-  name: NonEmptyStringSchema,
-  target: FHIRReferenceSchema.optional(),
-}).strict();
-
-export const PermissionRuleSchema = z.discriminatedUnion("kind", [
-  DataPermissionSchema,
-  OperationPermissionSchema,
-]);
-
 export const JurisdictionFilterSchema = z.object({
   kind: z.literal("jurisdiction"),
   address: FHIRAddressSchema,
@@ -219,7 +206,7 @@ export const DataHolderFilterSchema = z.discriminatedUnion("kind", [
 ]);
 
 export const AccessGrantSchema = z.object({
-  permissions: z.array(PermissionRuleSchema).min(1),
+  permissions: z.array(DataPermissionSchema).min(1),
   data_period: FHIRPeriodSchema.optional(),
   data_holder_filter: z.array(DataHolderFilterSchema).min(1).optional(),
 }).strict();
@@ -307,7 +294,7 @@ const TicketBaseSchema = z.object({
   aud: JwtAudienceSchema,
   aud_type: TicketAudienceTypeSchema.optional(),
   exp: z.number().int(),
-  iat: z.number().int().optional(),
+  iat: z.number().int(),
   jti: NonEmptyStringSchema,
   presenter_binding: PresenterBindingSchema.optional(),
   subject_identity_evidence: IdentityEvidenceSchema.optional(),
@@ -438,8 +425,6 @@ export type Subject = z.infer<typeof SubjectSchema>;
 export type Requester = z.infer<typeof RequesterSchema>;
 export type RestInteraction = z.infer<typeof RestInteractionSchema>;
 export type DataPermission = z.infer<typeof DataPermissionSchema>;
-export type OperationPermission = z.infer<typeof OperationPermissionSchema>;
-export type PermissionRule = z.infer<typeof PermissionRuleSchema>;
 export type JurisdictionFilter = z.infer<typeof JurisdictionFilterSchema>;
 export type OrganizationFilter = z.infer<typeof OrganizationFilterSchema>;
 export type DataHolderFilter = z.infer<typeof DataHolderFilterSchema>;

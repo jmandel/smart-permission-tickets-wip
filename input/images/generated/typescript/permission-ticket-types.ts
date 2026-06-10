@@ -17,10 +17,8 @@ export type PermissionTicketType =
 export type RestInteraction =
   | "read"
   | "search"
-  | "history"
   | "create"
   | "update"
-  | "patch"
   | "delete";
 
 export type TicketAudienceType = "data_holder_url" | "trust_framework";
@@ -80,14 +78,6 @@ export type DataPermission = {
   code_any_of?: NonEmptyArray<FHIRCoding>;
 };
 
-export type OperationPermission = {
-  kind: "operation";
-  name: string;
-  target?: FHIRReference;
-};
-
-export type PermissionRule = DataPermission | OperationPermission;
-
 export type JurisdictionFilter = {
   kind: "jurisdiction";
   address: FHIRAddress;
@@ -101,7 +91,7 @@ export type OrganizationFilter = {
 export type DataHolderFilter = JurisdictionFilter | OrganizationFilter;
 
 export type AccessGrant = {
-  permissions: NonEmptyArray<PermissionRule>;
+  permissions: NonEmptyArray<DataPermission>;
   data_period?: FHIRPeriod;
   data_holder_filter?: NonEmptyArray<DataHolderFilter>;
 };
@@ -144,7 +134,7 @@ export type PermissionTicketBase = {
   aud: JwtAudience;
   aud_type?: TicketAudienceType;
   exp: NumericDate;
-  iat?: NumericDate;
+  iat: NumericDate;
   jti: string;
   ticket_type: PermissionTicketType;
   presenter_binding?: PresenterBinding;

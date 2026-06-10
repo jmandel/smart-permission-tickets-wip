@@ -6,11 +6,7 @@ import {
     ClientAssertionSchema,
     PATIENT_DELEGATED_ACCESS_TICKET_TYPE,
     PATIENT_SELF_ACCESS_TICKET_TYPE,
-    PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
-    PROVIDER_CONSULT_TICKET_TYPE,
     PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
-    RESEARCH_STUDY_ACCESS_TICKET_TYPE,
-    SOCIAL_CARE_REFERRAL_TICKET_TYPE,
     type PermissionTicket,
     PermissionTicketSchema
 } from './permission-ticket-schema';
@@ -18,7 +14,8 @@ import {
 const OUTPUT_DIR = path.join(__dirname, '../input/examples/signed-tickets');
 const INCLUDES_DIR = path.join(__dirname, '../input/includes/generated/signed-tickets');
 const KEYS_DIR = path.join(__dirname, 'keys');
-const DEFAULT_EXP = Math.floor(Date.now() / 1000) + 3600;
+const DEFAULT_IAT = Math.floor(Date.now() / 1000);
+const DEFAULT_EXP = DEFAULT_IAT + 3600;
 
 // Load client public key and compute JWK Thumbprint (RFC 7638) at startup
 const clientPublicJwk = JSON.parse(fs.readFileSync(path.join(KEYS_DIR, 'client.public.json'), 'utf-8'));
@@ -61,7 +58,9 @@ async function signClientAssertion(payload: ClientAssertion, key: jose.KeyLike &
 const uc1_payload: PermissionTicket = {
     iss: "https://trusted-issuer.org",
     aud: "https://network.org",
+    aud_type: "trust_framework",
     exp: DEFAULT_EXP,
+    iat: DEFAULT_IAT,
     jti: "uc1-4b33cc1d-0f6b-44bf-bd33-80f6d7140f3e",
     ticket_type: PATIENT_SELF_ACCESS_TICKET_TYPE,
     presenter_binding: { method: "jkt", jkt: "" },
@@ -101,7 +100,9 @@ const uc1_evidence_payload: PermissionTicket = {
 const uc2_payload: PermissionTicket = {
     iss: "https://trusted-issuer.org",
     aud: "https://network.org",
+    aud_type: "trust_framework",
     exp: DEFAULT_EXP,
+    iat: DEFAULT_IAT,
     jti: "uc2-8c6f4ec2-4fb6-4c42-9530-6bbd11c77e49",
     ticket_type: PATIENT_DELEGATED_ACCESS_TICKET_TYPE,
     presenter_binding: { method: "jkt", jkt: "" },
@@ -135,7 +136,9 @@ const uc2_payload: PermissionTicket = {
 const uc3_payload: PermissionTicket = {
     iss: "https://issuer.state.example.gov",
     aud: "https://network.org",
+    aud_type: "trust_framework",
     exp: DEFAULT_EXP,
+    iat: DEFAULT_IAT,
     jti: "uc3-16ff62cf-2d2d-4b30-8c86-6a13d7ab7d16",
     ticket_type: PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
     presenter_binding: {
@@ -169,199 +172,6 @@ const uc3_payload: PermissionTicket = {
     context: {
         reportable_condition: {
             coding: [{ system: "http://snomed.info/sct", code: "840539006", display: "Disease caused by severe acute respiratory syndrome coronavirus 2 (disorder)" }]
-        }
-    }
-};
-
-// ─── UC4: Social Care Referral ──────────────────────────────────────────────
-
-const uc4_payload: PermissionTicket = {
-    iss: "https://issuer.example.org",
-    aud: "https://network.org",
-    exp: DEFAULT_EXP,
-    jti: "uc4-0d0f7272-2d85-49ef-8c39-d4a8e8d8a7f2",
-    ticket_type: SOCIAL_CARE_REFERRAL_TICKET_TYPE,
-    presenter_binding: {
-        method: "trust_framework_client",
-        trust_framework: "https://smarthealthit.org/trust-frameworks/reference-demo-well-known",
-        framework_type: "well-known",
-        entity_uri: "https://aco.example.org/entities/social-care-hub"
-    },
-    subject: {
-        patient: {
-            resourceType: "Patient",
-            identifier: [{ system: "http://hospital.example.org/mrn", value: "S778899" }],
-            birthDate: "1963-11-03",
-            name: [{ family: "Nguyen", given: ["Linh"] }]
-        }
-    },
-    requester: {
-        resourceType: "Organization",
-        identifier: [{ system: "urn:ietf:rfc:3986", value: "https://aco.example.org/entities/social-care-hub" }],
-        name: "Community Social Care Hub"
-    },
-    access: {
-        permissions: [
-            { kind: "data", resource_type: "ServiceRequest", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Observation", interactions: ["read", "search"] }
-        ]
-    },
-    context: {
-        concern: {
-            coding: [{ system: "http://snomed.info/sct", code: "733423003", display: "Food insecurity" }]
-        },
-        referral: {
-            resourceType: "ServiceRequest",
-            identifier: [{ system: "http://issuer.example.org/referrals", value: "REF-1001" }],
-            status: "active",
-            intent: "order"
-        }
-    }
-};
-
-// ─── UC5: Payer Claims Adjudication ─────────────────────────────────────────
-
-const uc5_payload: PermissionTicket = {
-    iss: "https://issuer.example.org",
-    aud: "https://network.org",
-    exp: DEFAULT_EXP,
-    jti: "uc5-9096d8d2-3627-45ee-8ea2-5e5a0ab51b7b",
-    ticket_type: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
-    presenter_binding: {
-        method: "trust_framework_client",
-        trust_framework: "https://payer.example.org/trust-framework",
-        framework_type: "udap",
-        entity_uri: "https://payer.example.org/entities/claims-ops"
-    },
-    subject: {
-        patient: {
-            resourceType: "Patient",
-            identifier: [{ system: "http://hospital.example.org/mrn", value: "C112233" }],
-            birthDate: "1954-07-19",
-            name: [{ family: "Johnson", given: ["Amelia"] }]
-        }
-    },
-    requester: {
-        resourceType: "Organization",
-        identifier: [{ system: "urn:ietf:rfc:3986", value: "https://payer.example.org/entities/claims-ops" }],
-        name: "Acme Health Plan Claims Operations"
-    },
-    access: {
-        permissions: [
-            { kind: "data", resource_type: "Claim", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "ExplanationOfBenefit", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "DocumentReference", interactions: ["read", "search"] }
-        ],
-        data_period: { start: "2025-01-01", end: "2025-12-31" },
-        data_holder_filter: [{
-            kind: "organization",
-            organization: {
-                resourceType: "Organization",
-                identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1234567893" }],
-                name: "General Hospital"
-            }
-        }]
-    },
-    context: {
-        service: {
-            coding: [{ system: "http://www.ama-assn.org/go/cpt", code: "99214", display: "Office or other outpatient visit" }]
-        },
-        claim: {
-            resourceType: "Claim",
-            identifier: [{ system: "http://payer.example.org/claims", value: "CLM-884422" }],
-            status: "active",
-            use: "claim"
-        }
-    }
-};
-
-// ─── UC6: Research Study ────────────────────────────────────────────────────
-
-const uc6_payload: PermissionTicket = {
-    iss: "https://issuer.example.org",
-    aud: "https://network.org",
-    exp: DEFAULT_EXP,
-    jti: "uc6-b5774e14-a020-46f2-94d3-2bb95b7ac4af",
-    ticket_type: RESEARCH_STUDY_ACCESS_TICKET_TYPE,
-    presenter_binding: {
-        method: "trust_framework_client",
-        trust_framework: "https://research.example.org/trust-framework",
-        framework_type: "udap",
-        entity_uri: "https://research.example.org/entities/study-team-204"
-    },
-    subject: {
-        patient: {
-            resourceType: "Patient",
-            identifier: [{ system: "http://hospital.example.org/mrn", value: "R445500" }],
-            birthDate: "1970-05-30",
-            name: [{ family: "Lopez", given: ["Marina"] }]
-        }
-    },
-    requester: {
-        resourceType: "Organization",
-        identifier: [{ system: "urn:ietf:rfc:3986", value: "https://research.example.org/entities/study-team-204" }],
-        name: "Study Team 204"
-    },
-    access: {
-        permissions: [
-            { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Observation", interactions: ["read", "search"] }
-        ],
-        data_period: { start: "2024-01-01", end: "2026-12-31" }
-    },
-    context: {
-        study: {
-            resourceType: "ResearchStudy",
-            identifier: [{ system: "http://research.example.org/studies", value: "STUDY-204" }],
-            status: "active",
-            title: "Diabetes Outcomes Registry"
-        }
-    }
-};
-
-// ─── UC7: Provider-to-Provider Consult ──────────────────────────────────────
-
-const uc7_payload: PermissionTicket = {
-    iss: "https://issuer.example.org",
-    aud: "https://network.org",
-    exp: DEFAULT_EXP,
-    jti: "uc7-d6927f7f-74c8-4b1b-a7a5-7f4e6d99390a",
-    ticket_type: PROVIDER_CONSULT_TICKET_TYPE,
-    presenter_binding: {
-        method: "trust_framework_client",
-        trust_framework: "https://smarthealthit.org/trust-frameworks/reference-demo-well-known",
-        framework_type: "well-known",
-        entity_uri: "https://hospital.example.org/entities/cardiology-group"
-    },
-    subject: {
-        patient: {
-            resourceType: "Patient",
-            identifier: [{ system: "http://hospital.example.org/mrn", value: "K667788" }],
-            birthDate: "1981-03-08",
-            name: [{ family: "Thomas", given: ["Jared"] }]
-        }
-    },
-    requester: {
-        resourceType: "PractitionerRole",
-        code: [{ coding: [{ system: "http://snomed.info/sct", code: "17561000", display: "Cardiologist" }] }]
-    },
-    access: {
-        permissions: [
-            { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Observation", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "DiagnosticReport", interactions: ["read", "search"] }
-        ]
-    },
-    context: {
-        reason: {
-            coding: [{ system: "http://snomed.info/sct", code: "53741008", display: "Coronary arteriosclerosis" }]
-        },
-        consult_request: {
-            resourceType: "ServiceRequest",
-            identifier: [{ system: "http://issuer.example.org/consults", value: "CONSULT-7788" }],
-            status: "active",
-            intent: "order"
         }
     }
 };
@@ -421,10 +231,6 @@ async function generate() {
         { name: 'uc1-evidence-ticket.jwt', payload: uc1_evidence_payload },
         { name: 'uc2-ticket.jwt', payload: uc2_payload },
         { name: 'uc3-ticket.jwt', payload: uc3_payload },
-        { name: 'uc4-ticket.jwt', payload: uc4_payload },
-        { name: 'uc5-ticket.jwt', payload: uc5_payload },
-        { name: 'uc6-ticket.jwt', payload: uc6_payload },
-        { name: 'uc7-ticket.jwt', payload: uc7_payload },
     ];
 
     for (const t of tickets) {

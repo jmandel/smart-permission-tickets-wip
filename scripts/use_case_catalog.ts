@@ -13,6 +13,7 @@ export type UseCaseCatalogEntry = {
   id: string;
   label: string;
   ticketTypeUri: PermissionTicketType;
+  future?: boolean;
 };
 
 export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
@@ -33,23 +34,27 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   },
   {
     id: "uc4",
-    label: "Use Case 4: Social Care (CBO) Referral",
-    ticketTypeUri: SOCIAL_CARE_REFERRAL_TICKET_TYPE
+    label: "Social Care (CBO) Referral",
+    ticketTypeUri: SOCIAL_CARE_REFERRAL_TICKET_TYPE,
+    future: true
   },
   {
     id: "uc5",
-    label: "Use Case 5: Payer Claims Adjudication",
-    ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE
+    label: "Payer Claims Adjudication",
+    ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
+    future: true
   },
   {
     id: "uc6",
-    label: "Use Case 6: Research Study",
-    ticketTypeUri: RESEARCH_STUDY_ACCESS_TICKET_TYPE
+    label: "Research Study",
+    ticketTypeUri: RESEARCH_STUDY_ACCESS_TICKET_TYPE,
+    future: true
   },
   {
     id: "uc7",
-    label: "Use Case 7: Provider-to-Provider Consult",
-    ticketTypeUri: PROVIDER_CONSULT_TICKET_TYPE
+    label: "Provider-to-Provider Consult",
+    ticketTypeUri: PROVIDER_CONSULT_TICKET_TYPE,
+    future: true
   }
 ];
 
