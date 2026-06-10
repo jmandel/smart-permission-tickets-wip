@@ -297,6 +297,13 @@ The base evidence shape is an embedded OpenID Connect ID token:
 }
 ```
 
+**How evidence is acquired.** The embedded token is issued by an identity provider — a party other than the ticket issuer — during an ordinary OpenID Connect sign-in. Two relying-party patterns produce it:
+
+* The **ticket issuer** signs the person in as its own relying party. The token's `aud` is the ticket issuer's client registration at the identity provider.
+* The **requesting app** performed the sign-in as its own relying party and passed the resulting token to the ticket issuer during issuance. The token's `aud` is the app's client registration at the identity provider.
+
+The verification rules below accept both patterns.
+
 **Base verification (both slots).** The embedded JWT is not trusted merely because it appears inside a signed Permission Ticket. When identity evidence is present, the Data Holder SHALL:
 
 * Parse the embedded JWT and verify its signature against the evidence issuer's published keys (for example, via OpenID Connect discovery from the token's `iss`).
