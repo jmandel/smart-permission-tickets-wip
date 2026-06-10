@@ -1,25 +1,30 @@
 {% include callouts.html %}
 
-**Status:** Experimental profile draft for discussion | **Author:** Josh Mandel | **Date:** May 27, 2026 (rev. June 9, 2026: narrowed to withholding only)
+**Status:** Experimental profile draft for discussion | **Author:** Josh Mandel | **Date:** May 27, 2026 (rev. June 10, 2026)
 
 ### Summary
 
-This proposal defines an experimental Permission Ticket profile for **withholding** sensitivity categories. The profile introduces a top-level `sensitivity_policy` claim that lets an issuer say: do not send data in these categories. It uses FHIR-compatible sensitivity codings.
+This proposal defines an experimental Permission Ticket profile for communicating sensitivity-category handling. The profile introduces a top-level `sensitivity_policy` claim with two kinds of rule, using FHIR-compatible codings:
 
-A withholding rule only ever narrows release. That gives it two properties no affirmative rule has: a Data Holder can honor it from any issuer without trusting that issuer (a request to send less cannot cause harm), and it can be enforced conservatively (when classification is uncertain, withhold more). It binds to labeling infrastructure that exists today — for example, CMS Blue Button tags 42 CFR Part 2-sensitive claims and filters them in B2B APIs.
+* **Withholding** — do not send data in these categories.
+* **Release authorization** — the issuer attests that these categories are within the authorization scope, subject to Data Holder policy and law.
 
-The claim is must-understand whenever present, because ignoring it could cause over-disclosure.
-
-**What this profile does not do.** It does not let a ticket authorize release of sensitive categories that local policy would otherwise hold back. That affirmative direction is the eventual payoff — a way for a patient to say "yes, include my behavioral health data" and have a restricted category flow — but it depends on standardized authorization workflows for sensitive categories, precise (not conservative) classification, and legal comfort with relying on an issuer-attested ceremony. None of those exists yet. When they do, an affirmative companion profile can be added without changing this one.
+This profile lives outside the base specification deliberately, and not because it is timid: its job is to lay out the *shape* of sensitive-data handling ahead of what base APIs can do today. The base kernel only carries what every conforming Data Holder can enforce now; this profile models where sensitive-data management needs to go, so that issuers, EHRs, and trust frameworks can build toward one shape instead of inventing several. The claim is must-understand whenever present: a Data Holder that cannot honor the stated rules rejects the ticket rather than silently letting the authorizing person's expectations fail.
 
 ### Motivation
 
-Two parties want withholding:
+Three parties need these rules:
 
-* **The patient or issuer**, excluding categories from a grant ("share my record, but not my substance-use history").
-* **The recipient itself**, as data minimization. A client that is not prepared or authorized to handle a category — and wants to insulate itself from the special handling obligations that come with it — can ask that the category never be sent. A Data Holder can honor that confidently because it only narrows release.
+* **The patient, through the issuer, restricting clients.** "Share my record with this app, but not my substance-use history." The patient's withholding choice is captured once, at the issuer, and travels in the ticket to every Data Holder — that is the core permission-ticket pattern applied to the data patients care most about.
+* **The recipient, minimizing its own intake.** A client not prepared to handle a category — and wanting to insulate itself from the special obligations that come with it — can ask that the category never be sent.
+* **The patient, unlocking access.** Today, when API policies filter restricted categories, there is often no field a patient can check to let their own data flow. A `release_authorized` entry is the signal that could change that: the issuer attests the patient's authorization covers the category, and the Data Holder decides under its own policy and law.
 
-Data Holders differ in how they classify restricted or legally protected data and whether classifications are available at API response time. This profile does not require any particular classification scheme; it requires that a Data Holder either enforce the withholding rule against its own classifications or reject the ticket.
+### Two Directions, Different Properties
+
+The two rule kinds carry different trust and enforcement properties. The profile states them plainly so trust frameworks can gate accordingly:
+
+* **Withholding** can be honored without trusting the issuer (a request to send less cannot expand access) and tolerates conservative enforcement — when classification is uncertain, withhold more. But conservative enforcement is not a free pass: a withholding rule the Data Holder cannot evaluate at all is a broken promise to the patient, which is why the claim is must-understand and fail-closed rather than best-effort.
+* **Release authorization** rests on the issuer's authorization ceremony and requires the Data Holder to trust that ceremony for sensitive categories specifically. It cannot be enforced conservatively in either direction: under-release defeats the patient's intent, over-release is a breach. Trust frameworks adopting this profile SHOULD define which issuers may assert `release_authorized`, for which categories, and what ceremony and evidence stand behind it.
 
 ### Profile Identifier
 
@@ -38,11 +43,14 @@ This profile does not define a new `ticket_type`. It is a composable profile tha
 | Field | Type | Description |
 |-------|------|-------------|
 | `withhold` | Coding[] | Sensitivity categories that SHALL be withheld if matched. |
-| `unlisted_sensitive_data` | `"local_policy"` \| `"withhold"` | How to treat locally classified sensitive data that does not match a `withhold` entry. `"local_policy"` (the default if absent) leaves it to the Data Holder's normal rules; `"withhold"` requires withholding all locally classified sensitive data. |
+| `release_authorized` | Coding[] | Sensitivity categories the issuer attests are within the authorization scope, subject to Data Holder policy and law. |
+| `unlisted_sensitive_data` | `"local_policy"` \| `"withhold"` \| `"release_authorized"` | How to treat locally classified sensitive data that matches neither list. Defaults to `"local_policy"` if absent. |
 
-At least one of `withhold` or `unlisted_sensitive_data` SHALL be present.
+At least one of `withhold`, `release_authorized`, or `unlisted_sensitive_data` SHALL be present. If `unlisted_sensitive_data` is `"withhold"`, the ticket requires withholding all locally classified sensitive data except categories explicitly listed in `release_authorized`. If it is `"release_authorized"`, the issuer attests that all locally classified sensitive data is within the authorization scope except categories explicitly listed in `withhold`.
 
-Each entry in `withhold` is a FHIR `Coding`:
+`unlisted_sensitive_data: "release_authorized"` is the broadest mode. It SHOULD only be used when the selected ticket-type profile or trust framework permits it and the issuer's authorization ceremony covers all locally classified sensitive data not otherwise withheld.
+
+Each entry in `withhold` or `release_authorized` is a FHIR `Coding`:
 
 ```json
 {
@@ -54,7 +62,7 @@ Each entry in `withhold` is a FHIR `Coding`:
 
 ### Example: Withhold a Category
 
-This ticket says the Data Holder must withhold data it classifies as substance-abuse-sensitive, while applying local policy to other sensitivity categories:
+The patient told the issuer not to share substance-use data with this app. Other sensitivity categories follow local policy:
 
 ```json
 {
@@ -71,7 +79,29 @@ This ticket says the Data Holder must withhold data it classifies as substance-a
 }
 ```
 
-### Example: Withhold All Locally Classified Sensitive Data
+### Example: Authorize One Category, Withhold Other Sensitive Data
+
+The patient authorized sharing HIV-related information; other locally classified sensitive data stays back unless separately authorized:
+
+```json
+{
+  "must_understand": ["sensitivity_policy"],
+  "sensitivity_policy": {
+    "release_authorized": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+        "code": "HIV",
+        "display": "HIV/AIDS information sensitivity"
+      }
+    ],
+    "unlisted_sensitive_data": "withhold"
+  }
+}
+```
+
+`release_authorized` does not force disclosure. It means the issuer attests this category is not outside the ticket's authorization scope. The Data Holder still applies local law, local policy, patient matching, and technical enforceability checks.
+
+### Example: Recipient Data Minimization
 
 A client doing routine medication reconciliation asks never to receive anything the Data Holder classifies as sensitive:
 
@@ -96,16 +126,17 @@ These codes identify categories. They do not by themselves define what data fall
 
 ### Processing Semantics
 
-`sensitivity_policy` is an additional access constraint. It narrows the data that may be returned; it never broadens `access`, client registration, or local policy.
+`sensitivity_policy` is an additional access constraint relative to `access`: it never broadens `access.permissions`, `data_period`, `data_holder_filter`, client registration, or what law permits. `release_authorized` operates on the Data Holder's own sensitivity gates — it can satisfy a local rule that conditions release on patient authorization, but it cannot override a rule that does not accept ticket-borne authorization.
 
 Data Holders implementing this profile SHALL:
 
 1. If `sensitivity_policy` is present, verify that `must_understand` includes `sensitivity_policy`.
-2. Withhold data matching a `withhold` category.
-3. If `unlisted_sensitive_data` is `"withhold"`, withhold all locally classified sensitive data.
-4. If `unlisted_sensitive_data` is absent or `"local_policy"`, apply local policy to locally classified sensitive data not matched by `withhold`.
-5. When classification is uncertain, withhold conservatively, or reject the request if the policy cannot be enforced at all.
-6. If the rule cannot be enforced, reject with `invalid_grant` and an appropriate `error_description`.
+2. Evaluate `withhold` before `release_authorized`. If data matches both, `withhold` wins.
+3. Withhold data matching a `withhold` category.
+4. Treat data matching a `release_authorized` category as within the ticket's authorization scope, releasing only if Data Holder policy, law, patient matching, and technical constraints permit.
+5. Apply `unlisted_sensitive_data` to locally classified sensitive data matching neither list: `"withhold"` withholds it, `"release_authorized"` treats it per rule 4, absent or `"local_policy"` applies local policy.
+6. When classification is uncertain, enforce `withhold` conservatively (withhold more); never resolve uncertainty in favor of release under rule 4.
+7. If a stated rule cannot be enforced at all, reject with `invalid_grant` and an appropriate `error_description` — silent partial enforcement is what breaks the authorizing person's expectations.
 
 This profile does not require Data Holders to reveal whether withheld sensitive data exists. Error descriptions and audit entries should not create that disclosure.
 
@@ -125,24 +156,30 @@ Issuers using this profile SHALL:
 
 - Include `sensitivity_policy` as a top-level claim and list it in `must_understand`.
 - Use code systems permitted by the incorporating ticket-type profile or trust framework.
-- Record whether each `withhold` rule was patient-requested, client-requested, issuer-imposed, or framework-imposed, for audit.
+- Distinguish withholding rules from release authorization in their records: note whether each `withhold` was patient-requested, client-requested, issuer-imposed, or framework-imposed, and retain the authorization ceremony evidence behind each `release_authorized` entry.
+- Avoid placing supporting sensitive documents directly in the ticket unless the incorporating profile explicitly requires that evidence.
 
 ### Relationship to Trust Frameworks
 
 Trust frameworks or ticket-type profiles incorporating this profile should define:
 
-- Which issuers and ticket types may carry `sensitivity_policy`.
+- Which issuers and ticket types may carry `sensitivity_policy`, and separately, which may assert `release_authorized` (the higher-trust direction).
 - Which code systems and codes are accepted.
+- What patient or requester authorization ceremony is required before an issuer may populate `release_authorized` or `unlisted_sensitive_data: "release_authorized"`.
 - Whether `withhold` rules may be client-requested, patient-requested, issuer-imposed, or trust-framework-imposed.
+- What evidence the issuer must retain, and how responders may audit issuer compliance.
 - How local mappings from EHR classifications to profile codes are validated or documented.
 
 ### Open Questions
 
-> **Open Question (OQ-5A): Disclosure Leakage.** How should a Data Holder respond when withholding applies and the Data Holder should not reveal whether such data exists?
+> **Open Question (OQ-5A): Disclosure Leakage.** How should a Data Holder respond when a category is requested but local policy, law, or patient preference prevents release and the Data Holder should not reveal whether such data exists?
 {: .callout .callout-open-question #oq-5a}
 
 > **Open Question (OQ-5B): Vocabulary Scope.** Should early implementations constrain this profile to v3 Information Sensitivity Policy codes, or also support confidentiality levels, privacy-law codes, or locally profiled value sets?
 {: .callout .callout-open-question #oq-5b}
 
-> **Open Question (OQ-5C): Unknown Classification.** Should the profile define an explicit behavior for resources whose sensitivity classification is unknown, or is conservative withholding under rule 5 sufficient?
+> **Open Question (OQ-5C): Unknown Classification.** Should the profile define an explicit behavior for resources whose sensitivity classification is unknown, or is `unlisted_sensitive_data` plus conservative withholding sufficient?
 {: .callout .callout-open-question #oq-5c}
+
+> **Open Question (OQ-5D): Release Authorization Prerequisites.** What authorization UX, classification precision, and trust-framework rules does a Data Holder need before honoring `release_authorized` for a category like 42 CFR Part 2 data, and who certifies that an issuer's ceremony meets the bar?
+{: .callout .callout-open-question #oq-5d}
