@@ -11,8 +11,12 @@ releaseLabel: ci-build
 pages:
   index.md:
     title: Permission Ticket Architecture
-  quickstart.md:
-    title: Implementer Quickstart
+  quickstart-data-holder.md:
+    title: "Quickstart: Data Holders"
+  quickstart-issuer.md:
+    title: "Quickstart: Issuers"
+  quickstart-client.md:
+    title: "Quickstart: Clients"
   use-case-catalog.md:
     title: Use Case Catalog
   patient-self-access.md:
@@ -25,6 +29,14 @@ pages:
     title: Payer Quality Gap Queries
   access-constraints.md:
     title: Access Constraints
+  fhir-resources.md:
+    title: "Constraint: fhir_resources"
+  data-period.md:
+    title: "Constraint: data_period"
+  data-holder-filter.md:
+    title: "Constraint: data_holder_filter"
+  claim-linkage.md:
+    title: "Constraint: claim_linkage"
   future-use-cases.md:
     title: Future Use Cases
   open-questions.md:
@@ -50,15 +62,18 @@ pages:
 
 menu:
   IG Home: index.html
-  Quickstart: quickstart.html
-  Access Constraints: access-constraints.html
+  Access Constraints:
+    "Overview": access-constraints.html
+    "fhir_resources": fhir-resources.html
+    "data_period": data-period.html
+    "data_holder_filter": data-holder-filter.html
+    "claim_linkage": claim-linkage.html
   Use Cases:
     "Use Case Catalog": use-case-catalog.html
     "Patient Self Access": patient-self-access.html
     "Patient-Delegated Access": patient-delegated-access.html
     "Payer Claims Adjudication": payer-claims-adjudication.html
     "Payer Quality Gap Queries": payer-quality-gap-queries.html
-  Open Questions: open-questions.html
   Proposals:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html
     "002: OpenID Federation Issuers": proposal-002-oidf-issuers.html
@@ -67,8 +82,13 @@ menu:
     "005: Sensitive Data Profile": proposal-005-sensitive-data-modeling.html
     "006: Well-Known JWKS Client Identity": proposal-006-well-known-client-identity.html
     "007: Issuer Accountability": proposal-007-issuer-accountability.html
-  Future Use Cases: future-use-cases.html
+  Quickstarts:
+    "Data Holders": quickstart-data-holder.html
+    "Issuers": quickstart-issuer.html
+    "Clients": quickstart-client.html
   More:
+    "Open Questions": open-questions.html
+    "Future Use Cases": future-use-cases.html
     "TypeScript Definitions": typescript-definitions.html
     "Downloads": downloads.html
     "Artifacts": artifacts.html
