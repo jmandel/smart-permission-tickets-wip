@@ -111,6 +111,26 @@ function renderUseCaseProfileRegistryTable(future: boolean): string {
   ].join("\n");
 }
 
+function renderPerProfileConstraintsTable(): string {
+  const rows = USE_CASE_CATALOG.filter((entry) => entry.profile)
+    .map((entry) => {
+      const label = entry.page ? `<a href="${entry.page}">${entry.label}</a>` : entry.label;
+      const profile = entry.profile!;
+      return `  <tr><td>${label}</td><td>${profile.presenterBinding}</td><td>${profile.requester}</td><td>${profile.identityEvidence}</td><td>${profile.accessConstraints}</td></tr>`;
+    })
+    .join("\n");
+  return [
+    "<table>",
+    "  <thead>",
+    "    <tr><th>Use Case</th><th><code>presenter_binding</code></th><th>Requester</th><th>Identity Evidence</th><th>Access Constraints</th></tr>",
+    "  </thead>",
+    "  <tbody>",
+    rows,
+    "  </tbody>",
+    "</table>",
+  ].join("\n");
+}
+
 function buildIndexSnippets(): void {
   const artifactExample: JsonObject = {
     iss: "https://trusted-issuer.org",
@@ -209,6 +229,7 @@ function buildIndexSnippets(): void {
   writeInclude("index/revocation-list.json.md", renderJsonFence(revocationListExample));
   writeInclude("index/use-case-profile-map.md", renderUseCaseProfileRegistryTable(false));
   writeInclude("index/future-use-case-map.md", renderUseCaseProfileRegistryTable(true));
+  writeInclude("index/per-profile-constraints.md", renderPerProfileConstraintsTable());
   writeInclude(
     "index/permission-ticket.schema.json.md",
     renderJsonFence(permissionTicketJsonSchema as JsonValue)

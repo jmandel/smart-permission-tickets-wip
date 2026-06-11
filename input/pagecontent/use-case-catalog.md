@@ -21,12 +21,7 @@ Patient Self Access is Ready; the other three ticket types are Modeled.
 
 The table below summarizes required and optional fields for each ticket type. Each profile pulls in the [access constraints](access-constraints.html) it needs; the Constraints section on each profile's page states which it draws and where the values come from.
 
-| Use Case | `presenter_binding` | Requester | Identity Evidence | Access Constraints |
-|----------|---------------------|-----------|-------------------|--------------------|
-| [Patient Self Access](patient-self-access.html) | Required | — | `subject_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
-| [Patient-Delegated Access](patient-delegated-access.html) | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
-| [Payer Claims Adjudication](payer-claims-adjudication.html) | Optional | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required |
-| [Payer Quality Gap Queries](payer-quality-gap-queries.html) | Optional | `Organization` (required) | — (requester is an organization) | `fhir_resources` (every entry narrowed), `data_period` required |
+{% include generated/spec-snippets/index/per-profile-constraints.md %}
 
 The Identity Evidence column applies the base rule from [Identity Evidence](index.html#identity-evidence) — evidence accompanies each natural person whose verified identity is the basis of the grant; per-type detail lives on each profile page.
 

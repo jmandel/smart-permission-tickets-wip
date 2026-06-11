@@ -418,15 +418,6 @@ The issuer does all real-world verification. The ticket carries only what the Da
 * Scope appropriateness (the requested access is within the delegation scope, study protocol, mandate authority, etc.)
 * Any jurisdiction-specific requirements
 
-#### What the Data Holder Uses from the Ticket
-
-* **For matching**: `subject.patient`, corroborated by verified `subject_identity_evidence` when present, to resolve to a local patient record
-* **For cryptographic validation**: signature, `iss` (issuer trust), `exp`, `aud`, `presenter_binding`
-* **For identity evidence validation**: `subject_identity_evidence` and `requester_identity_evidence`, whenever present — base verification rules plus profile-defined parameters
-* **For access filtering**: every constraint in `access`
-* **For local policy selection**: `requester` (type, identity, authority), `ticket_type`, and the type's profile claims — the Data Holder may apply different local policies based on these (e.g., broader release for a public health investigation than for a payer claim)
-* **For audit**: all of the above
-
 #### What the Data Holder Is Not Expected to Do
 
 * Repeat the issuer's verification of the delegation relationship, consent, mandate, or contract

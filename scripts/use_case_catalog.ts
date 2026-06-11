@@ -10,12 +10,20 @@ import {
   SOCIAL_CARE_REFERRAL_TICKET_TYPE,
 } from "./permission-ticket-schema";
 
+export type ProfileSummary = {
+  presenterBinding: string;
+  requester: string;
+  identityEvidence: string;
+  accessConstraints: string;
+};
+
 export type UseCaseCatalogEntry = {
   id: string;
   label: string;
   ticketTypeUri: PermissionTicketType;
   page?: string;
   future?: boolean;
+  profile?: ProfileSummary;
 };
 
 export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
@@ -23,13 +31,25 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
     id: "uc1",
     label: "Patient Self Access",
     ticketTypeUri: PATIENT_SELF_ACCESS_TICKET_TYPE,
-    page: "patient-self-access.html"
+    page: "patient-self-access.html",
+    profile: {
+      presenterBinding: "Required",
+      requester: "—",
+      identityEvidence: "<code>subject_identity_evidence</code> SHOULD",
+      accessConstraints: "<code>fhir_resources</code> required; <code>data_period</code>, <code>data_holder_filter</code> optional",
+    }
   },
   {
     id: "uc2",
     label: "Patient-Delegated Access",
     ticketTypeUri: PATIENT_DELEGATED_ACCESS_TICKET_TYPE,
-    page: "patient-delegated-access.html"
+    page: "patient-delegated-access.html",
+    profile: {
+      presenterBinding: "Required",
+      requester: "<code>RelatedPerson</code> (required)",
+      identityEvidence: "<code>subject_identity_evidence</code> SHOULD; <code>requester_identity_evidence</code> SHOULD",
+      accessConstraints: "<code>fhir_resources</code> required; <code>data_period</code>, <code>data_holder_filter</code> optional",
+    }
   },
   {
     id: "uc3",
@@ -47,7 +67,13 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
     id: "uc5",
     label: "Payer Claims Adjudication",
     ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
-    page: "payer-claims-adjudication.html"
+    page: "payer-claims-adjudication.html",
+    profile: {
+      presenterBinding: "Optional",
+      requester: "<code>Organization</code> (required)",
+      identityEvidence: "— (requester is an organization)",
+      accessConstraints: "<code>fhir_resources</code>, <code>claim_linkage</code> required",
+    }
   },
   {
     id: "uc6",
@@ -59,7 +85,13 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
     id: "payer-quality-gap",
     label: "Payer Quality Gap Queries",
     ticketTypeUri: PAYER_QUALITY_GAP_TICKET_TYPE,
-    page: "payer-quality-gap-queries.html"
+    page: "payer-quality-gap-queries.html",
+    profile: {
+      presenterBinding: "Optional",
+      requester: "<code>Organization</code> (required)",
+      identityEvidence: "— (requester is an organization)",
+      accessConstraints: "<code>fhir_resources</code> (every entry narrowed), <code>data_period</code> required",
+    }
   },
   {
     id: "uc7",
