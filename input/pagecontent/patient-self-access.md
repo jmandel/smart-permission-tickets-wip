@@ -30,7 +30,7 @@ Draws from the [constraint catalog](access-constraints.html). The authorizing pa
 
 ### Identity Evidence
 
-The patient's verified identity is the basis of this grant, so the ticket SHOULD carry `subject_identity_evidence`: the high-assurance identity token (for example, an IAL2 ID token) from the verification step — whether the issuer signed the patient in as its own relying party or the app performed the sign-in and passed the token to the issuer during issuance. Embedding the token lets the Data Holder check the identity claims itself instead of taking the issuer's word for them. How to verify the embedded token is defined in the [base specification](index.html#identity-evidence); this profile expects IAL2-grade assurance and enough demographics to match the patient. Trust frameworks MAY require the embedded token; `subject.patient` is present either way.
+The patient's verified identity is the basis of this grant, so the ticket SHOULD carry `subject_identity_evidence`: the high-assurance identity token (for example, an IAL2 ID token) from the verification step — whether the issuer signed the patient in as its own relying party or the app performed the sign-in and passed the token to the issuer during issuance. Embedding the token lets the Data Holder check the identity claims itself instead of taking the issuer's word for them. The [base specification](index.html#identity-evidence) defines how issuers and Data Holders verify who the embedded ID token was issued to; this profile expects IAL2-grade assurance and enough demographics to match the patient. Trust frameworks MAY require the embedded token; `subject.patient` is present either way.
 
 ### Policy Selection Inputs
 
@@ -48,7 +48,7 @@ One policy applies here: the Data Holder's patient self-access policy — the pa
 
 ### Variant: with identity evidence
 
-The same ticket carrying `subject_identity_evidence`. The embedded ID token's demographics match `subject.patient`, and its `aud` names the ticket issuer's client at the evidence issuer (the issuer-as-relying-party pattern; a token from the app's own sign-in would carry the app's client identifier instead):
+The same ticket carrying `subject_identity_evidence`. The embedded ID token's demographics match `subject.patient`, and its `aud` identifies the ticket issuer's OIDC client at the evidence issuer. A token from the app's own sign-in would carry the app's OIDC client identifier instead, and the issuer would verify that mapping before embedding it:
 
 {% include generated/signed-tickets/uc1-evidence-ticket.html %}
 

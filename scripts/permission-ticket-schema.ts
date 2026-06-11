@@ -207,11 +207,13 @@ export const DataHolderFilterSchema = z.discriminatedUnion("kind", [
   OrganizationFilterSchema,
 ]);
 
+export const AccessConstraintExtensionSchema = z.object({}).catchall(z.unknown());
+
 export const AccessGrantSchema = z.object({
   fhir_resources: z.array(FhirResourcePermissionSchema).min(1),
   data_period: FHIRPeriodSchema.optional(),
   data_holder_filter: z.array(DataHolderFilterSchema).min(1).optional(),
-}).strict();
+}).catchall(AccessConstraintExtensionSchema);
 
 const MinimalServiceRequestSchema = z.object({
   resourceType: z.literal("ServiceRequest"),
@@ -248,7 +250,7 @@ export const ClaimLinkageSchema = z.object({
 export const PayerClaimsAccessSchema = z.object({
   fhir_resources: z.array(FhirResourcePermissionSchema).min(1),
   claim_linkage: ClaimLinkageSchema,
-}).strict();
+}).catchall(AccessConstraintExtensionSchema);
 
 // Locked constraint set: exactly fhir_resources (every entry narrowed) +
 // data_period (the measurement or lookback period).
@@ -260,7 +262,7 @@ export const QualityGapAccessSchema = z.object({
     ),
   ).min(1),
   data_period: FHIRPeriodSchema,
-}).strict();
+}).catchall(AccessConstraintExtensionSchema);
 
 const TicketBaseSchema = z.object({
   iss: UriSchema,
@@ -379,6 +381,7 @@ export type JurisdictionFilter = z.infer<typeof JurisdictionFilterSchema>;
 export type OrganizationFilter = z.infer<typeof OrganizationFilterSchema>;
 export type DataHolderFilter = z.infer<typeof DataHolderFilterSchema>;
 export type TicketAudienceType = z.infer<typeof TicketAudienceTypeSchema>;
+export type AccessConstraintExtension = z.infer<typeof AccessConstraintExtensionSchema>;
 export type AccessGrant = z.infer<typeof AccessGrantSchema>;
 export type ClaimLinkage = z.infer<typeof ClaimLinkageSchema>;
 export type PayerClaimsAccess = z.infer<typeof PayerClaimsAccessSchema>;

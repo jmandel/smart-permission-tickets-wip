@@ -261,7 +261,7 @@ The Data Holder SHALL validate in two layers:
     *   **Verify Envelope:** Confirm `exp` has not passed and `aud` matches this Data Holder (see [Ticket Audience](#ticket-audience-aud-and-effective-eligible-data-holder-set)).
     *   **Check Revocation:** If `revocation` is present, check the ticket's revocation status; if status cannot be determined, reject (see [Revocation](#revocation)).
     *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`. If the selected ticket type requires binding and it is absent, reject.
-    *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per [Identity Evidence](#identity-evidence) — signature, evidence-issuer trust, temporal validity, audience, and demographic consistency with the party in that slot — plus the selected profile's assurance and claim parameters.
+    *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per [Identity Evidence](#identity-evidence) — signature, evidence-issuer trust, temporal validity, who the embedded ID token was issued to, and demographic consistency with the party in that slot — plus the selected profile's assurance and claim parameters.
     *   **Process Kernel Fields:** Every kernel field present in the ticket must be handled. Enforced fields — including every member of `access` — SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Field Handling and Extensions](#field-handling-and-extensions).
     *   **Verify Required Claims:** Confirm every claim the selected ticket type requires is present and well-formed (for example, the delegated-access authority coding, or a required constraint such as the payer profile's `claim_linkage`); reject with `invalid_grant` if missing.
     *   **Resolve Subject:** Resolve the subject to a unique local patient record; reject on zero or ambiguous matches (see [Subject Resolution](#subject-resolution)).
@@ -296,23 +296,35 @@ The base evidence shape is an embedded OpenID Connect ID token:
 }
 ```
 
-**How evidence is acquired.** The embedded token is issued by an identity provider — a party other than the ticket issuer — during an ordinary OpenID Connect sign-in. Two relying-party patterns produce it:
+**How evidence is acquired.** The embedded token is issued by an identity provider — a party other than the ticket issuer — during an ordinary OpenID Connect sign-in. The token's `aud`, qualified by `azp` when the token carries one, identifies the OIDC client the token was issued to. A ticket-type profile MAY designate another claim for this purpose. Two patterns produce evidence:
 
-* The **ticket issuer** signs the person in as its own relying party. The token's `aud` is the ticket issuer's client registration at the identity provider.
-* The **requesting app** performed the sign-in as its own relying party and passed the resulting token to the ticket issuer during issuance. The token's `aud` is the app's client registration at the identity provider.
+* The **ticket issuer** signs the person in. The ID token was issued to the ticket issuer's OIDC client.
+* The **requesting client** signs the person in and passes the resulting token to the ticket issuer during issuance. The ID token was issued to the requesting client's OIDC client.
 
 The verification rules below accept both patterns.
+
+If the ticket issuer verifies the person's identity itself at the required assurance level, it SHOULD omit the corresponding evidence slot. A self-issued ID token, where the evidence `iss` equals the ticket `iss`, adds no assurance beyond the ticket signature. In that case, the assurance is an issuer-attested fact backed by the trust framework's requirements on the issuer's verification practices.
+
+**Resolving who the ID token was issued to.** The ID token's `aud`/`azp` ties the sign-in to this ticket's issuance or presentation. The identifier does not always literally equal the OAuth client identifier the verifier sees later. It may be an OIDC client ID at the evidence issuer, while the issuer or Data Holder knows the same software by a URL, registration record, UDAP identity, or trust-framework entity. A verifier may rely on exact string equality or on a recognized mapping, such as registration records, issuer metadata, or a trust-framework directory.
+
+At issuance, before embedding client-obtained evidence, the issuer SHALL verify that the ID token was issued to the same client it authenticated in the issuance ceremony. If the issuer cannot verify that link by exact match or recognized mapping, it SHALL NOT embed the evidence. An issuer that can run its own sign-in MAY embed issuer-obtained evidence instead; an issuer that cannot supply evidence a selected ticket type requires cannot mint that ticket.
+
+At redemption, the Data Holder SHALL verify that the ID token was issued either to the ticket issuer or to the presenting client. Profiles MAY allow only one of those choices. This proves the sign-in happened as part of issuing or presenting this ticket, not as part of some unrelated application's sign-in.
+
+The embedded ID token is not issued to the Data Holder. Data Holders SHALL NOT expect their own URL or client identifier in the embedded token's `aud`.
+
+If a ticket type allows one party to obtain identity evidence and a different party to present the ticket, the ticket-type profile SHALL define which ID-token audience the Data Holder accepts.
 
 **Base verification (both slots).** The embedded JWT is not trusted merely because it appears inside a signed Permission Ticket. When identity evidence is present, the Data Holder SHALL:
 
 * Parse the embedded JWT and verify its signature against the evidence issuer's published keys (for example, via OpenID Connect discovery from the token's `iss`).
 * Confirm the evidence issuer is accepted for identity evidence under the Data Holder's configured trust policy. Evidence-issuer trust is configured separately from ticket-issuer trust.
 * Confirm the evidence was temporally valid when the ticket was issued (the ticket's `iat`) — the evidence records a verification event at issuance time, not a live authentication at redemption time.
-* Confirm who the evidence was issued to: the token's `aud` (and `azp`, when present) SHALL identify either the ticket issuer (via a client identifier the Data Holder's trust policy associates with it) or the presenting client itself. This proves the sign-in happened as part of issuing or presenting this ticket — not harvested from some other application's sign-in. Profiles MAY allow only one of these.
+* Confirm who the evidence was issued to by resolving the embedded ID token's `aud`/`azp` as described above.
 * Use the token's standard OpenID Connect claims (for example `given_name`, `family_name`, `birthdate`) as verified demographics: for subject resolution when carried in `subject_identity_evidence`, or to corroborate `requester` when carried in `requester_identity_evidence`.
 * Confirm the evidence describes the party in its slot: verified demographics in `subject_identity_evidence` SHALL be consistent with `subject.patient`, and in `requester_identity_evidence` with `requester`. The two slots share one verification pipeline, so this check is what stops evidence for one party from vouching for the other.
 
-The evidence `aud` never names the Data Holder itself — Data Holders SHALL NOT expect their own identifier there. How a Data Holder learns which client identifiers belong to a ticket issuer is deployment configuration: issuer metadata, a trust-framework directory, or direct configuration.
+**Evidence alongside the ticket.** Embedded evidence records a verification event at issuance time; that is what the temporal rule above checks. Some redemption-time policies want fresher proof, such as a recent `auth_time`. This base specification does not define a way to present identity evidence alongside the ticket at redemption; profiles MAY define a carrier for it. When a profile does, and a redemption carries both embedded and alongside evidence for the same subject, the two SHALL be consistent, with the comparison defined by the profile.
 
 **Profile parameters.** Ticket-type profiles and trust frameworks set the parameters of this base verification: which evidence issuers are acceptable, required assurance (for example, IAL2 or specific `acr` values), required claims, and any freshness window tighter than the base rule.
 
@@ -617,7 +629,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Validate client authentication per the locally supported OAuth client-authentication mechanism (for example, SMART Backend Services or UDAP)
 - Verify the ticket's signature, `ticket_type`, `aud`, and `exp`
 - If `presenter_binding` is present, verify it according to `presenter_binding.method`
-- If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per the base Identity Evidence rules (signature, evidence-issuer trust, temporal validity, audience, demographic consistency with the party in that slot) and any profile-defined assurance and claim requirements
+- If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per the base Identity Evidence rules (signature, evidence-issuer trust, temporal validity, who the embedded ID token was issued to, demographic consistency with the party in that slot) and any profile-defined assurance and claim requirements
 - Validate `ticket_type` is recognized (listed in `smart_permission_ticket_types_supported`) and select processing rules accordingly
 - Reject with `invalid_grant` if any present kernel field cannot be enforced
 - Resolve the ticket subject to a local patient record using `subject.patient`, corroborated by verified `subject_identity_evidence` when present; reject if zero or ambiguous matches
@@ -662,11 +674,13 @@ For clients using the well-known JWKS identity approach, see [Proposal 006](prop
 - Include `aud_type: "trust_framework"` when `aud` identifies a trust framework
 - When using `presenter_binding`, bind the ticket appropriately with one method (`jkt` or `trust_framework_client`)
 - When the ticket type requires identity evidence, include the applicable `subject_identity_evidence` or `requester_identity_evidence`
+- When embedding client-obtained identity evidence, verify that the embedded ID token was issued to the same client authenticated in the issuance ceremony, either by exact match or recognized mapping; if that link cannot be verified, do not embed the evidence
 - Verify the facts it attests (patient identity, requester identity and authority, legal basis, scope appropriateness) before minting, according to the selected ticket type and trust framework
 - If `revocation` is present, publish the status list at the URL specified in tickets
 
 **SHOULD:**
 - Include identity evidence for each individual whose verified identity is the basis of the grant, per the ticket-type profile
+- Omit identity evidence the issuer issued itself; a self-issued ID token adds no assurance beyond the ticket signature
 - Give the authorizing person a revocation management URL at grant time, reachable without the client's cooperation
 - Use short expiration for interactive use cases (1-4 hours)
 - Support revocation for long-lived tickets

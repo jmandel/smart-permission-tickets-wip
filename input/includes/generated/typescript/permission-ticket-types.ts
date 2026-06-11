@@ -90,10 +90,13 @@ export type OrganizationFilter = {
 
 export type DataHolderFilter = JurisdictionFilter | OrganizationFilter;
 
+export type AccessConstraintExtension = Record<string, unknown>;
+
 export type AccessGrant = {
   fhir_resources: NonEmptyArray<FhirResourcePermission>;
   data_period?: FHIRPeriod;
   data_holder_filter?: NonEmptyArray<DataHolderFilter>;
+  [constraint: string]: unknown;
 };
 
 export type ClaimLinkage = {
@@ -104,11 +107,13 @@ export type ClaimLinkage = {
 export type PayerClaimsAccess = {
   fhir_resources: NonEmptyArray<FhirResourcePermission>;
   claim_linkage: ClaimLinkage;
+  [constraint: string]: unknown;
 };
 
 export type QualityGapAccess = {
   fhir_resources: NonEmptyArray<FhirResourcePermission>;
   data_period: FHIRPeriod;
+  [constraint: string]: unknown;
 };
 
 export type PermissionTicketBase = {

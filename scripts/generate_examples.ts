@@ -87,8 +87,8 @@ const uc1_payload: PermissionTicket = {
 
 // ─── UC1 variant: Patient Self Access with identity evidence ─────────────────
 // The embedded id_token is minted at generation time (see generate()) and its
-// demographics match subject.patient. The token's aud names the ticket issuer's
-// client at the evidence issuer, per the base audience-binding rule.
+// demographics match subject.patient. The token's aud identifies the ticket
+// issuer's OIDC client at the evidence issuer.
 
 const uc1_evidence_payload: PermissionTicket = {
     ...uc1_payload,

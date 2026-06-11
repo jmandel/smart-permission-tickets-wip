@@ -77,4 +77,3 @@ Draft requirements:
 ### Relationship to the Base Specification
 
 The base specification states only that Data Holders are not required to issue refresh tokens after ticket redemption, and that any local continuation credential SHALL NOT authorize broader access than the effective grant computed at redemption time. Everything beyond that — the `continuation` claim, its lifetime bound, and its revocation linkage — lives in this proposal and is not part of base conformance unless adopted by the base or by a ticket-type profile.
-

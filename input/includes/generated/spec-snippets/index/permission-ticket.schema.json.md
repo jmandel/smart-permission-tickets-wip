@@ -510,7 +510,11 @@
           "required": [
             "fhir_resources"
           ],
-          "additionalProperties": false
+          "additionalProperties": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
         },
         "ticket_type": {
           "type": "string",
@@ -1161,7 +1165,11 @@
           "required": [
             "fhir_resources"
           ],
-          "additionalProperties": false
+          "additionalProperties": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
         },
         "ticket_type": {
           "type": "string",
@@ -1744,7 +1752,11 @@
           "required": [
             "fhir_resources"
           ],
-          "additionalProperties": false
+          "additionalProperties": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
         },
         "ticket_type": {
           "type": "string",
@@ -2355,7 +2367,11 @@
           "required": [
             "fhir_resources"
           ],
-          "additionalProperties": false
+          "additionalProperties": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
         },
         "ticket_type": {
           "type": "string",
@@ -3047,7 +3063,11 @@
             "fhir_resources",
             "claim_linkage"
           ],
-          "additionalProperties": false
+          "additionalProperties": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
         },
         "ticket_type": {
           "type": "string",
@@ -3630,7 +3650,11 @@
           "required": [
             "fhir_resources"
           ],
-          "additionalProperties": false
+          "additionalProperties": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
         },
         "ticket_type": {
           "type": "string",
@@ -4304,7 +4328,11 @@
           "required": [
             "fhir_resources"
           ],
-          "additionalProperties": false
+          "additionalProperties": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
         },
         "ticket_type": {
           "type": "string",
@@ -4876,7 +4904,11 @@
             "fhir_resources",
             "data_period"
           ],
-          "additionalProperties": false
+          "additionalProperties": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
         },
         "ticket_type": {
           "type": "string",

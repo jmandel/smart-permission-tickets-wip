@@ -22,4 +22,3 @@ For example, an entry `{ type: "Observation", interactions: ["read", "search"] }
 The `category` and `code` narrowings do not project into scope strings. The OAuth scope surface carries the resource-type and interaction grain only; the Data Holder enforces the narrowings from the ticket itself, at the token endpoint, the resource server, or both.
 
 FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base kernel. A future profile may add operation-level permissions when a use case requires them.
-
