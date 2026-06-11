@@ -7,7 +7,7 @@
 
 A Permission Ticket is a **signed access ticket**: an issuer-signed JWT that a client presents to a Data Holder's token endpoint via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). It lets a client ask a Data Holder for a local access token without repeating the whole authorization or verification workflow at every Data Holder. The ticket is portable: the same ticket can be presented at any Data Holder within its intended audience, without requiring the issuer to know where the subject has received care.
 
-The ticket is built around a **portable kernel**: only the signed fields that a Data Holder plausibly needs to say yes or no to a request live in the common shell. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), and an **access** object holding the ticket's access constraints (what may be released). A ticket type may add top-level profile claims for the facts its use case needs.
+The ticket is built around a **portable kernel**: the kernel carries only the signed fields that a Data Holder plausibly needs to say yes or no to a request. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), and an **access** object holding the ticket's access constraints (what may be released). A ticket type may add top-level profile claims for the facts its use case needs.
 
 These fields are **policy-selection inputs**. Data Holders already maintain internal access policies — for self-access, proxy classes, B2B disclosure, and more. The ticket carries enough issuer-verified facts about who is asking, about whom, and why, for the Data Holder to select the correct local policy, even for a requester it has never seen. The ticket selects among the Data Holder's policies; it does not rewrite them. If the Data Holder accepts the ticket, it issues a local access token scoped by the ticket, the client's request and eligibility, the selected ticket type, and the Data Holder's own policies and technical capabilities.
 
@@ -21,8 +21,8 @@ The ticket artifact first ([Ticket Structure](#artifact-ticket-structure), [Pres
 
 The ticket carries only what a Data Holder needs at redemption time. This table shows where each kind of information belongs:
 
-| Information | Usually belongs in |
-|-------------|--------------------|
+| Information | Belongs in |
+|-------------|------------|
 | Who signed the ticket | Ticket (`iss`, signature) |
 | Who the data is about | Ticket (`subject`, identity evidence) |
 | Who is asking, and why they can ask | Ticket (`requester`, ticket type, profile claims) |
@@ -45,7 +45,7 @@ The ticket carries only what a Data Holder needs at redemption time. This table 
 - Audience validation for single-Data-Holder and network-wide audience sets
 - Subject resolution and validation rules
 - Access calculation and access constraint enforcement
-- Must-understand semantics for base kernel fields and profile extensions
+- Field handling rules for kernel fields and profile extensions
 - Four ticket types, each with its own maturity status in the [Use Case Catalog](use-case-catalog.html); additional candidates are tracked in [Future Use Cases](future-use-cases.html)
 
 **This specification does not define:**
@@ -245,7 +245,7 @@ In all modes, the Data Holder authenticates the presenting client through its st
 
 #### Presenter Binding per Ticket Type
 
-Whether `presenter_binding` is required is a ticket-type rule: the individual-access types (patient self access, patient-delegated access) require it, and both payer types require it; other B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
+Whether `presenter_binding` is required is a ticket-type rule; every catalog type requires it. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
 
 ### Server-Side Validation
 The Data Holder SHALL validate in two layers:
@@ -352,7 +352,7 @@ The `access` object describes the maximum access the issuer is asking the Data H
 
 If the intersection yields no valid access, return `invalid_scope` error.
 
-Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes depending on ticket type. The `patient/*` versus `system/*` scope prefix reflects the OAuth client/access mode at the Data Holder, not whether the ticket is single-patient or population-level. In the current base kernel, every ticket identifies a single patient via `subject.patient`. For single-patient ticket types, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
+Requested scopes SHALL use SMART scope grammar. This specification allows either `patient/*` or `system/*` scopes. The prefix reflects the OAuth client/access mode at the Data Holder, not whether the ticket is single-patient or population-level. In the current base kernel, every ticket identifies a single patient via `subject.patient`. For single-patient ticket types, clients SHOULD request SMART v2 CRUDS suffix scopes (for example, `patient/Observation.rs`).
 
 #### Access Constraints
 
@@ -462,14 +462,6 @@ When `aud` is a **trust framework identifier**, the Data Holder SHALL be a verif
 ```json
 { "aud": "https://tefca.hhs.gov", "aud_type": "trust_framework" }
 ```
-
-#### Recommendations
-
-| Scenario | Recommended `aud` |
-|----------|-------------------|
-| Ticket for known single Data Holder | Specific Data Holder URL |
-| Ticket valid across a network | Trust framework identifier |
-| Ticket for multiple known Data Holders | Array of Data Holder URLs |
 
 Data Holders SHALL reject tickets where `aud` validation fails with error `invalid_grant` and `error_description`: "Ticket not valid for this server".
 

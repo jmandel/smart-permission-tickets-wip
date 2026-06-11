@@ -15,12 +15,7 @@ Ticket types are identified by their `ticket_type` URIs and referred to by name.
 | **Ready** | The underlying workflow is real today; ready for first implementations. |
 | **Modeled** | Fields and processing rules are drafted in detail, but no real-world deployments exercise this flow yet. |
 
-| Use Case | Status |
-|----------|--------|
-| Patient Self Access | Ready |
-| Patient-Delegated Access | Modeled |
-| Payer Claims Adjudication | Modeled |
-| Payer Quality Gap Queries | Modeled |
+Patient Self Access is Ready; the other three ticket types are Modeled.
 
 ### Per-Profile Constraints
 
@@ -33,7 +28,7 @@ The table below summarizes required and optional fields for each ticket type. Ea
 | Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required |
 | Payer Quality Gap Queries | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources` (every entry narrowed), `data_period` required |
 
-**Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For patient self access that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For delegated access that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
+The Identity Evidence column applies the base rule from [Identity Evidence](index.html#identity-evidence) — evidence accompanies each natural person whose verified identity is the basis of the grant; per-type detail lives in each profile section below.
 
 Each use case section below follows a common template, including **Policy Selection Inputs**. `ticket_type` tells the Data Holder what kind of request this is (self-access, proxy access, claims review, …); the inputs listed per use case are the ticket fields that help it pick the right one of its own internal policies for this specific request. Tickets help the Data Holder pick a policy; they do not create new policies or override existing ones.
 
@@ -126,7 +121,7 @@ Both evidence slots apply here because a proper issuer verifies both people: the
 
 #### Constraints
 
-Draws from the [constraint catalog](access-constraints.html). The authorizing party is the patient — or the instrument that confers authority — not the delegate who presents the ticket, so each definition's authorizing-party language is owed during the delegation ceremony. The Data Holder's proxy policy narrows below the ticket: a granted scope never overrides what local policy lets this class of requester see.
+Draws from the [constraint catalog](access-constraints.html). The authorizing party is the patient — or the instrument that confers authority — not the delegate who presents the ticket, so the issuer presents each definition's authorizing-party language during the delegation ceremony. The Data Holder's proxy policy narrows below the ticket: a granted scope never overrides what local policy lets this class of requester see.
 
 * **`fhir_resources`** (required) — the ceiling the patient set when granting the delegation.
 * **`data_period`** (optional) — a time bound set at the same ceremony.
@@ -177,7 +172,7 @@ The issuer keeps the source documents (POA instruments, delegation records, cour
 
 #### Open Questions
 
-> **Open Question: Per-Ticket Verification Class.** Should each ticket also say *how* the issuer verified the authority (portal delegation record, examined instrument, court order)? Or is it enough that each code carries defined issuer obligations, audited through the trust framework? The working group plans to review this with health-system authorization and release-of-information experts.
+> **Open Question (OQ-UC2-VERIFY): Per-Ticket Verification Class.** Should each ticket also say *how* the issuer verified the authority (portal delegation record, examined instrument, court order)? Or is it enough that each code carries defined issuer obligations, audited through the trust framework? The working group plans to review this with health-system authorization and release-of-information experts.
 {: .callout .callout-open-question #oq-verification-class}
 
 #### Example
@@ -223,7 +218,7 @@ The constraint set for this type is exactly these two. `data_period` is not part
 #### Restricted Data
 
 * Records restricted from disclosure to the payer are excluded silently. The base rule already covers this — a valid ticket does not override local rules — and the issuer is the Data Holder, which holds its own restriction flags. The leading case is the HIPAA right to restrict ([45 CFR 164.522(a)(1)(vi)](https://www.ecfr.gov/current/title-45/section-164.522)): a provider must honor a patient's request not to disclose to a health plan information about items or services paid out of pocket in full.
-* The payer is told the response may be lawfully incomplete (the client section above). Treating a filtered response as the complete record is the failure that sentence prevents.
+* The payer is told the response may be lawfully incomplete (the client section above). The payer must not treat a filtered response as the complete record.
 * When the patient has authorized disclosure of restricted items to the plan, the ticket says so explicitly: a `sensitivity_release_authorized` claim per [Proposal 005](proposal-005-sensitive-data-modeling.html), using the v3-ActCode `HIPAASelfPay` security label policy code — never a silent widening of the default.
 
 #### Policy Selection Inputs
@@ -293,7 +288,7 @@ Draws from the [constraint catalog](access-constraints.html), nothing new define
 * **`fhir_resources`** (required) — the elements, one entry per element: `{ "type": "Observation", "code": { "system": "http://loinc.org", "code": "4548-4" } }` is an HbA1c query. Every entry SHALL carry a `category` or `code` narrowing; an un-narrowed entry is a chart section, which is not what this type authorizes.
 * **`data_period`** (required) — the measurement or lookback period from the measure specification; without it a quality query is unbounded history. When a measure's elements carry different lookbacks — a ten-year colonoscopy window beside a one-year FIT window — mint one ticket per lookback; one wide window would over-expose the short-lookback elements.
 
-The constraint set for this type is exactly these two. `claim_linkage` is not part of it (there is no claim), and `data_holder_filter` is not part of it (the audience is a single named Data Holder). Cross-cutting constraints such as `sensitivity_withhold` MAY be added, with the standard consequence.
+The constraint set for this type is exactly these two. `claim_linkage` is not part of it (there is no claim), and `data_holder_filter` is not part of it (the audience is a single named Data Holder). Cross-cutting constraints such as `sensitivity_withhold` MAY be added; servers that do not enforce them reject the ticket.
 
 #### Policy Selection Inputs
 
@@ -312,7 +307,7 @@ The constraint set for this type is exactly these two. `claim_linkage` is not pa
 
 * That the response is the complete record; restricted data is excluded without notice.
 * That the member attribution behind the query is current; the issuer attests it, and trust frameworks decide what stands behind that attestation.
-* That this ticket type supports chart retrieval. It authorizes named elements; a request shaped like a chart pull belongs to a different conversation.
+* That this ticket type supports chart retrieval. It authorizes named elements; a request shaped like a chart pull is out of scope for this type.
 
 #### Open Questions
 

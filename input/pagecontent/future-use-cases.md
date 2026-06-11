@@ -14,7 +14,7 @@ These use cases are not part of the near-term implementable catalog. Most are sk
 
 Public health follow-up is well suited to ticket-based exchange: the requester is an organization, the request is tied to a concrete triggering event (a reportable condition), and the Data Holder can decide from the ticket alone — no user needs to sign in.
 
-In many jurisdictions, law already requires providers to respond to these queries. A ticket does not add a new gate on top of that obligation, and its absence does not create a right to refuse a legally mandated query. The ticket's job is to make an automated yes cheaper: it gives the responding system a verifiable, well-scoped request it can act on without a phone call.
+In many jurisdictions, law already requires providers to respond to these queries. A ticket does not add a new gate on top of that obligation, and its absence does not create a right to refuse a legally mandated query. The ticket's job is to make compliance cheaper: it gives the responding system a verifiable, well-scoped request it can act on without a phone call.
 
 #### Typical Flow
 
@@ -25,8 +25,8 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 * **Subject:** `Patient` (matched by demographics or identifier).
 * **Requester:** `Organization` (public health agency), identified well enough for directory matching (name, identifiers).
 * **Profile claims:** `reportable_condition` (coded condition), a top-level claim — says which investigation the request belongs to.
-* **Access:** `fhir_resources` required; `data_period` and `data_holder_filter` typical.
-* **Presenter binding:** Optional (B2B; `aud` + client authentication generally suffice).
+* **Access:** `fhir_resources` required; `data_period` and `data_holder_filter` optional.
+* **Presenter binding:** Optional (B2B; `aud` + client authentication provide the trust boundary).
 
 #### Policy Selection Inputs
 
@@ -73,5 +73,5 @@ Sketch: requester is an `Organization` (research institute); a `study` profile c
 
 Parked, not just immature: the natural issuer here is the referring provider's system — the same system the specialist would query — and a system that can mint a ticket for itself can simply grant access directly. Until someone shows where a signed, portable artifact adds value in this flow, this use case is on hold.
 
-> **Open Question (OQ-UC7-DESIGN): Core UC7 Design.** Three basics are unsettled. **Who is the requester?** Referrals usually go to an organization, and nobody knows which specialist will pick up the consult when the ticket would be minted. **Who mints the ticket?** The obvious issuer is the referring provider's system — but that is the same system the specialist will query. **Can EHRs apply the right policy?** An outside specialist has no user account at the referring system, and vendors say they treat that case as generic B2B trust today.
+> **Open Question (OQ-UC7-DESIGN): Core Consult Design.** Three basics are unsettled. **Who is the requester?** Referrals usually go to an organization, and nobody knows which specialist will pick up the consult when the ticket would be minted. **Who mints the ticket?** The obvious issuer is the referring provider's system — but that is the same system the specialist will query. **Can EHRs apply the right policy?** An outside specialist has no user account at the referring system, and vendors say they treat that case as generic B2B trust today.
 {: .callout .callout-open-question #oq-uc7-design}

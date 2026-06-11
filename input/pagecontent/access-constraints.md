@@ -4,7 +4,7 @@ This page is the registry of access constraints: the named members of `access`, 
 
 ### Constraint Model
 
-The `access` object holds the ticket's **access constraints**. Each member of `access` is a named constraint with a published definition — in this specification for the base constraints, or in a ticket-type profile for additional ones. Three rules govern every constraint:
+The `access` object holds the ticket's **access constraints**. Each member of `access` is a named constraint with a published definition — in this specification or in a ticket-type profile. Four rules govern every constraint:
 
 1. **Unrecognized means reject.** A Data Holder SHALL reject a ticket whose `access` contains a member it does not recognize and enforce, with `invalid_grant` and an `error_description` naming the unsupported constraint. There is no issuer opt-in and no capability negotiation: ignoring an access constraint always releases more than the issuer authorized, so unrecognized constraints fail closed.
 2. **Constraints only narrow.** No constraint broadens what another constraint, the requested scopes, the client's eligibility, or the Data Holder's policy would allow. Constraints combine by intersection (see [Constraint Algebra](#constraint-algebra)).
@@ -21,7 +21,7 @@ There is no tiered constraint vocabulary — just this catalog, assembled in dif
 | `claim_linkage` | [This page](#claim_linkage), for [Payer Claims Adjudication](use-case-catalog.html#payer-claims-adjudication) | Release limited to records the Data Holder associates with a referenced claim or prior authorization. |
 | `sensitivity_withhold` | [Proposal 005](proposal-005-sensitive-data-modeling.html) | Do not release data in the named sensitivity categories. |
 
-The three constraints defined on this page use machinery FHIR servers already have — `fhir_resources` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
+Three of these constraints use machinery FHIR servers already have — `fhir_resources` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
 
 Ticket-type profiles declare which constraints their tickets carry and may define new ones (see [Defining New Access Constraints](#defining-new-access-constraints)). A Data Holder that advertises a ticket type enforces every constraint the type declares, so any valid ticket of a supported type is accepted with no pre-coordination.
 
@@ -36,11 +36,11 @@ A constraint definition serves four parties, and it is complete when it answers 
 | **For the client** | Client | What the client can rely on and plan around, and what it must not assume. |
 | **For the Data Holder** | Data Holder | Exactly what is enforced. Enforcement must be determinate: given the Data Holder's facts, two implementations reach the same answer. The facts may be the Data Holder's own — `data_holder_filter` works this way. Any discretion is stated here with its direction: narrowing release is always allowed; anything that widens release must be named and bounded. |
 
-The base constraint definitions below follow this template, and profiles defining new constraints SHALL cover the same four sections. A definition that skips a section surfaces the gap later as a mismatch between what an authorization screen promised and what a server enforced.
+The constraint definitions below follow this template, and profiles defining new constraints SHALL cover the same four sections. A definition that skips a section surfaces the gap later as a mismatch between what an authorization screen promised and what a server enforced.
 
 ### `fhir_resources`
 
-**Shape and validity.** Required. An array of one or more entries. Each entry carries a FHIR resource `type`, one or more `interactions` (`create`, `read`, `update`, `delete`, `search`), and optionally one narrowing `category` coding and one narrowing `code` coding. An entry is a single conjunction: a resource matches it by being of the `type` and matching the `category` and `code` when present. There are no value lists inside an entry — a grant covering several categories or codes carries several entries. The issuer derives entries from the authorizing party's sharing decision or from the scope of access the ticket type defines. Omitting a type is the issuer's brake on automated release of whole kinds — clinical notes routed through human review, for example.
+**Shape and validity.** Required. An array of one or more entries. Each entry carries a FHIR resource `type`, one or more `interactions` (`create`, `read`, `update`, `delete`, `search`), and optionally one narrowing `category` coding and one narrowing `code` coding. An entry is a single conjunction: a resource matches it by being of the `type` and matching the `category` and `code` when present. There are no value lists inside an entry — a grant covering several categories or codes carries several entries. The issuer derives entries from the authorizing party's sharing decision or from the scope of access the ticket type defines. By omitting a type, the issuer keeps an entire record type out of automated release — clinical notes routed through human review, for example.
 
 **For the authorizing party.** Each entry is one kind of record being shared — immunizations, lab results, conditions. One screen choice, one entry. An entry without `category` or `code` means all records of that type.
 
@@ -124,13 +124,13 @@ Issuers SHOULD use directory or network information (published endpoint networks
 #### Organization Filters
 
 * Organization filters positively scope which Data Holders may answer.
-* Matching is by organizational identity, typically an NPI carried in `organization.identifier`.
+* Matching is by organizational identifier — for example, an NPI carried in `organization.identifier`.
 * A Data Holder may answer if it matches the named organization or is authorized to answer on that organization's behalf.
 * This filter is endpoint-agnostic. If a Data Holder operates multiple technical endpoints, a single organization filter authorizes access through any endpoint by which that organization is authorized to answer and that supports the Permission Ticket grant type.
 * Data Holders that manage integrated records across multiple facilities evaluate this filter at the Data Holder level, not as a resource-by-resource clinical data filter.
 * A Data Holder answering on behalf of a named organization that is served through a broader shared system MAY narrow its response to that organization's records, if its architecture supports the attribution. Narrowing is permitted, not promised: the filter still gates who may answer, and acceptance still typically returns the combined record.
 
-> **Open Question: Custodian-Level Targeting.** Should `data_holder_filter` gain an explicit custodian-scoped form — "answer only with this organization's records," enforce-or-reject — once vendors can attribute records to custodian organizations and network directories carry custodian-level identities? Today, narrowing is best-effort (above). Do existing network directories model custodian-level entries at all?
+> **Open Question (OQ-CUSTODIAN): Custodian-Level Targeting.** Should `data_holder_filter` gain an explicit custodian-scoped form — "answer only with this organization's records," enforce-or-reject — once vendors can attribute records to custodian organizations and network directories carry custodian-level identities? Today, narrowing is best-effort (above). Do existing network directories model custodian-level entries at all?
 {: .callout .callout-open-question #oq-custodian-targeting}
 
 ### `claim_linkage`
@@ -153,7 +153,7 @@ Introduced by the [Payer Claims Adjudication](use-case-catalog.html#payer-claims
 
 `claim` is a minimal FHIR Claim carrying the identifiers both sides use for re-association; `use` distinguishes a claim from a prior authorization. `encounter` optionally names the encounter records the claim covers, using the issuer's own resource references. The issuer mints these values from the claim it is submitting, so validity is checkable against its own records.
 
-**For the authorizing party.** The constraint records what the provider organization decided to disclose: records tied to this claim, for this adjudication, and nothing else. It is the ticket-shaped form of minimum necessary.
+**For the authorizing party.** The constraint records what the provider organization decided to disclose: records tied to this claim, for this adjudication, and nothing else. This is how the ticket carries HIPAA's minimum-necessary standard.
 
 **For the client.** The payer learns which claim or prior authorization the ticket belongs to — the re-association that document workflows carry in tracking numbers — and what to expect from redemption: records the provider associates with that claim. The response may be lawfully incomplete; absence of a record is not a representation that it does not exist.
 
@@ -211,7 +211,7 @@ Constraints combine as follows:
 }
 ```
 
-This example applies all three base constraints together:
+This example applies `fhir_resources`, `data_period`, and `data_holder_filter` together:
 
 - **`data_holder_filter`** (OR): only a Data Holder operating in CA, in NY, or matching organization NPI `123` may answer at all.
 - **`fhir_resources`** (OR across entries): at a matching Data Holder, an Observation is authorized if it is a laboratory result or carries the HbA1c code `4548-4`. A Condition is authorized by the third entry with no narrowing.

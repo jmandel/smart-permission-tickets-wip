@@ -130,7 +130,7 @@ Neither piece broadens any access constraint, client registration, or what law p
 
 Data Holders implementing this profile SHALL:
 
-1. Withhold data matching a `sensitivity_withhold` coding, and all locally classified sensitive data when its `unlisted` is `true` — except data covered by `sensitivity_release_authorized` and permitted under rule 2. Data matching an explicit `sensitivity_withhold` coding is withheld unconditionally.
+1. Withhold data matching a `sensitivity_withhold` coding unconditionally. When `sensitivity_withhold` sets `unlisted: true`, also withhold all locally classified sensitive data, except data covered by `sensitivity_release_authorized` and permitted under rule 2.
 2. Treat data covered by `sensitivity_release_authorized` as within the ticket's authorization scope, releasing only if Data Holder policy, law, patient matching, and technical constraints permit.
 3. When classification is uncertain, enforce withholding conservatively (withhold more); never resolve uncertainty in favor of release under rule 2.
 4. If a withholding rule cannot be enforced at all, reject with `invalid_grant` — this is the base rule for access constraints, restated.
