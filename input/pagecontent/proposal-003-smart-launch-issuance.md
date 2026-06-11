@@ -147,7 +147,7 @@ Each `EndpointHint` has:
 
 Endpoint hints are **advisory**. Final eligibility is determined at redemption time by the Data Holder's own validation (issuer trust, ticket `aud`, `data_holder_filter`, etc.). A client MAY also attempt redemption at endpoints not listed if the ticket's `aud` is a trust-framework identifier that covers them.
 
-Endpoint hints disclose where the patient receives care, and a site's name alone can reveal what a withheld category protects: a behavioral health clinic or a women's health center in the list identifies sensitive care, even when the site later releases nothing. Issuers SHOULD apply the grant's sharing decisions to the hint list itself — when the authorization withholds sensitive categories, do not name a site whose relationship would reveal them.
+Endpoint hints disclose where the patient receives care, and a site's name alone can reveal what a withheld category protects: a behavioral health clinic or a women's health center in the list identifies sensitive care, even when the site later releases nothing. Issuers SHOULD apply the grant's sharing decisions to the hint list itself — when the authorization withholds sensitive categories, do not name a site whose relationship would reveal them. Doing that requires knowing which relationships are sensitive to reveal, and issuers in this flow are typically operated by or closely affiliated with a network whose site directory can carry that knowledge. An issuer that cannot tell SHOULD NOT populate hints.
 
 #### 5. Client redeems tickets at Data Holders
 
@@ -189,9 +189,6 @@ For the individual-access ticket types, `presenter_binding` is REQUIRED per the 
 
 > **Open Question (OQ-3B): What format should endpoint hints use?** This proposal models endpoint hints as objects with `fhir_base_url`, `organization`, and `ticket_indices`. An alternative is to reuse the SMART App State / SMART Brands `Endpoint` resource format directly, which is already structured for this purpose and may provide better interoperability with existing patient-facing app directories. A third alternative is to keep the hints out of the base proposal entirely and define them in a separate profile, on the grounds that issuers and clients can negotiate them out of band.
 {: .callout .callout-open-question #oq-3b}
-
-> **Open Question (OQ-3D): How does an issuer know which care relationships are sensitive to reveal?** Suppressing a hint protects a relationship only if the issuer knows the relationship needs protecting — a site's name alone can reveal what a withheld category covers, while a general hospital's does not. No directory carries that distinction today.
-{: .callout .callout-open-question #oq-3d}
 
 > **Open Question (OQ-3C): What is the issuer-issued access token useful for?** The token response includes an `access_token` because that is the baseline SMART shape, but this proposal does not prescribe what that access token is useful for. Options: (a) it grants access to an issuer-operated FHIR endpoint that lets the client read back authorization state, consent artifacts, and audit records; (b) it authorizes refresh-token redemption only; (c) it is reserved for a future revision. Input welcome on whether issuer-side FHIR access is a real client need or an over-designed hypothetical.
 {: .callout .callout-open-question #oq-3c}
