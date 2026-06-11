@@ -28,9 +28,3 @@ Every open design question in this specification is listed here with a stable ID
 | RQ-SENSITIVE-BASE | Should the base ticket carry a sensitive-data flag? | No. Removed from the base kernel; sensitivity handling lives in the Proposal 005 profile, which models both withholding and release authorization. (May 27, 2026 call) |
 | RQ-BEARER | Are access tokens issued after redemption sender-constrained? | No. They are ordinary OAuth 2.0 bearer tokens; presenter binding constrains ticket redemption only. Deployments may add DPoP or mutual-TLS. (June 2026) |
 | RQ-FILTER-PROJECTION | Do `category`/`code` narrowings project into SMART scope strings? | No. The scope surface carries resource-type and interaction grain only; Data Holders enforce the narrowings from the ticket. (June 2026) |
-
-### Parked
-
-| ID | Question | Status |
-|----|----------|--------|
-| PQ-UC7 | Provider-to-provider consult ticket type | Parked: the natural issuer is the same system the specialist would query, so the value of a signed artifact is unclear. See [Future Use Cases](future-use-cases.html#oq-uc7-design). |
