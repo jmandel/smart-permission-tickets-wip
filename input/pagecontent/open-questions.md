@@ -7,7 +7,7 @@ Every open design question in this specification is listed here with a stable ID
 | ID | Question | Where |
 |----|----------|-------|
 | OQ-2 | Do future non-patient subjects (Group, subjectless) need an explicit ticket-level scope mode? | [Access Constraints](fhir-resources.html#oq-2) |
-| OQ-3 | Should the sensitivity profile be incorporated into specific ticket types, and what does each direction need before implementation? | [Access Constraints](access-constraints.html#oq-3) |
+| OQ-3 | Should the sensitivity profile be incorporated into specific ticket types, and what does each direction need before implementation? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-3) |
 | OQ-CUSTODIAN | Should `data_holder_filter` gain an enforce-or-reject custodian-scoped form once vendors can attribute records to custodian organizations? | [Access Constraints](data-holder-filter.html#oq-custodian-targeting) |
 | OQ-UC2-VERIFY | Should each delegated-access ticket say *how* the issuer verified the authority, or are per-code issuer obligations plus framework audit enough? | [Use Case Catalog](patient-delegated-access.html#oq-verification-class) |
 | OQ-PAYER-DATA | What resource types does claims adjudication need beyond US Core? | [Use Case Catalog](payer-claims-adjudication.html#oq-payer-data) |

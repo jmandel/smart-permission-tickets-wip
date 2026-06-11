@@ -118,11 +118,3 @@ For example, a profile that needs encounter-class scoping defines it as a constr
 ```
 
 A Data Holder that recognizes `encounter_class_filter` releases only records tied to matching encounters; one that does not recognize it rejects the ticket. The defining profile owes all four template sections — including what an authorization screen may say ("only office-visit records") and how records that link to no encounter at all are handled, since many patient-level resources do not.
-
-### Sensitive Data Profiles
-
-Sensitivity controls are handled through an experimental profile rather than the base kernel. Current implementations vary substantially in how they classify restricted or legally protected data, how they expose patient-facing choices, and how those choices map to access-control policy. [Proposal 005](proposal-005-sensitive-data-modeling.html) models both directions, split along the constraint border: a **withholding constraint** inside `access` — a limit any Data Holder with category labeling can honor, from any issuer, and servers that cannot enforce it reject the ticket — and a **release-authorization claim** at the top level — an issuer-attested fact, and a Data Holder that does not recognize it falls back to its own sensitivity gates and releases less. Withholding beats release authorization wherever both match; that is the constraint algebra, not a special rule. The profile is deliberately ahead of what base APIs can enforce today; its job is to give the ecosystem one shape to build toward.
-
-> **Open Question (OQ-3): Sensitive Data Profiles.** Should the Proposal 005 sensitivity profile be incorporated into specific ticket types, and what authorization UX, vocabulary constraints, and Data Holder enforcement capabilities does each direction need before implementation? See [Proposal 005: Sensitive Data Profile](proposal-005-sensitive-data-modeling.html).
-{: .callout .callout-open-question #oq-3}
-

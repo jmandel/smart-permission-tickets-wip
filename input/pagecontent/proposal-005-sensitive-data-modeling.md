@@ -171,6 +171,9 @@ Trust frameworks or ticket-type profiles incorporating this profile should defin
 
 ### Open Questions
 
+> **Open Question (OQ-3): Incorporation into Ticket Types.** Should this profile be incorporated into specific ticket types, and what authorization UX, vocabulary constraints, and Data Holder enforcement capabilities does each direction need before implementation?
+{: .callout .callout-open-question #oq-3}
+
 > **Open Question (OQ-5A): Disclosure Leakage.** How should a Data Holder respond when a category is requested but local policy, law, or patient preference prevents release and the Data Holder should not reveal whether such data exists?
 {: .callout .callout-open-question #oq-5a}
 
