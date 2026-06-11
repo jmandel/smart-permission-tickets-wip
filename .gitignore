@@ -32,3 +32,4 @@ ux/
 # Local working materials kept out of git
 calls/
 ux-variant-*/
+agents/
