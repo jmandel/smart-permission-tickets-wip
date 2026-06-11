@@ -24,7 +24,7 @@ The table below summarizes required and optional fields for each ticket type. Ea
 | Use Case | `presenter_binding` | Requester | Identity Evidence | Access Constraints |
 |----------|---------------------|-----------|-------------------|--------------------|
 | Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
-| Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period` optional |
+| Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
 | Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required |
 | Payer Quality Gap Queries | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources` (every entry narrowed), `data_period` required |
 
@@ -73,13 +73,8 @@ One policy applies here: the Data Holder's patient self-access policy — the pa
 #### Data Holder Processing
 
 * Resolve the subject to a local patient record; reject with `invalid_grant` on zero or ambiguous matches. Deployments that support an interactive fallback for subject disambiguation may use [Proposal 001](proposal-001-authz-code-fallback.html).
-* A valid ticket does not override local rules such as result-release holds or portal access restrictions.
+* A valid ticket does not override local rules such as result-release holds or portal access restrictions, and it does not establish that the patient has ever received care here — zero matches is a normal outcome, not an error in the ticket.
 * Grant access scoped by the intersection rules of the base specification.
-
-#### What This Ticket Does Not Prove
-
-* That the patient has (or ever had) an account or care relationship at the Data Holder.
-* That every requested data category is releasable under the Data Holder's local policy and applicable law.
 
 #### Example
 
@@ -125,6 +120,9 @@ Draws from the [constraint catalog](access-constraints.html). The authorizing pa
 
 * **`fhir_resources`** (required) — the ceiling the patient set when granting the delegation.
 * **`data_period`** (optional) — a time bound set at the same ceremony.
+* **`data_holder_filter`** (optional) — the organizations or regions the patient selected when delegating.
+
+The two individual-access types draw the same constraints; only the ceremony that sets the values differs.
 
 #### Requester and Authority
 
@@ -164,11 +162,6 @@ The issuer keeps the source documents (POA instruments, delegation records, cour
 * Resolve the subject as in patient self access.
 * Evaluate requester facts against local proxy-access policies. The Data Holder relies on the issuer's verification of identity and authority per its configured trust policy; it applies its own rules for what each requester class may see.
 * Local sensitivity and adolescent-privacy rules continue to apply below the ticket.
-
-#### What This Ticket Does Not Prove
-
-* That the requester may see every category of the patient's data; local policy decides what each kind of proxy can see.
-* That the authority remains valid indefinitely; the ticket's validity window and revocation status bound reliance.
 
 #### Open Questions
 
@@ -213,7 +206,7 @@ Draws from the [constraint catalog](access-constraints.html). The authorizing pa
 * **`fhir_resources`** (required) — the kind-level ceiling: the resource types adjudication needs, likely broader than US Core for some claim types (see the open question below). The record-level limit is `claim_linkage`.
 * **[`claim_linkage`](access-constraints.html#claim_linkage)** (required) — introduced by this profile; valued from the claim or prior authorization being submitted and its encounters.
 
-The constraint set for this type is exactly these two. `data_period` is not part of it, and issuers SHALL NOT include it: the claim is this type's time anchor — event records are bounded by their encounters through the claim association, and the patient-level floor is deliberately current-state — so any `data_period` value is either redundant (inside the encounter bounds) or contradictory (cutting current medications out of the floor). `data_holder_filter` is likewise not part of this type: the audience is the single issuing Data Holder. Cross-cutting constraints defined elsewhere in the catalog, such as `sensitivity_withhold`, MAY be added, with the standard consequence for servers that do not enforce them.
+The constraint set for this type is exactly these two — it scopes one adjudication, never bulk retrieval; element-specific quality queries are [Payer Quality Gap Queries](#payer-quality-gap-queries), and chart-scale retrieval is out of scope for both. `data_period` is not part of it, and issuers SHALL NOT include it: the claim is this type's time anchor — event records are bounded by their encounters through the claim association, and the patient-level floor is deliberately current-state — so any `data_period` value is either redundant (inside the encounter bounds) or contradictory (cutting current medications out of the floor). `data_holder_filter` is likewise not part of this type: the audience is the single issuing Data Holder. Cross-cutting constraints defined elsewhere in the catalog, such as `sensitivity_withhold`, MAY be added, with the standard consequence for servers that do not enforce them.
 
 #### Restricted Data
 
@@ -234,12 +227,6 @@ The constraint set for this type is exactly these two. `data_period` is not part
 * Verify presenter binding: the redeeming client is the payer the ticket names.
 * Resolve the subject; `recipient_record` resolves directly, since the issuer assigned it.
 * Enforce `claim_linkage` against the claim's association records; apply restriction flags before release.
-
-#### What This Ticket Does Not Prove
-
-* That the response is the complete record; restricted data is excluded without notice.
-* That the payer may use the data for anything beyond adjudicating the linked claim; downstream obligations live in law and contract.
-* That this ticket type covers bulk retrieval. Quality-measure and risk-adjustment chart retrieval are population-scale and not claim-linked; element-specific quality queries may become a separate ticket type, and broad chart-chase is out of scope.
 
 #### Open Questions
 
@@ -302,12 +289,7 @@ The constraint set for this type is exactly these two. `claim_linkage` is not pa
 * Verify issuer trust for this ticket type — trusting an issuer for claims adjudication tickets does not imply trusting it for recurring quality queries.
 * The Data Holder MAY narrow release to entries it judges consistent with the named measure.
 * Records restricted from disclosure to the payer are excluded silently, exactly as in claims adjudication — and the restriction matters more here, because no claim event implies the payer was party to the underlying care. The HIPAA self-pay restriction ([45 CFR 164.522(a)(1)(vi)](https://www.ecfr.gov/current/title-45/section-164.522)) is the leading case.
-
-#### What This Ticket Does Not Prove
-
-* That the response is the complete record; restricted data is excluded without notice.
-* That the member attribution behind the query is current; the issuer attests it, and trust frameworks decide what stands behind that attestation.
-* That this ticket type supports chart retrieval. It authorizes named elements; a request shaped like a chart pull is out of scope for this type.
+* The issuer attests the member attribution behind the query; trust frameworks decide what stands behind that attestation, and the Data Holder may check the relationship against its own coverage records.
 
 #### Open Questions
 

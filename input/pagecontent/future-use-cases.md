@@ -39,12 +39,7 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 
 * Verify issuer trust for this ticket type — trusting an issuer for patient self-access does not imply trusting it for public health tickets.
 * Match the requesting organization against directory or trust-framework information.
-* Apply local public-health disclosure policy; narrow or reject requests that go beyond the named condition.
-
-#### What This Ticket Does Not Prove
-
-* The detailed legal mandate behind the investigation. This specification is jurisdiction-neutral; the legal basis for public-health disclosure lives in applicable law, the trust framework, and the Data Holder's policy — not in the base ticket.
-* That every data class is responsive to the named condition; the Data Holder may narrow.
+* Apply local public-health disclosure policy; narrow or reject requests that go beyond the named condition. The legal basis for disclosure lives in applicable law, the trust framework, and local policy — the ticket carries the request, not the mandate.
 
 #### Example
 
