@@ -13,6 +13,10 @@ These fields are **policy-selection inputs**. Data Holders already maintain inte
 
 When present, `presenter_binding` cryptographically binds the ticket to the presenting client's key and/or trust-framework identity. A Data Holder authenticates the client, verifies the ticket signature against the issuer's published keys, enforces presenter binding if present, and grants access per [Access Calculation](#access-calculation). No user login is required at the Data Holder.
 
+### How This Page Is Organized
+
+The ticket artifact first ([Ticket Structure](#artifact-ticket-structure), [Presenter Binding](#presenter-binding), [Identity Evidence](#identity-evidence), [Profile Claims](#profile-claims)); then redemption ([Transport](#transport-token-exchange-rfc-8693), [Server-Side Validation](#server-side-validation), [Subject Resolution](#subject-resolution), [Access Calculation](#access-calculation)); then the rules around the edges ([Field Handling and Extensions](#field-handling-and-extensions), [Ticket Audience](#ticket-audience-aud-and-effective-eligible-data-holder-set), [Ticket Lifecycle](#ticket-lifecycle), [Conformance](#conformance)). What limits mean lives on [Access Constraints](access-constraints.html); what each ticket type assembles lives in the [Use Case Catalog](use-case-catalog.html).
+
 ### Where Things Belong
 
 The ticket carries only what a Data Holder needs at redemption time. This table shows where each kind of information belongs:
@@ -106,15 +110,13 @@ A trusted issuer mints a Permission Ticket and delivers it to the client. The cl
 
 ---
 
-### Technical Specification
-
-#### Transport: Token Exchange (RFC 8693)
+### Transport: Token Exchange (RFC 8693)
 
 Permission Tickets are presented via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). The client authenticates using a standard OAuth client-authentication mechanism and presents the Permission Ticket as a separate `subject_token` parameter. A common pattern is a JWT `client_assertion` per **RFC 7523**, as profiled by **[SMART Backend Services](https://build.fhir.org/ig/HL7/smart-app-launch/backend-services.html)** and **UDAP**. This cleanly separates client **authentication** from the authorization **grant**: the client-authentication artifact proves client identity; the `subject_token` carries the Permission Ticket.
 
 Using a distinct grant type (`urn:ietf:params:oauth:grant-type:token-exchange`) ensures that Data Holders that do not support Permission Tickets will reject the request with `unsupported_grant_type` rather than silently ignoring the ticket.
 
-##### Discovery
+#### Discovery
 
 Data Holders that support Permission Tickets SHALL advertise this in their `.well-known/smart-configuration`:
 
@@ -136,7 +138,7 @@ Data Holders that support Permission Tickets SHALL advertise this in their `.wel
 | `grant_types_supported` | SHALL include `urn:ietf:params:oauth:grant-type:token-exchange` |
 | `smart_permission_ticket_types_supported` | Array of `ticket_type` URIs the Data Holder accepts. Clients SHOULD check this before presenting a ticket. |
 
-##### Trust and Client Registration
+#### Trust and Client Registration
 
 This specification does not require a global client registry. Every Data Holder authenticates every presenting client — through local registration, well-known keys, UDAP, OpenID Federation, or another trust-framework mechanism it accepts. When the ticket carries `presenter_binding`, the client must also prove it is the specific client allowed to redeem that ticket.
 
@@ -176,14 +178,14 @@ grant_type=urn:ietf:params:oauth:grant-type:token-exchange
 | `client_assertion_type` | `urn:ietf:params:oauth:client-assertion-type:jwt-bearer` |
 | `client_assertion` | Client authentication JWT (for example, a SMART Backend Services or UDAP assertion) |
 
-##### Full Example
+#### Full Example
 Here is what the `client_assertion` looks like when decoded. This example uses SMART Backend Services conventions; it does not contain the Permission Ticket.
 
 {% include generated/signed-tickets/example-client-assertion.html %}
 
 The Permission Ticket is sent separately in the `subject_token` parameter. See the [Use Case Catalog](use-case-catalog.html) for decoded ticket payloads.
 
-##### Presentation Model
+#### Presentation Model
 
 Client authentication and authorization are separated:
 
@@ -200,7 +202,7 @@ In all three modes, the Data Holder authenticates the client through its standar
 
 The Data Holder SHALL NOT rely on any cross-party-stable client identifier inside the Permission Ticket itself. Client identity is established by the `client_assertion` (`iss`/`sub`).
 
-#### Artifact: Ticket Structure
+### Artifact: Ticket Structure
 The ticket payload is a JWT. It carries top-level `subject` and `access`, plus optional `requester`, identity-evidence, `presenter_binding`, and `revocation` claims alongside the standard JWT envelope. `ticket_type` is the sole discriminator for the processing rules: which claims are required, which profile claims the type defines, and which access constraints its tickets use.
 
 {% include generated/spec-snippets/index/artifact-ticket.js.md %}
@@ -209,7 +211,7 @@ See the JSON Schema and generated TypeScript definitions below for formal struct
 
 Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. The Data Holder uses `ticket_type` to select validation and access logic.
 
-#### Presenter Binding
+### Presenter Binding
 A Permission Ticket MAY bind redemption to a specific client using the `presenter_binding` claim. `presenter_binding` is a discriminated union selected by `method`, with two shapes:
 
 - **Key binding**:
@@ -231,7 +233,7 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
 
 **Note on `cnf` (decided).** Standard JWT confirmation uses the `cnf` claim ([RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)). This specification diverges: both binding modes live in one `presenter_binding` discriminated union rather than splitting key binding into `cnf` and framework binding into a custom claim. The key-binding semantics are exactly `cnf.jkt` — the same RFC 7638 thumbprint comparison, so thumbprint code written for `cnf.jkt` is reusable as-is — and only the claim shape differs. Recorded as a resolved design decision in the [Open Questions registry](open-questions.html).
 
-##### Binding Modes
+#### Binding Modes
 
 | Mode | `method` | Verification |
 |------|----------|--------------|
@@ -241,11 +243,11 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
 
 In all modes, the Data Holder authenticates the presenting client through its standard mechanism. Presenter binding adds a constraint on top of that authentication, not in place of it.
 
-##### Presenter Binding per Ticket Type
+#### Presenter Binding per Ticket Type
 
 Whether `presenter_binding` is required is a ticket-type rule: the individual-access types (patient self access, patient-delegated access) require it, and both payer types require it; other B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
 
-#### Server-Side Validation
+### Server-Side Validation
 The Data Holder SHALL validate in two layers:
 
 1.  **Layer 1: Client Authentication (Standard OAuth)**
@@ -269,7 +271,7 @@ The Data Holder SHALL validate in two layers:
     *   **Resolve Subject:** Resolve the subject to a unique local patient record; reject on zero or ambiguous matches (see [Subject Resolution](#subject-resolution)).
     *   **Grant Access:** If valid, grant access per [Access Calculation](#access-calculation).
 
-#### Subject Resolution
+### Subject Resolution
 
 Every ticket SHALL include `subject.patient`, a FHIR Patient resource carrying the demographic facts needed for matching (name, date of birth, identifiers). The patient may be thin — it only needs enough information for the Data Holder to resolve to a local record. Keeping the FHIR shape in every ticket means all tickets parse consistently, and relying parties that accept the issuer's attestation directly can work from `subject.patient` alone.
 
@@ -279,7 +281,7 @@ Every ticket SHALL include `subject.patient`, a FHIR Patient resource carrying t
 
 If subject resolution yields zero matches, or more than one match, the Data Holder SHALL reject the request with `invalid_grant` and an appropriate `error_description`.
 
-#### Identity Evidence
+### Identity Evidence
 
 Tickets MAY include top-level identity-evidence claims carrying verifiable identity facts about the parties named in the ticket. The two slots are symmetric — same shape, same verification pipeline — differing only in which party they identify:
 
@@ -324,7 +326,7 @@ Identity evidence supplements — it does not replace — the FHIR party represe
 
 *Design note:* evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. The evidence is a JWT verified with standard OIDC processing at the token endpoint, not clinical content; top-level claims are how this specification handles extensions; and sibling slots keep the two evidence claims identical in shape. There is no ambiguity about who the evidence describes, because a ticket names exactly one subject and at most one requester.
 
-#### Profile Claims
+### Profile Claims
 
 A ticket type may define top-level **profile claims** carrying the facts that type needs — which investigation a public-health request belongs to, for example. The dividing rule, restated from [Access Constraints](access-constraints.html): a field whose neglect would widen release is an access constraint and lives in `access`; a fact the Data Holder weighs in its policy decision is a profile claim. Ignoring a profile claim can only lead to less release, so profile claims do not need the fail-closed handling constraints get. In the current catalog, payer quality gap queries require one (`measure`); the public-health profile on [Future Use Cases](future-use-cases.html) defines another (`reportable_condition`).
 
