@@ -5104,6 +5104,33 @@
         "ticket_type": {
           "type": "string",
           "const": "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1"
+        },
+        "measure": {
+          "type": "object",
+          "properties": {
+            "coding": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "display": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": {}
+              }
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": {}
         }
       },
       "required": [
@@ -5115,7 +5142,8 @@
         "subject",
         "requester",
         "access",
-        "ticket_type"
+        "ticket_type",
+        "measure"
       ],
       "additionalProperties": {}
     }

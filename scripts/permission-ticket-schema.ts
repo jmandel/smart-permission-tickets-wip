@@ -306,6 +306,7 @@ export const ProviderConsultTicketSchema = TicketBaseSchema.extend({
 export const PayerQualityGapTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(PAYER_QUALITY_GAP_TICKET_TYPE),
   requester: OrganizationSchema,
+  measure: FHIRCodeableConceptSchema,
 });
 
 export const PermissionTicketSchema = z.discriminatedUnion("ticket_type", [

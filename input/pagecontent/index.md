@@ -243,7 +243,7 @@ In all modes, the Data Holder authenticates the presenting client through its st
 
 ##### Presenter Binding per Ticket Type
 
-Whether `presenter_binding` is required is a ticket-type rule: the individual-access types (patient self access, patient-delegated access) require it, and payer claims adjudication requires it because the ticket travels through claims-processing infrastructure; other B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
+Whether `presenter_binding` is required is a ticket-type rule: the individual-access types (patient self access, patient-delegated access) require it, and both payer types require it; other B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
 
 #### Server-Side Validation
 The Data Holder SHALL validate in two layers:
@@ -326,7 +326,7 @@ Identity evidence supplements — it does not replace — the FHIR party represe
 
 #### Profile Claims
 
-A ticket type may define top-level **profile claims** carrying the facts that type needs — which investigation a public-health request belongs to, for example. The dividing rule, restated from [Access Constraints](access-constraints.html): a field whose neglect would widen release is an access constraint and lives in `access`; a fact the Data Holder weighs in its policy decision is a profile claim. Ignoring a profile claim can only lead to less release, so profile claims do not need the fail-closed handling constraints get. No ticket type in the current catalog requires one; the public-health sketch on [Future Use Cases](future-use-cases.html) defines `reportable_condition`.
+A ticket type may define top-level **profile claims** carrying the facts that type needs — which investigation a public-health request belongs to, for example. The dividing rule, restated from [Access Constraints](access-constraints.html): a field whose neglect would widen release is an access constraint and lives in `access`; a fact the Data Holder weighs in its policy decision is a profile claim. Ignoring a profile claim can only lead to less release, so profile claims do not need the fail-closed handling constraints get. In the current catalog, payer quality gap queries require one (`measure`); the public-health profile on [Future Use Cases](future-use-cases.html) defines another (`reportable_condition`).
 
 `requester` and profile claims are issuer-attested facts. The Data Holder uses them for local policy evaluation and audit. The Data Holder is not expected to repeat upstream verification steps — requester identity, delegation relationship, consent, mandate, contract — when its configured trust policy permits reliance on the issuer. It may still deny, narrow, require a supported fallback, or route to review when required by local policy, the selected ticket type, the subject match result, or technical capability.
 

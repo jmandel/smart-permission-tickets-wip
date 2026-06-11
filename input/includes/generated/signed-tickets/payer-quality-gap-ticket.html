@@ -1,0 +1,103 @@
+<!-- Static JWT Viewer - No JavaScript -->
+<div class="jwt-artifact"
+    style="margin: 20px 0; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; font-family: sans-serif;">
+    <h4 style="margin: 0; padding: 12px; background: #e8e8e8; border-bottom: 1px solid #ddd;">Permission Ticket Artifact
+    </h4>
+
+    <div style="padding: 15px;">
+        <h5 style="margin-top: 0;">Header</h5>
+        <pre
+            style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
+  "alg": "ES256",
+  "kid": "nvOGRCsTz2QIQLsbl0ZQ_ux0tfyh5iave-jvNsANWv8"
+}</code></pre>
+
+        <h5>Payload (Claims)</h5>
+        <pre
+            style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto;"><code>{
+  "iss": "https://fhir.provider.example.org",
+  "aud": "https://fhir.provider.example.org",
+  "aud_type": "data_holder_url",
+  "exp": 1791508200,
+  "iat": 1781140200,
+  "jti": "qg-7b41d6e8-90af-4c33-8d12-64e07f5a21c9",
+  "ticket_type": "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1",
+  "presenter_binding": {
+    "method": "trust_framework_client",
+    "trust_framework": "https://directory.example-network.org",
+    "framework_type": "udap",
+    "entity_uri": "https://payer.example.com/organizations/quality"
+  },
+  "subject": {
+    "patient": {
+      "resourceType": "Patient",
+      "identifier": [
+        {
+          "system": "http://fhir.provider.example.org/mrn",
+          "value": "C10288"
+        }
+      ],
+      "birthDate": "1957-11-02",
+      "name": [
+        {
+          "family": "Tran",
+          "given": [
+            "Lien"
+          ]
+        }
+      ]
+    },
+    "recipient_record": {
+      "reference": "Patient/C10288",
+      "type": "Patient"
+    }
+  },
+  "requester": {
+    "resourceType": "Organization",
+    "identifier": [
+      {
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "1093817465"
+      }
+    ],
+    "name": "Example Health Plan"
+  },
+  "measure": {
+    "coding": [
+      {
+        "system": "https://www.cms.gov/medicare/quality/measures",
+        "code": "CMS122v12",
+        "display": "Diabetes: Glycemic Status Assessment Greater Than 9%"
+      }
+    ],
+    "text": "Diabetes glycemic status (HbA1c)"
+  },
+  "access": {
+    "fhir_resources": [
+      {
+        "type": "Observation",
+        "interactions": [
+          "read",
+          "search"
+        ],
+        "code": {
+          "system": "http://loinc.org",
+          "code": "4548-4",
+          "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+        }
+      }
+    ],
+    "data_period": {
+      "start": "2026-01-01",
+      "end": "2026-12-31"
+    }
+  }
+}</code></pre>
+
+        <details open style="margin-top: 15px;">
+            <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
+            <pre
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL2ZoaXIucHJvdmlkZXIuZXhhbXBsZS5vcmciLCJhdWQiOiJodHRwczovL2ZoaXIucHJvdmlkZXIuZXhhbXBsZS5vcmciLCJhdWRfdHlwZSI6ImRhdGFfaG9sZGVyX3VybCIsImV4cCI6MTc5MTUwODIwMCwiaWF0IjoxNzgxMTQwMjAwLCJqdGkiOiJxZy03YjQxZDZlOC05MGFmLTRjMzMtOGQxMi02NGUwN2Y1YTIxYzkiLCJ0aWNrZXRfdHlwZSI6Imh0dHBzOi8vc21hcnRoZWFsdGhpdC5vcmcvcGVybWlzc2lvbi10aWNrZXQtdHlwZS9wYXllci1xdWFsaXR5LWdhcC12MSIsInByZXNlbnRlcl9iaW5kaW5nIjp7Im1ldGhvZCI6InRydXN0X2ZyYW1ld29ya19jbGllbnQiLCJ0cnVzdF9mcmFtZXdvcmsiOiJodHRwczovL2RpcmVjdG9yeS5leGFtcGxlLW5ldHdvcmsub3JnIiwiZnJhbWV3b3JrX3R5cGUiOiJ1ZGFwIiwiZW50aXR5X3VyaSI6Imh0dHBzOi8vcGF5ZXIuZXhhbXBsZS5jb20vb3JnYW5pemF0aW9ucy9xdWFsaXR5In0sInN1YmplY3QiOnsicGF0aWVudCI6eyJyZXNvdXJjZVR5cGUiOiJQYXRpZW50IiwiaWRlbnRpZmllciI6W3sic3lzdGVtIjoiaHR0cDovL2ZoaXIucHJvdmlkZXIuZXhhbXBsZS5vcmcvbXJuIiwidmFsdWUiOiJDMTAyODgifV0sImJpcnRoRGF0ZSI6IjE5NTctMTEtMDIiLCJuYW1lIjpbeyJmYW1pbHkiOiJUcmFuIiwiZ2l2ZW4iOlsiTGllbiJdfV19LCJyZWNpcGllbnRfcmVjb3JkIjp7InJlZmVyZW5jZSI6IlBhdGllbnQvQzEwMjg4IiwidHlwZSI6IlBhdGllbnQifX0sInJlcXVlc3RlciI6eyJyZXNvdXJjZVR5cGUiOiJPcmdhbml6YXRpb24iLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaGw3Lm9yZy9maGlyL3NpZC91cy1ucGkiLCJ2YWx1ZSI6IjEwOTM4MTc0NjUifV0sIm5hbWUiOiJFeGFtcGxlIEhlYWx0aCBQbGFuIn0sIm1lYXN1cmUiOnsiY29kaW5nIjpbeyJzeXN0ZW0iOiJodHRwczovL3d3dy5jbXMuZ292L21lZGljYXJlL3F1YWxpdHkvbWVhc3VyZXMiLCJjb2RlIjoiQ01TMTIydjEyIiwiZGlzcGxheSI6IkRpYWJldGVzOiBHbHljZW1pYyBTdGF0dXMgQXNzZXNzbWVudCBHcmVhdGVyIFRoYW4gOSUifV0sInRleHQiOiJEaWFiZXRlcyBnbHljZW1pYyBzdGF0dXMgKEhiQTFjKSJ9LCJhY2Nlc3MiOnsiZmhpcl9yZXNvdXJjZXMiOlt7InR5cGUiOiJPYnNlcnZhdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl0sImNvZGUiOnsic3lzdGVtIjoiaHR0cDovL2xvaW5jLm9yZyIsImNvZGUiOiI0NTQ4LTQiLCJkaXNwbGF5IjoiSGVtb2dsb2JpbiBBMWMvSGVtb2dsb2Jpbi50b3RhbCBpbiBCbG9vZCJ9fV0sImRhdGFfcGVyaW9kIjp7InN0YXJ0IjoiMjAyNi0wMS0wMSIsImVuZCI6IjIwMjYtMTItMzEifX19._2iCrhfQMkEbbxa4Ul9TC49gutGHUbJaT0xPqM5SfAXSgMbTm_kHaKCtjIruXDZlqyWIyroH5g0z826VO6bXnw</code></pre>
+        </details>
+    </div>
+</div>

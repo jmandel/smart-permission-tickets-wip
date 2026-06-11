@@ -2,7 +2,7 @@
 
 This page is the registry of Permission Ticket use cases. Each use case maps to a single `ticket_type` URI that identifies the ticket's schema and processing rules. The base protocol — transport, validation pipeline, access calculation — is defined on the [main specification page](index.html); this page defines what each ticket type requires and how a Data Holder processes it.
 
-This specification currently defines three ticket types:
+This specification currently defines four ticket types:
 
 {% include generated/spec-snippets/index/use-case-profile-map.md %}
 
@@ -20,6 +20,7 @@ Ticket types are identified by their `ticket_type` URIs and referred to by name.
 | Patient Self Access | Ready |
 | Patient-Delegated Access | Modeled |
 | Payer Claims Adjudication | Modeled |
+| Payer Quality Gap Queries | Modeled |
 
 ### Per-Profile Constraints
 
@@ -30,6 +31,7 @@ The table below summarizes required and optional fields for each ticket type. Ea
 | Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
 | Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period` optional |
 | Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required; `data_period` recommended |
+| Payer Quality Gap Queries | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources` (code-narrowed) required; `data_period` recommended |
 
 **Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For patient self access that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For delegated access that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
 
@@ -280,3 +282,69 @@ The enforcement floor names patient-level categories explicitly because encounte
 #### Example
 
 {% include generated/signed-tickets/uc5-ticket.html %}
+
+---
+
+### Payer Quality Gap Queries
+
+**Status:** Modeled
+
+#### Purpose
+
+*A payer or value-based care organization retrieves the specific data elements that close a quality gap — an HbA1c result, a mammogram report, a blood-pressure reading — without pulling the chart.*
+
+CMS's [Interoperability Framework](https://www.cms.gov/health-technology-ecosystem/interoperability-framework) names this flow among its criteria: "Payers, including CMS, and other Value-based care organizations may query for specific quality data elements (e.g., HbA1c, mammograms, colonoscopies, blood pressure, BMI, depression screening) necessary for payment or health care operations."
+
+Today this need is met by chart retrieval at scale — HEDIS season runs February through May, with thousands of record requests per provider organization, and broad pulls are exactly what providers resist. An element-scoped ticket is the narrow alternative: the wire artifact says precisely which elements, for which measure, over which period, and nothing else is authorized.
+
+#### Typical Flow
+
+A ticket is minted per member and measure, naming the payer as requester and the measure as a profile claim → the payer's system presents the ticket at the provider's endpoint → the provider issues an access token limited to the named elements over the measurement period.
+
+How tickets get minted is deliberately open — see the open question below. Unlike claims adjudication, no submission event anchors issuance; candidate issuers include the provider's system working from an attribution list, or network infrastructure operating under a participation agreement. The ticket artifact is the same under any of them, which is why it can be defined now.
+
+#### Required Claims
+
+* **Subject:** `Patient`, with `subject.recipient_record` SHOULD when the issuer is the Data Holder.
+* **Requester:** `Organization` (the payer or value-based care entity), identified well enough to match a coverage or contract relationship.
+* **Profile claim:** `measure` (CodeableConcept, required) — which quality measure the query serves. A fact, not a limit: it tells the Data Holder which of its policies applies and gives both sides the audit and re-association anchor, while `fhir_resources` carries the actual limit.
+* **Presenter binding:** Required — `trust_framework_client` naming the requesting organization, or `jkt`.
+* **Expiration:** `exp` SHOULD cover the reporting window the query serves.
+
+#### Constraints
+
+This profile needs nothing beyond the [constraint catalog](access-constraints.html):
+
+* **`fhir_resources`** (required). Code-narrowed entries naming the elements — `{ "type": "Observation", "code": { "system": "http://loinc.org", "code": "4548-4" } }` is an HbA1c query. Entries SHOULD be element-specific; an entry without `category` or `code` narrowing is contrary to this profile's purpose.
+* **`data_period`** (recommended). The measurement period. Same constraint, same meaning as everywhere else; the value comes from the measure specification.
+
+#### Policy Selection Inputs
+
+| Input | Ticket field | Selects among |
+|-------|--------------|---------------|
+| Requesting organization | `requester` (Organization identifiers) | Whether a coverage or value-based contract relationship exists for this member |
+| Measure | `measure` | Whether the requested elements are consistent with the named measure; any per-program arrangements |
+
+#### Data Holder Processing
+
+* Verify issuer trust for this ticket type — trusting an issuer for claims adjudication tickets does not imply trusting it for recurring quality queries.
+* The Data Holder MAY narrow release to entries it judges consistent with the named measure.
+* Records restricted from disclosure to the payer are excluded silently, exactly as in claims adjudication — and the restriction matters more here, because no claim event implies the payer was party to the underlying care. The HIPAA self-pay restriction ([45 CFR 164.522(a)(1)(vi)](https://www.ecfr.gov/current/title-45/section-164.522)) is the leading case.
+
+#### What This Ticket Does Not Prove
+
+* That the response is the complete record; restricted data is excluded without notice.
+* That the member attribution behind the query is current; the issuer attests it, and trust frameworks decide what stands behind that attestation.
+* That this ticket type supports chart retrieval. It authorizes named elements; a request shaped like a chart pull belongs to a different conversation.
+
+#### Open Questions
+
+> **Open Question (OQ-QUALITY-GAP): Issuance topology.** Claims-based access anchors minting, scope, and expiry to a submission the provider just made. Quality gap queries have no such event. Who issues the ticket, against what relationship record, and for what lifetime?
+{: .callout .callout-open-question #oq-quality-gap}
+
+> **Open Question (OQ-PANEL): Element panels.** Some measures need many codes; enumerating them as single-code entries is verbose. Should a future constraint reference a value set or measure definition instead of enumerating codes, and what would Data Holder enforcement of a value-set reference require?
+{: .callout .callout-open-question #oq-panel}
+
+#### Example
+
+{% include generated/signed-tickets/payer-quality-gap-ticket.html %}

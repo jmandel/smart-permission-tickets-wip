@@ -12,7 +12,8 @@ Every open design question in this specification is listed here with a stable ID
 | OQ-UC2-VERIFY | Should each delegated-access ticket say *how* the issuer verified the authority, or are per-code issuer obligations plus framework audit enough? | [Use Case Catalog](use-case-catalog.html#oq-verification-class) |
 | OQ-PAYER-DATA | What resource types does claims adjudication need beyond US Core? | [Use Case Catalog](use-case-catalog.html#oq-payer-data) |
 | OQ-PAYER-TRANSPORT | How does a payer claims ticket travel with the claim — X12 275 attachment, CDex Task, or by reference? | [Use Case Catalog](use-case-catalog.html#oq-payer-transport) |
-| OQ-QUALITY-GAP | Who issues quality-gap-query tickets, against what relationship record, and for what lifetime? | [Future Use Cases](future-use-cases.html#oq-quality-gap) |
+| OQ-QUALITY-GAP | Who issues quality-gap-query tickets, against what relationship record, and for what lifetime? | [Use Case Catalog](use-case-catalog.html#oq-quality-gap) |
+| OQ-PANEL | Should element panels reference value sets or measure definitions instead of enumerating codes? | [Use Case Catalog](use-case-catalog.html#oq-panel) |
 | OQ-3A | Is the marker-scope plus CRUDS-scopes approach expressive enough for requesting tickets at issuance, or is a structured parameter needed? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3a) |
 | OQ-3B | Should issuance endpoint hints reuse the SMART Brands `Endpoint` format instead of a custom shape? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3b) |
 | OQ-3C | What is the issuer-issued access token in the issuance flow actually for? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3c) |

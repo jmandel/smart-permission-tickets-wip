@@ -167,6 +167,7 @@ export type ProviderConsultTicket = PermissionTicketBase & {
 export type PayerQualityGapTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1";
   requester: fhir4.Organization;
+  measure: FHIRCodeableConcept;
 };
 
 export type PermissionTicket =

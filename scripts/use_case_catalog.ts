@@ -54,8 +54,7 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   {
     id: "payer-quality-gap",
     label: "Payer Quality Gap Queries",
-    ticketTypeUri: PAYER_QUALITY_GAP_TICKET_TYPE,
-    future: true
+    ticketTypeUri: PAYER_QUALITY_GAP_TICKET_TYPE
   },
   {
     id: "uc7",

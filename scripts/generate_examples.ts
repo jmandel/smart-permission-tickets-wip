@@ -7,6 +7,7 @@ import {
     PATIENT_DELEGATED_ACCESS_TICKET_TYPE,
     PATIENT_SELF_ACCESS_TICKET_TYPE,
     PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
+    PAYER_QUALITY_GAP_TICKET_TYPE,
     PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
     type PermissionTicket,
     PermissionTicketSchema
@@ -227,6 +228,50 @@ const uc5_payload: PermissionTicket = {
     }
 };
 
+// ─── Payer Quality Gap Queries ───────────────────────────────────────────────
+// Element-scoped: the ticket authorizes exactly the data elements a quality
+// measure needs, narrowed by code, over the measurement period.
+
+const quality_gap_payload: PermissionTicket = {
+    iss: "https://fhir.provider.example.org",
+    aud: "https://fhir.provider.example.org",
+    aud_type: "data_holder_url",
+    exp: DEFAULT_IAT + 120 * 86400,
+    iat: DEFAULT_IAT,
+    jti: "qg-7b41d6e8-90af-4c33-8d12-64e07f5a21c9",
+    ticket_type: PAYER_QUALITY_GAP_TICKET_TYPE,
+    presenter_binding: {
+        method: "trust_framework_client",
+        trust_framework: "https://directory.example-network.org",
+        framework_type: "udap",
+        entity_uri: "https://payer.example.com/organizations/quality"
+    },
+    subject: {
+        patient: {
+            resourceType: "Patient",
+            identifier: [{ system: "http://fhir.provider.example.org/mrn", value: "C10288" }],
+            birthDate: "1957-11-02",
+            name: [{ family: "Tran", given: ["Lien"] }]
+        },
+        recipient_record: { reference: "Patient/C10288", type: "Patient" }
+    },
+    requester: {
+        resourceType: "Organization",
+        identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "1093817465" }],
+        name: "Example Health Plan"
+    },
+    measure: {
+        coding: [{ system: "https://www.cms.gov/medicare/quality/measures", code: "CMS122v12", display: "Diabetes: Glycemic Status Assessment Greater Than 9%" }],
+        text: "Diabetes glycemic status (HbA1c)"
+    },
+    access: {
+        fhir_resources: [
+            { type: "Observation", interactions: ["read", "search"], code: { system: "http://loinc.org", code: "4548-4", display: "Hemoglobin A1c/Hemoglobin.total in Blood" } }
+        ],
+        data_period: { start: "2026-01-01", end: "2026-12-31" }
+    }
+};
+
 // ─── Lightweight Invariant Validator ─────────────────────────────────────────
 
 function validateTicketExample(name: string, payload: PermissionTicket): void {
@@ -283,6 +328,7 @@ async function generate() {
         { name: 'uc2-ticket.jwt', payload: uc2_payload },
         { name: 'uc3-ticket.jwt', payload: uc3_payload },
         { name: 'uc5-ticket.jwt', payload: uc5_payload },
+        { name: 'payer-quality-gap-ticket.jwt', payload: quality_gap_payload },
     ];
 
     for (const t of tickets) {
