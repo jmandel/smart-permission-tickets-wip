@@ -1,10 +1,10 @@
 {% include callouts.html %}
 
-These use cases are not part of the near-term implementable catalog. Most are sketches: their `ticket_type` URIs are reserved, their field lists are unsettled, and each has unresolved questions. UC3 (Public Health Investigation) is the exception — fully modeled and deferred, not unfinished. They are kept here so the work is not lost, and to keep the [Use Case Catalog](use-case-catalog.html) focused on what implementers on the project are ready to build.
+These use cases are not part of the near-term implementable catalog. Most are sketches: their `ticket_type` URIs are reserved, their field lists are unsettled, and each has unresolved questions. Public Health Investigation is the exception — fully modeled and deferred, not unfinished. They are kept here so the work is not lost, and to keep the [Use Case Catalog](use-case-catalog.html) focused on what implementers on the project are ready to build.
 
 {% include generated/spec-snippets/index/future-use-case-map.md %}
 
-### Use Case 3: Public Health Investigation
+### Public Health Investigation
 
 **Status:** Modeled — moved here from the active catalog in June 2026 to keep near-term focus on the flows implementers on the project are ready to exercise. The profile below is complete; a worked tuberculosis follow-up example for review with the public health work group is in progress.
 
@@ -66,6 +66,15 @@ Sketch: requester is an `Organization` (social care hub or CBO); profile claims 
 *A research organization retrieves records for a study participant without the researcher becoming a user at the hospital.*
 
 Sketch: requester is an `Organization` (research institute); a `study` profile claim identifies the governing ResearchStudy. The ticket would say which study this is and that the issuer verified the study's required workflow — participant consent, an approved waiver, or whatever the study and trust framework require. The base ticket does not try to model research authorization in general; this becomes viable where study governance is concrete and verifiable.
+
+### Payer Quality Gap Queries
+
+*A payer or value-based care organization queries specific quality data elements — HbA1c results, mammograms, blood pressure readings — for payment or health care operations.*
+
+Named in the CMS Interoperability Framework as "open quality gap queries." Sketch: requester is an `Organization` (payer or value-based care entity); access needs only cataloged constraints — `fhir_resources` entries narrowed by `code` identify the elements — with no claim linkage. Unlike claims-based access, nothing anchors issuance: there is no submission event to set the grant's scope or expiry, so who mints these tickets (the provider against an attribution list, or network infrastructure) and on what cadence is unresolved. Sensitivity and self-pay handling matter more here than in claim-linked access, since no claim implies the payer's involvement in the underlying care.
+
+> **Open Question (OQ-QUALITY-GAP): Issuance topology.** Claims-based access anchors minting, scope, and expiry to a submission the provider just made. Quality gap queries have no such event. Who issues the ticket, against what relationship record, and for what lifetime?
+{: .callout .callout-open-question #oq-quality-gap}
 
 ### Provider-to-Provider Consult — parked
 

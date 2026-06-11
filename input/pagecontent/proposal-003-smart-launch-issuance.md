@@ -79,7 +79,7 @@ The client includes:
 
 #### 3. Issuer runs its issuance workflow and mints tickets
 
-Between authorize and redirect, the issuer runs whatever verification and approval workflow the selected ticket type requires. For patient-facing use cases, this may include sign-in, identity proofing via a digital ID wallet, delegation capture for UC2, and user approval of sharing preferences. An app that already performed a high-assurance sign-in as its own relying party can supply that ID token to the issuer during this workflow; the issuer may embed it as identity evidence, since the base specification's verification rules accept evidence whose `aud` names the presenting app rather than the issuer. For B2B use cases, issuance generally rests on case, claim, referral, study, directory, or participation checks rather than a user-facing approval ceremony (and may use a different kickoff than the user-facing launch described here). This is the same workflow the issuer would run under any other kickoff mechanism; SMART App Launch just wraps it.
+Between authorize and redirect, the issuer runs whatever verification and approval workflow the selected ticket type requires. For patient-facing use cases, this may include sign-in, identity proofing via a digital ID wallet, delegation capture for delegated access, and user approval of sharing preferences. An app that already performed a high-assurance sign-in as its own relying party can supply that ID token to the issuer during this workflow; the issuer may embed it as identity evidence, since the base specification's verification rules accept evidence whose `aud` names the presenting app rather than the issuer. For B2B use cases, issuance generally rests on case, claim, referral, study, directory, or participation checks rather than a user-facing approval ceremony (and may use a different kickoff than the user-facing launch described here). This is the same workflow the issuer would run under any other kickoff mechanism; SMART App Launch just wraps it.
 
 At the end of the workflow, the issuer mints one or more Permission Tickets. The issuer chooses ticket `aud` and `data_holder_filter` based on the network it operates within and the user's selections. It chooses `ticket_type` based on the relationship expressed during the workflow (self-access vs delegation, and so on).
 
@@ -164,7 +164,7 @@ When the issuer registers the client with a known public key (e.g., a well-known
 - `jkt` — the client's JWK Thumbprint, if the issuer knows the exact client key it wants to bind against.
 - `trust_framework_client` — when the client participates in a trust framework (well-known, UDAP, OIDF) and redemption should be open to any instance of that framework-recognized entity.
 
-For patient access use cases (UC1/UC2), `presenter_binding` is REQUIRED per the main specification, so the issuer SHALL NOT mint an unbound UC1/UC2 ticket through this flow.
+For the individual-access ticket types, `presenter_binding` is REQUIRED per the main specification, so the issuer SHALL NOT mint an unbound individual-access ticket through this flow.
 
 ### Design Rationale
 
@@ -184,7 +184,7 @@ For patient access use cases (UC1/UC2), `presenter_binding` is REQUIRED per the 
 
 ### Open Questions
 
-> **Open Question (OQ-3A): How should a client request ticket access?** This proposal introduces a `permission_ticket` marker scope plus SMART v2 CRUDS scopes (e.g., `patient/Observation.rs`) to convey the desired ticket access. Alternatives considered: a single structured parameter (e.g., `ticket_request=<json>`) passed in the authorize request, or a `ticket_type`-prefixed scope form (e.g., `ticket:patient-self-access-v1:patient/Observation.rs`). The working group should decide whether the marker-scope plus CRUDS approach is expressive enough for the full range of ticket-type-specific constraints (e.g., UC3 `reportable_condition`, UC5 `claim` reference) or whether a structured parameter is needed for those cases.
+> **Open Question (OQ-3A): How should a client request ticket access?** This proposal introduces a `permission_ticket` marker scope plus SMART v2 CRUDS scopes (e.g., `patient/Observation.rs`) to convey the desired ticket access. Alternatives considered: a single structured parameter (e.g., `ticket_request=<json>`) passed in the authorize request, or a `ticket_type`-prefixed scope form (e.g., `ticket:patient-self-access-v1:patient/Observation.rs`). The working group should decide whether the marker-scope plus CRUDS approach is expressive enough for the full range of ticket-type-specific constraints (e.g., the public-health `reportable_condition` claim, the payer `claim_linkage` constraint) or whether a structured parameter is needed for those cases.
 {: .callout .callout-open-question #oq-3a}
 
 > **Open Question (OQ-3B): What format should endpoint hints use?** This proposal models endpoint hints as objects with `fhir_base_url`, `organization`, and `ticket_indices`. An alternative is to reuse the SMART App State / SMART Brands `Endpoint` resource format directly, which is already structured for this purpose and may provide better interoperability with existing patient-facing app directories. A third alternative is to keep the hints out of the base proposal entirely and define them in a separate profile, on the grounds that issuers and clients can negotiate them out of band.

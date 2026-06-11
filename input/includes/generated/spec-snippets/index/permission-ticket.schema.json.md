@@ -4535,6 +4535,589 @@
         "consult_request"
       ],
       "additionalProperties": {}
+    },
+    {
+      "type": "object",
+      "properties": {
+        "iss": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aud": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          ]
+        },
+        "aud_type": {
+          "type": "string",
+          "enum": [
+            "data_holder_url",
+            "trust_framework"
+          ]
+        },
+        "exp": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "iat": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "jti": {
+          "type": "string",
+          "minLength": 1
+        },
+        "presenter_binding": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "const": "jkt"
+                },
+                "jkt": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "method",
+                "jkt"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "const": "trust_framework_client"
+                },
+                "trust_framework": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "framework_type": {
+                  "type": "string",
+                  "enum": [
+                    "well-known",
+                    "udap",
+                    "oidf"
+                  ]
+                },
+                "entity_uri": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "method",
+                "trust_framework",
+                "framework_type",
+                "entity_uri"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "subject_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "requester_identity_evidence": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "embedded"
+            },
+            "token_type": {
+              "type": "string",
+              "const": "id_token"
+            },
+            "jwt": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "source",
+            "token_type",
+            "jwt"
+          ],
+          "additionalProperties": false
+        },
+        "revocation": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "minLength": 1
+            },
+            "index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "url",
+            "index"
+          ],
+          "additionalProperties": false
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "patient": {
+              "type": "object",
+              "properties": {
+                "resourceType": {
+                  "type": "string",
+                  "const": "Patient"
+                },
+                "identifier": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "object",
+                        "properties": {
+                          "coding": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "system": {
+                                  "type": "string"
+                                },
+                                "code": {
+                                  "type": "string"
+                                },
+                                "display": {
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": {}
+                            }
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": {}
+                      }
+                    },
+                    "additionalProperties": {}
+                  }
+                },
+                "name": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "family": {
+                        "type": "string"
+                      },
+                      "given": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "prefix": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "suffix": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "additionalProperties": {}
+                  }
+                },
+                "birthDate": {
+                  "type": "string"
+                },
+                "gender": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "resourceType"
+              ],
+              "additionalProperties": {}
+            },
+            "recipient_record": {
+              "type": "object",
+              "properties": {
+                "reference": {
+                  "type": "string"
+                },
+                "identifier": {
+                  "type": "object",
+                  "properties": {
+                    "system": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "object",
+                      "properties": {
+                        "coding": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "system": {
+                                "type": "string"
+                              },
+                              "code": {
+                                "type": "string"
+                              },
+                              "display": {
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": {}
+                          }
+                        },
+                        "text": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "additionalProperties": {}
+                },
+                "type": {
+                  "type": "string",
+                  "const": "Patient"
+                },
+                "display": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": {}
+            }
+          },
+          "required": [
+            "patient"
+          ],
+          "additionalProperties": false
+        },
+        "requester": {
+          "type": "object",
+          "properties": {
+            "resourceType": {
+              "type": "string",
+              "const": "Organization"
+            },
+            "name": {
+              "type": "string"
+            },
+            "identifier": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "object",
+                    "properties": {
+                      "coding": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "system": {
+                              "type": "string"
+                            },
+                            "code": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
+                            }
+                          },
+                          "additionalProperties": {}
+                        }
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
+                  }
+                },
+                "additionalProperties": {}
+              }
+            }
+          },
+          "required": [
+            "resourceType"
+          ],
+          "additionalProperties": {}
+        },
+        "access": {
+          "type": "object",
+          "properties": {
+            "fhir_resources": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "interactions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "read",
+                        "search",
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    }
+                  },
+                  "category": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
+                  },
+                  "code": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
+                  }
+                },
+                "required": [
+                  "type",
+                  "interactions"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "data_period": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "string"
+                },
+                "end": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": {}
+            },
+            "data_holder_filter": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "jurisdiction"
+                      },
+                      "address": {
+                        "type": "object",
+                        "properties": {
+                          "country": {
+                            "type": "string"
+                          },
+                          "state": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "address"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "organization"
+                      },
+                      "organization": {
+                        "type": "object",
+                        "properties": {
+                          "resourceType": {
+                            "type": "string",
+                            "const": "Organization"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "identifier": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "system": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "object",
+                                  "properties": {
+                                    "coding": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "system": {
+                                            "type": "string"
+                                          },
+                                          "code": {
+                                            "type": "string"
+                                          },
+                                          "display": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "additionalProperties": {}
+                                      }
+                                    },
+                                    "text": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": {}
+                                }
+                              },
+                              "additionalProperties": {}
+                            }
+                          }
+                        },
+                        "required": [
+                          "resourceType"
+                        ],
+                        "additionalProperties": {}
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "organization"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "fhir_resources"
+          ],
+          "additionalProperties": false
+        },
+        "ticket_type": {
+          "type": "string",
+          "const": "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1"
+        }
+      },
+      "required": [
+        "iss",
+        "aud",
+        "exp",
+        "iat",
+        "jti",
+        "subject",
+        "requester",
+        "access",
+        "ticket_type"
+      ],
+      "additionalProperties": {}
     }
   ]
 }

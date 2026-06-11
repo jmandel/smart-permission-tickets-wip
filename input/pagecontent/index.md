@@ -243,7 +243,7 @@ In all modes, the Data Holder authenticates the presenting client through its st
 
 ##### Presenter Binding per Ticket Type
 
-Whether `presenter_binding` is required is a ticket-type rule: individual-access types (UC1, UC2) require it, and UC5 requires it because the ticket travels through claims-processing infrastructure; other B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
+Whether `presenter_binding` is required is a ticket-type rule: the individual-access types (patient self access, patient-delegated access) require it, and payer claims adjudication requires it because the ticket travels through claims-processing infrastructure; other B2B types leave it optional, since `aud` plus client authentication generally suffice. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
 
 #### Server-Side Validation
 The Data Holder SHALL validate in two layers:
@@ -265,7 +265,7 @@ The Data Holder SHALL validate in two layers:
     *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`. If the selected ticket type requires binding and it is absent, reject.
     *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per [Identity Evidence](#identity-evidence) — signature, evidence-issuer trust, temporal validity, audience, and demographic consistency with the party in that slot — plus the selected profile's assurance and claim parameters.
     *   **Process Kernel Fields:** Every kernel field present in the ticket must be handled. Enforced fields — including every member of `access` — SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Field Handling and Extensions](#field-handling-and-extensions).
-    *   **Verify Required Claims:** Confirm every claim the selected ticket type requires is present and well-formed (for example, UC2's authority coding, or a constraint the type requires such as UC5's `claim_linkage`); reject with `invalid_grant` if missing.
+    *   **Verify Required Claims:** Confirm every claim the selected ticket type requires is present and well-formed (for example, the delegated-access authority coding, or a required constraint such as the payer profile's `claim_linkage`); reject with `invalid_grant` if missing.
     *   **Resolve Subject:** Resolve the subject to a unique local patient record; reject on zero or ambiguous matches (see [Subject Resolution](#subject-resolution)).
     *   **Grant Access:** If valid, grant access per [Access Calculation](#access-calculation).
 
@@ -326,7 +326,7 @@ Identity evidence supplements — it does not replace — the FHIR party represe
 
 #### Profile Claims
 
-A ticket type may define top-level **profile claims** carrying the facts that type needs — which investigation a public-health request belongs to, for example. The dividing rule, restated from [Access Constraints](access-constraints.html): a field whose neglect would widen release is an access constraint and lives in `access`; a fact the Data Holder weighs in its policy decision is a profile claim. Ignoring a profile claim can only lead to less release, so profile claims do not need the fail-closed handling constraints get. No active ticket type currently requires one; UC3 on the [Future Use Cases](future-use-cases.html) page sketches `reportable_condition`.
+A ticket type may define top-level **profile claims** carrying the facts that type needs — which investigation a public-health request belongs to, for example. The dividing rule, restated from [Access Constraints](access-constraints.html): a field whose neglect would widen release is an access constraint and lives in `access`; a fact the Data Holder weighs in its policy decision is a profile claim. Ignoring a profile claim can only lead to less release, so profile claims do not need the fail-closed handling constraints get. No ticket type in the current catalog requires one; the public-health sketch on [Future Use Cases](future-use-cases.html) defines `reportable_condition`.
 
 `requester` and profile claims are issuer-attested facts. The Data Holder uses them for local policy evaluation and audit. The Data Holder is not expected to repeat upstream verification steps — requester identity, delegation relationship, consent, mandate, contract — when its configured trust policy permits reliance on the issuer. It may still deny, narrow, require a supported fallback, or route to review when required by local policy, the selected ticket type, the subject match result, or technical capability.
 
@@ -354,7 +354,7 @@ Requested scopes SHALL use SMART scope grammar. This specification allows either
 
 #### Access Constraints
 
-The `access` object holds the ticket's named **access constraints**. Every member of `access` is enforce-or-reject: a Data Holder that does not recognize and enforce a member rejects the ticket. The base constraints (`fhir_resources`, `data_period`, `data_holder_filter`), the four-part template every constraint definition follows, the constraint algebra, and the rules for defining new constraints are specified on the [Access Constraints](access-constraints.html) page.
+The `access` object holds the ticket's named **access constraints**. Every member of `access` is enforce-or-reject: a Data Holder that does not recognize and enforce a member rejects the ticket. The constraint catalog (`fhir_resources`, `data_period`, `data_holder_filter`, and profile-defined constraints), the four-part template every constraint definition follows, the constraint algebra, and the rules for defining new constraints are specified on the [Access Constraints](access-constraints.html) page.
 
 #### Token-Time and Resource-Time Enforcement
 
@@ -404,7 +404,7 @@ The `requester` and `presenter_binding` will often identify the same organizatio
 
 For delegated access, the `requester` is a `RelatedPerson` carrying **exactly one** relationship coding: the requester's authority — why they are permitted to ask — from a closed value set of existing [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts. Family relationship ("daughter," "spouse") is deliberately not modeled: it is not an authority assertion, and proxy policies turn on the authority type and the patient's age; the requester's `name` covers display.
 
-The value set, per-code issuer verification obligations, validity rules, and a worked example are defined by [UC2: Patient-Delegated Access](use-case-catalog.html#use-case-2-patient-delegated-access).
+The value set, per-code issuer verification obligations, validity rules, and a worked example are defined by [Patient-Delegated Access](use-case-catalog.html#patient-delegated-access).
 
 ---
 
@@ -651,7 +651,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Reject with `invalid_grant` if any present kernel field cannot be enforced
 - Resolve the ticket subject to a local patient record using `subject.patient`, corroborated by verified `subject_identity_evidence` when present; reject if zero or ambiguous matches
 - Calculate granted access per [Access Calculation](#access-calculation): the intersection of requested scopes, ticket access, client eligibility, ticket-type rules, and local policy and capability
-- Support the three base access constraints (`fhir_resources`, `data_period`, `data_holder_filter`) and enforce them per their defined semantics — `data_period` via the designated date search parameters in [Data Period Enforcement](access-constraints.html#data-period-enforcement)
+- Enforce every access constraint declared by the ticket types you support, per the definitions on [Access Constraints](access-constraints.html) — for the current catalog: `fhir_resources`, `data_period`, `data_holder_filter`, and `claim_linkage` for payer claims adjudication
 - Reject tickets carrying any `access` member the server does not recognize and enforce
 - Enforce subset constraints at the appropriate layer (token endpoint, resource server, or both)
 - If `revocation` is present, perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request

@@ -10,9 +10,9 @@ Cryptography proves a ticket came from an issuer. It does not prove the issuer d
 
 The base specification says the issuer verifies real-world facts before minting. A framework admitting issuers should pin down, per ticket type:
 
-- Which identity verification standard applies (for example, IAL2 for UC1/UC2) and which providers are acceptable.
-- What the delegation-verification workflow must include for each UC2 authority code (the [per-code obligations](use-case-catalog.html#issuer-verification-obligations) are the starting point).
-- What triggering-event evidence backs B2B tickets (the case report behind a UC3 ticket).
+- Which identity verification standard applies (for example, IAL2 for the individual-access types) and which providers are acceptable.
+- What the delegation-verification workflow must include for each delegated-access authority code (the [per-code obligations](use-case-catalog.html#issuer-verification-obligations) are the starting point).
+- What triggering-event evidence backs B2B tickets (the case report behind a public-health ticket).
 
 ### Record Retention and Audit
 

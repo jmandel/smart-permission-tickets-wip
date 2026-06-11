@@ -75,7 +75,7 @@ Once the Data Holder has resolved the local gap for a given ticket (keyed by `jt
 
 #### 6. B2B tickets: not applicable
 
-For B2B ticket types (UC3–UC7), `interaction_required` SHOULD NOT be returned. There is no patient present to interact with. If a Data Holder cannot process a B2B ticket silently, it should reject with `invalid_grant` and an appropriate `error_description`.
+For B2B ticket types, `interaction_required` SHOULD NOT be returned. There is no patient present to interact with. If a Data Holder cannot process a B2B ticket silently, it should reject with `invalid_grant` and an appropriate `error_description`.
 
 ### Design Rationale
 
@@ -85,4 +85,4 @@ For B2B ticket types (UC3–UC7), `interaction_required` SHOULD NOT be returned.
 
 *Why is sign-in acceptable in the fallback?* The primary flow succeeds when the ticket's `subject.patient` demographics are sufficient for the Data Holder to resolve to a unique local record. When they're not — multiple candidates, no match with sufficient confidence — someone has to disambiguate. The ticket carried the authorization; sign-in fills the identity gap. The patient benefits from the ticket because they don't need to re-authorize; they just need to help the Data Holder find the right record.
 
-*Relationship to presenter binding.* For UC1/UC2, `presenter_binding` is required. The ticket is cryptographically bound to the client's key regardless of whether redemption goes through token exchange or the SMART Launch fallback. The security properties hold in both paths.
+*Relationship to presenter binding.* For the individual-access types, `presenter_binding` is required. The ticket is cryptographically bound to the client's key regardless of whether redemption goes through token exchange or the SMART Launch fallback. The security properties hold in both paths.

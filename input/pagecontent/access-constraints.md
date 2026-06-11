@@ -9,18 +9,21 @@ The `access` object holds the ticket's **access constraints**. Each member of `a
 1. **Unrecognized means reject.** A Data Holder SHALL reject a ticket whose `access` contains a member it does not recognize and enforce, with `invalid_grant` and an `error_description` naming the unsupported constraint. There is no issuer opt-in and no capability negotiation: ignoring an access constraint always releases more than the issuer authorized, so unrecognized constraints fail closed.
 2. **Constraints only narrow.** No constraint broadens what another constraint, the requested scopes, the client's eligibility, or the Data Holder's policy would allow. Constraints combine by intersection (see [Constraint Algebra](#constraint-algebra)).
 3. **Limits live here.** Any field whose neglect would widen release belongs in `access`. Facts that inform the Data Holder's policy decision — who is asking, what event the request belongs to — are profile claims, not access constraints (see [Profile Claims](index.html#profile-claims)).
+4. **One name, one meaning.** A constraint means the same thing in every ticket type. Profiles choose which constraints their tickets carry, set their values, and may narrow a discretion the definition states; they never change what a constraint means. A use case that needs different semantics defines a new constraint under a new name.
 
-The base constraints are:
+There is no tiered constraint vocabulary — just this catalog, assembled in different combinations per ticket type. The constraints currently defined:
 
-| Constraint | Type | Description |
+| Constraint | Defined by | Summary |
 |-------|------|-------------|
-| `fhir_resources` | FhirResourcePermission[] | **Required.** Each entry specifies a resource `type`, required `interactions`, and optionally one narrowing `category` and one narrowing `code`. |
-| `data_period` | Period | One coarse timeframe, enforced through each resource type's designated date search parameter. If disjoint windows are needed, mint separate tickets. |
-| `data_holder_filter` | DataHolderFilter[] | Data Holder-side scoping. Each entry is either a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`). A Data Holder may answer if it matches **any** listed filter. |
+| `fhir_resources` | This page | **Present in every ticket** — the positive grant. Each entry specifies a resource `type`, required `interactions`, and optionally one narrowing `category` and one narrowing `code`. |
+| `data_period` | This page | One coarse clinical-date window, filtered through designated date search parameters. If disjoint windows are needed, mint separate tickets. |
+| `data_holder_filter` | This page | Which Data Holders may answer. Each entry is a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`); matching any entry suffices. |
+| `claim_linkage` | [Payer Claims Adjudication](use-case-catalog.html#payer-claims-adjudication) | Release limited to records the Data Holder associates with a referenced claim or prior authorization. |
+| `sensitivity_withhold` | [Proposal 005](proposal-005-sensitive-data-modeling.html) | Do not release data in the named sensitivity categories. |
 
-All three base constraints are part of the base kernel: conforming Data Holders SHALL be able to enforce each of them. Each is defined so enforcement uses machinery FHIR servers already have — `fhir_resources` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
+The three constraints defined on this page use machinery FHIR servers already have — `fhir_resources` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
 
-Ticket-type profiles state which constraints their tickets use and may define new ones (see [Defining New Access Constraints](#defining-new-access-constraints)). A ticket that uses only base constraints works at any conforming Data Holder with no pre-coordination.
+Ticket-type profiles declare which constraints their tickets carry and may define new ones (see [Defining New Access Constraints](#defining-new-access-constraints)). A Data Holder that advertises a ticket type enforces every constraint the type declares, so any valid ticket of a supported type is accepted with no pre-coordination.
 
 ### Constraint Template
 

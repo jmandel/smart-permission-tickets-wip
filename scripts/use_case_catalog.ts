@@ -1,5 +1,6 @@
 import {
   type PermissionTicketType,
+  PAYER_QUALITY_GAP_TICKET_TYPE,
   PATIENT_DELEGATED_ACCESS_TICKET_TYPE,
   PATIENT_SELF_ACCESS_TICKET_TYPE,
   PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
@@ -19,17 +20,17 @@ export type UseCaseCatalogEntry = {
 export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   {
     id: "uc1",
-    label: "Use Case 1: Patient Self Access",
+    label: "Patient Self Access",
     ticketTypeUri: PATIENT_SELF_ACCESS_TICKET_TYPE
   },
   {
     id: "uc2",
-    label: "Use Case 2: Patient-Delegated Access",
+    label: "Patient-Delegated Access",
     ticketTypeUri: PATIENT_DELEGATED_ACCESS_TICKET_TYPE
   },
   {
     id: "uc3",
-    label: "Use Case 3: Public Health Investigation",
+    label: "Public Health Investigation",
     ticketTypeUri: PUBLIC_HEALTH_INVESTIGATION_TICKET_TYPE,
     future: true
   },
@@ -41,13 +42,19 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   },
   {
     id: "uc5",
-    label: "Use Case 5: Payer Claims Adjudication",
+    label: "Payer Claims Adjudication",
     ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE
   },
   {
     id: "uc6",
     label: "Research Study",
     ticketTypeUri: RESEARCH_STUDY_ACCESS_TICKET_TYPE,
+    future: true
+  },
+  {
+    id: "payer-quality-gap",
+    label: "Payer Quality Gap Queries",
+    ticketTypeUri: PAYER_QUALITY_GAP_TICKET_TYPE,
     future: true
   },
   {

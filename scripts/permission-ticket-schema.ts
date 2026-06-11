@@ -14,6 +14,8 @@ export const RESEARCH_STUDY_ACCESS_TICKET_TYPE =
   "https://smarthealthit.org/permission-ticket-type/research-study-access-v1";
 export const PROVIDER_CONSULT_TICKET_TYPE =
   "https://smarthealthit.org/permission-ticket-type/provider-consult-v1";
+export const PAYER_QUALITY_GAP_TICKET_TYPE =
+  "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1";
 
 export const PermissionTicketTypeValues = [
   PATIENT_SELF_ACCESS_TICKET_TYPE,
@@ -23,6 +25,7 @@ export const PermissionTicketTypeValues = [
   PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
   RESEARCH_STUDY_ACCESS_TICKET_TYPE,
   PROVIDER_CONSULT_TICKET_TYPE,
+  PAYER_QUALITY_GAP_TICKET_TYPE,
 ] as const;
 
 export const PermissionTicketTypeSchema = z.enum(PermissionTicketTypeValues);
@@ -300,6 +303,11 @@ export const ProviderConsultTicketSchema = TicketBaseSchema.extend({
   consult_request: MinimalServiceRequestSchema,
 });
 
+export const PayerQualityGapTicketSchema = TicketBaseSchema.extend({
+  ticket_type: z.literal(PAYER_QUALITY_GAP_TICKET_TYPE),
+  requester: OrganizationSchema,
+});
+
 export const PermissionTicketSchema = z.discriminatedUnion("ticket_type", [
   PatientSelfAccessTicketSchema,
   PatientDelegatedAccessTicketSchema,
@@ -308,6 +316,7 @@ export const PermissionTicketSchema = z.discriminatedUnion("ticket_type", [
   PayerClaimsTicketSchema,
   ResearchStudyTicketSchema,
   ProviderConsultTicketSchema,
+  PayerQualityGapTicketSchema,
 ]);
 
 export const ClientAssertionSchema = z.object({
@@ -361,6 +370,7 @@ export type SocialCareReferralTicket = z.infer<typeof SocialCareReferralTicketSc
 export type PayerClaimsTicket = z.infer<typeof PayerClaimsTicketSchema>;
 export type ResearchStudyTicket = z.infer<typeof ResearchStudyTicketSchema>;
 export type ProviderConsultTicket = z.infer<typeof ProviderConsultTicketSchema>;
+export type PayerQualityGapTicket = z.infer<typeof PayerQualityGapTicketSchema>;
 export type ClientAssertion = z.infer<typeof ClientAssertionSchema>;
 export type TokenExchangeRequest = z.infer<typeof TokenExchangeRequestSchema>;
 

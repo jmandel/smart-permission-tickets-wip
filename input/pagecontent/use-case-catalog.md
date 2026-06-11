@@ -6,7 +6,7 @@ This specification currently defines three ticket types:
 
 {% include generated/spec-snippets/index/use-case-profile-map.md %}
 
-Use-case numbers are stable identifiers, not an ordering. UC3 (Public Health Investigation) is fully modeled and lives on [Future Use Cases](future-use-cases.html) since June 2026, alongside the other candidates; the near-term catalog holds the flows implementers on the project are ready to exercise.
+Ticket types are identified by their `ticket_type` URIs and referred to by name. Public Health Investigation is fully modeled and lives on [Future Use Cases](future-use-cases.html) since June 2026, alongside the other candidates; the near-term catalog holds the flows implementers on the project are ready to exercise.
 
 ### Status
 
@@ -17,9 +17,9 @@ Use-case numbers are stable identifiers, not an ordering. UC3 (Public Health Inv
 
 | Use Case | Status |
 |----------|--------|
-| UC1: Patient Self Access | Ready |
-| UC2: Patient-Delegated Access | Modeled |
-| UC5: Payer Claims Adjudication | Modeled |
+| Patient Self Access | Ready |
+| Patient-Delegated Access | Modeled |
+| Payer Claims Adjudication | Modeled |
 
 ### Per-Profile Constraints
 
@@ -27,17 +27,17 @@ The table below summarizes required and optional fields for each ticket type. Ea
 
 | Use Case | `presenter_binding` | Requester | Identity Evidence | Access Constraints |
 |----------|---------------------|-----------|-------------------|--------------------|
-| UC1: Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
-| UC2: Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period` optional |
-| UC5: Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required; `data_period` recommended |
+| Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
+| Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period` optional |
+| Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required; `data_period` recommended |
 
-**Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For UC1 that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For UC2 that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
+**Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For patient self access that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For delegated access that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
 
 Each use case section below follows a common template, including **Policy Selection Inputs**. `ticket_type` tells the Data Holder what kind of request this is (self-access, proxy access, claims review, …); the inputs listed per use case are the ticket fields that help it pick the right one of its own internal policies for this specific request. Tickets help the Data Holder pick a policy; they do not create new policies or override existing ones.
 
 ---
 
-### Use Case 1: Patient Self Access
+### Patient Self Access
 
 **Status:** Ready
 
@@ -100,7 +100,7 @@ The embedded ID token decodes to:
 
 ---
 
-### Use Case 2: Patient-Delegated Access
+### Patient-Delegated Access
 
 **Status:** Modeled
 
@@ -127,7 +127,7 @@ Both evidence slots apply here because a proper issuer verifies both people: the
 The authorizing party is the patient — or the instrument that confers authority — not the delegate who presents the ticket. The sharing decision is captured during the delegation ceremony, so that ceremony is where each constraint's explanation is owed:
 
 * **`fhir_resources`** (required). The ceiling on what the delegate's app may receive, set when the patient granted the delegation ("my daughter may see my conditions, medications, and immunizations"). The Data Holder's proxy policy narrows further: a granted scope never overrides what local policy lets this class of requester see, and adolescent-privacy and sensitivity rules continue to apply below the ticket.
-* **`data_period`** (optional). A time bound the patient set when delegating, with the same clinical-dates semantics and currently-relevant caveat as UC1.
+* **`data_period`** (optional). A time bound the patient set when delegating — the same constraint with the same meaning as in patient self access; only the ceremony that sets it differs.
 
 #### Requester and Authority
 
@@ -164,7 +164,7 @@ The issuer keeps the source documents (POA instruments, delegation records, cour
 
 #### Data Holder Processing
 
-* Resolve the subject as in UC1.
+* Resolve the subject as in patient self access.
 * Evaluate requester facts against local proxy-access policies. The Data Holder relies on the issuer's verification of identity and authority per its configured trust policy; it applies its own rules for what each requester class may see.
 * Local sensitivity and adolescent-privacy rules continue to apply below the ticket.
 
@@ -184,7 +184,7 @@ The issuer keeps the source documents (POA instruments, delegation records, cour
 
 ---
 
-### Use Case 5: Payer Claims Adjudication
+### Payer Claims Adjudication
 
 **Status:** Modeled
 
@@ -211,10 +211,10 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 #### Constraints
 
-This profile pulls in `fhir_resources` and `data_period` from the base set and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
+This profile pulls `fhir_resources` and `data_period` from the [constraint catalog](access-constraints.html) and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
 
 * **`fhir_resources`** (required). The resource types adjudication legitimately needs. Likely broader than US Core for some claim types — see the open question below.
-* **`data_period`** (recommended). A hard outer bound on clinical dates, typically the claim's service period with margin. No association judgment under `claim_linkage` may release anything outside it.
+* **`data_period`** (recommended). The clinical-date window for the adjudication, typically derived from the claim's service period. Same constraint, same meaning as everywhere else — only the value's source differs.
 * **`claim_linkage`** (required). Defined below.
 
 #### `claim_linkage`
@@ -239,7 +239,7 @@ This profile pulls in `fhir_resources` and `data_period` from the base set and d
 
 **For the client.** The payer learns which claim or prior authorization the ticket belongs to — the re-association that document workflows carry in tracking numbers — and what to expect from redemption: records the provider associates with that claim. The response may be lawfully incomplete; absence of a record is not a representation that it does not exist.
 
-**For the Data Holder.** Release only records you associate with the referenced claim: at minimum the records linked to the named encounters, plus current problems, medications, and allergies; never beyond `data_period` when present. The association is your own — you minted the ticket against your own claim — so enforcement is determinate against your own records. A Data Holder with no association knowledge for the referenced claim cannot enforce this constraint and rejects the ticket. That is the correct outcome, and it is what confines this ticket type to self-issued tickets today.
+**For the Data Holder.** Release only records you associate with the referenced claim: at minimum the records linked to the named encounters, plus current problems, medications, and allergies. (`data_period`, when present, applies as usual — constraints combine by intersection.) The association is your own — you minted the ticket against your own claim — so enforcement is determinate against your own records. A Data Holder with no association knowledge for the referenced claim cannot enforce this constraint and rejects the ticket. That is the correct outcome, and it is what confines this ticket type to self-issued tickets today.
 
 The enforcement floor names patient-level categories explicitly because encounter linkage in FHIR data is incomplete: the records adjudication needs most — problem list, medications, allergies — typically link to no encounter at all.
 
@@ -271,11 +271,11 @@ The enforcement floor names patient-level categories explicitly because encounte
 
 #### Open Questions
 
-> **Open Question (OQ-UC5-DATA): Resource types for adjudication.** What does claims review need beyond US Core resource types? Claim, Coverage, and documentation resources are candidates; payer implementers should name the list before this profile advances.
-{: .callout .callout-open-question #oq-uc5-data}
+> **Open Question (OQ-PAYER-DATA): Resource types for adjudication.** What does claims review need beyond US Core resource types? Claim, Coverage, and documentation resources are candidates; payer implementers should name the list before this profile advances.
+{: .callout .callout-open-question #oq-payer-data}
 
-> **Open Question (OQ-UC5-TRANSPORT): How the ticket travels with the claim.** In an X12 275 attachment, in a CDex Task, or by reference from the claim itself? This profile defines the artifact, not the transport; early adopters should converge on one carriage pattern.
-{: .callout .callout-open-question #oq-uc5-transport}
+> **Open Question (OQ-PAYER-TRANSPORT): How the ticket travels with the claim.** In an X12 275 attachment, in a CDex Task, or by reference from the claim itself? This profile defines the artifact, not the transport; early adopters should converge on one carriage pattern.
+{: .callout .callout-open-question #oq-payer-transport}
 
 #### Example
 

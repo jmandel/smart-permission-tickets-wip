@@ -12,7 +12,8 @@ export type PermissionTicketType =
   | "https://smarthealthit.org/permission-ticket-type/social-care-referral-v1"
   | "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1"
   | "https://smarthealthit.org/permission-ticket-type/research-study-access-v1"
-  | "https://smarthealthit.org/permission-ticket-type/provider-consult-v1";
+  | "https://smarthealthit.org/permission-ticket-type/provider-consult-v1"
+  | "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1";
 
 export type RestInteraction =
   | "read"
@@ -163,6 +164,11 @@ export type ProviderConsultTicket = PermissionTicketBase & {
   consult_request: fhir4.ServiceRequest;
 };
 
+export type PayerQualityGapTicket = PermissionTicketBase & {
+  ticket_type: "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1";
+  requester: fhir4.Organization;
+};
+
 export type PermissionTicket =
   | PatientSelfAccessTicket
   | PatientDelegatedAccessTicket
@@ -170,7 +176,8 @@ export type PermissionTicket =
   | SocialCareReferralTicket
   | PayerClaimsTicket
   | ResearchStudyTicket
-  | ProviderConsultTicket;
+  | ProviderConsultTicket
+  | PayerQualityGapTicket;
 
 export type ClientAssertion = {
   iss: string;
