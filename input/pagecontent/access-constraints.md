@@ -9,7 +9,7 @@ The `access` object holds the ticket's **access constraints**. Each member of `a
 1. **Unrecognized means reject.** A Data Holder SHALL reject a ticket whose `access` contains a member it does not recognize and enforce, with `invalid_grant` and an `error_description` naming the unsupported constraint. There is no issuer opt-in and no capability negotiation: ignoring an access constraint always releases more than the issuer authorized, so unrecognized constraints fail closed.
 2. **Constraints only narrow.** No constraint broadens what another constraint, the requested scopes, the client's eligibility, or the Data Holder's policy would allow. Constraints combine by intersection (see [Constraint Algebra](#constraint-algebra)).
 3. **Limits live here.** Any field whose neglect would widen release belongs in `access`. Facts that inform the Data Holder's policy decision — who is asking, what event the request belongs to — are profile claims, not access constraints (see [Profile Claims](index.html#profile-claims)).
-4. **One name, one meaning.** A constraint means the same thing in every ticket type. Profiles choose which constraints their tickets carry, set their values, and may narrow a discretion the definition states; they never change what a constraint means. A use case that needs different semantics defines a new constraint under a new name.
+4. **One name, one meaning.** A constraint means the same thing in every ticket type. Profiles choose which constraints their tickets carry and set their values — nothing else. A use case that needs different semantics defines a new constraint under a new name. (A Data Holder declining to exercise a discretion its definition permits is not a semantic change; releasing less is always allowed.)
 
 There is no tiered constraint vocabulary — just this catalog, assembled in different combinations per ticket type. The constraints currently defined:
 
@@ -72,7 +72,7 @@ FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base ker
 
 **For the client.** Where date filtering applies, resources outside the window are excluded regardless of when they were created or last updated. The window shapes the response; it is not a guarantee in either direction: absence of a record is not evidence it does not exist, and an out-of-window record that is still clinically current is not an error.
 
-**For the Data Holder.** Apply designated-parameter filtering (below) to every resource type that has a designated parameter. For resource types that have none, filter by the best available date attribution or release unfiltered — either is within the promise. Releasing records regardless of the window is also permitted when local policy treats them as currently relevant (active allergies, active problem-list items). Ticket-type profiles MAY tighten any of this — for example, requiring exclusion of resource types that cannot be date-filtered.
+**For the Data Holder.** Apply designated-parameter filtering (below) to every resource type that has a designated parameter. For resource types that have none, filter by the best available date attribution or release unfiltered — either is within the promise. Releasing records regardless of the window is also permitted when local policy treats them as currently relevant (active allergies, active problem-list items).
 
 ### Data Period Enforcement
 
