@@ -215,7 +215,7 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 This profile pulls `fhir_resources` from the [constraint catalog](access-constraints.html) and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
 
-* **`fhir_resources`** (required). The resource types adjudication legitimately needs. Likely broader than US Core for some claim types — see the open question below.
+* **`fhir_resources`** (required). The kinds of records and interactions the payer may use: it projects to the OAuth scopes issued at redemption, tells the payer what to expect, and lets the issuer keep whole kinds out of automated release — clinical notes, for example, which a provider may route through human review instead. The record-level limit is `claim_linkage`; this is the kind-level ceiling around it. Likely broader than US Core for some claim types — see the open question below.
 * **`claim_linkage`** (required). Defined below.
 
 The constraint set for this type is exactly these two. `data_period` is not part of it, and issuers SHALL NOT include it: the claim is this type's time anchor — event records are bounded by their encounters through the claim association, and the patient-level floor is deliberately current-state — so any `data_period` value is either redundant (inside the encounter bounds) or contradictory (cutting current medications out of the floor). `data_holder_filter` is likewise not part of this type: the audience is the single issuing Data Holder. Cross-cutting constraints defined elsewhere in the catalog, such as `sensitivity_withhold`, MAY be added, with the standard consequence for servers that do not enforce them.
@@ -317,7 +317,7 @@ How tickets get minted is deliberately open — see the open question below. Unl
 This profile needs nothing beyond the [constraint catalog](access-constraints.html):
 
 * **`fhir_resources`** (required). Code-narrowed entries naming the elements — `{ "type": "Observation", "code": { "system": "http://loinc.org", "code": "4548-4" } }` is an HbA1c query. Every entry SHALL carry a `category` or `code` narrowing: an un-narrowed entry is a chart section, which is not what this type authorizes.
-* **`data_period`** (required). The measurement or lookback period, taken from the measure specification. Same constraint, same meaning as everywhere else; without it a quality query is unbounded history, which is not what this type authorizes.
+* **`data_period`** (required). The measurement or lookback period, taken from the measure specification. Same constraint, same meaning as everywhere else; without it a quality query is unbounded history, which is not what this type authorizes. When a measure's elements carry different lookbacks — a ten-year colonoscopy window beside a one-year FIT window — the issuer mints one ticket per lookback, the base rule for disjoint windows; one wide window would over-expose the short-lookback elements.
 
 The constraint set for this type is exactly these two. `claim_linkage` is not part of it (there is no claim), and `data_holder_filter` is not part of it (the audience is a single named Data Holder). Cross-cutting constraints such as `sensitivity_withhold` MAY be added, with the standard consequence.
 
