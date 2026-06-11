@@ -17,7 +17,7 @@ Every open design question in this specification is listed here with a stable ID
 | OQ-3A | Is the marker-scope plus CRUDS-scopes approach expressive enough for requesting tickets at issuance, or is a structured parameter needed? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3a) |
 | OQ-3B | Should issuance endpoint hints reuse the SMART Brands `Endpoint` format instead of a custom shape? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3b) |
 | OQ-3C | What is the issuer-issued access token in the issuance flow actually for? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3c) |
-| OQ-3D | How does an issuer know which care relationships are sensitive to reveal, and should hint suppression ever be enforced (e.g., a network issuer pairing it with `data_holder_filter`, at the cost of disclosing the site list to every Data Holder)? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3d) |
+| OQ-3D | How does an issuer know which care relationships are sensitive to reveal through endpoint hints? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3d) |
 | OQ-P4A | Should the `continuation` claim be promoted into the base claims set once implementations validate it? | [Proposal 004](proposal-004-continuation-credentials.html#oq-p4a) |
 | OQ-5A | How does a Data Holder withhold without revealing that withheld data exists? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-5a) |
 | OQ-5B | Which sensitivity vocabularies should early implementations support? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-5b) |

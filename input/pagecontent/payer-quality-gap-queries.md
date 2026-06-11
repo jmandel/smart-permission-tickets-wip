@@ -25,7 +25,7 @@ How tickets get minted is deliberately open — see the open question below. Unl
 * **Subject:** `Patient`, with `subject.recipient_record` SHOULD when the issuer is the Data Holder.
 * **Requester:** `Organization` (the payer or value-based care entity), identified well enough to match a coverage or contract relationship.
 * **Profile claim:** `measure` (CodeableConcept, required) — which quality measure the query serves. A fact, not a limit: it tells the Data Holder which of its policies applies and gives both sides the audit and re-association anchor, while `fhir_resources` carries the actual limit.
-* **Presenter binding:** Required — `trust_framework_client` or `jkt`, naming the party authorized to redeem: the requesting organization or a contractor working on its behalf under a tracked delegation, as in [claims adjudication](payer-claims-adjudication.html).
+* **Presenter binding:** Optional (B2B), as in [claims adjudication](payer-claims-adjudication.html): the Data Holder confirms the redeeming client acts for the requester, whether through binding, registration, or a trust-framework relationship.
 * **Expiration:** `exp` SHOULD cover the reporting window the query serves.
 
 ### Constraints

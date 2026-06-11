@@ -245,7 +245,7 @@ In all modes, the Data Holder authenticates the presenting client through its st
 
 #### Presenter Binding per Ticket Type
 
-Whether `presenter_binding` is required is a ticket-type rule; every catalog type requires it. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
+Whether `presenter_binding` is required is a ticket-type rule: the individual-access types require it; B2B types leave it optional, since `aud` plus client authentication provide the trust boundary. See the per-profile constraints in the [Use Case Catalog](use-case-catalog.html). Deployments may require binding more broadly by local policy or narrower profiles.
 
 ### Server-Side Validation
 The Data Holder SHALL validate in two layers:

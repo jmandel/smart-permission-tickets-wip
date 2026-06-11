@@ -10,7 +10,7 @@ This page defines one Permission Ticket type. The overview of all types is the [
 
 When a payer needs more than the claim itself — medical-necessity review, a request for additional information, post-submission documentation — today's path is document exchange: the payer guesses a document code, the provider assembles and pushes attachments. A ticket attached to the claim replaces that follow-up loop with a scoped read. The provider knows at submission time exactly which patient, which encounters, and which period the claim concerns, so it can mint the grant itself.
 
-The issuer and the Data Holder are the same party. This is the ticket type with the fewest moving parts — one system mints tickets and later accepts them back — and trust validation is correspondingly simple. The signature still matters: the ticket travels through the payer's claims pipeline, and presenter binding keeps anything else that handles the claim from redeeming it.
+The issuer and the Data Holder are the same party. This is the ticket type with the fewest moving parts — one system mints tickets and later accepts them back — and trust validation is correspondingly simple. The signature still matters: the ticket travels through the payer's claims pipeline, and only an authenticated client the provider accepts as acting for the requester can redeem it.
 
 CMS's [Interoperability Framework](https://www.cms.gov/health-technology-ecosystem/interoperability-framework) names this flow among its criteria for aligned networks: "Payers, including CMS, can query for relevant data tied to a claim submitted in the last 60 days and receive clinical data for that encounter." The criterion names the goal and leaves the mechanism open; this profile is a candidate mechanism.
 
@@ -22,7 +22,7 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 * **Subject:** `Patient`, with `subject.recipient_record` SHOULD — the issuer is the Data Holder, so it knows its own record identifier and the direct-target hint always resolves.
 * **Requester:** `Organization` (the payer), identified well enough for the provider to match it to the claim's payer.
-* **Presenter binding:** Required — `trust_framework_client` or `jkt`, naming the party authorized to redeem. That is often the payer itself, but `requester` identifies the principal, not necessarily the presenter: a contractor adjudicating on the payer's behalf may redeem with its own registered client when the delegation is tracked through registration or expressed in the trust framework (OpenID Federation can carry it explicitly). See [the base specification](index.html#relationship-between-presenter_binding-and-requester) on this distinction.
+* **Presenter binding:** Optional (B2B): `aud` plus client authentication provide the trust boundary. `requester` identifies the principal, not necessarily the presenter — a contractor adjudicating on the payer's behalf may redeem with its own registered client when the delegation is tracked through registration or expressed in the trust framework (OpenID Federation can carry it explicitly). See [the base specification](index.html#relationship-between-presenter_binding-and-requester) on this distinction.
 * **Expiration:** `exp` SHOULD cover the payer's documented additional-information window for the linked claim. Sixty days from submission matches the CMS criterion; the operational windows underneath run 45–75 days (Medicare ADR, PERM, commercial record-request periods), so the length is a deployment parameter, not a fixed rule.
 
 ### Constraints
@@ -50,7 +50,7 @@ The constraint set for this type is exactly these two — it scopes one adjudica
 ### Data Holder Processing
 
 * Verify the ticket signature against this system's own issuing keys — the issuer is the Data Holder.
-* Verify presenter binding: the redeeming client is the payer the ticket names.
+* Confirm the redeeming client acts for the requester — by presenter binding when present, or by the client's registration or trust-framework relationship to the named payer.
 * Resolve the subject; `recipient_record` resolves directly, since the issuer assigned it.
 * Enforce `claim_linkage` against the claim's association records; apply restriction flags before release.
 
