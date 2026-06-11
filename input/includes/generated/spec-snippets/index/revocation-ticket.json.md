@@ -21,9 +21,9 @@
     }
   },
   "access": {
-    "permissions": [
+    "fhir_resources": [
       {
-        "resource_type": "*",
+        "type": "*",
         "interactions": [
           "read",
           "search"

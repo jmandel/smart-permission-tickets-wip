@@ -25,7 +25,7 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 * **Subject:** `Patient` (matched by demographics or identifier).
 * **Requester:** `Organization` (public health agency), identified well enough for directory matching (name, identifiers).
 * **Profile claims:** `reportable_condition` (coded condition), a top-level claim — says which investigation the request belongs to.
-* **Access:** `permissions` required; `data_period` and `data_holder_filter` typical.
+* **Access:** `fhir_resources` required; `data_period` and `data_holder_filter` typical.
 * **Presenter binding:** Optional (B2B; `aud` + client authentication generally suffice).
 
 #### Policy Selection Inputs

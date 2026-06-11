@@ -133,10 +133,10 @@ function buildIndexSnippets(): void {
       },
     },
     access: {
-      permissions: [
-        { resource_type: "Immunization", interactions: ["read", "search"] },
+      fhir_resources: [
+        { type: "Immunization", interactions: ["read", "search"] },
         {
-          resource_type: "AllergyIntolerance",
+          type: "AllergyIntolerance",
           interactions: ["read", "search"],
         },
       ],
@@ -145,39 +145,23 @@ function buildIndexSnippets(): void {
 
   const accessExample: JsonObject = {
     access: {
-      permissions: [
+      fhir_resources: [
         {
-          resource_type: "Observation",
+          type: "Observation",
           interactions: ["read", "search"],
-          category_any_of: [
-            {
-              system: "http://terminology.hl7.org/CodeSystem/observation-category",
-              code: "laboratory",
-            },
-            {
-              system: "http://terminology.hl7.org/CodeSystem/observation-category",
-              code: "vital-signs",
-            },
-          ],
-          code_any_of: [
-            { system: "http://loinc.org", code: "718-7" },
-            { system: "http://loinc.org", code: "4548-4" },
-          ],
-        },
-        { resource_type: "Condition", interactions: ["read", "search"] },
-      ],
-      data_period: { start: "2023-01-01", end: "2024-12-31" },
-      data_holder_filter: [
-        { kind: "jurisdiction", address: { country: "US", state: "CA" } },
-        { kind: "jurisdiction", address: { country: "US", state: "NY" } },
-        {
-          kind: "organization",
-          organization: {
-            resourceType: "Organization",
-            identifier: [{ system: "http://hl7.org/fhir/sid/us-npi", value: "123" }],
+          category: {
+            system: "http://terminology.hl7.org/CodeSystem/observation-category",
+            code: "laboratory",
           },
         },
+        {
+          type: "Observation",
+          interactions: ["read", "search"],
+          code: { system: "http://loinc.org", code: "4548-4" },
+        },
+        { type: "Condition", interactions: ["read", "search"] },
       ],
+      data_period: { start: "2023-01-01", end: "2024-12-31" },
     },
   };
 
@@ -201,7 +185,7 @@ function buildIndexSnippets(): void {
       patient: { resourceType: "Patient" },
     },
     access: {
-      permissions: [{ resource_type: "*", interactions: ["read", "search"] }],
+      fhir_resources: [{ type: "*", interactions: ["read", "search"] }],
     },
   };
 

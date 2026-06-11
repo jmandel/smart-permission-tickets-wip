@@ -23,13 +23,13 @@ Use-case numbers are stable identifiers, not an ordering. UC3 (Public Health Inv
 
 ### Per-Profile Constraints
 
-The table below summarizes required and optional fields for each ticket type. Each profile pulls in the [access constraints](index.html#access-constraints) it needs; a Constraints section in each profile states how the [constraint template](index.html#constraint-template)'s sections land for that use case.
+The table below summarizes required and optional fields for each ticket type. Each profile pulls in the [access constraints](access-constraints.html) it needs; a Constraints section in each profile states how the [constraint template](access-constraints.html#constraint-template)'s sections land for that use case.
 
 | Use Case | `presenter_binding` | Requester | Identity Evidence | Access Constraints |
 |----------|---------------------|-----------|-------------------|--------------------|
-| UC1: Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `permissions` required; `data_period`, `data_holder_filter` optional |
-| UC2: Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `permissions` required; `data_period` optional |
-| UC5: Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `permissions`, `claim_linkage` required; `data_period` recommended |
+| UC1: Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
+| UC2: Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period` optional |
+| UC5: Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required; `data_period` recommended |
 
 **Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For UC1 that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For UC2 that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
 
@@ -61,9 +61,9 @@ Patient completes identity verification and authorization with the issuer → is
 
 The authorizing party is the patient, making sharing choices on the issuer's authorization screen. Each constraint carries one of those choices:
 
-* **`permissions`** (required). The record types the patient chose to share, carried as resource types with optional category and code filters. The screen lists kinds of records ("immunizations," "lab results"); the app receives at most what the patient picked.
-* **`data_period`** (optional). The time limit the patient set ("records since 2021"). The screen presents it as bounding clinical dates, with currently relevant items such as active allergies possibly included regardless — that caveat is part of the promise, not fine print discovered later.
-* **`data_holder_filter`** (optional). The organizations or regions the patient selected. The screen must not promise more than the filter delivers: it gates which Data Holders may answer, and an answering Data Holder typically returns the combined record it holds (see the [implementation note](index.html#data_holder_filter) on shared systems).
+* **`fhir_resources`** (required). The record types the patient chose to share, one entry per choice, optionally narrowed by category or code. The screen lists kinds of records ("immunizations," "lab results"); the app receives at most what the patient picked.
+* **`data_period`** (optional). The time limit the patient set ("records since 2021"). The screen presents it as bounding clinical dates approximately: items still relevant to current care, and kinds of records that cannot be filtered by date, may come along regardless. That caveat is part of the promise, not fine print discovered later.
+* **`data_holder_filter`** (optional). The organizations or regions the patient selected. The screen must not promise more than the filter delivers: it gates which Data Holders may answer, and an answering Data Holder typically returns the combined record it holds (see the [implementation note](access-constraints.html#data_holder_filter) on shared systems).
 
 #### Identity Evidence
 
@@ -126,7 +126,7 @@ Both evidence slots apply here because a proper issuer verifies both people: the
 
 The authorizing party is the patient — or the instrument that confers authority — not the delegate who presents the ticket. The sharing decision is captured during the delegation ceremony, so that ceremony is where each constraint's explanation is owed:
 
-* **`permissions`** (required). The ceiling on what the delegate's app may receive, set when the patient granted the delegation ("my daughter may see my conditions, medications, and immunizations"). The Data Holder's proxy policy narrows further: a granted scope never overrides what local policy lets this class of requester see, and adolescent-privacy and sensitivity rules continue to apply below the ticket.
+* **`fhir_resources`** (required). The ceiling on what the delegate's app may receive, set when the patient granted the delegation ("my daughter may see my conditions, medications, and immunizations"). The Data Holder's proxy policy narrows further: a granted scope never overrides what local policy lets this class of requester see, and adolescent-privacy and sensitivity rules continue to apply below the ticket.
 * **`data_period`** (optional). A time bound the patient set when delegating, with the same clinical-dates semantics and currently-relevant caveat as UC1.
 
 #### Requester and Authority
@@ -211,9 +211,9 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 #### Constraints
 
-This profile pulls in `permissions` and `data_period` from the base set and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
+This profile pulls in `fhir_resources` and `data_period` from the base set and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
 
-* **`permissions`** (required). The resource types adjudication legitimately needs. Likely broader than US Core for some claim types — see the open question below.
+* **`fhir_resources`** (required). The resource types adjudication legitimately needs. Likely broader than US Core for some claim types — see the open question below.
 * **`data_period`** (recommended). A hard outer bound on clinical dates, typically the claim's service period with margin. No association judgment under `claim_linkage` may release anything outside it.
 * **`claim_linkage`** (required). Defined below.
 

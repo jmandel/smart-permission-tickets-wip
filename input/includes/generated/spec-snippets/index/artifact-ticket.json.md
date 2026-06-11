@@ -32,16 +32,16 @@
     }
   },
   "access": {
-    "permissions": [
+    "fhir_resources": [
       {
-        "resource_type": "Immunization",
+        "type": "Immunization",
         "interactions": [
           "read",
           "search"
         ]
       },
       {
-        "resource_type": "AllergyIntolerance",
+        "type": "AllergyIntolerance",
         "interactions": [
           "read",
           "search"

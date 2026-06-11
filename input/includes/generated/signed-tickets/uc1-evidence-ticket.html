@@ -18,8 +18,8 @@
   "iss": "https://trusted-issuer.org",
   "aud": "https://network.org",
   "aud_type": "trust_framework",
-  "exp": 1781141371,
-  "iat": 1781137771,
+  "exp": 1781142794,
+  "iat": 1781139194,
   "jti": "uc1-ev-9f1c2b6a-3a77-4d09-9c4e-5a0d2f81c3b7",
   "ticket_type": "https://smarthealthit.org/permission-ticket-type/patient-self-access-v1",
   "presenter_binding": {
@@ -47,30 +47,30 @@
     }
   },
   "access": {
-    "permissions": [
+    "fhir_resources": [
       {
-        "resource_type": "AllergyIntolerance",
+        "type": "AllergyIntolerance",
         "interactions": [
           "read",
           "search"
         ]
       },
       {
-        "resource_type": "Condition",
+        "type": "Condition",
         "interactions": [
           "read",
           "search"
         ]
       },
       {
-        "resource_type": "Observation",
+        "type": "Observation",
         "interactions": [
           "read",
           "search"
         ]
       },
       {
-        "resource_type": "MedicationRequest",
+        "type": "MedicationRequest",
         "interactions": [
           "read",
           "search"
@@ -85,14 +85,14 @@
   "subject_identity_evidence": {
     "source": "embedded",
     "token_type": "id_token",
-    "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImYtU1NKamJDV1BJMnJtU2hXSjUwNHpLQy1Mb01tWGlyVnV0SWtrcmxuZmcifQ.eyJpc3MiOiJodHRwczovL2lkLmV4YW1wbGUtY3NwLm9yZyIsImF1ZCI6InRydXN0ZWQtaXNzdWVyLWFwcCIsInN1YiI6ImNzcC11c2VyLTdkMmYwYTQ0IiwiZ2l2ZW5fbmFtZSI6IkVsZW5hIiwiZmFtaWx5X25hbWUiOiJSZXllcyIsImJpcnRoZGF0ZSI6IjE5ODktMDktMTQiLCJhY3IiOiJodHRwczovL2lkLmV4YW1wbGUtY3NwLm9yZy9hc3N1cmFuY2UvaWFsMiIsImlhdCI6MTc4MTEzNzc3MSwiZXhwIjoxNzgxMTM4MDcxfQ.Uf0FYpUPVU6w6x0i58P3sElI_4Bb5gZXERbamDdH3Ul3mzC-xUPbkdxEY4rdhRne6rVV5BpqT1OumzNHqvjebw"
+    "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImYtU1NKamJDV1BJMnJtU2hXSjUwNHpLQy1Mb01tWGlyVnV0SWtrcmxuZmcifQ.eyJpc3MiOiJodHRwczovL2lkLmV4YW1wbGUtY3NwLm9yZyIsImF1ZCI6InRydXN0ZWQtaXNzdWVyLWFwcCIsInN1YiI6ImNzcC11c2VyLTdkMmYwYTQ0IiwiZ2l2ZW5fbmFtZSI6IkVsZW5hIiwiZmFtaWx5X25hbWUiOiJSZXllcyIsImJpcnRoZGF0ZSI6IjE5ODktMDktMTQiLCJhY3IiOiJodHRwczovL2lkLmV4YW1wbGUtY3NwLm9yZy9hc3N1cmFuY2UvaWFsMiIsImlhdCI6MTc4MTEzOTE5NCwiZXhwIjoxNzgxMTM5NDk0fQ.NOB_Z5LDG4MHUGEKsLLeGfHjdJyXqr30IbvjmvuNzrNlQcJjNg8WUqcsNQ1y1LPqQzywIjBFBz31y4Gfvfb7OQ"
   }
 }</code></pre>
 
         <details open style="margin-top: 15px;">
             <summary style="cursor: pointer; font-weight: bold;">Raw Signed JWT</summary>
             <pre
-                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0ZWQtaXNzdWVyLm9yZyIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJhdWRfdHlwZSI6InRydXN0X2ZyYW1ld29yayIsImV4cCI6MTc4MTE0MTM3MSwiaWF0IjoxNzgxMTM3NzcxLCJqdGkiOiJ1YzEtZXYtOWYxYzJiNmEtM2E3Ny00ZDA5LTljNGUtNWEwZDJmODFjM2I3IiwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcGF0aWVudC1zZWxmLWFjY2Vzcy12MSIsInByZXNlbnRlcl9iaW5kaW5nIjp7Im1ldGhvZCI6ImprdCIsImprdCI6Ikp1STZpYlpIY01QUUlDYUlaNTVQYlhwbnN1ZFFtS3QwMEQwQmlFWE5yTWMifSwic3ViamVjdCI6eyJwYXRpZW50Ijp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaG9zcGl0YWwuZXhhbXBsZS5vcmcvbXJuIiwidmFsdWUiOiJBMTIzNDUifV0sImJpcnRoRGF0ZSI6IjE5ODktMDktMTQiLCJuYW1lIjpbeyJmYW1pbHkiOiJSZXllcyIsImdpdmVuIjpbIkVsZW5hIl19XX19LCJhY2Nlc3MiOnsicGVybWlzc2lvbnMiOlt7InJlc291cmNlX3R5cGUiOiJBbGxlcmd5SW50b2xlcmFuY2UiLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfSx7InJlc291cmNlX3R5cGUiOiJDb25kaXRpb24iLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfSx7InJlc291cmNlX3R5cGUiOiJPYnNlcnZhdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsicmVzb3VyY2VfdHlwZSI6Ik1lZGljYXRpb25SZXF1ZXN0IiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX1dLCJkYXRhX3BlcmlvZCI6eyJzdGFydCI6IjIwMjEtMDEtMDEiLCJlbmQiOiIyMDI2LTAxLTAxIn19LCJzdWJqZWN0X2lkZW50aXR5X2V2aWRlbmNlIjp7InNvdXJjZSI6ImVtYmVkZGVkIiwidG9rZW5fdHlwZSI6ImlkX3Rva2VuIiwiand0IjoiZXlKaGJHY2lPaUpGVXpJMU5pSXNJbXRwWkNJNkltWXRVMU5LYW1KRFYxQkpNbkp0VTJoWFNqVXdOSHBMUXkxTWIwMXRXR2x5Vm5WMFNXdHJjbXh1Wm1jaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJsa0xtVjRZVzF3YkdVdFkzTndMbTl5WnlJc0ltRjFaQ0k2SW5SeWRYTjBaV1F0YVhOemRXVnlMV0Z3Y0NJc0luTjFZaUk2SW1OemNDMTFjMlZ5TFRka01tWXdZVFEwSWl3aVoybDJaVzVmYm1GdFpTSTZJa1ZzWlc1aElpd2labUZ0YVd4NVgyNWhiV1VpT2lKU1pYbGxjeUlzSW1KcGNuUm9aR0YwWlNJNklqRTVPRGt0TURrdE1UUWlMQ0poWTNJaU9pSm9kSFJ3Y3pvdkwybGtMbVY0WVcxd2JHVXRZM053TG05eVp5OWhjM04xY21GdVkyVXZhV0ZzTWlJc0ltbGhkQ0k2TVRjNE1URXpOemMzTVN3aVpYaHdJam94TnpneE1UTTRNRGN4ZlEuVWYwRllwVVBWVTZ3NngwaTU4UDNzRWxJXzRCYjVnWlhFUmJhbURkSDNVbDNtekMteFVQYmtkeEVZNHJkaFJuZTZyVlY1QnBxVDFPdW16TkhxdmplYncifX0.pdUpFuUKp_ZDGuwxMxCxAQUIEJT1bVqxRebmbjvWbg0lsQgyQCr6roxVo4wLLj7x36r2AZ-rIJ-otOImOlqRWA</code></pre>
+                style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-top: 10px;"><code>eyJhbGciOiJFUzI1NiIsImtpZCI6Im52T0dSQ3NUejJRSVFMc2JsMFpRX3V4MHRmeWg1aWF2ZS1qdk5zQU5XdjgifQ.eyJpc3MiOiJodHRwczovL3RydXN0ZWQtaXNzdWVyLm9yZyIsImF1ZCI6Imh0dHBzOi8vbmV0d29yay5vcmciLCJhdWRfdHlwZSI6InRydXN0X2ZyYW1ld29yayIsImV4cCI6MTc4MTE0Mjc5NCwiaWF0IjoxNzgxMTM5MTk0LCJqdGkiOiJ1YzEtZXYtOWYxYzJiNmEtM2E3Ny00ZDA5LTljNGUtNWEwZDJmODFjM2I3IiwidGlja2V0X3R5cGUiOiJodHRwczovL3NtYXJ0aGVhbHRoaXQub3JnL3Blcm1pc3Npb24tdGlja2V0LXR5cGUvcGF0aWVudC1zZWxmLWFjY2Vzcy12MSIsInByZXNlbnRlcl9iaW5kaW5nIjp7Im1ldGhvZCI6ImprdCIsImprdCI6Ikp1STZpYlpIY01QUUlDYUlaNTVQYlhwbnN1ZFFtS3QwMEQwQmlFWE5yTWMifSwic3ViamVjdCI6eyJwYXRpZW50Ijp7InJlc291cmNlVHlwZSI6IlBhdGllbnQiLCJpZGVudGlmaWVyIjpbeyJzeXN0ZW0iOiJodHRwOi8vaG9zcGl0YWwuZXhhbXBsZS5vcmcvbXJuIiwidmFsdWUiOiJBMTIzNDUifV0sImJpcnRoRGF0ZSI6IjE5ODktMDktMTQiLCJuYW1lIjpbeyJmYW1pbHkiOiJSZXllcyIsImdpdmVuIjpbIkVsZW5hIl19XX19LCJhY2Nlc3MiOnsiZmhpcl9yZXNvdXJjZXMiOlt7InR5cGUiOiJBbGxlcmd5SW50b2xlcmFuY2UiLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfSx7InR5cGUiOiJDb25kaXRpb24iLCJpbnRlcmFjdGlvbnMiOlsicmVhZCIsInNlYXJjaCJdfSx7InR5cGUiOiJPYnNlcnZhdGlvbiIsImludGVyYWN0aW9ucyI6WyJyZWFkIiwic2VhcmNoIl19LHsidHlwZSI6Ik1lZGljYXRpb25SZXF1ZXN0IiwiaW50ZXJhY3Rpb25zIjpbInJlYWQiLCJzZWFyY2giXX1dLCJkYXRhX3BlcmlvZCI6eyJzdGFydCI6IjIwMjEtMDEtMDEiLCJlbmQiOiIyMDI2LTAxLTAxIn19LCJzdWJqZWN0X2lkZW50aXR5X2V2aWRlbmNlIjp7InNvdXJjZSI6ImVtYmVkZGVkIiwidG9rZW5fdHlwZSI6ImlkX3Rva2VuIiwiand0IjoiZXlKaGJHY2lPaUpGVXpJMU5pSXNJbXRwWkNJNkltWXRVMU5LYW1KRFYxQkpNbkp0VTJoWFNqVXdOSHBMUXkxTWIwMXRXR2x5Vm5WMFNXdHJjbXh1Wm1jaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJsa0xtVjRZVzF3YkdVdFkzTndMbTl5WnlJc0ltRjFaQ0k2SW5SeWRYTjBaV1F0YVhOemRXVnlMV0Z3Y0NJc0luTjFZaUk2SW1OemNDMTFjMlZ5TFRka01tWXdZVFEwSWl3aVoybDJaVzVmYm1GdFpTSTZJa1ZzWlc1aElpd2labUZ0YVd4NVgyNWhiV1VpT2lKU1pYbGxjeUlzSW1KcGNuUm9aR0YwWlNJNklqRTVPRGt0TURrdE1UUWlMQ0poWTNJaU9pSm9kSFJ3Y3pvdkwybGtMbVY0WVcxd2JHVXRZM053TG05eVp5OWhjM04xY21GdVkyVXZhV0ZzTWlJc0ltbGhkQ0k2TVRjNE1URXpPVEU1TkN3aVpYaHdJam94TnpneE1UTTVORGswZlEuTk9CX1o1TERHNE1IVUdFS3NMTGVHZkhqZEp5WHFyMzBJYnZqbXZ1TnpyTmxRY0pqTmc4V1VxY3NOUTF5MUxQcVF6eXdJakJGQnozMXk0R2Z2ZmI3T1EifX0.QgjekU6_L80GHdP6iRwQna-oKq_11-XaySpFc3gtiUWVFOVrD8Z3233vE69XLilfEBdQXhJQnqQIqB10Ce3viA</code></pre>
         </details>
     </div>
 </div>

@@ -70,11 +70,11 @@ export type Revocation = {
   index: number;
 };
 
-export type DataPermission = {
-  resource_type: string;
+export type FhirResourcePermission = {
+  type: string;
   interactions: NonEmptyArray<RestInteraction>;
-  category_any_of?: NonEmptyArray<FHIRCoding>;
-  code_any_of?: NonEmptyArray<FHIRCoding>;
+  category?: FHIRCoding;
+  code?: FHIRCoding;
 };
 
 export type JurisdictionFilter = {
@@ -90,7 +90,7 @@ export type OrganizationFilter = {
 export type DataHolderFilter = JurisdictionFilter | OrganizationFilter;
 
 export type AccessGrant = {
-  permissions: NonEmptyArray<DataPermission>;
+  fhir_resources: NonEmptyArray<FhirResourcePermission>;
   data_period?: FHIRPeriod;
   data_holder_filter?: NonEmptyArray<DataHolderFilter>;
 };

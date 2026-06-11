@@ -326,13 +326,13 @@
         "access": {
           "type": "object",
           "properties": {
-            "permissions": {
+            "fhir_resources": {
               "minItems": 1,
               "type": "array",
               "items": {
                 "type": "object",
                 "properties": {
-                  "resource_type": {
+                  "type": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -350,47 +350,39 @@
                       ]
                     }
                   },
-                  "category_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "category": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   },
-                  "code_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "code": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   }
                 },
                 "required": [
-                  "resource_type",
+                  "type",
                   "interactions"
                 ],
                 "additionalProperties": false
@@ -516,7 +508,7 @@
             }
           },
           "required": [
-            "permissions"
+            "fhir_resources"
           ],
           "additionalProperties": false
         },
@@ -985,13 +977,13 @@
         "access": {
           "type": "object",
           "properties": {
-            "permissions": {
+            "fhir_resources": {
               "minItems": 1,
               "type": "array",
               "items": {
                 "type": "object",
                 "properties": {
-                  "resource_type": {
+                  "type": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -1009,47 +1001,39 @@
                       ]
                     }
                   },
-                  "category_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "category": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   },
-                  "code_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "code": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   }
                 },
                 "required": [
-                  "resource_type",
+                  "type",
                   "interactions"
                 ],
                 "additionalProperties": false
@@ -1175,7 +1159,7 @@
             }
           },
           "required": [
-            "permissions"
+            "fhir_resources"
           ],
           "additionalProperties": false
         },
@@ -1576,13 +1560,13 @@
         "access": {
           "type": "object",
           "properties": {
-            "permissions": {
+            "fhir_resources": {
               "minItems": 1,
               "type": "array",
               "items": {
                 "type": "object",
                 "properties": {
-                  "resource_type": {
+                  "type": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -1600,47 +1584,39 @@
                       ]
                     }
                   },
-                  "category_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "category": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   },
-                  "code_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "code": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   }
                 },
                 "required": [
-                  "resource_type",
+                  "type",
                   "interactions"
                 ],
                 "additionalProperties": false
@@ -1766,7 +1742,7 @@
             }
           },
           "required": [
-            "permissions"
+            "fhir_resources"
           ],
           "additionalProperties": false
         },
@@ -2195,13 +2171,13 @@
         "access": {
           "type": "object",
           "properties": {
-            "permissions": {
+            "fhir_resources": {
               "minItems": 1,
               "type": "array",
               "items": {
                 "type": "object",
                 "properties": {
-                  "resource_type": {
+                  "type": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -2219,47 +2195,39 @@
                       ]
                     }
                   },
-                  "category_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "category": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   },
-                  "code_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "code": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   }
                 },
                 "required": [
-                  "resource_type",
+                  "type",
                   "interactions"
                 ],
                 "additionalProperties": false
@@ -2385,7 +2353,7 @@
             }
           },
           "required": [
-            "permissions"
+            "fhir_resources"
           ],
           "additionalProperties": false
         },
@@ -2880,13 +2848,13 @@
         "access": {
           "type": "object",
           "properties": {
-            "permissions": {
+            "fhir_resources": {
               "minItems": 1,
               "type": "array",
               "items": {
                 "type": "object",
                 "properties": {
-                  "resource_type": {
+                  "type": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -2904,47 +2872,39 @@
                       ]
                     }
                   },
-                  "category_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "category": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   },
-                  "code_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "code": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   }
                 },
                 "required": [
-                  "resource_type",
+                  "type",
                   "interactions"
                 ],
                 "additionalProperties": false
@@ -3202,7 +3162,7 @@
             }
           },
           "required": [
-            "permissions",
+            "fhir_resources",
             "claim_linkage"
           ],
           "additionalProperties": false
@@ -3604,13 +3564,13 @@
         "access": {
           "type": "object",
           "properties": {
-            "permissions": {
+            "fhir_resources": {
               "minItems": 1,
               "type": "array",
               "items": {
                 "type": "object",
                 "properties": {
-                  "resource_type": {
+                  "type": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -3628,47 +3588,39 @@
                       ]
                     }
                   },
-                  "category_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "category": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   },
-                  "code_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "code": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   }
                 },
                 "required": [
-                  "resource_type",
+                  "type",
                   "interactions"
                 ],
                 "additionalProperties": false
@@ -3794,7 +3746,7 @@
             }
           },
           "required": [
-            "permissions"
+            "fhir_resources"
           ],
           "additionalProperties": false
         },
@@ -4286,13 +4238,13 @@
         "access": {
           "type": "object",
           "properties": {
-            "permissions": {
+            "fhir_resources": {
               "minItems": 1,
               "type": "array",
               "items": {
                 "type": "object",
                 "properties": {
-                  "resource_type": {
+                  "type": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -4310,47 +4262,39 @@
                       ]
                     }
                   },
-                  "category_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "category": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   },
-                  "code_any_of": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "system": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "display": {
-                          "type": "string"
-                        }
+                  "code": {
+                    "type": "object",
+                    "properties": {
+                      "system": {
+                        "type": "string"
                       },
-                      "additionalProperties": {}
-                    }
+                      "code": {
+                        "type": "string"
+                      },
+                      "display": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {}
                   }
                 },
                 "required": [
-                  "resource_type",
+                  "type",
                   "interactions"
                 ],
                 "additionalProperties": false
@@ -4476,7 +4420,7 @@
             }
           },
           "required": [
-            "permissions"
+            "fhir_resources"
           ],
           "additionalProperties": false
         },

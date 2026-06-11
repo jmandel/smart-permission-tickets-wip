@@ -182,11 +182,11 @@ export const RevocationSchema = z.object({
   index: z.number().int().nonnegative(),
 }).strict();
 
-export const DataPermissionSchema = z.object({
-  resource_type: NonEmptyStringSchema,
+export const FhirResourcePermissionSchema = z.object({
+  type: NonEmptyStringSchema,
   interactions: z.array(RestInteractionSchema).min(1),
-  category_any_of: z.array(FHIRCodingSchema).min(1).optional(),
-  code_any_of: z.array(FHIRCodingSchema).min(1).optional(),
+  category: FHIRCodingSchema.optional(),
+  code: FHIRCodingSchema.optional(),
 }).strict();
 
 export const JurisdictionFilterSchema = z.object({
@@ -205,7 +205,7 @@ export const DataHolderFilterSchema = z.discriminatedUnion("kind", [
 ]);
 
 export const AccessGrantSchema = z.object({
-  permissions: z.array(DataPermissionSchema).min(1),
+  fhir_resources: z.array(FhirResourcePermissionSchema).min(1),
   data_period: FHIRPeriodSchema.optional(),
   data_holder_filter: z.array(DataHolderFilterSchema).min(1).optional(),
 }).strict();
@@ -346,7 +346,7 @@ export type IdentityEvidence = z.infer<typeof IdentityEvidenceSchema>;
 export type Subject = z.infer<typeof SubjectSchema>;
 export type Requester = z.infer<typeof RequesterSchema>;
 export type RestInteraction = z.infer<typeof RestInteractionSchema>;
-export type DataPermission = z.infer<typeof DataPermissionSchema>;
+export type FhirResourcePermission = z.infer<typeof FhirResourcePermissionSchema>;
 export type JurisdictionFilter = z.infer<typeof JurisdictionFilterSchema>;
 export type OrganizationFilter = z.infer<typeof OrganizationFilterSchema>;
 export type DataHolderFilter = z.infer<typeof DataHolderFilterSchema>;

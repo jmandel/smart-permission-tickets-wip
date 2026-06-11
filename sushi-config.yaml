@@ -15,6 +15,8 @@ pages:
     title: Implementer Quickstart
   use-case-catalog.md:
     title: Use Case Catalog
+  access-constraints.md:
+    title: Access Constraints
   future-use-cases.md:
     title: Future Use Cases
   open-questions.md:
@@ -42,6 +44,7 @@ menu:
   IG Home: index.html
   Quickstart: quickstart.html
   Use Case Catalog: use-case-catalog.html
+  Access Constraints: access-constraints.html
   Open Questions: open-questions.html
   Proposals:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html

@@ -63,7 +63,7 @@ GET /authorize?
 
 From this point forward, the flow follows the existing SMART App Launch specification. The Data Holder presents whatever interaction is needed to resolve the specific gap, issues an authorization code, and redirects back. The client exchanges the code for an access token through the standard code exchange.
 
-The Data Holder resolves the `launch` parameter to the cached permission ticket and applies the ticket's access constraints when issuing the resulting access token. The same intersection logic applies as in the silent token exchange path: granted access is the intersection of requested scopes, ticket `access.permissions`, and client registration.
+The Data Holder resolves the `launch` parameter to the cached permission ticket and applies the ticket's access constraints when issuing the resulting access token. The same intersection logic applies as in the silent token exchange path: granted access is the intersection of requested scopes, the ticket's access constraints, and client registration.
 
 #### 4. Sign-in MAY be required
 

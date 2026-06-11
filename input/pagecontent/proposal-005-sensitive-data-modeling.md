@@ -4,7 +4,7 @@
 
 ### Summary
 
-This proposal defines an experimental Permission Ticket profile for communicating sensitivity-category handling, in two pieces that live on opposite sides of the [access constraint border](index.html#access-constraints):
+This proposal defines an experimental Permission Ticket profile for communicating sensitivity-category handling, in two pieces that live on opposite sides of the [access constraint border](access-constraints.html):
 
 * **`sensitivity_withhold`** — an access constraint: do not send data in these categories. A limit, so it fails closed: a Data Holder that cannot enforce it rejects the ticket rather than silently letting the authorizing person's expectations fail.
 * **`sensitivity_release_authorized`** — a top-level profile claim: the issuer attests that these categories are within the authorization scope, subject to Data Holder policy and law. A fact, so it degrades gracefully: a Data Holder that does not recognize it falls back to its own sensitivity gates and releases less.
@@ -26,7 +26,7 @@ The two pieces carry different trust and enforcement properties, and the split e
 * **Withholding** can be honored without trusting the issuer (a request to send less cannot expand access) and tolerates conservative enforcement — when classification is uncertain, withhold more. But a withholding rule the Data Holder cannot evaluate at all is a broken promise to the patient, which is why it is an access constraint: unrecognized or unenforceable means the ticket is rejected.
 * **Release authorization** rests on the issuer's authorization ceremony and requires the Data Holder to trust that ceremony for sensitive categories specifically. It cannot be enforced conservatively in either direction: under-release defeats the patient's intent, over-release is a breach. Trust frameworks adopting this profile SHOULD define which issuers may assert release authorization, for which categories, and what ceremony and evidence stand behind it. A Data Holder that does not implement it ignores it — the patient gets the conservative default instead of no data at all. Issuers SHOULD say so when capturing the authorization: the unlock may not be honored everywhere.
 
-Wherever both match the same data, withholding wins. That is not a special rule of this profile: a constraint always bounds what a fact can unlock, by the base [constraint algebra](index.html#constraint-algebra).
+Wherever both match the same data, withholding wins. That is not a special rule of this profile: a constraint always bounds what a fact can unlock, by the base [constraint algebra](access-constraints.html#constraint-algebra).
 
 ### Profile Identifier
 
@@ -66,7 +66,7 @@ The patient told the issuer not to share substance-use data with this app. Other
 
 ```json
 "access": {
-  "permissions": [ { "resource_type": "Observation", "interactions": ["read", "search"] } ],
+  "fhir_resources": [ { "type": "Observation", "interactions": ["read", "search"] } ],
   "sensitivity_withhold": {
     "codes": [
       {
@@ -95,7 +95,7 @@ The patient authorized sharing HIV-related information; other locally classified
     ]
   },
   "access": {
-    "permissions": [ { "resource_type": "Observation", "interactions": ["read", "search"] } ],
+    "fhir_resources": [ { "type": "Observation", "interactions": ["read", "search"] } ],
     "sensitivity_withhold": { "unlisted": true }
   }
 }
@@ -109,7 +109,7 @@ A client doing routine medication reconciliation asks never to receive anything 
 
 ```json
 "access": {
-  "permissions": [ { "resource_type": "MedicationRequest", "interactions": ["read", "search"] } ],
+  "fhir_resources": [ { "type": "MedicationRequest", "interactions": ["read", "search"] } ],
   "sensitivity_withhold": { "unlisted": true }
 }
 ```
