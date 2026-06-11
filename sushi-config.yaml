@@ -15,6 +15,14 @@ pages:
     title: Implementer Quickstart
   use-case-catalog.md:
     title: Use Case Catalog
+  patient-self-access.md:
+    title: Patient Self Access
+  patient-delegated-access.md:
+    title: Patient-Delegated Access
+  payer-claims-adjudication.md:
+    title: Payer Claims Adjudication
+  payer-quality-gap-queries.md:
+    title: Payer Quality Gap Queries
   access-constraints.md:
     title: Access Constraints
   future-use-cases.md:
@@ -44,7 +52,12 @@ menu:
   IG Home: index.html
   Quickstart: quickstart.html
   Access Constraints: access-constraints.html
-  Use Case Catalog: use-case-catalog.html
+  Use Cases:
+    "Use Case Catalog": use-case-catalog.html
+    "Patient Self Access": patient-self-access.html
+    "Patient-Delegated Access": patient-delegated-access.html
+    "Payer Claims Adjudication": payer-claims-adjudication.html
+    "Payer Quality Gap Queries": payer-quality-gap-queries.html
   Open Questions: open-questions.html
   Proposals:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html

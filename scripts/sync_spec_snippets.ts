@@ -96,7 +96,7 @@ function renderUseCaseProfileRegistryTable(future: boolean): string {
   const rows = USE_CASE_CATALOG.filter((entry) => Boolean(entry.future) === future)
     .map(
       (entry) =>
-        `  <tr><td>${entry.label}</td><td><code>${entry.ticketTypeUri}</code></td></tr>`
+        `  <tr><td>${entry.page ? `<a href="${entry.page}">${entry.label}</a>` : entry.label}</td><td><code>${entry.ticketTypeUri}</code></td></tr>`
     )
     .join("\n");
   return [

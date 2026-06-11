@@ -406,7 +406,7 @@ The `requester` and `presenter_binding` will often identify the same organizatio
 
 For delegated access, the `requester` is a `RelatedPerson` carrying **exactly one** relationship coding: the requester's authority — why they are permitted to ask — from a closed value set of existing [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts. Family relationship ("daughter," "spouse") is deliberately not modeled: it is not an authority assertion, and proxy policies turn on the authority type and the patient's age; the requester's `name` covers display.
 
-The value set, per-code issuer verification obligations, validity rules, and a worked example are defined by [Patient-Delegated Access](use-case-catalog.html#patient-delegated-access).
+The value set, per-code issuer verification obligations, validity rules, and a worked example are defined by [Patient-Delegated Access](patient-delegated-access.html).
 
 ---
 

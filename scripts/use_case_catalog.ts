@@ -14,6 +14,7 @@ export type UseCaseCatalogEntry = {
   id: string;
   label: string;
   ticketTypeUri: PermissionTicketType;
+  page?: string;
   future?: boolean;
 };
 
@@ -21,12 +22,14 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   {
     id: "uc1",
     label: "Patient Self Access",
-    ticketTypeUri: PATIENT_SELF_ACCESS_TICKET_TYPE
+    ticketTypeUri: PATIENT_SELF_ACCESS_TICKET_TYPE,
+    page: "patient-self-access.html"
   },
   {
     id: "uc2",
     label: "Patient-Delegated Access",
-    ticketTypeUri: PATIENT_DELEGATED_ACCESS_TICKET_TYPE
+    ticketTypeUri: PATIENT_DELEGATED_ACCESS_TICKET_TYPE,
+    page: "patient-delegated-access.html"
   },
   {
     id: "uc3",
@@ -43,7 +46,8 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   {
     id: "uc5",
     label: "Payer Claims Adjudication",
-    ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE
+    ticketTypeUri: PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE,
+    page: "payer-claims-adjudication.html"
   },
   {
     id: "uc6",
@@ -54,7 +58,8 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
   {
     id: "payer-quality-gap",
     label: "Payer Quality Gap Queries",
-    ticketTypeUri: PAYER_QUALITY_GAP_TICKET_TYPE
+    ticketTypeUri: PAYER_QUALITY_GAP_TICKET_TYPE,
+    page: "payer-quality-gap-queries.html"
   },
   {
     id: "uc7",

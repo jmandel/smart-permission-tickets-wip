@@ -18,7 +18,7 @@ There is no tiered constraint vocabulary — just this catalog, assembled in dif
 | `fhir_resources` | This page | **Present in every ticket** — the positive grant. Each entry specifies a resource `type`, required `interactions`, and optionally one narrowing `category` and one narrowing `code`. |
 | `data_period` | This page | One coarse clinical-date window, filtered through designated date search parameters. If disjoint windows are needed, mint separate tickets. |
 | `data_holder_filter` | This page | Which Data Holders may answer. Each entry is a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`); matching any entry suffices. |
-| `claim_linkage` | [This page](#claim_linkage), for [Payer Claims Adjudication](use-case-catalog.html#payer-claims-adjudication) | Release limited to records the Data Holder associates with a referenced claim or prior authorization. |
+| `claim_linkage` | [This page](#claim_linkage), for [Payer Claims Adjudication](payer-claims-adjudication.html) | Release limited to records the Data Holder associates with a referenced claim or prior authorization. |
 | `sensitivity_withhold` | [Proposal 005](proposal-005-sensitive-data-modeling.html) | Do not release data in the named sensitivity categories. |
 
 Three of these constraints use machinery FHIR servers already have — `fhir_resources` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
@@ -135,7 +135,7 @@ Issuers SHOULD use directory or network information (published endpoint networks
 
 ### `claim_linkage`
 
-Introduced by the [Payer Claims Adjudication](use-case-catalog.html#payer-claims-adjudication) ticket type. Enforcement is defined against the issuing Data Holder's own claim records, which confines its use to self-issued tickets today.
+Introduced by the [Payer Claims Adjudication](payer-claims-adjudication.html) ticket type. Enforcement is defined against the issuing Data Holder's own claim records, which confines its use to self-issued tickets today.
 
 **Shape and validity.**
 
