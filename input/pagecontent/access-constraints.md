@@ -18,7 +18,7 @@ There is no tiered constraint vocabulary — just this catalog, assembled in dif
 | `fhir_resources` | This page | **Present in every ticket** — the positive grant. Each entry specifies a resource `type`, required `interactions`, and optionally one narrowing `category` and one narrowing `code`. |
 | `data_period` | This page | One coarse clinical-date window, filtered through designated date search parameters. If disjoint windows are needed, mint separate tickets. |
 | `data_holder_filter` | This page | Which Data Holders may answer. Each entry is a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`); matching any entry suffices. |
-| `claim_linkage` | [Payer Claims Adjudication](use-case-catalog.html#payer-claims-adjudication) | Release limited to records the Data Holder associates with a referenced claim or prior authorization. |
+| `claim_linkage` | [This page](#claim_linkage), for [Payer Claims Adjudication](use-case-catalog.html#payer-claims-adjudication) | Release limited to records the Data Holder associates with a referenced claim or prior authorization. |
 | `sensitivity_withhold` | [Proposal 005](proposal-005-sensitive-data-modeling.html) | Do not release data in the named sensitivity categories. |
 
 The three constraints defined on this page use machinery FHIR servers already have — `fhir_resources` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
@@ -40,7 +40,7 @@ The base constraint definitions below follow this template, and profiles definin
 
 ### `fhir_resources`
 
-**Shape and validity.** Required. An array of one or more entries. Each entry carries a FHIR resource `type`, one or more `interactions` (`create`, `read`, `update`, `delete`, `search`), and optionally one narrowing `category` coding and one narrowing `code` coding. An entry is a single conjunction: a resource matches it by being of the `type` and matching the `category` and `code` when present. There are no value lists inside an entry — a grant covering several categories or codes carries several entries. The issuer derives entries from the authorizing party's sharing decision or from the scope of access the ticket type defines.
+**Shape and validity.** Required. An array of one or more entries. Each entry carries a FHIR resource `type`, one or more `interactions` (`create`, `read`, `update`, `delete`, `search`), and optionally one narrowing `category` coding and one narrowing `code` coding. An entry is a single conjunction: a resource matches it by being of the `type` and matching the `category` and `code` when present. There are no value lists inside an entry — a grant covering several categories or codes carries several entries. The issuer derives entries from the authorizing party's sharing decision or from the scope of access the ticket type defines. Omitting a type is the issuer's brake on automated release of whole kinds — clinical notes routed through human review, for example.
 
 **For the authorizing party.** Each entry is one kind of record being shared — immunizations, lab results, conditions. One screen choice, one entry. An entry without `category` or `code` means all records of that type.
 
@@ -48,7 +48,7 @@ The base constraint definitions below follow this template, and profiles definin
 
 **For the Data Holder.** Enforce resource types and interactions through SMART scope projection (below). Enforce `category` and `code` narrowings from the ticket itself — at the token endpoint, the resource server, or both.
 
-### SMART Scope Projection
+#### SMART Scope Projection
 
 The `access.fhir_resources` array is the normative authorization model. Each entry maps to SMART v2 scopes as follows:
 
@@ -74,7 +74,7 @@ FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base ker
 
 **For the Data Holder.** Apply designated-parameter filtering (below) to every resource type that has a designated parameter. For resource types that have none, filter by the best available date attribution or release unfiltered — either is within the promise. Releasing records regardless of the window is also permitted when local policy treats them as currently relevant (active allergies, active problem-list items).
 
-### Data Period Enforcement
+#### Data Period Enforcement
 
 Where date filtering applies, its meaning is defined by standard FHIR R4 date search parameters. A resource type's **designated parameter** is its standard `date` search parameter when the type defines one, except where the table below overrides the choice. For each covered type, the Data Holder SHALL behave **as if every search carried `&{param}=ge{start}&{param}=le{end}`** using the designated parameter, and SHALL apply the same comparison to the designated element on direct reads. FHIR date search semantics apply: period-valued elements match on overlap, and resources with no value in the designated element do not match. The designated parameter defines the semantics; a Data Holder may implement the filter internally by any equivalent means and does not need to expose the search parameter to clients.
 
@@ -115,13 +115,13 @@ Issuers SHOULD use directory or network information (published endpoint networks
 
 </div>
 
-### Jurisdiction Filters
+#### Jurisdiction Filters
 
 * Jurisdiction filters are modeled with country/state-style values only.
 * A Data Holder checks whether its own jurisdiction matches the listed address.
 * A Data Holder operating in multiple jurisdictions SHOULD answer if any of its jurisdictions match the filter, and MAY apply narrower internal filtering if its architecture supports that attribution.
 
-### Organization Filters
+#### Organization Filters
 
 * Organization filters positively scope which Data Holders may answer.
 * Matching is by organizational identity, typically an NPI carried in `organization.identifier`.
@@ -132,6 +132,34 @@ Issuers SHOULD use directory or network information (published endpoint networks
 
 > **Open Question: Custodian-Level Targeting.** Should `data_holder_filter` gain an explicit custodian-scoped form — "answer only with this organization's records," enforce-or-reject — once vendors can attribute records to custodian organizations and network directories carry custodian-level identities? Today, narrowing is best-effort (above). Do existing network directories model custodian-level entries at all?
 {: .callout .callout-open-question #oq-custodian-targeting}
+
+### `claim_linkage`
+
+Introduced by the [Payer Claims Adjudication](use-case-catalog.html#payer-claims-adjudication) ticket type. Enforcement is defined against the issuing Data Holder's own claim records, which confines its use to self-issued tickets today.
+
+**Shape and validity.**
+
+```json
+"claim_linkage": {
+  "claim": {
+    "resourceType": "Claim",
+    "identifier": [{ "system": "https://provider.example.org/claims", "value": "CLM-2026-0042" }],
+    "status": "active",
+    "use": "claim"
+  },
+  "encounter": [{ "reference": "Encounter/enc-2026-0117" }]
+}
+```
+
+`claim` is a minimal FHIR Claim carrying the identifiers both sides use for re-association; `use` distinguishes a claim from a prior authorization. `encounter` optionally names the encounter records the claim covers, using the issuer's own resource references. The issuer mints these values from the claim it is submitting, so validity is checkable against its own records.
+
+**For the authorizing party.** The constraint records what the provider organization decided to disclose: records tied to this claim, for this adjudication, and nothing else. It is the ticket-shaped form of minimum necessary.
+
+**For the client.** The payer learns which claim or prior authorization the ticket belongs to — the re-association that document workflows carry in tracking numbers — and what to expect from redemption: records the provider associates with that claim. The response may be lawfully incomplete; absence of a record is not a representation that it does not exist.
+
+**For the Data Holder.** Release only records you associate with the referenced claim: at minimum the records linked to the named encounters, plus current problems, medications, and allergies. The association is your own — you minted the ticket against your own claim — so enforcement is determinate against your own records. A Data Holder with no association knowledge for the referenced claim cannot enforce this constraint and rejects the ticket. That is the correct outcome, and it is what confines this ticket type to self-issued tickets today.
+
+The enforcement floor names patient-level categories explicitly because encounter linkage in FHIR data is incomplete: the records adjudication needs most — problem list, medications, allergies — typically link to no encounter at all.
 
 ### Constraint Algebra
 
@@ -193,7 +221,7 @@ Because constraints are ANDed: a matching Observation from a non-matching Data H
 
 ### Defining New Access Constraints
 
-Ticket-type profiles MAY define additional access constraints. A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template). Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
+Ticket-type profiles MAY introduce additional access constraints. A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template); constraints introduced by catalog ticket types are defined on this page, so the catalog stays the one place definitions live. Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
 
 Discovery rides on ticket types. A `ticket_type` URI fixes the constraints its tickets require; changing the required set means minting a new URI. Data Holders advertise supported types, so a server that lists a type can enforce everything the type requires. A ticket MAY also carry constraints beyond its type's required set — a sensitivity withholding, for example — with the standard consequence: servers that do not enforce them reject the ticket, and issuers should expect that rejection wherever the extra constraint is unsupported.
 

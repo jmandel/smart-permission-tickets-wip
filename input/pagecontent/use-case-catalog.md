@@ -61,11 +61,11 @@ Patient completes identity verification and authorization with the issuer → is
 
 #### Constraints
 
-The authorizing party is the patient, making sharing choices on the issuer's authorization screen. Each constraint carries one of those choices:
+Draws from the [constraint catalog](access-constraints.html). The authorizing party is the patient at the issuer's authorization screen; each definition's authorizing-party language is what that screen says.
 
-* **`fhir_resources`** (required). The record types the patient chose to share, one entry per choice, optionally narrowed by category or code. The screen lists kinds of records ("immunizations," "lab results"); the app receives at most what the patient picked.
-* **`data_period`** (optional). The time limit the patient set ("records since 2021"). The screen presents it as bounding clinical dates approximately: items still relevant to current care, and kinds of records that cannot be filtered by date, may come along regardless. That caveat is part of the promise, not fine print discovered later.
-* **`data_holder_filter`** (optional). The organizations or regions the patient selected. The screen must not promise more than the filter delivers: it gates which Data Holders may answer, and an answering Data Holder typically returns the combined record it holds (see the [implementation note](access-constraints.html#data_holder_filter) on shared systems).
+* **`fhir_resources`** (required) — the record types the patient chose, one entry per choice.
+* **`data_period`** (optional) — the time limit the patient set.
+* **`data_holder_filter`** (optional) — the organizations or regions the patient selected.
 
 #### Identity Evidence
 
@@ -126,10 +126,10 @@ Both evidence slots apply here because a proper issuer verifies both people: the
 
 #### Constraints
 
-The authorizing party is the patient — or the instrument that confers authority — not the delegate who presents the ticket. The sharing decision is captured during the delegation ceremony, so that ceremony is where each constraint's explanation is owed:
+Draws from the [constraint catalog](access-constraints.html). The authorizing party is the patient — or the instrument that confers authority — not the delegate who presents the ticket, so each definition's authorizing-party language is owed during the delegation ceremony. The Data Holder's proxy policy narrows below the ticket: a granted scope never overrides what local policy lets this class of requester see.
 
-* **`fhir_resources`** (required). The ceiling on what the delegate's app may receive, set when the patient granted the delegation ("my daughter may see my conditions, medications, and immunizations"). The Data Holder's proxy policy narrows further: a granted scope never overrides what local policy lets this class of requester see, and adolescent-privacy and sensitivity rules continue to apply below the ticket.
-* **`data_period`** (optional). A time bound the patient set when delegating — the same constraint with the same meaning as in patient self access; only the ceremony that sets it differs.
+* **`fhir_resources`** (required) — the ceiling the patient set when granting the delegation.
+* **`data_period`** (optional) — a time bound set at the same ceremony.
 
 #### Requester and Authority
 
@@ -213,38 +213,12 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 #### Constraints
 
-This profile pulls `fhir_resources` from the [constraint catalog](access-constraints.html) and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
+Draws from the [constraint catalog](access-constraints.html). The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
 
-* **`fhir_resources`** (required). The kinds of records and interactions the payer may use: it projects to the OAuth scopes issued at redemption, tells the payer what to expect, and lets the issuer keep whole kinds out of automated release — clinical notes, for example, which a provider may route through human review instead. The record-level limit is `claim_linkage`; this is the kind-level ceiling around it. Likely broader than US Core for some claim types — see the open question below.
-* **`claim_linkage`** (required). Defined below.
+* **`fhir_resources`** (required) — the kind-level ceiling: the resource types adjudication needs, likely broader than US Core for some claim types (see the open question below). The record-level limit is `claim_linkage`.
+* **[`claim_linkage`](access-constraints.html#claim_linkage)** (required) — introduced by this profile; valued from the claim or prior authorization being submitted and its encounters.
 
 The constraint set for this type is exactly these two. `data_period` is not part of it, and issuers SHALL NOT include it: the claim is this type's time anchor — event records are bounded by their encounters through the claim association, and the patient-level floor is deliberately current-state — so any `data_period` value is either redundant (inside the encounter bounds) or contradictory (cutting current medications out of the floor). `data_holder_filter` is likewise not part of this type: the audience is the single issuing Data Holder. Cross-cutting constraints defined elsewhere in the catalog, such as `sensitivity_withhold`, MAY be added, with the standard consequence for servers that do not enforce them.
-
-#### `claim_linkage`
-
-**Shape and validity.**
-
-```json
-"claim_linkage": {
-  "claim": {
-    "resourceType": "Claim",
-    "identifier": [{ "system": "https://provider.example.org/claims", "value": "CLM-2026-0042" }],
-    "status": "active",
-    "use": "claim"
-  },
-  "encounter": [{ "reference": "Encounter/enc-2026-0117" }]
-}
-```
-
-`claim` is a minimal FHIR Claim carrying the identifiers both sides use for re-association; `use` distinguishes a claim from a prior authorization. `encounter` optionally names the encounter records the claim covers, using the issuer's own resource references. The issuer mints these values from the claim it is submitting, so validity is checkable against its own records.
-
-**For the authorizing party.** The constraint records what the provider organization decided to disclose: records tied to this claim, for this adjudication, and nothing else. It is the ticket-shaped form of minimum necessary.
-
-**For the client.** The payer learns which claim or prior authorization the ticket belongs to — the re-association that document workflows carry in tracking numbers — and what to expect from redemption: records the provider associates with that claim. The response may be lawfully incomplete; absence of a record is not a representation that it does not exist.
-
-**For the Data Holder.** Release only records you associate with the referenced claim: at minimum the records linked to the named encounters, plus current problems, medications, and allergies. The association is your own — you minted the ticket against your own claim — so enforcement is determinate against your own records. A Data Holder with no association knowledge for the referenced claim cannot enforce this constraint and rejects the ticket. That is the correct outcome, and it is what confines this ticket type to self-issued tickets today.
-
-The enforcement floor names patient-level categories explicitly because encounter linkage in FHIR data is incomplete: the records adjudication needs most — problem list, medications, allergies — typically link to no encounter at all.
 
 #### Restricted Data
 
@@ -314,10 +288,10 @@ How tickets get minted is deliberately open — see the open question below. Unl
 
 #### Constraints
 
-This profile needs nothing beyond the [constraint catalog](access-constraints.html):
+Draws from the [constraint catalog](access-constraints.html), nothing new defined:
 
-* **`fhir_resources`** (required). Code-narrowed entries naming the elements — `{ "type": "Observation", "code": { "system": "http://loinc.org", "code": "4548-4" } }` is an HbA1c query. Every entry SHALL carry a `category` or `code` narrowing: an un-narrowed entry is a chart section, which is not what this type authorizes.
-* **`data_period`** (required). The measurement or lookback period, taken from the measure specification. Same constraint, same meaning as everywhere else; without it a quality query is unbounded history, which is not what this type authorizes. When a measure's elements carry different lookbacks — a ten-year colonoscopy window beside a one-year FIT window — the issuer mints one ticket per lookback, the base rule for disjoint windows; one wide window would over-expose the short-lookback elements.
+* **`fhir_resources`** (required) — the elements, one entry per element: `{ "type": "Observation", "code": { "system": "http://loinc.org", "code": "4548-4" } }` is an HbA1c query. Every entry SHALL carry a `category` or `code` narrowing; an un-narrowed entry is a chart section, which is not what this type authorizes.
+* **`data_period`** (required) — the measurement or lookback period from the measure specification; without it a quality query is unbounded history. When a measure's elements carry different lookbacks — a ten-year colonoscopy window beside a one-year FIT window — mint one ticket per lookback; one wide window would over-expose the short-lookback elements.
 
 The constraint set for this type is exactly these two. `claim_linkage` is not part of it (there is no claim), and `data_holder_filter` is not part of it (the audience is a single named Data Holder). Cross-cutting constraints such as `sensitivity_withhold` MAY be added, with the standard consequence.
 
