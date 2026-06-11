@@ -51,10 +51,7 @@ A reportable event triggers case reporting → the issuer (which may be the repo
 
 *A community-based organization accesses referral-related data; a food bank volunteer updates a referral status.*
 
-Sketch: requester is an `Organization` (social care hub or CBO); profile claims carry the coded `concern` and the `referral` (ServiceRequest); access could include `create`/`update` interactions for referral status.
-
-> **Open Question (OQ-UC4-WRITE): Social Care Write Access.** Should write access (for example, updating referral status) be modeled in this profile at all, or split into a separate, narrower ticket type? Letting an outside organization write into the record raises governance questions that read-only access does not.
-{: .callout .callout-open-question #oq-uc4-write}
+Sketch: requester is an `Organization` (social care hub or CBO); profile claims carry the coded `concern` and the `referral` (ServiceRequest); access could include `create`/`update` interactions for referral status — though letting an outside organization write into the record raises governance questions that read-only access does not.
 
 ### Research Study
 

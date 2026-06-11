@@ -37,5 +37,3 @@ Issuers SHOULD use directory or network information (published endpoint networks
 * Data Holders that manage integrated records across multiple facilities evaluate this filter at the Data Holder level, not as a resource-by-resource clinical data filter.
 * A Data Holder answering on behalf of a named organization that is served through a broader shared system MAY narrow its response to that organization's records, if its architecture supports the attribution. Narrowing is permitted, not promised: the filter still gates who may answer, and acceptance still typically returns the combined record.
 
-> **Open Question (OQ-CUSTODIAN): Custodian-Level Targeting.** Should `data_holder_filter` gain an explicit custodian-scoped form — "answer only with this organization's records," enforce-or-reject — once vendors can attribute records to custodian organizations and network directories carry custodian-level identities? Today, narrowing is best-effort (above). Do existing network directories model custodian-level entries at all?
-{: .callout .callout-open-question #oq-custodian-targeting}

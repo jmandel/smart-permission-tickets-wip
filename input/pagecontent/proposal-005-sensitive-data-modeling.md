@@ -171,17 +171,5 @@ Trust frameworks or ticket-type profiles incorporating this profile should defin
 
 ### Open Questions
 
-> **Open Question (OQ-3): Incorporation into Ticket Types.** Should this profile be incorporated into specific ticket types, and what authorization UX, vocabulary constraints, and Data Holder enforcement capabilities does each direction need before implementation?
-{: .callout .callout-open-question #oq-3}
-
-> **Open Question (OQ-5A): Disclosure Leakage.** How should a Data Holder respond when a category is requested but local policy, law, or patient preference prevents release and the Data Holder should not reveal whether such data exists?
-{: .callout .callout-open-question #oq-5a}
-
-> **Open Question (OQ-5B): Vocabulary Scope.** Should early implementations constrain this profile to v3 Information Sensitivity Policy codes, or also support confidentiality levels, privacy-law codes, or locally profiled value sets?
-{: .callout .callout-open-question #oq-5b}
-
-> **Open Question (OQ-5C): Unknown Classification.** Should the profile define an explicit behavior for resources whose sensitivity classification is unknown, or is `unlisted` plus conservative withholding sufficient?
-{: .callout .callout-open-question #oq-5c}
-
 > **Open Question (OQ-5D): Release Authorization Prerequisites.** What authorization UX, classification precision, and trust-framework rules does a Data Holder need before honoring `sensitivity_release_authorized` for a category like 42 CFR Part 2 data, and who certifies that an issuer's ceremony meets the bar?
 {: .callout .callout-open-question #oq-5d}

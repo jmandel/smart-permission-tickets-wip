@@ -78,7 +78,3 @@ Draft requirements:
 
 The base specification states only that Data Holders are not required to issue refresh tokens after ticket redemption, and that any local continuation credential SHALL NOT authorize broader access than the effective grant computed at redemption time. Everything beyond that — the `continuation` claim, its lifetime bound, and its revocation linkage — lives in this proposal and is not part of base conformance unless adopted by the base or by a ticket-type profile.
 
-### Open Questions
-
-> **Open Question (OQ-P4A): Adoption Path.** Should the `continuation` claim be promoted into the base claims set once implementations validate it, or should it remain a composable extension that individual ticket-type profiles or trust frameworks adopt?
-{: .callout .callout-open-question #oq-p4a}

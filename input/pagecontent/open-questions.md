@@ -6,21 +6,10 @@ Every open design question in this specification is listed here with a stable ID
 
 | ID | Question | Where |
 |----|----------|-------|
-| OQ-3 | Should the sensitivity profile be incorporated into specific ticket types, and what does each direction need before implementation? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-3) |
-| OQ-CUSTODIAN | Should `data_holder_filter` gain an enforce-or-reject custodian-scoped form once vendors can attribute records to custodian organizations? | [Access Constraints](data-holder-filter.html#oq-custodian-targeting) |
 | OQ-UC2-VERIFY | Should each delegated-access ticket say *how* the issuer verified the authority, or are per-code issuer obligations plus framework audit enough? | [Use Case Catalog](patient-delegated-access.html#oq-verification-class) |
 | OQ-PAYER-DATA | What resource types does claims adjudication need beyond US Core? | [Use Case Catalog](payer-claims-adjudication.html#oq-payer-data) |
-| OQ-PAYER-TRANSPORT | How does a payer claims ticket travel with the claim — X12 275 attachment, CDex Task, or by reference? | [Use Case Catalog](payer-claims-adjudication.html#oq-payer-transport) |
 | OQ-QUALITY-GAP | Who issues quality-gap-query tickets, against what relationship record, and for what lifetime? | [Use Case Catalog](payer-quality-gap-queries.html#oq-quality-gap) |
-| OQ-3A | Is the marker-scope plus CRUDS-scopes approach expressive enough for requesting tickets at issuance, or is a structured parameter needed? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3a) |
-| OQ-3B | Should issuance endpoint hints reuse the SMART Brands `Endpoint` format instead of a custom shape? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3b) |
-| OQ-3C | What is the issuer-issued access token in the issuance flow actually for? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3c) |
-| OQ-P4A | Should the `continuation` claim be promoted into the base claims set once implementations validate it? | [Proposal 004](proposal-004-continuation-credentials.html#oq-p4a) |
-| OQ-5A | How does a Data Holder withhold without revealing that withheld data exists? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-5a) |
-| OQ-5B | Which sensitivity vocabularies should early implementations support? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-5b) |
-| OQ-5C | Does unknown sensitivity classification need explicit behavior beyond conservative withholding? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-5c) |
 | OQ-5D | What must be true (authorization UX, classification precision, framework rules) before a Data Holder honors `release_authorized` for a restricted category? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-5d) |
-| OQ-UC4-WRITE | Should social-care write access be modeled at all, or split into a narrower ticket type? | [Future Use Cases](future-use-cases.html#oq-uc4-write) |
 
 ### Resolved
 

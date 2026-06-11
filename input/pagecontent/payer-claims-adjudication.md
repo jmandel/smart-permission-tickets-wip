@@ -16,7 +16,7 @@ CMS's [Interoperability Framework](https://www.cms.gov/health-technology-ecosyst
 
 ### Typical Flow
 
-Provider's system submits a claim (or prior authorization) → mints a ticket naming the payer as requester and linking the claim → the ticket travels with the submission → during adjudication, the payer's system presents the ticket at the provider's token endpoint → the provider validates its own signature, checks presenter binding, and issues an access token limited to records associated with the claim.
+Provider's system submits a claim (or prior authorization) → mints a ticket naming the payer as requester and linking the claim → the ticket travels with the submission (in an X12 275 attachment, a CDex Task, or by reference — tickets are a capability other exchange flows carry, and this profile does not pick the vehicle) → during adjudication, the payer's system presents the ticket at the provider's token endpoint → the provider validates its own signature, checks presenter binding, and issues an access token limited to records associated with the claim.
 
 ### Required Claims
 
@@ -58,9 +58,6 @@ The constraint set for this type is exactly these two — it scopes one adjudica
 
 > **Open Question (OQ-PAYER-DATA): Resource types for adjudication.** What does claims review need beyond US Core resource types? Claim, Coverage, and documentation resources are candidates; payer implementers should name the list before this profile advances.
 {: .callout .callout-open-question #oq-payer-data}
-
-> **Open Question (OQ-PAYER-TRANSPORT): How the ticket travels with the claim.** In an X12 275 attachment, in a CDex Task, or by reference from the claim itself? This profile defines the artifact, not the transport; early adopters should converge on one carriage pattern.
-{: .callout .callout-open-question #oq-payer-transport}
 
 ### Example
 

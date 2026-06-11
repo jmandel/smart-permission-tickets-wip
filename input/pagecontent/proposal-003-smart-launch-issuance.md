@@ -182,13 +182,3 @@ For the individual-access ticket types, `presenter_binding` is REQUIRED per the 
 
 *Relationship to proposal 002 (OIDF issuers).* Proposal 002 covers how an issuer publishes its ticket-signing keys under OpenID Federation. Proposal 003 is agnostic to how the issuer's keys are published; a given issuer may use the baseline well-known JWKS, an OIDF federation chain, or both. The two proposals address orthogonal concerns.
 
-### Open Questions
-
-> **Open Question (OQ-3A): How should a client request ticket access?** This proposal introduces a `permission_ticket` marker scope plus SMART v2 CRUDS scopes (e.g., `patient/Observation.rs`) to convey the desired ticket access. Alternatives considered: a single structured parameter (e.g., `ticket_request=<json>`) passed in the authorize request, or a `ticket_type`-prefixed scope form (e.g., `ticket:patient-self-access-v1:patient/Observation.rs`). The working group should decide whether the marker-scope plus CRUDS approach is expressive enough for the full range of ticket-type-specific constraints (e.g., the public-health `reportable_condition` claim, the payer `claim_linkage` constraint) or whether a structured parameter is needed for those cases.
-{: .callout .callout-open-question #oq-3a}
-
-> **Open Question (OQ-3B): What format should endpoint hints use?** This proposal models endpoint hints as objects with `fhir_base_url`, `organization`, and `ticket_indices`. An alternative is to reuse the SMART App State / SMART Brands `Endpoint` resource format directly, which is already structured for this purpose and may provide better interoperability with existing patient-facing app directories. A third alternative is to keep the hints out of the base proposal entirely and define them in a separate profile, on the grounds that issuers and clients can negotiate them out of band.
-{: .callout .callout-open-question #oq-3b}
-
-> **Open Question (OQ-3C): What is the issuer-issued access token useful for?** The token response includes an `access_token` because that is the baseline SMART shape, but this proposal does not prescribe what that access token is useful for. Options: (a) it grants access to an issuer-operated FHIR endpoint that lets the client read back authorization state, consent artifacts, and audit records; (b) it authorizes refresh-token redemption only; (c) it is reserved for a future revision. Input welcome on whether issuer-side FHIR access is a real client need or an over-designed hypothetical.
-{: .callout .callout-open-question #oq-3c}
