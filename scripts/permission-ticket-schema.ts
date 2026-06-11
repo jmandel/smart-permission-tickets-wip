@@ -243,26 +243,6 @@ export const PayerAccessGrantSchema = AccessGrantSchema.extend({
   claim_linkage: ClaimLinkageSchema,
 });
 
-const BaseKernelTopLevelClaimNames = new Set([
-  "iss",
-  "aud",
-  "exp",
-  "iat",
-  "jti",
-  "ticket_type",
-  "aud_type",
-  "presenter_binding",
-  "subject_identity_evidence",
-  "requester_identity_evidence",
-  "revocation",
-  "must_understand",
-  "subject",
-  "requester",
-  "access",
-]);
-
-const MustUnderstandClaimNameSchema = z.string().regex(/^[a-z][a-z0-9_]*$/);
-
 const TicketBaseSchema = z.object({
   iss: UriSchema,
   aud: JwtAudienceSchema,
@@ -274,7 +254,6 @@ const TicketBaseSchema = z.object({
   subject_identity_evidence: IdentityEvidenceSchema.optional(),
   requester_identity_evidence: IdentityEvidenceSchema.optional(),
   revocation: RevocationSchema.optional(),
-  must_understand: z.array(MustUnderstandClaimNameSchema).min(1).optional(),
   subject: SubjectSchema,
   requester: RequesterSchema.optional(),
   access: AccessGrantSchema,
@@ -330,37 +309,7 @@ export const PermissionTicketSchema = z.discriminatedUnion("ticket_type", [
   PayerClaimsTicketSchema,
   ResearchStudyTicketSchema,
   ProviderConsultTicketSchema,
-]).superRefine((ticket, ctx) => {
-  if (!ticket.must_understand) return;
-
-  const duplicates = new Set<string>();
-  for (const claimName of ticket.must_understand) {
-    if (duplicates.has(claimName)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `must_understand contains duplicate entry ${claimName}.`,
-        path: ["must_understand"],
-      });
-    }
-    duplicates.add(claimName);
-
-    if (BaseKernelTopLevelClaimNames.has(claimName)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `${claimName} is a base claim and must not be listed in must_understand.`,
-        path: ["must_understand"],
-      });
-    }
-
-    if (!(claimName in ticket)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `must_understand entry ${claimName} does not match a top-level ticket claim.`,
-        path: ["must_understand"],
-      });
-    }
-  }
-});
+]);
 
 export const ClientAssertionSchema = z.object({
   iss: NonEmptyStringSchema,

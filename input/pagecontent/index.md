@@ -201,7 +201,7 @@ In all three modes, the Data Holder authenticates the client through its standar
 The Data Holder SHALL NOT rely on any cross-party-stable client identifier inside the Permission Ticket itself. Client identity is established by the `client_assertion` (`iss`/`sub`).
 
 #### Artifact: Ticket Structure
-The ticket payload is a JWT. It carries top-level `subject` and `access`, plus optional `requester`, identity-evidence, `presenter_binding`, `revocation`, and `must_understand` claims alongside the standard JWT envelope. `ticket_type` is the sole discriminator for the processing rules: which claims are required, which profile claims the type defines, and which access constraints its tickets use.
+The ticket payload is a JWT. It carries top-level `subject` and `access`, plus optional `requester`, identity-evidence, `presenter_binding`, and `revocation` claims alongside the standard JWT envelope. `ticket_type` is the sole discriminator for the processing rules: which claims are required, which profile claims the type defines, and which access constraints its tickets use.
 
 {% include generated/spec-snippets/index/artifact-ticket.js.md %}
 
@@ -264,8 +264,7 @@ The Data Holder SHALL validate in two layers:
     *   **Check Revocation:** If `revocation` is present, check the ticket's revocation status; if status cannot be determined, reject (see [Revocation](#revocation)).
     *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`. If the selected ticket type requires binding and it is absent, reject.
     *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per [Identity Evidence](#identity-evidence) — signature, evidence-issuer trust, temporal validity, audience, and demographic consistency with the party in that slot — plus the selected profile's assurance and claim parameters.
-    *   **Check `must_understand`:** If `must_understand` is present, verify the Data Holder recognizes every listed claim name. Reject with `invalid_grant` if any entry is unrecognized.
-    *   **Process Kernel Fields:** Every kernel field present in the ticket is must-understand. Enforced fields — including every member of `access` — SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Must-Understand Semantics](#must-understand-semantics).
+    *   **Process Kernel Fields:** Every kernel field present in the ticket must be handled. Enforced fields — including every member of `access` — SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Field Handling and Extensions](#field-handling-and-extensions).
     *   **Verify Required Claims:** Confirm every claim the selected ticket type requires is present and well-formed (for example, UC2's authority coding, or a constraint the type requires such as UC5's `claim_linkage`); reject with `invalid_grant` if missing.
     *   **Resolve Subject:** Resolve the subject to a unique local patient record; reject on zero or ambiguous matches (see [Subject Resolution](#subject-resolution)).
     *   **Grant Access:** If valid, grant access per [Access Calculation](#access-calculation).
@@ -323,9 +322,11 @@ Future versions may define additional identity-evidence token types, such as mob
 
 Identity evidence supplements — it does not replace — the FHIR party representations (see [Subject Resolution](#subject-resolution)). The same rule applies on the requester side: `requester` stays present, and the issuer SHALL keep it consistent with any `requester_identity_evidence`.
 
-*Design note:* evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. The evidence is a JWT verified with standard OIDC processing at the token endpoint, not clinical content; top-level claims are how this specification handles must-understand and extensions; and sibling slots keep the two evidence claims identical in shape. There is no ambiguity about who the evidence describes, because a ticket names exactly one subject and at most one requester.
+*Design note:* evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. The evidence is a JWT verified with standard OIDC processing at the token endpoint, not clinical content; top-level claims are how this specification handles extensions; and sibling slots keep the two evidence claims identical in shape. There is no ambiguity about who the evidence describes, because a ticket names exactly one subject and at most one requester.
 
-#### Issuer-Attested Claims
+#### Profile Claims
+
+A ticket type may define top-level **profile claims** carrying the facts that type needs — which investigation a public-health request belongs to, for example. The dividing rule, restated from [Access Constraints](#access-constraints): a field whose neglect would widen release is an access constraint and lives in `access`; a fact the Data Holder weighs in its policy decision is a profile claim. Ignoring a profile claim can only lead to less release, so profile claims do not need the fail-closed handling constraints get. No active ticket type currently requires one; UC3 on the [Future Use Cases](future-use-cases.html) page sketches `reportable_condition`.
 
 `requester` and profile claims are issuer-attested facts. The Data Holder uses them for local policy evaluation and audit. The Data Holder is not expected to repeat upstream verification steps — requester identity, delegation relationship, consent, mandate, contract — when its configured trust policy permits reliance on the issuer. It may still deny, narrow, require a supported fallback, or route to review when required by local policy, the selected ticket type, the subject match result, or technical capability.
 
@@ -357,7 +358,7 @@ The `access` object holds the ticket's **access constraints**. Each member of `a
 
 1. **Unrecognized means reject.** A Data Holder SHALL reject a ticket whose `access` contains a member it does not recognize and enforce, with `invalid_grant` and an `error_description` naming the unsupported constraint. There is no issuer opt-in and no capability negotiation: ignoring an access constraint always releases more than the issuer authorized, so unrecognized constraints fail closed.
 2. **Constraints only narrow.** No constraint broadens what another constraint, the requested scopes, the client's eligibility, or the Data Holder's policy would allow. Constraints combine by intersection (see [Constraint Algebra](#constraint-algebra)).
-3. **Limits live here.** Any field whose neglect would widen release belongs in `access`. Facts that inform the Data Holder's policy decision — who is asking, what event the request belongs to — are profile claims, not access constraints (see [Profile Claims](#profile-claims-ticket-type-specific-facts)).
+3. **Limits live here.** Any field whose neglect would widen release belongs in `access`. Facts that inform the Data Holder's policy decision — who is asking, what event the request belongs to — are profile claims, not access constraints (see [Profile Claims](#profile-claims)).
 
 The base constraints are:
 
@@ -414,7 +415,7 @@ FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base ker
 
 **Shape and validity.** Optional. A FHIR Period with `start` and/or `end`. One coarse window per ticket; if the grant needs disjoint windows, the issuer mints separate tickets.
 
-**For the authorizing party.** The window bounds the clinical dates of what is shared: "records from 2023 through 2024." The bound is approximate in exactly one stated way: a Data Holder may also release records it treats as currently clinically relevant — an active allergy recorded years ago — even when their dates fall outside the window. Authorization screens SHOULD present the period as bounding clinical dates, not as a seal.
+**For the authorizing party.** The window bounds the clinical dates of what is shared: "records from 2023 through 2024." The bound is approximate in exactly one stated way: a Data Holder may also release active allergies and active problem-list conditions — an allergy recorded years ago that is still active — even when their dates fall outside the window. Authorization screens SHOULD present the period as bounding clinical dates, not as a seal.
 
 **For the client.** Resources whose designated dates fall outside the window are excluded, regardless of when they were created or last updated. Absence of a record from a response is not evidence the record does not exist.
 
@@ -450,7 +451,7 @@ For any resource type in neither list, a Data Holder SHALL NOT return resources 
 
 Parameter choices favor reliably populated dates over clinically richer but sparse ones: `recorded-date` rather than `onset-date` for Condition (onset is a choice type, often absent or non-date), `authoredon` for MedicationRequest (the R4 `date` parameter binds to dosing-schedule timing, not order time), `date` rather than `issued` for DiagnosticReport (clinical time, not release time). These dates reflect when content was recorded or performed: a condition recorded last month passes a recent window even if it began years ago.
 
-**Bounded discretion (widens release).** A Data Holder MAY release a resource whose designated date falls outside the window when its local policy treats the resource as currently clinically relevant — the standing examples are active allergies and active problem-list items. This is the only discretion this constraint allows beyond ordinary narrowing, and it runs in the widening direction, so the explanation shown to the authorizing party carries it: the window bounds clinical dates, with currently relevant items possibly included regardless.
+**Bounded discretion (widens release).** A Data Holder MAY release AllergyIntolerance resources and problem-list Condition resources whose clinical status is active, regardless of the window. This list is closed; a ticket-type profile may extend it for its own tickets. The discretion runs in the widening direction, so the explanation shown to the authorizing party carries it.
 
 #### `data_holder_filter`
 
@@ -597,13 +598,9 @@ Because constraints are ANDed: a matching Observation from a non-matching Data H
 
 #### Defining New Access Constraints
 
-Ticket-type profiles and ecosystem guides MAY define additional access constraints. The rules:
+Ticket-type profiles MAY define additional access constraints. A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template). Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
 
-* A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template).
-* Fail-closed behavior comes from the base rule: Data Holders that do not recognize the name reject the ticket. New constraints never need `must_understand`, which is for top-level claims.
-* Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate. A profile may define a constraint only some Data Holders can evaluate; the others reject, which is the correct outcome.
-* Base constraint names are unprefixed. A constraint defined outside this specification SHOULD carry a name that identifies its defining profile, to keep independently developed constraints from colliding.
-* A constraint that proves broadly useful should be proposed for the base set.
+Discovery rides on ticket types. A `ticket_type` URI fixes the constraints its tickets require; changing the required set means minting a new URI. Data Holders advertise supported types, so a server that lists a type can enforce everything the type requires. A ticket MAY also carry constraints beyond its type's required set — a sensitivity withholding, for example — with the standard consequence: servers that do not enforce them reject the ticket, and issuers should expect that rejection wherever the extra constraint is unsupported.
 
 For example, a profile that needs encounter-class scoping defines it as a constraint:
 
@@ -624,11 +621,9 @@ A Data Holder that recognizes `encounter_class_filter` releases only records tie
 
 #### Sensitive Data Profiles
 
-Sensitivity controls are handled through profile-level claims rather than the base `access` object. Current implementations vary substantially in how they classify restricted or legally protected data, how they expose patient-facing choices, and how those choices map to access-control policy. [Proposal 005](proposal-005-sensitive-data-modeling.html) defines an experimental profile with both directions: withholding categories (which any Data Holder with category labeling can honor, from any issuer) and release authorization (which requires trusting the issuer's authorization ceremony for sensitive categories). The profile is deliberately ahead of what base APIs can enforce today; its job is to give the ecosystem one shape to build toward.
+Sensitivity controls are handled through an experimental profile rather than the base kernel. Current implementations vary substantially in how they classify restricted or legally protected data, how they expose patient-facing choices, and how those choices map to access-control policy. [Proposal 005](proposal-005-sensitive-data-modeling.html) models both directions, split along the constraint border: a **withholding constraint** inside `access` — a limit any Data Holder with category labeling can honor, from any issuer, and servers that cannot enforce it reject the ticket — and a **release-authorization claim** at the top level — an issuer-attested fact, and a Data Holder that does not recognize it falls back to its own sensitivity gates and releases less. Withholding beats release authorization wherever both match; that is the constraint algebra, not a special rule. The profile is deliberately ahead of what base APIs can enforce today; its job is to give the ecosystem one shape to build toward.
 
-`sensitivity_policy` predates the access constraint model and lives as a top-level claim that the issuer SHALL list in `must_understand` whenever present — which gives it the same fail-closed behavior an access constraint gets automatically. Whether it migrates into `access` is part of OQ-3.
-
-> **Open Question (OQ-3): Sensitive Data Profiles.** Should the Proposal 005 `sensitivity_policy` profile be incorporated into specific ticket types, and what authorization UX, vocabulary constraints, and Data Holder enforcement capabilities does each direction need before implementation? See [Proposal 005: Sensitive Data Profile](proposal-005-sensitive-data-modeling.html).
+> **Open Question (OQ-3): Sensitive Data Profiles.** Should the Proposal 005 sensitivity profile be incorporated into specific ticket types, and what authorization UX, vocabulary constraints, and Data Holder enforcement capabilities does each direction need before implementation? See [Proposal 005: Sensitive Data Profile](proposal-005-sensitive-data-modeling.html).
 {: .callout .callout-open-question #oq-3}
 
 #### Token-Time and Resource-Time Enforcement
@@ -649,37 +644,15 @@ This pattern also applies when one set of intended permissions does not fit clea
 
 ---
 
-### Must-Understand Semantics
+### Field Handling and Extensions
 
-#### Base Must-Understand Set
+Three rules cover every field a Data Holder may meet:
 
-Every field defined in the kernel is must-understand when present, but fields differ in what "understanding" requires:
+1. **Kernel fields are handled or the ticket is rejected.** Envelope fields (`iss`, `aud`, `exp`, `jti`, `ticket_type`), `presenter_binding`, `revocation`, and every member of `access` are enforced. `subject`, `requester`, and the identity-evidence slots are processed well enough to apply the selected ticket type and local policy. Claims a ticket type requires come with type support: a Data Holder that lists a `ticket_type` as supported understands the claims and constraints that type defines.
+2. **Unknown members of `access` are rejected.** Ignoring a limit always releases more than the issuer authorized.
+3. **Unknown top-level claims are ignored.** Standard JWT behavior. A fact the Data Holder does not recognize can only make its policy decision more conservative, never less.
 
-* **Enforced fields** SHALL be enforced. If the Data Holder cannot enforce a present field, it SHALL reject with `invalid_grant`:
-  * JWT envelope: `iss`, `aud`, `exp`, `jti`, `ticket_type`
-  * `presenter_binding`
-  * `revocation`
-  * every member of `access` — each access constraint is enforce-or-reject by definition (see [Access Constraints](#access-constraints))
-* **Policy-selection fields** SHALL be processed: the Data Holder must understand the field well enough to apply the selected ticket type and its own local policy. If it cannot safely interpret a field the selected ticket type requires, it SHALL reject with `invalid_grant`:
-  * `subject` (`subject.patient` and optional `subject.recipient_record`)
-  * `subject_identity_evidence`
-  * `requester`
-  * `requester_identity_evidence`
-* **Profile claims required by the selected ticket type** are part of recognizing that type: a Data Holder that lists a `ticket_type` in its supported set understands the claims that type requires (see [Profile Claims](#profile-claims-ticket-type-specific-facts)).
-
-#### `must_understand` for Extensions
-
-Top-level claims not in the base set and not required by the selected ticket type are safe to ignore **unless** the issuer lists them in `must_understand`. A Data Holder that sees a `must_understand` entry it does not recognize SHALL reject the ticket with `invalid_grant`.
-
-`must_understand` lists **top-level claim names** that the Data Holder MUST understand beyond the base kernel. Each entry is a string matching a top-level claim in the ticket payload. This is inspired by the JWS `crit` header parameter ([RFC 7515](https://www.rfc-editor.org/rfc/rfc7515) Section 4.1.11) but applied to payload claims rather than header parameters.
-
-The two extension surfaces divide by the rule from [Access Constraints](#access-constraints): a field that limits release is a new access constraint, rejected automatically when unrecognized, with no `must_understand` involvement. A field that carries facts is a top-level claim, ignored when unrecognized unless the issuer lists it in `must_understand`. The live example of the second kind is [Proposal 005](proposal-005-sensitive-data-modeling.html)'s `sensitivity_policy`, which the issuer SHALL list in `must_understand` whenever present.
-
-#### Unknown Fields
-
-Top-level claims not in the base kernel, not required by the selected ticket type, not in `must_understand`, and not recognized by the Data Holder are safe to ignore. This is standard JWT behavior. Unrecognized members of `access` are the exception: they are rejected, never ignored.
-
-Extensions should be modeled as new top-level claims or new access constraints rather than injecting fields into existing kernel structures. This keeps extensions visible and prevents profiles from silently altering the semantics of base claims.
+There is no opt-in "critical claim" marker. An earlier draft had one (`must_understand`); the constraint model makes it unnecessary — a field that must not be ignored is a limit, and limits live in `access`, where rejection is automatic. Extensions follow the same border: a profile-grown limit is a new access constraint ([Defining New Access Constraints](#defining-new-access-constraints)); a profile-grown fact is a new top-level claim, advisory by construction. Extensions SHALL NOT alter the meaning of base fields.
 
 ---
 
@@ -735,19 +708,6 @@ The issuer does all real-world verification. The ticket carries only what the Da
 When its configured trust policy permits reliance on the issuer for the presented ticket type, the Data Holder relies on the issuer for real-world verification; the issuer's accountability under the trust framework backs that reliance. Reliance is not blind: the Data Holder retains its own patient matching, local policy, sensitivity handling, and technical enforceability checks.
 
 ---
-
-### Profile Claims (Ticket-Type-Specific Facts)
-
-A ticket type may define top-level claims carrying the facts that type needs — which investigation a public-health request belongs to, for example. `ticket_type` alone determines which profile claims are required and what they mean.
-
-The dividing rule, restated from [Access Constraints](#access-constraints): a field whose neglect would widen release is an access constraint and lives in `access`; a fact the Data Holder weighs in its policy decision is a profile claim. Ignoring a profile claim can only lead to less release — a policy that needed the fact does not fire — so profile claims do not need the fail-closed handling constraints get.
-
-| Ticket Type | Required Profile Claims |
-|-------------|------------------------|
-| UC1, UC2 | *(none)* |
-| UC5 | *(none — its claim linkage is an access constraint)* |
-
-UC1 and UC2 intentionally define no profile claims; delegation is expressed by the presence and type of `requester`. Ticket types on the [Future Use Cases](future-use-cases.html) page sketch their own profile claims (UC3's `reportable_condition`, for example).
 
 ---
 
@@ -931,7 +891,6 @@ When ticket validation fails, the Data Holder SHALL return an OAuth 2.0 error re
 | `aud` mismatch | `invalid_grant` | "Ticket not valid for this server" |
 | Identity evidence invalid (base rules or profile parameters) | `invalid_grant` | "Invalid identity evidence" |
 | Unknown `ticket_type` | `invalid_grant` | "Unsupported ticket type" |
-| Unrecognized `must_understand` entry | `invalid_grant` | "Unrecognized must_understand claim: {name}" |
 | Unsupported kernel field | `invalid_grant` | "Cannot enforce kernel field: {field}" |
 | Subject not resolvable | `invalid_grant` | "Unable to resolve ticket subject" |
 | Ambiguous subject match | `invalid_grant` | "Ambiguous ticket subject match" |
@@ -959,7 +918,6 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - If `presenter_binding` is present, verify it according to `presenter_binding.method`
 - If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per the base Identity Evidence rules (signature, evidence-issuer trust, temporal validity, audience, demographic consistency with the party in that slot) and any profile-defined assurance and claim requirements
 - Validate `ticket_type` is recognized (listed in `smart_permission_ticket_types_supported`) and select processing rules accordingly
-- Process `must_understand`: reject with `invalid_grant` if any listed claim name is unrecognized
 - Reject with `invalid_grant` if any present kernel field cannot be enforced
 - Resolve the ticket subject to a local patient record using `subject.patient`, corroborated by verified `subject_identity_evidence` when present; reject if zero or ambiguous matches
 - Calculate granted access per [Access Calculation](#access-calculation): the intersection of requested scopes, ticket access, client eligibility, ticket-type rules, and local policy and capability
@@ -1011,7 +969,6 @@ For clients using the well-known JWKS identity approach, see [Proposal 006](prop
 - Give the authorizing person a revocation management URL at grant time, reachable without the client's cooperation
 - Use short expiration for interactive use cases (1-4 hours)
 - Support revocation for long-lived tickets
-- Include `must_understand` when minting tickets with profile-specific extension claims
 
 ---
 

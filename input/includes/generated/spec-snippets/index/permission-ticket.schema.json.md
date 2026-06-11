@@ -165,14 +165,6 @@
           ],
           "additionalProperties": false
         },
-        "must_understand": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
         "subject": {
           "type": "object",
           "properties": {
@@ -712,14 +704,6 @@
             "index"
           ],
           "additionalProperties": false
-        },
-        "must_understand": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
         },
         "subject": {
           "type": "object",
@@ -1386,14 +1370,6 @@
           ],
           "additionalProperties": false
         },
-        "must_understand": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
         "subject": {
           "type": "object",
           "properties": {
@@ -2017,14 +1993,6 @@
             "index"
           ],
           "additionalProperties": false
-        },
-        "must_understand": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
         },
         "subject": {
           "type": "object",
@@ -2715,14 +2683,6 @@
             "index"
           ],
           "additionalProperties": false
-        },
-        "must_understand": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
         },
         "subject": {
           "type": "object",
@@ -3453,14 +3413,6 @@
           ],
           "additionalProperties": false
         },
-        "must_understand": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
         "subject": {
           "type": "object",
           "properties": {
@@ -4120,14 +4072,6 @@
             "index"
           ],
           "additionalProperties": false
-        },
-        "must_understand": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
         },
         "subject": {
           "type": "object",

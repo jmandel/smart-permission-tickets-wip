@@ -25,11 +25,11 @@ Use-case numbers are stable identifiers, not an ordering. UC3 (Public Health Inv
 
 The table below summarizes required and optional fields for each ticket type. Each profile pulls in the [access constraints](index.html#access-constraints) it needs; a Constraints section in each profile states how the [constraint template](index.html#constraint-template)'s sections land for that use case.
 
-| Use Case | `presenter_binding` | Requester | Identity Evidence | Profile Claims | Access Constraints |
-|----------|---------------------|-----------|-------------------|----------------|--------------------|
-| UC1: Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | *(none)* | `permissions` required; `data_period`, `data_holder_filter` optional |
-| UC2: Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | *(none)* | `permissions` required; `data_period` optional |
-| UC5: Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | *(none)* | `permissions`, `claim_linkage` required; `data_period` recommended |
+| Use Case | `presenter_binding` | Requester | Identity Evidence | Access Constraints |
+|----------|---------------------|-----------|-------------------|--------------------|
+| UC1: Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `permissions` required; `data_period`, `data_holder_filter` optional |
+| UC2: Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `permissions` required; `data_period` optional |
+| UC5: Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `permissions`, `claim_linkage` required; `data_period` recommended |
 
 **Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For UC1 that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For UC2 that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
 
@@ -247,7 +247,7 @@ The enforcement floor names patient-level categories explicitly because encounte
 
 * Records restricted from disclosure to the payer are excluded silently. The base rule already covers this — a valid ticket does not override local rules — and the issuer is the Data Holder, which holds its own restriction flags. The leading case is the HIPAA right to restrict ([45 CFR 164.522(a)(1)(vi)](https://www.ecfr.gov/current/title-45/section-164.522)): a provider must honor a patient's request not to disclose to a health plan information about items or services paid out of pocket in full.
 * The payer is told the response may be lawfully incomplete (the client section above). Treating a filtered response as the complete record is the failure that sentence prevents.
-* When the patient has authorized disclosure of restricted items to the plan, the ticket says so explicitly: a `sensitivity_policy` `release_authorized` entry per [Proposal 005](proposal-005-sensitive-data-modeling.html), using the v3-ActCode `HIPAASelfPay` security label policy code — never a silent widening of the default.
+* When the patient has authorized disclosure of restricted items to the plan, the ticket says so explicitly: a `sensitivity_release_authorized` claim per [Proposal 005](proposal-005-sensitive-data-modeling.html), using the v3-ActCode `HIPAASelfPay` security label policy code — never a silent widening of the default.
 
 #### Policy Selection Inputs
 
