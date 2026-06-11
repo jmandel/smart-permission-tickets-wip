@@ -227,7 +227,7 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
   }
   ```
 
-**Note on `cnf` (decided).** Standard JWT confirmation uses the `cnf` claim ([RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)). This specification diverges: both binding modes live in one `presenter_binding` discriminated union rather than splitting key binding into `cnf` and framework binding into a custom claim. The key-binding semantics are exactly `cnf.jkt` — the same RFC 7638 thumbprint comparison, so thumbprint code written for `cnf.jkt` is reusable as-is — and only the claim shape differs. Recorded as a resolved design decision in the [Open Questions registry](open-questions.html).
+**Note on `cnf` (decided).** Standard JWT confirmation uses the `cnf` claim ([RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)). This specification diverges: both binding modes live in one `presenter_binding` discriminated union rather than splitting key binding into `cnf` and framework binding into a custom claim. The key-binding semantics are exactly `cnf.jkt` — the same RFC 7638 thumbprint comparison, so thumbprint code written for `cnf.jkt` is reusable as-is — and only the claim shape differs.
 
 #### Binding Modes
 
