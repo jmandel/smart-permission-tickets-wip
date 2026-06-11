@@ -22,7 +22,7 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 * **Subject:** `Patient`, with `subject.recipient_record` SHOULD — the issuer is the Data Holder, so it knows its own record identifier and the direct-target hint always resolves.
 * **Requester:** `Organization` (the payer), identified well enough for the provider to match it to the claim's payer.
-* **Presenter binding:** Required — `trust_framework_client` naming the payer organization, or `jkt`.
+* **Presenter binding:** Required — `trust_framework_client` or `jkt`, naming the party authorized to redeem. That is often the payer itself, but `requester` identifies the principal, not necessarily the presenter: a contractor adjudicating on the payer's behalf may redeem with its own registered client when the delegation is tracked through registration or expressed in the trust framework (OpenID Federation can carry it explicitly). See [the base specification](index.html#relationship-between-presenter_binding-and-requester) on this distinction.
 * **Expiration:** `exp` SHOULD cover the payer's documented additional-information window for the linked claim. Sixty days from submission matches the CMS criterion; the operational windows underneath run 45–75 days (Medicare ADR, PERM, commercial record-request periods), so the length is a deployment parameter, not a fixed rule.
 
 ### Constraints

@@ -98,7 +98,9 @@ Because constraints are ANDed: a matching Observation from a non-matching Data H
 
 ### Defining New Access Constraints
 
-Ticket-type profiles and other implementation guides MAY introduce additional access constraints. A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template); constraints introduced by catalog ticket types get definition pages here, so this catalog stays the one place definitions live. Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
+Ticket-type profiles and other implementation guides MAY introduce additional access constraints. A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template); constraints introduced by catalog ticket types get definition pages here, so this catalog stays the one place definitions live.
+
+Bare member names are reserved for constraints this specification defines. A constraint defined in another implementation guide uses its canonical URL as the member name — the standard pattern for downstream extension — so independently defined constraints cannot collide and every name resolves to its definition. Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
 
 Discovery rides on ticket types. A `ticket_type` URI fixes the constraints its tickets require; changing the required set means minting a new URI. Data Holders advertise supported types, so a server that lists a type can enforce everything the type requires. A ticket MAY also carry constraints beyond its type's required set — a sensitivity withholding, for example — with the standard consequence: servers that do not enforce them reject the ticket, and issuers should expect that rejection wherever the extra constraint is unsupported.
 
@@ -109,7 +111,7 @@ For example, a profile that needs encounter-class scoping defines it as a constr
   "fhir_resources": [
     { "type": "DocumentReference", "interactions": ["read", "search"] }
   ],
-  "encounter_class_filter": {
+  "https://example.org/permission-ticket/encounter-class-filter": {
     "include": [
       { "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode", "code": "AMB" }
     ]
@@ -117,4 +119,4 @@ For example, a profile that needs encounter-class scoping defines it as a constr
 }
 ```
 
-A Data Holder that recognizes `encounter_class_filter` releases only records tied to matching encounters; one that does not recognize it rejects the ticket. The defining profile owes all four template sections — including what an authorization screen may say ("only office-visit records") and how records that link to no encounter at all are handled, since many patient-level resources do not.
+A Data Holder that recognizes the constraint releases only records tied to matching encounters; one that does not recognize it rejects the ticket. The defining profile owes all four template sections — including what an authorization screen may say ("only office-visit records") and how records that link to no encounter at all are handled, since many patient-level resources do not.
