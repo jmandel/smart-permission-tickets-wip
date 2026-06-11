@@ -4,7 +4,7 @@ This page is the registry of access constraints: the named members of `access`, 
 
 ### Constraint Model
 
-The `access` object holds the ticket's **access constraints**. Each member of `access` is a named constraint with a published definition — in this specification or in a ticket-type profile. Four rules govern every constraint:
+The `access` object holds the ticket's **access constraints**. Each member of `access` is a named constraint with a published definition, and this page is where definitions live. (One experimental constraint, `sensitivity_withhold`, is staged in [Proposal 005](proposal-005-sensitive-data-modeling.html) until it graduates.) Other implementation guides MAY define additional constraints, which participate under the same rules. Four rules govern every constraint:
 
 1. **Unrecognized means reject.** A Data Holder SHALL reject a ticket whose `access` contains a member it does not recognize and enforce, with `invalid_grant` and an `error_description` naming the unsupported constraint. There is no issuer opt-in and no capability negotiation: ignoring an access constraint always releases more than the issuer authorized, so unrecognized constraints fail closed.
 2. **Constraints only narrow.** No constraint broadens what another constraint, the requested scopes, the client's eligibility, or the Data Holder's policy would allow. Constraints combine by intersection (see [Constraint Algebra](#constraint-algebra)).
@@ -221,7 +221,7 @@ Because constraints are ANDed: a matching Observation from a non-matching Data H
 
 ### Defining New Access Constraints
 
-Ticket-type profiles MAY introduce additional access constraints. A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template); constraints introduced by catalog ticket types are defined on this page, so the catalog stays the one place definitions live. Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
+Ticket-type profiles and other implementation guides MAY introduce additional access constraints. A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template); constraints introduced by catalog ticket types are defined on this page, so the catalog stays the one place definitions live. Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
 
 Discovery rides on ticket types. A `ticket_type` URI fixes the constraints its tickets require; changing the required set means minting a new URI. Data Holders advertise supported types, so a server that lists a type can enforce everything the type requires. A ticket MAY also carry constraints beyond its type's required set — a sensitivity withholding, for example — with the standard consequence: servers that do not enforce them reject the ticket, and issuers should expect that rejection wherever the extra constraint is unsupported.
 
