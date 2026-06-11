@@ -71,7 +71,6 @@ export type Revocation = {
 };
 
 export type DataPermission = {
-  kind: "data";
   resource_type: string;
   interactions: NonEmptyArray<RestInteraction>;
   category_any_of?: NonEmptyArray<FHIRCoding>;

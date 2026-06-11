@@ -75,10 +75,10 @@ const uc1_payload: PermissionTicket = {
     },
     access: {
         permissions: [
-            { kind: "data", resource_type: "AllergyIntolerance", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Observation", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "MedicationRequest", interactions: ["read", "search"] }
+            { resource_type: "AllergyIntolerance", interactions: ["read", "search"] },
+            { resource_type: "Condition", interactions: ["read", "search"] },
+            { resource_type: "Observation", interactions: ["read", "search"] },
+            { resource_type: "MedicationRequest", interactions: ["read", "search"] }
         ],
         data_period: { start: "2021-01-01", end: "2026-01-01" }
     }
@@ -125,9 +125,9 @@ const uc2_payload: PermissionTicket = {
     },
     access: {
         permissions: [
-            { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Immunization", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "MedicationRequest", interactions: ["read", "search"] }
+            { resource_type: "Condition", interactions: ["read", "search"] },
+            { resource_type: "Immunization", interactions: ["read", "search"] },
+            { resource_type: "MedicationRequest", interactions: ["read", "search"] }
         ]
     }
 };
@@ -163,9 +163,9 @@ const uc3_payload: PermissionTicket = {
     },
     access: {
         permissions: [
-            { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Observation", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "DiagnosticReport", interactions: ["read", "search"] }
+            { resource_type: "Condition", interactions: ["read", "search"] },
+            { resource_type: "Observation", interactions: ["read", "search"] },
+            { resource_type: "DiagnosticReport", interactions: ["read", "search"] }
         ],
         data_period: { start: "2025-12-01", end: "2026-06-01" },
         data_holder_filter: [{ kind: "jurisdiction", address: { country: "US", state: "TX" } }]
@@ -209,10 +209,10 @@ const uc5_payload: PermissionTicket = {
     },
     access: {
         permissions: [
-            { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Observation", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "Procedure", interactions: ["read", "search"] },
-            { kind: "data", resource_type: "DocumentReference", interactions: ["read", "search"] }
+            { resource_type: "Condition", interactions: ["read", "search"] },
+            { resource_type: "Observation", interactions: ["read", "search"] },
+            { resource_type: "Procedure", interactions: ["read", "search"] },
+            { resource_type: "DocumentReference", interactions: ["read", "search"] }
         ],
         data_period: { start: "2026-04-15", end: "2026-06-15" },
         claim_linkage: {

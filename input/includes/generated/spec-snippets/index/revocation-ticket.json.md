@@ -23,7 +23,6 @@
   "access": {
     "permissions": [
       {
-        "kind": "data",
         "resource_type": "*",
         "interactions": [
           "read",

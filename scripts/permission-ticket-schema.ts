@@ -183,7 +183,6 @@ export const RevocationSchema = z.object({
 }).strict();
 
 export const DataPermissionSchema = z.object({
-  kind: z.literal("data"),
   resource_type: NonEmptyStringSchema,
   interactions: z.array(RestInteractionSchema).min(1),
   category_any_of: z.array(FHIRCodingSchema).min(1).optional(),

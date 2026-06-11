@@ -387,13 +387,13 @@ The base constraint definitions below follow this template, and profiles definin
 
 #### `permissions`
 
-**Shape and validity.** Required. An array of one or more `DataPermission` entries. Each entry carries `kind: "data"`, a FHIR `resource_type`, one or more `interactions` (`create`, `read`, `update`, `delete`, `search`), and optional narrowing filters `category_any_of` and `code_any_of` (arrays of codings). The issuer derives entries from the authorizing party's sharing decision or from the scope of access the ticket type defines.
+**Shape and validity.** Required. An array of one or more `DataPermission` entries. Each entry carries a FHIR `resource_type`, one or more `interactions` (`create`, `read`, `update`, `delete`, `search`), and optional narrowing filters `category_any_of` and `code_any_of` (arrays of codings). The issuer derives entries from the authorizing party's sharing decision or from the scope of access the ticket type defines.
 
 **For the authorizing party.** Each entry is a kind of record being shared — immunizations, lab results, conditions. Resource types and category filters are the units an authorization screen can name truthfully; an entry without filters means all records of that type.
 
 **For the client.** `permissions` is the ceiling on what scopes can be granted. Request SMART scopes within it. Narrowing filters apply even though they never appear in scope strings: a granted scope does not mean unfiltered data.
 
-**For the Data Holder.** Enforce resource types and interactions through SMART scope projection (below). Enforce narrowing filters from the ticket itself — at the token endpoint, the resource server, or both. An entry whose `kind` the Data Holder does not recognize is an unrecognized constraint: reject the ticket.
+**For the Data Holder.** Enforce resource types and interactions through SMART scope projection (below). Enforce narrowing filters from the ticket itself — at the token endpoint, the resource server, or both.
 
 ##### SMART Scope Projection
 
@@ -402,7 +402,7 @@ The `access.permissions` array is the normative authorization model. Each `DataP
 * `resource_type` maps to the SMART resource type (e.g., `Observation`, `Condition`, or `*` for all resources)
 * `interactions` map to SMART CRUDS suffixes: `create` = `c`, `read` = `r`, `update` = `u`, `delete` = `d`, `search` = `s`
 
-For example, a permission `{ kind: "data", resource_type: "Observation", interactions: ["read", "search"] }` projects to a SMART scope such as `patient/Observation.rs` or `system/Observation.rs`, depending on the applicable ticket profile and client mode.
+For example, a permission `{ resource_type: "Observation", interactions: ["read", "search"] }` projects to a SMART scope such as `patient/Observation.rs` or `system/Observation.rs`, depending on the applicable ticket profile and client mode.
 
 Narrowing filters (`category_any_of`, `code_any_of`) do not project into scope strings. The OAuth scope surface carries the resource-type and interaction grain only; the Data Holder enforces the filters from the ticket itself, at the token endpoint, the resource server, or both.
 
@@ -461,18 +461,7 @@ Parameter choices favor reliably populated dates over clinically richer but spar
 
 **For the client.** The filter tells the client which Data Holders are worth trying. A rejection for filter mismatch means this Data Holder is outside the ticket's scope, not that the ticket is invalid elsewhere.
 
-**For the Data Holder.** Answer the question "do I match any listed entry?" once, when the ticket is presented. Matching rules follow.
-
-##### Data Holder Filters
-
-`data_holder_filter` determines which Data Holders may answer. It is not a promise that returned data can be filtered by facility, department, custodian, endpoint, or resource provenance: a Data Holder that accepts the ticket returns data according to its actual legal, operational, and technical response boundary.
-
-* Each entry is one of:
-  * `{ kind: "jurisdiction", address }`
-  * `{ kind: "organization", organization }`
-* The filter gates the responding Data Holder, not individual clinical resources. Matching is one-hop against the responding Data Holder, not a provenance chain.
-* `aud` identifies the coarse intended Data Holder audience for the ticket; `data_holder_filter` narrows within that audience.
-* Multiple filter entries are ORed together.
+**For the Data Holder.** Answer the question "do I match any listed entry?" once, when the ticket is presented. Matching is one-hop against the responding Data Holder, not a provenance chain, and gates the Data Holder as a whole, not individual clinical resources — the filter is not a promise that returned data can be split by facility, department, custodian, endpoint, or provenance. `aud` identifies the coarse intended audience; `data_holder_filter` narrows within it. Matching rules per entry kind follow.
 
 <div class="callout callout-info" markdown="1">
 
@@ -519,7 +508,6 @@ Constraints combine as follows:
 "access": {
   "permissions": [
     {
-      "kind": "data",
       "resource_type": "Observation",
       "interactions": [
         "read",
@@ -547,7 +535,6 @@ Constraints combine as follows:
       ]
     },
     {
-      "kind": "data",
       "resource_type": "Condition",
       "interactions": [
         "read",
@@ -607,7 +594,7 @@ For example, a profile that needs encounter-class scoping defines it as a constr
 ```json
 "access": {
   "permissions": [
-    { "kind": "data", "resource_type": "DocumentReference", "interactions": ["read", "search"] }
+    { "resource_type": "DocumentReference", "interactions": ["read", "search"] }
   ],
   "encounter_class_filter": {
     "include": [

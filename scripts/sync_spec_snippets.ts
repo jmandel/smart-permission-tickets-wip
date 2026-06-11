@@ -134,9 +134,8 @@ function buildIndexSnippets(): void {
     },
     access: {
       permissions: [
-        { kind: "data", resource_type: "Immunization", interactions: ["read", "search"] },
+        { resource_type: "Immunization", interactions: ["read", "search"] },
         {
-          kind: "data",
           resource_type: "AllergyIntolerance",
           interactions: ["read", "search"],
         },
@@ -148,7 +147,6 @@ function buildIndexSnippets(): void {
     access: {
       permissions: [
         {
-          kind: "data",
           resource_type: "Observation",
           interactions: ["read", "search"],
           category_any_of: [
@@ -166,7 +164,7 @@ function buildIndexSnippets(): void {
             { system: "http://loinc.org", code: "4548-4" },
           ],
         },
-        { kind: "data", resource_type: "Condition", interactions: ["read", "search"] },
+        { resource_type: "Condition", interactions: ["read", "search"] },
       ],
       data_period: { start: "2023-01-01", end: "2024-12-31" },
       data_holder_filter: [
@@ -203,7 +201,7 @@ function buildIndexSnippets(): void {
       patient: { resourceType: "Patient" },
     },
     access: {
-      permissions: [{ kind: "data", resource_type: "*", interactions: ["read", "search"] }],
+      permissions: [{ resource_type: "*", interactions: ["read", "search"] }],
     },
   };
 

@@ -43,7 +43,6 @@
   "access": {
     "permissions": [
       {
-        "kind": "data",
         "resource_type": "Immunization",
         "interactions": [
           "read",
@@ -51,7 +50,6 @@
         ]
       },
       {
-        "kind": "data",
         "resource_type": "AllergyIntolerance",
         "interactions": [
           "read",

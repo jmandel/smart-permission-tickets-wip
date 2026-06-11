@@ -63,7 +63,7 @@ The authorizing party is the patient, making sharing choices on the issuer's aut
 
 * **`permissions`** (required). The record types the patient chose to share, carried as resource types with optional category and code filters. The screen lists kinds of records ("immunizations," "lab results"); the app receives at most what the patient picked.
 * **`data_period`** (optional). The time limit the patient set ("records since 2021"). The screen presents it as bounding clinical dates, with currently relevant items such as active allergies possibly included regardless — that caveat is part of the promise, not fine print discovered later.
-* **`data_holder_filter`** (optional). The organizations or regions the patient selected. The screen must not promise more than the filter delivers: it gates which Data Holders may answer, and an answering Data Holder typically returns the combined record it holds (see the [implementation note](index.html#data-holder-filters) on shared systems).
+* **`data_holder_filter`** (optional). The organizations or regions the patient selected. The screen must not promise more than the filter delivers: it gates which Data Holders may answer, and an answering Data Holder typically returns the combined record it holds (see the [implementation note](index.html#data_holder_filter) on shared systems).
 
 #### Identity Evidence
 

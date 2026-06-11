@@ -3,7 +3,6 @@
   "access": {
     "permissions": [
       {
-        "kind": "data",
         "resource_type": "Observation",
         "interactions": [
           "read",
@@ -31,7 +30,6 @@
         ]
       },
       {
-        "kind": "data",
         "resource_type": "Condition",
         "interactions": [
           "read",

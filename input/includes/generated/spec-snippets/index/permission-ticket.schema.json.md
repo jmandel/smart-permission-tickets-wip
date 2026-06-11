@@ -332,10 +332,6 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "kind": {
-                    "type": "string",
-                    "const": "data"
-                  },
                   "resource_type": {
                     "type": "string",
                     "minLength": 1
@@ -394,7 +390,6 @@
                   }
                 },
                 "required": [
-                  "kind",
                   "resource_type",
                   "interactions"
                 ],
@@ -996,10 +991,6 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "kind": {
-                    "type": "string",
-                    "const": "data"
-                  },
                   "resource_type": {
                     "type": "string",
                     "minLength": 1
@@ -1058,7 +1049,6 @@
                   }
                 },
                 "required": [
-                  "kind",
                   "resource_type",
                   "interactions"
                 ],
@@ -1592,10 +1582,6 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "kind": {
-                    "type": "string",
-                    "const": "data"
-                  },
                   "resource_type": {
                     "type": "string",
                     "minLength": 1
@@ -1654,7 +1640,6 @@
                   }
                 },
                 "required": [
-                  "kind",
                   "resource_type",
                   "interactions"
                 ],
@@ -2216,10 +2201,6 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "kind": {
-                    "type": "string",
-                    "const": "data"
-                  },
                   "resource_type": {
                     "type": "string",
                     "minLength": 1
@@ -2278,7 +2259,6 @@
                   }
                 },
                 "required": [
-                  "kind",
                   "resource_type",
                   "interactions"
                 ],
@@ -2906,10 +2886,6 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "kind": {
-                    "type": "string",
-                    "const": "data"
-                  },
                   "resource_type": {
                     "type": "string",
                     "minLength": 1
@@ -2968,7 +2944,6 @@
                   }
                 },
                 "required": [
-                  "kind",
                   "resource_type",
                   "interactions"
                 ],
@@ -3635,10 +3610,6 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "kind": {
-                    "type": "string",
-                    "const": "data"
-                  },
                   "resource_type": {
                     "type": "string",
                     "minLength": 1
@@ -3697,7 +3668,6 @@
                   }
                 },
                 "required": [
-                  "kind",
                   "resource_type",
                   "interactions"
                 ],
@@ -4322,10 +4292,6 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "kind": {
-                    "type": "string",
-                    "const": "data"
-                  },
                   "resource_type": {
                     "type": "string",
                     "minLength": 1
@@ -4384,7 +4350,6 @@
                   }
                 },
                 "required": [
-                  "kind",
                   "resource_type",
                   "interactions"
                 ],
