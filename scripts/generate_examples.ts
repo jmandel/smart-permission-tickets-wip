@@ -215,7 +215,6 @@ const uc5_payload: PermissionTicket = {
             { type: "Procedure", interactions: ["read", "search"] },
             { type: "DocumentReference", interactions: ["read", "search"] }
         ],
-        data_period: { start: "2026-04-15", end: "2026-06-15" },
         claim_linkage: {
             claim: {
                 resourceType: "Claim",

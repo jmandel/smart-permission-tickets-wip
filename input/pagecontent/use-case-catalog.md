@@ -30,7 +30,7 @@ The table below summarizes required and optional fields for each ticket type. Ea
 |----------|---------------------|-----------|-------------------|--------------------|
 | Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
 | Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period` optional |
-| Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required; `data_period` recommended |
+| Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required |
 | Payer Quality Gap Queries | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources` (code-narrowed) required; `data_period` recommended |
 
 **Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For patient self access that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For delegated access that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
@@ -213,11 +213,12 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 #### Constraints
 
-This profile pulls `fhir_resources` and `data_period` from the [constraint catalog](access-constraints.html) and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
+This profile pulls `fhir_resources` from the [constraint catalog](access-constraints.html) and defines one new constraint, `claim_linkage`. The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
 
 * **`fhir_resources`** (required). The resource types adjudication legitimately needs. Likely broader than US Core for some claim types — see the open question below.
-* **`data_period`** (recommended). The clinical-date window for the adjudication, typically derived from the claim's service period. Same constraint, same meaning as everywhere else — only the value's source differs.
 * **`claim_linkage`** (required). Defined below.
+
+`data_period` is typically omitted: the claim is this profile's time anchor. Encounter-linked records are already bounded by their encounters, and the patient-level floor below is deliberately current-state — a service-period window would cut into it (a current medication authored before the window fails the date filter, and only active allergies and problems are rescued by `data_period`'s currently-relevant allowance). An issuer MAY still add any cataloged constraint, with the usual consequence: constraints combine by intersection.
 
 #### `claim_linkage`
 
@@ -241,7 +242,7 @@ This profile pulls `fhir_resources` and `data_period` from the [constraint catal
 
 **For the client.** The payer learns which claim or prior authorization the ticket belongs to — the re-association that document workflows carry in tracking numbers — and what to expect from redemption: records the provider associates with that claim. The response may be lawfully incomplete; absence of a record is not a representation that it does not exist.
 
-**For the Data Holder.** Release only records you associate with the referenced claim: at minimum the records linked to the named encounters, plus current problems, medications, and allergies. (`data_period`, when present, applies as usual — constraints combine by intersection.) The association is your own — you minted the ticket against your own claim — so enforcement is determinate against your own records. A Data Holder with no association knowledge for the referenced claim cannot enforce this constraint and rejects the ticket. That is the correct outcome, and it is what confines this ticket type to self-issued tickets today.
+**For the Data Holder.** Release only records you associate with the referenced claim: at minimum the records linked to the named encounters, plus current problems, medications, and allergies. The association is your own — you minted the ticket against your own claim — so enforcement is determinate against your own records. A Data Holder with no association knowledge for the referenced claim cannot enforce this constraint and rejects the ticket. That is the correct outcome, and it is what confines this ticket type to self-issued tickets today.
 
 The enforcement floor names patient-level categories explicitly because encounter linkage in FHIR data is incomplete: the records adjudication needs most — problem list, medications, allergies — typically link to no encounter at all.
 
