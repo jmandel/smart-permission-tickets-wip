@@ -23,5 +23,3 @@ The `category` and `code` narrowings do not project into scope strings. The OAut
 
 FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base kernel. A future profile may add operation-level permissions when a use case requires them.
 
-> **Open Question (OQ-2): Do future non-patient subjects need an explicit ticket-level scope mode?** The current base kernel always identifies a single patient through `subject.patient`, so current tickets naturally project to patient-level semantics even when redeemed by backend clients. If future use cases introduce a different subject shape (for example, `Group`) or no subject at all, the working group may need an explicit ticket-level scope mode (for example, `patient` vs `system`) or a profile rule that changes SMART scope projection. This question is only relevant if future use cases require non-individual or subjectless tickets.
-{: .callout .callout-open-question #oq-2}

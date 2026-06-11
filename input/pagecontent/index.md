@@ -13,10 +13,6 @@ These fields are **policy-selection inputs**. Data Holders already maintain inte
 
 When present, `presenter_binding` cryptographically binds the ticket to the presenting client's key and/or trust-framework identity. A Data Holder authenticates the client, verifies the ticket signature against the issuer's published keys, enforces presenter binding if present, and grants access per [Access Calculation](#access-calculation). No user login is required at the Data Holder.
 
-### How This Page Is Organized
-
-The ticket artifact first ([Ticket Structure](#artifact-ticket-structure), [Presenter Binding](#presenter-binding), [Identity Evidence](#identity-evidence), [Profile Claims](#profile-claims)); then redemption ([Transport](#transport-token-exchange-rfc-8693), [Server-Side Validation](#server-side-validation), [Subject Resolution](#subject-resolution), [Access Calculation](#access-calculation)); then the rules around the edges ([Field Handling and Extensions](#field-handling-and-extensions), [Ticket Audience](#ticket-audience-aud-and-effective-eligible-data-holder-set), [Ticket Lifecycle](#ticket-lifecycle), [Conformance](#conformance)). What limits mean lives on [Access Constraints](access-constraints.html); what each ticket type assembles lives in the [Use Case Catalog](use-case-catalog.html).
-
 ### Where Things Belong
 
 The ticket carries only what a Data Holder needs at redemption time. This table shows where each kind of information belongs:
@@ -558,11 +554,7 @@ A ticket may be presented any number of times during its validity period, to the
 
 #### TypeScript Types
 
-The published TypeScript definitions are maintained alongside the canonical Zod schema using lightweight FHIR aliases, then copied into the IG include path during snippet sync.
-
-They are published on a dedicated page to keep this main architecture page lighter:
-
-* [TypeScript Definitions](typescript-definitions.html)
+TypeScript definitions matching the canonical schema are published at [TypeScript Definitions](typescript-definitions.html).
 
 #### Signing Algorithm
 

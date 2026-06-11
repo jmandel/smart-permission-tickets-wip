@@ -56,9 +56,6 @@ The constraint set for this type is exactly these two. `claim_linkage` is not pa
 > **Open Question (OQ-QUALITY-GAP): Issuance topology.** Claims-based access anchors minting, scope, and expiry to a submission the provider just made. Quality gap queries have no such event. Three candidates: the provider's system mints from a payer's gap list (strongest provider control — the Data Holder mints exactly what it will honor); the payer mints under trust-framework accountability (the public-health pattern — the authority is the contract and the permitted purpose, and the ticket standardizes a verifiable request); or network infrastructure mints, attesting member attribution for both sides. Which of these, against what relationship record, and for what lifetime?
 {: .callout .callout-open-question #oq-quality-gap}
 
-> **Open Question (OQ-PANEL): Element panels.** Some measures need many codes; enumerating them as single-code entries is verbose. Should a future constraint reference a value set or measure definition instead of enumerating codes, and what would Data Holder enforcement of a value-set reference require?
-{: .callout .callout-open-question #oq-panel}
-
 ### Example
 
 {% include generated/signed-tickets/payer-quality-gap-ticket.html %}

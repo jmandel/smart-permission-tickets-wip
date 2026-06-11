@@ -6,14 +6,12 @@ Every open design question in this specification is listed here with a stable ID
 
 | ID | Question | Where |
 |----|----------|-------|
-| OQ-2 | Do future non-patient subjects (Group, subjectless) need an explicit ticket-level scope mode? | [Access Constraints](fhir-resources.html#oq-2) |
 | OQ-3 | Should the sensitivity profile be incorporated into specific ticket types, and what does each direction need before implementation? | [Proposal 005](proposal-005-sensitive-data-modeling.html#oq-3) |
 | OQ-CUSTODIAN | Should `data_holder_filter` gain an enforce-or-reject custodian-scoped form once vendors can attribute records to custodian organizations? | [Access Constraints](data-holder-filter.html#oq-custodian-targeting) |
 | OQ-UC2-VERIFY | Should each delegated-access ticket say *how* the issuer verified the authority, or are per-code issuer obligations plus framework audit enough? | [Use Case Catalog](patient-delegated-access.html#oq-verification-class) |
 | OQ-PAYER-DATA | What resource types does claims adjudication need beyond US Core? | [Use Case Catalog](payer-claims-adjudication.html#oq-payer-data) |
 | OQ-PAYER-TRANSPORT | How does a payer claims ticket travel with the claim — X12 275 attachment, CDex Task, or by reference? | [Use Case Catalog](payer-claims-adjudication.html#oq-payer-transport) |
 | OQ-QUALITY-GAP | Who issues quality-gap-query tickets, against what relationship record, and for what lifetime? | [Use Case Catalog](payer-quality-gap-queries.html#oq-quality-gap) |
-| OQ-PANEL | Should element panels reference value sets or measure definitions instead of enumerating codes? | [Use Case Catalog](payer-quality-gap-queries.html#oq-panel) |
 | OQ-3A | Is the marker-scope plus CRUDS-scopes approach expressive enough for requesting tickets at issuance, or is a structured parameter needed? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3a) |
 | OQ-3B | Should issuance endpoint hints reuse the SMART Brands `Endpoint` format instead of a custom shape? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3b) |
 | OQ-3C | What is the issuer-issued access token in the issuance flow actually for? | [Proposal 003](proposal-003-smart-launch-issuance.html#oq-3c) |
