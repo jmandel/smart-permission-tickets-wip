@@ -31,7 +31,7 @@ The table below summarizes required and optional fields for each ticket type. Ea
 | Patient Self Access | Required | — | `subject_identity_evidence` SHOULD | `fhir_resources` required; `data_period`, `data_holder_filter` optional |
 | Patient-Delegated Access | Required | `RelatedPerson` (required) | `subject_identity_evidence` SHOULD; `requester_identity_evidence` SHOULD | `fhir_resources` required; `data_period` optional |
 | Payer Claims Adjudication | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources`, `claim_linkage` required |
-| Payer Quality Gap Queries | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources` (code-narrowed) required; `data_period` recommended |
+| Payer Quality Gap Queries | Required | `Organization` (required) | — (requester is an organization) | `fhir_resources` (every entry narrowed), `data_period` required |
 
 **Identity evidence principle.** Identity evidence SHOULD accompany each individual natural person whose verified identity is the basis of the grant. For patient self access that is the patient (`subject_identity_evidence`; the patient is also the requester, so it is recorded once). For delegated access that is both the delegate and the patient: the issuer verifies the delegate's identity and the patient's identity and wishes, so both evidence slots SHOULD be populated. B2B ticket types name an organization as requester; organizational trust is institutional and the evidence slots do not apply. Trust frameworks may strengthen SHOULD to SHALL.
 
@@ -218,7 +218,7 @@ This profile pulls `fhir_resources` from the [constraint catalog](access-constra
 * **`fhir_resources`** (required). The resource types adjudication legitimately needs. Likely broader than US Core for some claim types — see the open question below.
 * **`claim_linkage`** (required). Defined below.
 
-`data_period` is typically omitted: the claim is this profile's time anchor. Encounter-linked records are already bounded by their encounters, and the patient-level floor below is deliberately current-state — a service-period window would cut into it (a current medication authored before the window fails the date filter, and only active allergies and problems are rescued by `data_period`'s currently-relevant allowance). An issuer MAY still add any cataloged constraint, with the usual consequence: constraints combine by intersection.
+The constraint set for this type is exactly these two. `data_period` is not part of it, and issuers SHALL NOT include it: the claim is this type's time anchor — event records are bounded by their encounters through the claim association, and the patient-level floor is deliberately current-state — so any `data_period` value is either redundant (inside the encounter bounds) or contradictory (cutting current medications out of the floor). `data_holder_filter` is likewise not part of this type: the audience is the single issuing Data Holder. Cross-cutting constraints defined elsewhere in the catalog, such as `sensitivity_withhold`, MAY be added, with the standard consequence for servers that do not enforce them.
 
 #### `claim_linkage`
 
@@ -316,8 +316,10 @@ How tickets get minted is deliberately open — see the open question below. Unl
 
 This profile needs nothing beyond the [constraint catalog](access-constraints.html):
 
-* **`fhir_resources`** (required). Code-narrowed entries naming the elements — `{ "type": "Observation", "code": { "system": "http://loinc.org", "code": "4548-4" } }` is an HbA1c query. Entries SHOULD be element-specific; an entry without `category` or `code` narrowing is contrary to this profile's purpose.
-* **`data_period`** (recommended). The measurement period. Same constraint, same meaning as everywhere else; the value comes from the measure specification.
+* **`fhir_resources`** (required). Code-narrowed entries naming the elements — `{ "type": "Observation", "code": { "system": "http://loinc.org", "code": "4548-4" } }` is an HbA1c query. Every entry SHALL carry a `category` or `code` narrowing: an un-narrowed entry is a chart section, which is not what this type authorizes.
+* **`data_period`** (required). The measurement or lookback period, taken from the measure specification. Same constraint, same meaning as everywhere else; without it a quality query is unbounded history, which is not what this type authorizes.
+
+The constraint set for this type is exactly these two. `claim_linkage` is not part of it (there is no claim), and `data_holder_filter` is not part of it (the audience is a single named Data Holder). Cross-cutting constraints such as `sensitivity_withhold` MAY be added, with the standard consequence.
 
 #### Policy Selection Inputs
 

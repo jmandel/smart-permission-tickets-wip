@@ -234,16 +234,33 @@ const MinimalResearchStudySchema = z.object({
   title: z.string().optional(),
 }).catchall(z.unknown());
 
-// Profile-grown access constraint defined by UC5: release is limited to records
-// the Data Holder associates with the referenced claim or prior authorization.
+// Profile-grown access constraint defined by Payer Claims Adjudication: release
+// is limited to records the Data Holder associates with the referenced claim or
+// prior authorization.
 export const ClaimLinkageSchema = z.object({
   claim: MinimalClaimSchema,
   encounter: z.array(FHIRReferenceSchema).min(1).optional(),
 }).strict();
 
-export const PayerAccessGrantSchema = AccessGrantSchema.extend({
+// Locked constraint set: exactly fhir_resources + claim_linkage. The claim is
+// the type's time anchor, so data_period is prohibited (redundant inside the
+// encounter bounds, contradictory against the current-state floor).
+export const PayerClaimsAccessSchema = z.object({
+  fhir_resources: z.array(FhirResourcePermissionSchema).min(1),
   claim_linkage: ClaimLinkageSchema,
-});
+}).strict();
+
+// Locked constraint set: exactly fhir_resources (every entry narrowed) +
+// data_period (the measurement or lookback period).
+export const QualityGapAccessSchema = z.object({
+  fhir_resources: z.array(
+    FhirResourcePermissionSchema.refine(
+      (entry) => entry.category !== undefined || entry.code !== undefined,
+      { message: "Quality gap entries must carry a category or code narrowing." },
+    ),
+  ).min(1),
+  data_period: FHIRPeriodSchema,
+}).strict();
 
 const TicketBaseSchema = z.object({
   iss: UriSchema,
@@ -287,7 +304,7 @@ export const SocialCareReferralTicketSchema = TicketBaseSchema.extend({
 export const PayerClaimsTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(PAYER_CLAIMS_ADJUDICATION_TICKET_TYPE),
   requester: OrganizationSchema,
-  access: PayerAccessGrantSchema,
+  access: PayerClaimsAccessSchema,
 });
 
 export const ResearchStudyTicketSchema = TicketBaseSchema.extend({
@@ -307,6 +324,7 @@ export const PayerQualityGapTicketSchema = TicketBaseSchema.extend({
   ticket_type: z.literal(PAYER_QUALITY_GAP_TICKET_TYPE),
   requester: OrganizationSchema,
   measure: FHIRCodeableConceptSchema,
+  access: QualityGapAccessSchema,
 });
 
 export const PermissionTicketSchema = z.discriminatedUnion("ticket_type", [
@@ -363,7 +381,8 @@ export type DataHolderFilter = z.infer<typeof DataHolderFilterSchema>;
 export type TicketAudienceType = z.infer<typeof TicketAudienceTypeSchema>;
 export type AccessGrant = z.infer<typeof AccessGrantSchema>;
 export type ClaimLinkage = z.infer<typeof ClaimLinkageSchema>;
-export type PayerAccessGrant = z.infer<typeof PayerAccessGrantSchema>;
+export type PayerClaimsAccess = z.infer<typeof PayerClaimsAccessSchema>;
+export type QualityGapAccess = z.infer<typeof QualityGapAccessSchema>;
 export type PatientSelfAccessTicket = z.infer<typeof PatientSelfAccessTicketSchema>;
 export type PatientDelegatedAccessTicket = z.infer<typeof PatientDelegatedAccessTicketSchema>;
 export type PublicHealthTicket = z.infer<typeof PublicHealthTicketSchema>;

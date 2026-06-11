@@ -101,8 +101,14 @@ export type ClaimLinkage = {
   encounter?: NonEmptyArray<FHIRReference>;
 };
 
-export type PayerAccessGrant = AccessGrant & {
+export type PayerClaimsAccess = {
+  fhir_resources: NonEmptyArray<FhirResourcePermission>;
   claim_linkage: ClaimLinkage;
+};
+
+export type QualityGapAccess = {
+  fhir_resources: NonEmptyArray<FhirResourcePermission>;
+  data_period: FHIRPeriod;
 };
 
 export type PermissionTicketBase = {
@@ -148,7 +154,7 @@ export type SocialCareReferralTicket = PermissionTicketBase & {
 export type PayerClaimsTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/payer-claims-adjudication-v1";
   requester: fhir4.Organization;
-  access: PayerAccessGrant;
+  access: PayerClaimsAccess;
 };
 
 export type ResearchStudyTicket = PermissionTicketBase & {
@@ -168,6 +174,7 @@ export type PayerQualityGapTicket = PermissionTicketBase & {
   ticket_type: "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1";
   requester: fhir4.Organization;
   measure: FHIRCodeableConcept;
+  access: QualityGapAccess;
 };
 
 export type PermissionTicket =
