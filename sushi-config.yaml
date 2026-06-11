@@ -43,8 +43,8 @@ pages:
 menu:
   IG Home: index.html
   Quickstart: quickstart.html
-  Use Case Catalog: use-case-catalog.html
   Access Constraints: access-constraints.html
+  Use Case Catalog: use-case-catalog.html
   Open Questions: open-questions.html
   Proposals:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html
