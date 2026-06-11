@@ -392,7 +392,7 @@ Three rules cover every field a Data Holder may meet:
 2. **Unknown members of `access` are rejected.** Ignoring a limit always releases more than the issuer authorized.
 3. **Unknown top-level claims are ignored.** Standard JWT behavior. A fact the Data Holder does not recognize can only make its policy decision more conservative, never less.
 
-There is no opt-in "critical claim" marker. An earlier draft had one (`must_understand`); the constraint model makes it unnecessary — a field that must not be ignored is a limit, and limits live in `access`, where rejection is automatic. Extensions follow the same border: a profile-grown limit is a new access constraint ([Defining New Access Constraints](access-constraints.html#defining-new-access-constraints)); a profile-grown fact is a new top-level claim, advisory by construction. Extensions SHALL NOT alter the meaning of base fields.
+Extensions follow the same border. A profile-grown limit is a new access constraint ([Defining New Access Constraints](access-constraints.html#defining-new-access-constraints)); a profile-grown fact is a new top-level claim, advisory by construction. Extensions SHALL NOT alter the meaning of base fields.
 
 ---
 

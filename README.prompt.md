@@ -16,10 +16,10 @@ Write for both, but lead with the first. A reader who has never seen this projec
 A great README for a spec project is **mostly about conveying the mental model**, not the mechanics. Someone who reads this once should walk away with a correct intuition about *what a Permission Ticket is*, *why it is shaped the way it is*, and *what it is deliberately not*. The build commands are a small tail at the bottom; the weight should sit in the design explanation.
 
 - **Opens with the one-sentence pitch.** What is a Permission Ticket, who signs it, and what does presenting it get you. No FHIR jargon in the first sentence.
-- **Shows the actor flow visually.** Include at least one ASCII diagram showing the three-party exchange (Trusted Issuer → Client → Data Holder → FHIR). A second diagram showing the JWT structure (security envelope + subject + access + context + optional binding) is welcome if it earns its space. Diagrams are high-information-density and worth the lines they take.
+- **Shows the actor flow visually.** Include at least one ASCII diagram showing the three-party exchange (Trusted Issuer -> Client -> Data Holder -> FHIR). A second diagram showing the JWT structure (security envelope, subject, access constraints, profile claims, and optional binding) is welcome if it earns its space. Diagrams are high-information-density and worth the lines they take.
 - **Explains the mental model, not just the fields.** What kind of authorization object is a Permission Ticket — is it a capability, a claim, a grant, a delegation? How is it different from a SMART access token, from a UMA ticket, from a bearer assertion? A reader from a vanilla SMART-on-FHIR background should finish this section understanding what changed and why.
-- **Names the load-bearing design choices**, not every design choice. Think: the 3–5 things that would surprise someone coming from a vanilla SMART-on-FHIR background. For each, state the decision *and* the reason. Examples of the kind of decision that earns a bullet: why token exchange instead of a custom redemption endpoint, why a portable kernel vs. per-holder vocabularies, why presenter binding is optional, how extensibility is gated (`must_understand`), what was deliberately left out (e.g., no regrant, no authority chain).
-- **Explains the boundary between portable kernel and ticket-type context.** This is the single most important architectural idea in the spec. Readers must understand that there is a common kernel (subject, access, presenter binding, revocation) and per-ticket-type context, and that the seam between them is load-bearing for interop.
+- **Names the load-bearing design choices**, not every design choice. Think: the 3–5 things that would surprise someone coming from a vanilla SMART-on-FHIR background. For each, state the decision *and* the reason. Examples of the kind of decision that earns a bullet: why token exchange instead of a custom redemption endpoint, why a portable kernel vs. per-holder vocabularies, why presenter binding is optional, how access constraints fail closed, what was deliberately left out (e.g., no regrant, no authority chain).
+- **Explains the boundary between limits and facts.** This is the single most important architectural idea in the spec. Readers must understand that limits live in `access` as enforce-or-reject constraints, while ticket-type facts live as top-level profile claims the Data Holder uses for policy selection and audit.
 - **Points at the normative document** (the spec prose) and the machine-readable sources of truth (logical model, JSON Schema, examples) so readers know what is authoritative vs. derived.
 - **Gives a build recipe that works from a clean clone.** Every command should be runnable as-is. Prefer `npm`/`bun`/`sushi`/`./_genonce.sh` invocations that already exist in the repo over invented ones.
 - **States the status honestly** (draft, ballot, published, etc.) and links to the published IG if one exists.
@@ -31,7 +31,7 @@ Include these, in roughly this order. Omit a section only if it genuinely does n
 
 1. **Title + one-sentence pitch.**
 2. **What is a Permission Ticket** — 2–4 sentences. Include a small flow diagram.
-3. **Key design points** — 4–6 bullets. Each bullet should be a decision, not a feature list. Examples of what qualifies: the transport binding (e.g., token exchange vs. custom endpoint), how presenter binding works, how ticket types are discovered, how extensibility is gated.
+3. **Key design points** — 4–6 bullets. Each bullet should be a decision, not a feature list. Examples of what qualifies: the transport binding (e.g., token exchange vs. custom endpoint), how presenter binding works, how ticket types are discovered, and why unknown access constraints fail closed.
 4. **Repository structure** — a small tree of the directories a reader needs to know about (`input/pagecontent`, `input/fsh`, `input/examples`, `input/includes/generated`, `scripts/`, top-level IG config files). Annotate each line with one-phrase purpose. Do not enumerate every file.
 5. **Building the IG** — prerequisites, install, generate derived artifacts, run the IG Publisher. Each command should be copy-pasteable.
 6. **Where the spec lives** — explicit pointers to the spec prose file and to the ticket logical model file.
@@ -51,7 +51,7 @@ Read these directly — don't copy from the old README, which drifts. Concrete c
 | Claim type | Source of truth |
 |---|---|
 | What a Permission Ticket *is* and the flow | `input/pagecontent/index.md` (opening sections: Introduction, Scope, Protocol Overview) |
-| Ticket JWT field shape, required claims | `input/fsh/PermissionTicket.fsh` (logical model) and `input/includes/generated/json-schema/permission-ticket.schema.json` |
+| Ticket JWT field shape, required claims | `scripts/permission-ticket-schema.ts`, `scripts/permission-ticket-types.ts`, and `input/includes/generated/json-schema/permission-ticket.schema.json` |
 | Ticket types currently defined | `scripts/use_case_catalog.ts` — this file is the canonical list of use case identifiers and labels |
 | How binding / presenter binding works | Search `input/pagecontent/index.md` for `presenter_binding` |
 | How the transport works (token exchange vs. other) | Search `input/pagecontent/index.md` for `RFC 8693` or `token_exchange` |
