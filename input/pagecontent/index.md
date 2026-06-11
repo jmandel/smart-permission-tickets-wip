@@ -306,14 +306,14 @@ A third arrangement needs no embedded evidence at all: the ticket issuer perform
 
 **Mapping the client label.** The client label is checked at both ends of the ticket's life, and the same identifier scheme serves both checks:
 
-* At issuance, before embedding client-obtained evidence, the issuer SHALL verify through a recognized mapping that the evidence's client label resolves to the client it authenticated in the issuance ceremony. Absent a resolvable mapping, the issuer SHALL NOT embed the evidence; it falls back to running its own sign-in and embedding issuer-obtained evidence.
+* At issuance, before embedding client-obtained evidence, the issuer SHALL verify through a recognized mapping that the evidence's client label resolves to the client it authenticated in the issuance ceremony. Absent a resolvable mapping, the issuer SHALL NOT embed the evidence. An issuer able to run its own sign-in MAY embed issuer-obtained evidence instead; an issuer that cannot, and whose selected ticket type requires the evidence, cannot mint the ticket.
 * At redemption, the Data Holder SHALL resolve the evidence's client label to either the ticket issuer or the presenting client, using the same identifier scheme it bound to that client at its own registration. Profiles MAY allow only one of these. Resolving the label is what proves the sign-in happened as part of issuing or presenting this ticket rather than being harvested from some other application's sign-in.
 
 The client label never names the Data Holder itself — Data Holders SHALL NOT expect their own identifier there. How a Data Holder learns which client identifiers belong to a ticket issuer is deployment configuration: issuer metadata, a trust-framework directory, or direct configuration.
 
 Evidence labeled for one client inside a ticket presented by a different party fails the presenting-client check by design: it prevents a sign-in completed at one application from laundering through another presenter. Ticket-type profiles that introduce delegation, where one party obtains a ticket and a different party presents it, SHALL address this case explicitly.
 
-*Design note:* the client label may be self-asserted by the application when it configures itself at the evidence issuer, because the label is only useful to a presenter that can cryptographically authenticate as that label at the verifier. What makes a mapping recognized is the identifier scheme: for example, a canonical registry identifier (such as a `software_id` from a federally signed software statement) carried as or alongside `aud`. Trust frameworks and ticket-type profiles designate the scheme.
+*Design note:* the client label may be self-asserted by the application when it configures itself at the evidence issuer, because the label is only useful to a presenter that can cryptographically authenticate as that label at the verifier. What makes a mapping recognized is the identifier scheme: for example, a canonical client identifier anchored in a registry or trust-framework directory, carried as or alongside `aud`. Trust frameworks and ticket-type profiles designate the scheme.
 
 **Base verification (both slots).** The embedded JWT is not trusted merely because it appears inside a signed Permission Ticket. When identity evidence is present, the Data Holder SHALL:
 
@@ -965,7 +965,7 @@ For clients using the well-known JWKS identity approach, see [Proposal 006](prop
 - Include `aud_type: "trust_framework"` when `aud` identifies a trust framework
 - When using `presenter_binding`, bind the ticket appropriately with one method (`jkt` or `trust_framework_client`)
 - When the ticket type requires identity evidence, include the applicable `subject_identity_evidence` or `requester_identity_evidence`
-- When embedding client-obtained identity evidence, verify through a recognized mapping that the evidence's client label resolves to the client authenticated in the issuance ceremony; absent a resolvable mapping, omit the evidence and run its own sign-in instead
+- When embedding client-obtained identity evidence, verify through a recognized mapping that the evidence's client label resolves to the client authenticated in the issuance ceremony; absent a resolvable mapping, omit the evidence (an issuer able to run its own sign-in MAY embed issuer-obtained evidence instead)
 - Verify the facts it attests (patient identity, requester identity and authority, legal basis, scope appropriateness) before minting, according to the selected ticket type and trust framework
 - If `revocation` is present, publish the status list at the URL specified in tickets
 
