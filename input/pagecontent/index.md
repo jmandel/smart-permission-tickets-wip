@@ -42,7 +42,7 @@ The ticket carries only what a Data Holder needs at redemption time. This table 
 - Subject resolution and validation rules
 - Access calculation and access constraint enforcement
 - Must-understand semantics for base kernel fields and profile extensions
-- Three use-case ticket types, each with its own maturity status in the [Use Case Catalog](use-case-catalog.html); additional candidates are tracked in [Future Use Cases](future-use-cases.html)
+- Four ticket types, each with its own maturity status in the [Use Case Catalog](use-case-catalog.html); additional candidates are tracked in [Future Use Cases](future-use-cases.html)
 
 **This specification does not define:**
 - How a ticket issuer verifies real-world facts before minting a ticket
@@ -475,9 +475,10 @@ Data Holders SHALL reject tickets where `aud` validation fails with error `inval
 
 ### Ticket Type Registry
 
-Each use case maps to a `ticket_type` URI that identifies the ticket's schema and processing rules:
+Each use case maps to a `ticket_type` URI that identifies the ticket's schema and processing rules, with its own status, required claims, constraint set, and worked example:
 
-* [Use Case Catalog](use-case-catalog.html)
+* [Use Case Catalog](use-case-catalog.html) — patient self access, patient-delegated access, payer claims adjudication, payer quality gap queries
+* [Future Use Cases](future-use-cases.html) — public health investigation (fully modeled, deferred) and other candidates under discussion
 
 Data Holders advertise which `ticket_type` URIs they support via `smart_permission_ticket_types_supported` in their `.well-known/smart-configuration`. Unknown `ticket_type` values SHALL be rejected with `invalid_grant`.
 
@@ -557,14 +558,7 @@ A ticket may be presented any number of times during its validity period, to the
 
 ---
 
-### Catalog of Use Cases
 
-Three use cases are specified, each mapping to a single `ticket_type` with its own status, required claims, policy-selection inputs, and worked example:
-
-* [Use Case Catalog](use-case-catalog.html) — patient self access, patient-delegated access, payer claims adjudication
-* [Future Use Cases](future-use-cases.html) — public health investigation (fully modeled, deferred) and other candidates under discussion
-
----
 
 ### Developer Reference
 

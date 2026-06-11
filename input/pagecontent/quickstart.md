@@ -13,7 +13,7 @@ You are adding one grant type to your existing SMART-on-FHIR token endpoint. No 
 5. **Issue a scoped access token**: the intersection of requested scopes, the ticket's `access`, client eligibility, ticket-type rules, and your own policy. Enforce `data_period` by applying each resource type's designated date search parameter as an implicit filter — searches your server already supports. ([Access Calculation](index.html#access-calculation), [Data Period Enforcement](access-constraints.html#data-period-enforcement))
 6. **Configure trusted issuers** per ticket type. Trusting an issuer for patient self-access does not trust it for delegated access.
 
-Start with patient self access: it has no requester, no profile claims, and a single policy question — can you match the patient. The [conformance section](index.html#data-holder-requirements) is your checklist; the [signed examples](use-case-catalog.html) are your test vectors.
+Start with patient self access: it has no requester, no profile claims, and a single policy question — can you match the patient. The [conformance section](index.html#data-holder-requirements) is your checklist, [Access Constraints](access-constraints.html) defines what you enforce, and the [signed examples](use-case-catalog.html) are your test vectors.
 
 ### If you want to mint tickets (Issuer)
 

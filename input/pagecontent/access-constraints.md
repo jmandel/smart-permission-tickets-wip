@@ -2,7 +2,7 @@
 
 This page is the registry of access constraints: the named members of `access`, each a limit on what a ticket releases. The protocol that carries and redeems tickets is defined on the [main specification page](index.html); ticket types and their constraint choices are in the [Use Case Catalog](use-case-catalog.html).
 
-### Access Constraints
+### Constraint Model
 
 The `access` object holds the ticket's **access constraints**. Each member of `access` is a named constraint with a published definition — in this specification for the base constraints, or in a ticket-type profile for additional ones. Three rules govern every constraint:
 

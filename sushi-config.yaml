@@ -54,8 +54,8 @@ menu:
     "005: Sensitive Data Profile": proposal-005-sensitive-data-modeling.html
     "006: Well-Known JWKS Client Identity": proposal-006-well-known-client-identity.html
     "007: Issuer Accountability": proposal-007-issuer-accountability.html
+  Future Use Cases: future-use-cases.html
   More:
-    "Future Use Cases": future-use-cases.html
     "TypeScript Definitions": typescript-definitions.html
     "Downloads": downloads.html
     "Artifacts": artifacts.html
