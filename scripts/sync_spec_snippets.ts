@@ -182,6 +182,19 @@ function buildIndexSnippets(): void {
         { type: "Condition", interactions: ["read", "search"] },
       ],
       data_period: { start: "2023-01-01", end: "2024-12-31" },
+      data_holder_filter: [
+        { kind: "jurisdiction", address: { state: "CA" } },
+        { kind: "jurisdiction", address: { state: "NY" } },
+        {
+          kind: "organization",
+          organization: {
+            resourceType: "Organization",
+            identifier: [
+              { system: "http://hl7.org/fhir/sid/us-npi", value: "123" },
+            ],
+          },
+        },
+      ],
     },
   };
 

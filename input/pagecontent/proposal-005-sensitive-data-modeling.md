@@ -124,39 +124,43 @@ This profile uses FHIR `Coding` values and expects ticket-type profiles to const
 
 These codes identify categories. They do not by themselves define what data falls into a category at a given Data Holder; that mapping is profile-specific, trust-framework-specific, and local.
 
-### Processing Semantics
+### `sensitivity_withhold`: Constraint Definition
 
-Neither piece broadens any access constraint, client registration, or what law permits. `sensitivity_release_authorized` operates on the Data Holder's own sensitivity gates — it can satisfy a local rule that conditions release on patient authorization, but it cannot override a rule that does not accept ticket-borne authorization.
+`sensitivity_withhold` is an access constraint, so its definition follows the four-section [constraint template](access-constraints.html#constraint-template). (`sensitivity_release_authorized` is a profile claim, not a constraint; its rules follow in the next section and are not bound by the template.) Neither piece broadens any access constraint, client registration, or what law permits.
 
-Data Holders implementing this profile SHALL:
+#### Shape and validity
 
-1. Withhold data matching a `sensitivity_withhold` coding unconditionally. When `sensitivity_withhold` sets `unlisted: true`, also withhold all locally classified sensitive data, except data covered by `sensitivity_release_authorized` and permitted under rule 2.
-2. Treat data covered by `sensitivity_release_authorized` as within the ticket's authorization scope, releasing only if Data Holder policy, law, patient matching, and technical constraints permit.
-3. When classification is uncertain, enforce withholding conservatively (withhold more); never resolve uncertainty in favor of release under rule 2.
-4. If a withholding rule cannot be enforced at all, reject with `invalid_grant` — this is the base rule for access constraints, restated.
-
-A Data Holder that does not implement this profile rejects tickets carrying `sensitivity_withhold` (an unrecognized access member) and ignores `sensitivity_release_authorized` (an unrecognized top-level claim). Both defaults protect the patient's conservative expectations.
-
-This profile does not require Data Holders to reveal whether withheld sensitive data exists. Error descriptions and audit entries should not create that disclosure.
-
-### Matching Categories
-
-Data Holders MAY match sensitivity categories through:
-
-- FHIR security labels present on returned resources.
-- Local classifications mapped to the profile-supported coding system.
-- Encounter, department, service-line, order, diagnosis, note-type, or patient-level classifications when local policy treats those as equivalent to the listed category.
-
-Ticket-type profiles that incorporate this profile SHOULD define which code systems and local mappings are in scope.
-
-### Issuer Requirements
-
-Issuers using this profile SHALL:
+The wire shape is the shared shape above: a non-empty `codes` array, `unlisted: true`, or both. The issuer determines the value from its withholding records, and SHALL:
 
 - Use code systems permitted by the incorporating ticket-type profile or trust framework.
-- Distinguish withholding rules from release authorization in their records: note whether each withholding was patient-requested, client-requested, issuer-imposed, or framework-imposed, and retain the authorization ceremony evidence behind each release authorization.
-- Apply the withholding decision to everything that could reveal what was withheld — including issuance-time artifacts such as endpoint hints (see [Proposal 003](proposal-003-smart-launch-issuance.html)).
+- Record the provenance of each withholding — patient-requested, client-requested, issuer-imposed, or framework-imposed.
+- Apply the withholding decision to everything that could reveal what was withheld, including issuance-time artifacts such as endpoint hints (see [Proposal 003](proposal-003-smart-launch-issuance.html)).
 - Avoid placing supporting sensitive documents directly in the ticket unless the incorporating profile explicitly requires that evidence.
+
+#### For the authorizing party
+
+The constraint encodes a withholding choice an authorization screen can state plainly — "share my record with this app, but not my substance-use history." Because a request to send less can never expand access, it is honored without trusting the issuer, and it is enforced conservatively: where classification is uncertain, more is withheld, not less.
+
+#### For the client
+
+The client can rely on withheld categories never arriving, and a recipient not prepared to handle a category can use the constraint to keep it out of its own intake. A client must not treat a response as the complete record: it may be lawfully incomplete because data was withheld. The profile does not reveal whether withheld sensitive data exists, so a category's absence is not evidence either way.
+
+#### For the Data Holder
+
+A Data Holder implementing the constraint SHALL:
+
+1. Withhold data matching a `sensitivity_withhold` coding unconditionally. When `unlisted: true`, also withhold all locally classified sensitive data, except data covered by `sensitivity_release_authorized` and permitted under that claim's rule below.
+2. When classification is uncertain, enforce withholding conservatively (withhold more); never resolve uncertainty in favor of release.
+3. If the withholding rule cannot be enforced at all, reject with `invalid_grant` — the base rule for access constraints, restated. A Data Holder that does not implement this profile therefore rejects any ticket carrying `sensitivity_withhold`, an unrecognized access member.
+4. Not reveal whether withheld sensitive data exists; error descriptions and audit entries SHALL NOT create that disclosure.
+
+Enforcement is determinate against the Data Holder's own facts. The Data Holder MAY match sensitivity categories — for both withholding and release authorization — through FHIR security labels on returned resources, local classifications mapped to the profile-supported coding system, or encounter, department, service-line, order, diagnosis, note-type, or patient-level classifications when local policy treats those as equivalent to the listed category. Ticket-type profiles that incorporate this profile SHOULD define which code systems and local mappings are in scope.
+
+### `sensitivity_release_authorized`: Profile Claim
+
+`sensitivity_release_authorized` is a top-level profile claim, not an access constraint: an issuer attestation that the named categories are within the authorization scope. It operates on the Data Holder's own sensitivity gates — it can satisfy a local rule that conditions release on patient authorization, but it cannot override a rule that does not accept ticket-borne authorization, and it broadens nothing on its own.
+
+A Data Holder implementing this profile treats data covered by `sensitivity_release_authorized` as within the ticket's authorization scope, releasing only if Data Holder policy, law, patient matching, and technical constraints permit; it never resolves classification uncertainty in favor of release. A Data Holder that does not implement the profile ignores the claim — an unrecognized top-level claim — and applies its conservative default. Issuers SHALL retain the authorization-ceremony evidence behind each release authorization.
 
 ### Relationship to Trust Frameworks
 

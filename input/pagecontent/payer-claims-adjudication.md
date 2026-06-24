@@ -37,7 +37,7 @@ The constraint set for this type is exactly these two — it scopes one adjudica
 ### Restricted Data
 
 * Records restricted from disclosure to the payer are excluded silently. The base rule already covers this — a valid ticket does not override local rules — and the issuer is the Data Holder, which holds its own restriction flags. The leading case is the HIPAA right to restrict ([45 CFR 164.522(a)(1)(vi)](https://www.ecfr.gov/current/title-45/section-164.522)): a provider must honor a patient's request not to disclose to a health plan information about items or services paid out of pocket in full.
-* The payer is told the response may be lawfully incomplete (the client section above). The payer must not treat a filtered response as the complete record.
+* The payer is told the response may be lawfully incomplete (see the [`claim_linkage`](claim-linkage.html) constraint's "For the client" note). The payer must not treat a filtered response as the complete record.
 * When the patient has authorized disclosure of restricted items to the plan, the ticket says so explicitly: a `sensitivity_release_authorized` claim per [Proposal 005](proposal-005-sensitive-data-modeling.html), using the v3-ActCode `HIPAASelfPay` security label policy code — never a silent widening of the default.
 
 ### Policy Selection Inputs
