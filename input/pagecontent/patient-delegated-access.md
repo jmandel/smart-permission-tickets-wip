@@ -26,7 +26,7 @@ Both evidence slots apply here because a proper issuer verifies both people: the
 
 Draws from the [constraint catalog](access-constraints.html). The authorizing party is the patient — or the instrument that confers authority — not the delegate who presents the ticket, so the issuer presents each definition's authorizing-party language during the delegation ceremony. The Data Holder's proxy policy narrows below the ticket: a granted scope never overrides what local policy lets this class of requester see.
 
-* **`fhir_resources`** (required) — the ceiling the patient set when granting the delegation.
+* **`smart_scopes`** (required) — the ceiling the patient set when granting the delegation.
 * **`data_period`** (optional) — a time bound set at the same ceremony.
 * **`data_holder_filter`** (optional) — the organizations or regions the patient selected when delegating.
 

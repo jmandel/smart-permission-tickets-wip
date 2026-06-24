@@ -15,13 +15,6 @@ export type PermissionTicketType =
   | "https://smarthealthit.org/permission-ticket-type/provider-consult-v1"
   | "https://smarthealthit.org/permission-ticket-type/payer-quality-gap-v1";
 
-export type RestInteraction =
-  | "read"
-  | "search"
-  | "create"
-  | "update"
-  | "delete";
-
 export type TicketAudienceType = "data_holder_url" | "trust_framework";
 export type FrameworkType = "well-known" | "udap" | "oidf";
 
@@ -71,12 +64,9 @@ export type Revocation = {
   index: number;
 };
 
-export type FhirResourcePermission = {
-  type: string;
-  interactions: NonEmptyArray<RestInteraction>;
-  category?: FHIRCoding;
-  code?: FHIRCoding;
-};
+// A single SMART v2 scope string, e.g. "patient/Observation.rs" or
+// "patient/Observation.rs?code=http://loinc.org|4548-4".
+export type SmartScope = string;
 
 export type JurisdictionFilter = {
   kind: "jurisdiction";
@@ -93,7 +83,7 @@ export type DataHolderFilter = JurisdictionFilter | OrganizationFilter;
 export type AccessConstraintExtension = Record<string, unknown>;
 
 export type AccessGrant = {
-  fhir_resources: NonEmptyArray<FhirResourcePermission>;
+  smart_scopes: NonEmptyArray<SmartScope>;
   data_period?: FHIRPeriod;
   data_holder_filter?: NonEmptyArray<DataHolderFilter>;
   [constraint: string]: unknown;
@@ -105,13 +95,13 @@ export type ClaimLinkage = {
 };
 
 export type PayerClaimsAccess = {
-  fhir_resources: NonEmptyArray<FhirResourcePermission>;
+  smart_scopes: NonEmptyArray<SmartScope>;
   claim_linkage: ClaimLinkage;
   [constraint: string]: unknown;
 };
 
 export type QualityGapAccess = {
-  fhir_resources: NonEmptyArray<FhirResourcePermission>;
+  smart_scopes: NonEmptyArray<SmartScope>;
   data_period: FHIRPeriod;
   [constraint: string]: unknown;
 };

@@ -24,7 +24,7 @@ How tickets get minted is deliberately open — see the open question below. Unl
 
 * **Subject:** `Patient`, with `subject.recipient_record` SHOULD when the issuer is the Data Holder.
 * **Requester:** `Organization` (the payer or value-based care entity), identified well enough to match a coverage or contract relationship.
-* **Profile claim:** `measure` (CodeableConcept, required) — which quality measure the query serves. A fact, not a limit: it tells the Data Holder which of its policies applies and gives both sides the audit and re-association anchor, while `fhir_resources` carries the actual limit.
+* **Profile claim:** `measure` (CodeableConcept, required) — which quality measure the query serves. A fact, not a limit: it tells the Data Holder which of its policies applies and gives both sides the audit and re-association anchor, while `smart_scopes` carries the actual limit.
 * **Presenter binding:** Optional (B2B), as in [claims adjudication](payer-claims-adjudication.html): the Data Holder confirms the redeeming client acts for the requester, whether through binding, registration, or a trust-framework relationship.
 * **Expiration:** `exp` SHOULD cover the reporting window the query serves.
 
@@ -32,7 +32,7 @@ How tickets get minted is deliberately open — see the open question below. Unl
 
 Draws from the [constraint catalog](access-constraints.html), nothing new defined:
 
-* **`fhir_resources`** (required) — the elements, one entry per element: `{ "type": "Observation", "code": { "system": "http://loinc.org", "code": "4548-4" } }` is an HbA1c query. Every entry SHALL carry a `category` or `code` narrowing, and entries SHALL NOT name document types such as `DocumentReference`: an un-narrowed entry is a chart section, and a notes query is document retrieval — neither is what this type authorizes.
+* **`smart_scopes`** (required) — the elements, one scope per element: `patient/Observation.rs?code=http://loinc.org|4548-4` is an HbA1c query. Every scope carries a granular `?category` or `?code` narrowing, so the ticket authorizes specific elements rather than whole record types.
 * **`data_period`** (required) — the measurement or lookback period from the measure specification; without it a quality query is unbounded history. When a measure's elements carry different lookbacks — a ten-year colonoscopy window beside a one-year FIT window — mint one ticket per lookback; one wide window would over-expose the short-lookback elements.
 
 The constraint set for this type is exactly these two. `claim_linkage` is not part of it (there is no claim), and `data_holder_filter` is not part of it (the audience is a single named Data Holder). Cross-cutting constraints such as `sensitivity_withhold` MAY be added; servers that do not enforce them reject the ticket.

@@ -21,14 +21,8 @@
     }
   },
   "access": {
-    "fhir_resources": [
-      {
-        "type": "*",
-        "interactions": [
-          "read",
-          "search"
-        ]
-      }
+    "smart_scopes": [
+      "patient/*.rs"
     ]
   }
 }

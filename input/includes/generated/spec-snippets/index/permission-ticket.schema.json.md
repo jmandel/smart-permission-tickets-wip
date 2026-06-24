@@ -326,66 +326,12 @@
         "access": {
           "type": "object",
           "properties": {
-            "fhir_resources": {
+            "smart_scopes": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "interactions": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "read",
-                        "search",
-                        "create",
-                        "update",
-                        "delete"
-                      ]
-                    }
-                  },
-                  "category": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  },
-                  "code": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "interactions"
-                ],
-                "additionalProperties": false
+                "type": "string",
+                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
               }
             },
             "data_period": {
@@ -508,7 +454,7 @@
             }
           },
           "required": [
-            "fhir_resources"
+            "smart_scopes"
           ],
           "additionalProperties": {
             "type": "object",
@@ -981,66 +927,12 @@
         "access": {
           "type": "object",
           "properties": {
-            "fhir_resources": {
+            "smart_scopes": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "interactions": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "read",
-                        "search",
-                        "create",
-                        "update",
-                        "delete"
-                      ]
-                    }
-                  },
-                  "category": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  },
-                  "code": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "interactions"
-                ],
-                "additionalProperties": false
+                "type": "string",
+                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
               }
             },
             "data_period": {
@@ -1163,7 +1055,7 @@
             }
           },
           "required": [
-            "fhir_resources"
+            "smart_scopes"
           ],
           "additionalProperties": {
             "type": "object",
@@ -1568,66 +1460,12 @@
         "access": {
           "type": "object",
           "properties": {
-            "fhir_resources": {
+            "smart_scopes": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "interactions": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "read",
-                        "search",
-                        "create",
-                        "update",
-                        "delete"
-                      ]
-                    }
-                  },
-                  "category": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  },
-                  "code": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "interactions"
-                ],
-                "additionalProperties": false
+                "type": "string",
+                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
               }
             },
             "data_period": {
@@ -1750,7 +1588,7 @@
             }
           },
           "required": [
-            "fhir_resources"
+            "smart_scopes"
           ],
           "additionalProperties": {
             "type": "object",
@@ -2183,66 +2021,12 @@
         "access": {
           "type": "object",
           "properties": {
-            "fhir_resources": {
+            "smart_scopes": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "interactions": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "read",
-                        "search",
-                        "create",
-                        "update",
-                        "delete"
-                      ]
-                    }
-                  },
-                  "category": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  },
-                  "code": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "interactions"
-                ],
-                "additionalProperties": false
+                "type": "string",
+                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
               }
             },
             "data_period": {
@@ -2365,7 +2149,7 @@
             }
           },
           "required": [
-            "fhir_resources"
+            "smart_scopes"
           ],
           "additionalProperties": {
             "type": "object",
@@ -2864,66 +2648,12 @@
         "access": {
           "type": "object",
           "properties": {
-            "fhir_resources": {
+            "smart_scopes": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "interactions": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "read",
-                        "search",
-                        "create",
-                        "update",
-                        "delete"
-                      ]
-                    }
-                  },
-                  "category": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  },
-                  "code": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "interactions"
-                ],
-                "additionalProperties": false
+                "type": "string",
+                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
               }
             },
             "claim_linkage": {
@@ -3060,7 +2790,7 @@
             }
           },
           "required": [
-            "fhir_resources",
+            "smart_scopes",
             "claim_linkage"
           ],
           "additionalProperties": {
@@ -3466,66 +3196,12 @@
         "access": {
           "type": "object",
           "properties": {
-            "fhir_resources": {
+            "smart_scopes": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "interactions": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "read",
-                        "search",
-                        "create",
-                        "update",
-                        "delete"
-                      ]
-                    }
-                  },
-                  "category": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  },
-                  "code": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "interactions"
-                ],
-                "additionalProperties": false
+                "type": "string",
+                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
               }
             },
             "data_period": {
@@ -3648,7 +3324,7 @@
             }
           },
           "required": [
-            "fhir_resources"
+            "smart_scopes"
           ],
           "additionalProperties": {
             "type": "object",
@@ -4144,66 +3820,12 @@
         "access": {
           "type": "object",
           "properties": {
-            "fhir_resources": {
+            "smart_scopes": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "interactions": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "read",
-                        "search",
-                        "create",
-                        "update",
-                        "delete"
-                      ]
-                    }
-                  },
-                  "category": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  },
-                  "code": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "interactions"
-                ],
-                "additionalProperties": false
+                "type": "string",
+                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
               }
             },
             "data_period": {
@@ -4326,7 +3948,7 @@
             }
           },
           "required": [
-            "fhir_resources"
+            "smart_scopes"
           ],
           "additionalProperties": {
             "type": "object",
@@ -4825,66 +4447,12 @@
         "access": {
           "type": "object",
           "properties": {
-            "fhir_resources": {
+            "smart_scopes": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "interactions": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "read",
-                        "search",
-                        "create",
-                        "update",
-                        "delete"
-                      ]
-                    }
-                  },
-                  "category": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  },
-                  "code": {
-                    "type": "object",
-                    "properties": {
-                      "system": {
-                        "type": "string"
-                      },
-                      "code": {
-                        "type": "string"
-                      },
-                      "display": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "interactions"
-                ],
-                "additionalProperties": false
+                "type": "string",
+                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
               }
             },
             "data_period": {
@@ -4901,7 +4469,7 @@
             }
           },
           "required": [
-            "fhir_resources",
+            "smart_scopes",
             "data_period"
           ],
           "additionalProperties": {

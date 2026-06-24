@@ -153,33 +153,19 @@ function buildIndexSnippets(): void {
       },
     },
     access: {
-      fhir_resources: [
-        { type: "Immunization", interactions: ["read", "search"] },
-        {
-          type: "AllergyIntolerance",
-          interactions: ["read", "search"],
-        },
+      smart_scopes: [
+        "patient/Immunization.rs",
+        "patient/AllergyIntolerance.rs",
       ],
     },
   };
 
   const accessExample: JsonObject = {
     access: {
-      fhir_resources: [
-        {
-          type: "Observation",
-          interactions: ["read", "search"],
-          category: {
-            system: "http://terminology.hl7.org/CodeSystem/observation-category",
-            code: "laboratory",
-          },
-        },
-        {
-          type: "Observation",
-          interactions: ["read", "search"],
-          code: { system: "http://loinc.org", code: "4548-4" },
-        },
-        { type: "Condition", interactions: ["read", "search"] },
+      smart_scopes: [
+        "patient/Observation.rs?category=http://terminology.hl7.org/CodeSystem/observation-category|laboratory",
+        "patient/Observation.rs?code=http://loinc.org|4548-4",
+        "patient/Condition.rs",
       ],
       data_period: { start: "2023-01-01", end: "2024-12-31" },
       data_holder_filter: [
@@ -218,7 +204,7 @@ function buildIndexSnippets(): void {
       patient: { resourceType: "Patient" },
     },
     access: {
-      fhir_resources: [{ type: "*", interactions: ["read", "search"] }],
+      smart_scopes: ["patient/*.rs"],
     },
   };
 

@@ -29,8 +29,8 @@ pages:
     title: Payer Quality Gap Queries
   access-constraints.md:
     title: Access Constraints
-  fhir-resources.md:
-    title: "Constraint: fhir_resources"
+  smart-scopes.md:
+    title: "Constraint: smart_scopes"
   data-period.md:
     title: "Constraint: data_period"
   data-holder-filter.md:
@@ -64,7 +64,7 @@ menu:
   IG Home: index.html
   Access Constraints:
     "Overview": access-constraints.html
-    "fhir_resources": fhir-resources.html
+    "smart_scopes": smart-scopes.html
     "data_period": data-period.html
     "data_holder_filter": data-holder-filter.html
     "claim_linkage": claim-linkage.html

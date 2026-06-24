@@ -41,21 +41,9 @@
 
   // Access: defines what the client may read or search once the ticket is redeemed.
   "access": {
-    "fhir_resources": [
-      {
-        "type": "Immunization",
-        "interactions": [
-          "read",
-          "search"
-        ]
-      },
-      {
-        "type": "AllergyIntolerance",
-        "interactions": [
-          "read",
-          "search"
-        ]
-      }
+    "smart_scopes": [
+      "patient/Immunization.rs",
+      "patient/AllergyIntolerance.rs"
     ]
   }
 }

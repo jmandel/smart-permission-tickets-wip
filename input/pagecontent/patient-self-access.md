@@ -24,7 +24,7 @@ Patient completes identity verification and authorization with the issuer → is
 
 Draws from the [constraint catalog](access-constraints.html). The authorizing party is the patient at the issuer's authorization screen; each definition's authorizing-party language is what that screen says.
 
-* **`fhir_resources`** (required) — the record types the patient chose, one entry per choice.
+* **`smart_scopes`** (required) — the record types the patient chose, one scope per choice.
 * **`data_period`** (optional) — the time limit the patient set.
 * **`data_holder_filter`** (optional) — the organizations or regions the patient selected.
 

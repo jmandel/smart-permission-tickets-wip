@@ -66,7 +66,7 @@ The patient told the issuer not to share substance-use data with this app. Other
 
 ```json
 "access": {
-  "fhir_resources": [ { "type": "Observation", "interactions": ["read", "search"] } ],
+  "smart_scopes": [ "patient/Observation.rs" ],
   "sensitivity_withhold": {
     "codes": [
       {
@@ -95,7 +95,7 @@ The patient authorized sharing HIV-related information; other locally classified
     ]
   },
   "access": {
-    "fhir_resources": [ { "type": "Observation", "interactions": ["read", "search"] } ],
+    "smart_scopes": [ "patient/Observation.rs" ],
     "sensitivity_withhold": { "unlisted": true }
   }
 }
@@ -109,7 +109,7 @@ A client doing routine medication reconciliation asks never to receive anything 
 
 ```json
 "access": {
-  "fhir_resources": [ { "type": "MedicationRequest", "interactions": ["read", "search"] } ],
+  "smart_scopes": [ "patient/MedicationRequest.rs" ],
   "sensitivity_withhold": { "unlisted": true }
 }
 ```

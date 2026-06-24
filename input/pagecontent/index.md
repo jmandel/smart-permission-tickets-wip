@@ -364,7 +364,7 @@ Requested scopes SHALL use SMART scope grammar. This specification allows either
 
 #### Access Constraints
 
-The `access` object holds the ticket's named **access constraints**. Every member of `access` is enforce-or-reject: a Data Holder that does not recognize and enforce a member rejects the ticket. The constraint catalog (`fhir_resources`, `data_period`, `data_holder_filter`, and profile-defined constraints), the four-part template every constraint definition follows, the constraint algebra, and the rules for defining new constraints are specified on the [Access Constraints](access-constraints.html) page.
+The `access` object holds the ticket's named **access constraints**. Every member of `access` is enforce-or-reject: a Data Holder that does not recognize and enforce a member rejects the ticket. The constraint catalog (`smart_scopes`, `data_period`, `data_holder_filter`, and profile-defined constraints), the four-part template every constraint definition follows, the constraint algebra, and the rules for defining new constraints are specified on the [Access Constraints](access-constraints.html) page.
 
 #### Token-Time and Resource-Time Enforcement
 
@@ -634,7 +634,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 - Reject with `invalid_grant` if any present kernel field cannot be enforced
 - Resolve the ticket subject to a local patient record using `subject.patient`, corroborated by verified `subject_identity_evidence` when present; reject if zero or ambiguous matches
 - Calculate granted access per [Access Calculation](#access-calculation): the intersection of requested scopes, ticket access, client eligibility, ticket-type rules, and local policy and capability
-- Enforce every access constraint declared by the ticket types you support, per the definitions on [Access Constraints](access-constraints.html) — for the current catalog: `fhir_resources`, `data_period`, `data_holder_filter`, and `claim_linkage` for payer claims adjudication
+- Enforce every access constraint declared by the ticket types you support, per the definitions on [Access Constraints](access-constraints.html) — for the current catalog: `smart_scopes`, `data_period`, `data_holder_filter`, and `claim_linkage` for payer claims adjudication
 - Reject tickets carrying any `access` member the server does not recognize and enforce
 - Enforce subset constraints at the appropriate layer (token endpoint, resource server, or both)
 - If `revocation` is present, perform revocation checking before issuing a token; if revocation status cannot be determined, reject the request

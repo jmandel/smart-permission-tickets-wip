@@ -30,15 +30,6 @@ export const PermissionTicketTypeValues = [
 
 export const PermissionTicketTypeSchema = z.enum(PermissionTicketTypeValues);
 
-export const RestInteractionValues = [
-  "read",
-  "search",
-  "create",
-  "update",
-  "delete",
-] as const;
-
-export const RestInteractionSchema = z.enum(RestInteractionValues);
 export const FrameworkTypeSchema = z.enum(["well-known", "udap", "oidf"]);
 
 const NonEmptyStringSchema = z.string().min(1);
@@ -185,12 +176,14 @@ export const RevocationSchema = z.object({
   index: z.number().int().nonnegative(),
 }).strict();
 
-export const FhirResourcePermissionSchema = z.object({
-  type: NonEmptyStringSchema,
-  interactions: z.array(RestInteractionSchema).min(1),
-  category: FHIRCodingSchema.optional(),
-  code: FHIRCodingSchema.optional(),
-}).strict();
+// A single SMART v2 scope string (SMART App Launch v2 scope grammar), e.g.
+// "patient/Observation.rs" or, with granular search-parameter narrowing,
+// "patient/Observation.rs?category=http://terminology.hl7.org/CodeSystem/observation-category|laboratory".
+// Validation is intentionally light — structure only, not search-parameter semantics.
+export const SmartScopeSchema = z.string().regex(
+  /^(patient|user|system)\/(\*|[A-Za-z]+)\.[cruds]+(\?\S+)?$/,
+  { message: "Must be a SMART v2 scope, e.g. patient/Observation.rs or patient/Observation.rs?code=http://loinc.org|4548-4" },
+);
 
 export const JurisdictionFilterSchema = z.object({
   kind: z.literal("jurisdiction"),
@@ -210,7 +203,7 @@ export const DataHolderFilterSchema = z.discriminatedUnion("kind", [
 export const AccessConstraintExtensionSchema = z.object({}).catchall(z.unknown());
 
 export const AccessGrantSchema = z.object({
-  fhir_resources: z.array(FhirResourcePermissionSchema).min(1),
+  smart_scopes: z.array(SmartScopeSchema).min(1),
   data_period: FHIRPeriodSchema.optional(),
   data_holder_filter: z.array(DataHolderFilterSchema).min(1).optional(),
 }).catchall(AccessConstraintExtensionSchema);
@@ -244,23 +237,20 @@ export const ClaimLinkageSchema = z.object({
   encounter: z.array(FHIRReferenceSchema).min(1).optional(),
 }).strict();
 
-// Locked constraint set: exactly fhir_resources + claim_linkage. The claim is
+// Locked constraint set: exactly smart_scopes + claim_linkage. The claim is
 // the type's time anchor, so data_period is prohibited (redundant inside the
 // encounter bounds, contradictory against the current-state floor).
 export const PayerClaimsAccessSchema = z.object({
-  fhir_resources: z.array(FhirResourcePermissionSchema).min(1),
+  smart_scopes: z.array(SmartScopeSchema).min(1),
   claim_linkage: ClaimLinkageSchema,
 }).catchall(AccessConstraintExtensionSchema);
 
-// Locked constraint set: exactly fhir_resources (every entry narrowed) +
-// data_period (the measurement or lookback period).
+// Locked constraint set: exactly smart_scopes + data_period (the measurement or
+// lookback period). The profile additionally requires every scope to carry a
+// granular search-parameter narrowing; that rule is stated in prose rather than
+// enforced structurally here.
 export const QualityGapAccessSchema = z.object({
-  fhir_resources: z.array(
-    FhirResourcePermissionSchema.refine(
-      (entry) => entry.category !== undefined || entry.code !== undefined,
-      { message: "Quality gap entries must carry a category or code narrowing." },
-    ),
-  ).min(1),
+  smart_scopes: z.array(SmartScopeSchema).min(1),
   data_period: FHIRPeriodSchema,
 }).catchall(AccessConstraintExtensionSchema);
 
@@ -375,8 +365,7 @@ export type EmbeddedIdentityEvidence = z.infer<typeof EmbeddedIdentityEvidenceSc
 export type IdentityEvidence = z.infer<typeof IdentityEvidenceSchema>;
 export type Subject = z.infer<typeof SubjectSchema>;
 export type Requester = z.infer<typeof RequesterSchema>;
-export type RestInteraction = z.infer<typeof RestInteractionSchema>;
-export type FhirResourcePermission = z.infer<typeof FhirResourcePermissionSchema>;
+export type SmartScope = z.infer<typeof SmartScopeSchema>;
 export type JurisdictionFilter = z.infer<typeof JurisdictionFilterSchema>;
 export type OrganizationFilter = z.infer<typeof OrganizationFilterSchema>;
 export type DataHolderFilter = z.infer<typeof DataHolderFilterSchema>;

@@ -43,7 +43,7 @@ The signed payload has a small, fixed shape:
 | requester?     RelatedPerson | Practitioner |                 |  on whose behalf
 |                PractitionerRole | Organization                |  (issuer-attested)
 +---------------------------------------------------------------+
-| access:        fhir_resources[]                               |  release limits
+| access:        smart_scopes[]                                 |  release limits
 |                data_period?                                   |
 |                data_holder_filter?                            |
 |                profile constraints?                           |
@@ -59,7 +59,7 @@ The signed payload has a small, fixed shape:
 
 A Permission Ticket is a **portable, issuer-signed authorization grant** — a capability the issuer hands a client, redeemable at any Data Holder inside the ticket's audience. Compared to a vanilla SMART-on-FHIR access token, it sits one step earlier in the flow: it is the artifact a client presents to *get* an access token, not the token itself. Compared to a UMA permission ticket, it is signed and self-contained — the Data Holder validates it offline against the issuer's published keys, with no callback to the issuer at redemption time. Compared to an opaque bearer assertion, it is structured and discriminated by `ticket_type`, so the Data Holder knows exactly which schema and processing rules to apply.
 
-The payload separates facts from limits. The portable kernel carries the JWT envelope, the subject, optional requester, presenter binding, revocation, and `access`. The `access` object contains named constraints such as `fhir_resources`, `data_period`, `data_holder_filter`, and profile-defined constraints like `claim_linkage`. Ticket-type profile claims carry facts the Data Holder weighs in policy selection, such as a quality `measure` or a public-health `reportable_condition`. Ignoring an access constraint could release too much, so unknown access constraints fail closed. Ignoring an unknown top-level profile claim can only make release more conservative, so ordinary JWT extension handling is sufficient there.
+The payload separates facts from limits. The portable kernel carries the JWT envelope, the subject, optional requester, presenter binding, revocation, and `access`. The `access` object contains named constraints such as `smart_scopes`, `data_period`, `data_holder_filter`, and profile-defined constraints like `claim_linkage`. Ticket-type profile claims carry facts the Data Holder weighs in policy selection, such as a quality `measure` or a public-health `reportable_condition`. Ignoring an access constraint could release too much, so unknown access constraints fail closed. Ignoring an unknown top-level profile claim can only make release more conservative, so ordinary JWT extension handling is sufficient there.
 
 ## Key design points
 
@@ -77,7 +77,7 @@ The payload separates facts from limits. The portable kernel carries the JWT env
 input/
   pagecontent/index.md          Normative specification prose (the spec)
   pagecontent/access-constraints.md  Access-constraint registry
-  pagecontent/fhir-resources.md      Access-constraint definition pages
+  pagecontent/smart-scopes.md        Access-constraint definition pages
   pagecontent/data-*.md
   pagecontent/claim-linkage.md
   pagecontent/patient-*.md      Active individual-access ticket profiles

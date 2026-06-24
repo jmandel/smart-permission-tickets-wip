@@ -36,7 +36,7 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
       presenterBinding: "Required",
       requester: "—",
       identityEvidence: "<code>subject_identity_evidence</code> SHOULD",
-      accessConstraints: "<code>fhir_resources</code> required; <code>data_period</code>, <code>data_holder_filter</code> optional",
+      accessConstraints: "<code>smart_scopes</code> required; <code>data_period</code>, <code>data_holder_filter</code> optional",
     }
   },
   {
@@ -48,7 +48,7 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
       presenterBinding: "Required",
       requester: "<code>RelatedPerson</code> (required)",
       identityEvidence: "<code>subject_identity_evidence</code> SHOULD; <code>requester_identity_evidence</code> SHOULD",
-      accessConstraints: "<code>fhir_resources</code> required; <code>data_period</code>, <code>data_holder_filter</code> optional",
+      accessConstraints: "<code>smart_scopes</code> required; <code>data_period</code>, <code>data_holder_filter</code> optional",
     }
   },
   {
@@ -72,7 +72,7 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
       presenterBinding: "Optional",
       requester: "<code>Organization</code> (required)",
       identityEvidence: "— (requester is an organization)",
-      accessConstraints: "<code>fhir_resources</code>, <code>claim_linkage</code> required",
+      accessConstraints: "<code>smart_scopes</code>, <code>claim_linkage</code> required",
     }
   },
   {
@@ -90,7 +90,7 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
       presenterBinding: "Optional",
       requester: "<code>Organization</code> (required)",
       identityEvidence: "— (requester is an organization)",
-      accessConstraints: "<code>fhir_resources</code> (every entry narrowed), <code>data_period</code> required",
+      accessConstraints: "<code>smart_scopes</code> (every scope narrowed), <code>data_period</code> required",
     }
   },
   {

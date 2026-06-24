@@ -15,13 +15,13 @@ There is no tiered constraint vocabulary — just this catalog, assembled in dif
 
 | Constraint | Defined by | Summary |
 |-------|------|-------------|
-| [`fhir_resources`](fhir-resources.html) | This specification | **Present in every ticket** — the positive grant. Each entry specifies a resource `type`, required `interactions`, and optionally one narrowing `category` and one narrowing `code`. |
+| [`smart_scopes`](smart-scopes.html) | This specification | **Present in every ticket** — the positive grant. An array of SMART v2 scope strings naming resource types and interactions, optionally narrowed by SMART's granular search-parameter syntax. |
 | [`data_period`](data-period.html) | This specification | One coarse clinical-date window, filtered through designated date search parameters. If disjoint windows are needed, mint separate tickets. |
 | [`data_holder_filter`](data-holder-filter.html) | This specification | Which Data Holders may answer. Each entry is a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`); matching any entry suffices. |
 | [`claim_linkage`](claim-linkage.html) | This specification, for [Payer Claims Adjudication](payer-claims-adjudication.html) | Release limited to records the Data Holder associates with a referenced claim or prior authorization. |
 | `sensitivity_withhold` | [Proposal 005](proposal-005-sensitive-data-modeling.html) | Do not release data in the named sensitivity categories. |
 
-Three of these constraints use machinery FHIR servers already have — `fhir_resources` projects to SMART scopes, `data_period` to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
+Three of these constraints use machinery FHIR servers already have — `smart_scopes` *is* SMART scopes, `data_period` maps to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
 
 Ticket-type profiles declare which constraints their tickets carry and may define new ones (see [Defining New Access Constraints](#defining-new-access-constraints)). A Data Holder that advertises a ticket type enforces every constraint the type declares, so any valid ticket of a supported type is accepted with no pre-coordination.
 
@@ -43,18 +43,18 @@ Each constraint page follows this template, and profiles defining new constraint
 Constraints combine as follows:
 
 - **Across constraints** (AND): returned data must satisfy every constraint present in `access`. An absent constraint imposes no restriction.
-- **Within a `fhir_resources` entry** (AND): a resource must be of the entry's `type` and match its `category` and `code` when present.
-- **Across `fhir_resources` entries** (OR): a resource matching any single entry is authorized.
+- **Within a `smart_scopes` entry** (AND): a resource must be of the scope's resource type and match any granular search-parameter narrowing the scope carries.
+- **Across `smart_scopes` entries** (OR): a resource matching any single scope is authorized — the standard SMART v2 union of scopes.
 - **Within `data_holder_filter`** (OR): a Data Holder may answer if it matches any listed entry.
 
 ### Example Walkthrough
 
 {% include generated/spec-snippets/index/access-example.json.md %}
 
-This example applies `fhir_resources`, `data_period`, and `data_holder_filter` together:
+This example applies `smart_scopes`, `data_period`, and `data_holder_filter` together:
 
 - **`data_holder_filter`** (OR): only a Data Holder operating in CA, in NY, or matching organization NPI `123` may answer at all.
-- **`fhir_resources`** (OR across entries): at a matching Data Holder, an Observation is authorized if it is a laboratory result or carries the HbA1c code `4548-4`. A Condition is authorized by the third entry with no narrowing.
+- **`smart_scopes`** (OR across scopes): at a matching Data Holder, an Observation is authorized if it is a laboratory result or carries the HbA1c code `4548-4`. A Condition is authorized by the third scope with no narrowing.
 - **`data_period`**: date filtering applies per the designated parameters — Observations by `date`, Conditions by `recorded-date` — limiting results to 2023–2024, with the stated allowances for currently relevant records.
 
 Because constraints are ANDed: a matching Observation from a non-matching Data Holder is still not authorized, and date-filterable data outside the period is excluded even if it matches an entry. If disjoint time windows are needed, mint separate tickets.
@@ -71,9 +71,7 @@ For example, a profile that needs encounter-class scoping defines it as a constr
 
 ```json
 "access": {
-  "fhir_resources": [
-    { "type": "DocumentReference", "interactions": ["read", "search"] }
-  ],
+  "smart_scopes": [ "patient/Observation.rs" ],
   "https://example.org/permission-ticket/encounter-class-filter": {
     "include": [
       { "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode", "code": "AMB" }
@@ -82,4 +80,4 @@ For example, a profile that needs encounter-class scoping defines it as a constr
 }
 ```
 
-A Data Holder that recognizes the constraint releases only records tied to matching encounters; one that does not recognize it rejects the ticket. The defining profile owes all four template sections — including what an authorization screen may say ("only office-visit records") and how records that link to no encounter at all are handled, since many patient-level resources do not.
+A Data Holder that recognizes the constraint releases only records tied to a matching encounter; one that does not recognize it rejects the ticket. The defining profile owes all four template sections.

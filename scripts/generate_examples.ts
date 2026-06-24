@@ -75,11 +75,11 @@ const uc1_payload: PermissionTicket = {
         }
     },
     access: {
-        fhir_resources: [
-            { type: "AllergyIntolerance", interactions: ["read", "search"] },
-            { type: "Condition", interactions: ["read", "search"] },
-            { type: "Observation", interactions: ["read", "search"] },
-            { type: "MedicationRequest", interactions: ["read", "search"] }
+        smart_scopes: [
+            "patient/AllergyIntolerance.rs",
+            "patient/Condition.rs",
+            "patient/Observation.rs",
+            "patient/MedicationRequest.rs"
         ],
         data_period: { start: "2021-01-01", end: "2026-01-01" }
     }
@@ -125,10 +125,10 @@ const uc2_payload: PermissionTicket = {
         name: [{ family: "Reyes", given: ["Elena"] }]
     },
     access: {
-        fhir_resources: [
-            { type: "Condition", interactions: ["read", "search"] },
-            { type: "Immunization", interactions: ["read", "search"] },
-            { type: "MedicationRequest", interactions: ["read", "search"] }
+        smart_scopes: [
+            "patient/Condition.rs",
+            "patient/Immunization.rs",
+            "patient/MedicationRequest.rs"
         ]
     }
 };
@@ -163,10 +163,10 @@ const uc3_payload: PermissionTicket = {
         name: "State Epidemiology Unit"
     },
     access: {
-        fhir_resources: [
-            { type: "Condition", interactions: ["read", "search"] },
-            { type: "Observation", interactions: ["read", "search"] },
-            { type: "DiagnosticReport", interactions: ["read", "search"] }
+        smart_scopes: [
+            "patient/Condition.rs",
+            "patient/Observation.rs",
+            "patient/DiagnosticReport.rs"
         ],
         data_period: { start: "2025-12-01", end: "2026-06-01" },
         data_holder_filter: [{ kind: "jurisdiction", address: { country: "US", state: "TX" } }]
@@ -209,11 +209,11 @@ const uc5_payload: PermissionTicket = {
         name: "Example Health Plan"
     },
     access: {
-        fhir_resources: [
-            { type: "Condition", interactions: ["read", "search"] },
-            { type: "Observation", interactions: ["read", "search"] },
-            { type: "Procedure", interactions: ["read", "search"] },
-            { type: "DocumentReference", interactions: ["read", "search"] }
+        smart_scopes: [
+            "patient/Condition.rs",
+            "patient/Observation.rs",
+            "patient/Procedure.rs",
+            "patient/DocumentReference.rs"
         ],
         claim_linkage: {
             claim: {
@@ -264,8 +264,8 @@ const quality_gap_payload: PermissionTicket = {
         text: "Diabetes glycemic status (HbA1c)"
     },
     access: {
-        fhir_resources: [
-            { type: "Observation", interactions: ["read", "search"], code: { system: "http://loinc.org", code: "4548-4", display: "Hemoglobin A1c/Hemoglobin.total in Blood" } }
+        smart_scopes: [
+            "patient/Observation.rs?code=http://loinc.org|4548-4"
         ],
         data_period: { start: "2026-01-01", end: "2026-12-31" }
     }
