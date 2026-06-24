@@ -30,7 +30,7 @@ Issuers SHOULD use directory or network information (published endpoint networks
 
 ### Organization Filters
 
-* An organization filter's `organization` is an **array of references** to the organizations whose Data Holders may answer. All allowed organization identifiers are flattened into this one array; a Data Holder may answer if it matches **any** entry.
+* An organization filter's `organization` is an **array of references** to the organizations whose Data Holders may answer. All allowed organization identifiers are flattened into one array; a Data Holder may answer if it matches **any** entry.
 * Each reference carries an organizational `identifier` — for example an NPI or TIN — and MAY carry a `display`. Matching is by identifier; the display is for logs and screens. An organization known by several identifiers (a TIN plus one or more NPIs, say) contributes one entry per identifier.
 * A Data Holder may answer if it matches a listed organization or is authorized to answer on that organization's behalf.
 * This filter is endpoint-agnostic. If a Data Holder operates multiple technical endpoints, a single organization filter authorizes access through any endpoint by which that organization is authorized to answer and that supports the Permission Ticket grant type.

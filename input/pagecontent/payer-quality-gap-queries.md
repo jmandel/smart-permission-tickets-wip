@@ -18,7 +18,7 @@ The ticket authorizes data only for quality measurement of the named measure. Us
 
 A ticket is minted per member and measure, naming the payer as requester and the measure it serves → the payer's system presents the ticket at the provider's endpoint → the provider issues an access token limited to the named elements over the measurement period. One ticket serves one measure; a member's open gaps for the season are several tickets, each with its own purpose and audit trail, not one blurred union.
 
-The payer typically mints the ticket itself, within a trust relationship it already has with the provider — a network, a value-based care contract, or a coverage relationship. The ticket does not establish that relationship; it carries a signed, scoped, single-purpose assertion within it that the provider can enforce uniformly and log. A provider may instead mint tickets from a payer's gap list; the artifact is identical either way.
+The payer typically mints the ticket itself, within a trust relationship it already has with the provider — a network, a value-based care contract, or a coverage relationship. The ticket does not establish that relationship; it carries a signed, scoped, single-purpose assertion that the provider can enforce uniformly and log. A provider may instead mint tickets from a payer's gap list; the artifact is identical either way.
 
 ### Required Claims
 
@@ -35,7 +35,7 @@ Draws from the [constraint catalog](access-constraints.html), nothing new define
 * **`smart_scopes`** (required) — the elements, one scope per element: `patient/Observation.rs?code=http://loinc.org|4548-4` is an HbA1c query. Every scope carries a granular `?category` or `?code` narrowing, so the ticket authorizes specific elements rather than whole record types. This is the enforced limit.
 * **`data_period`** (required) — the measurement or lookback period from the measure specification; without it a quality query is unbounded history. When a measure's elements carry different lookbacks — a ten-year colonoscopy window beside a one-year FIT window — mint one ticket per lookback; one wide window would over-expose the short-lookback elements.
 
-The constraint set for this type is exactly these two. `claim_linkage` is not part of it (there is no claim), and `data_holder_filter` is not part of it (the audience is a single named Data Holder). Cross-cutting constraints such as `sensitivity_withhold` MAY be added; servers that do not enforce them reject the ticket.
+This type carries just `smart_scopes` and `data_period`. `claim_linkage` is not part of it (there is no claim), and `data_holder_filter` is not part of it (the audience is a single named Data Holder). Cross-cutting constraints such as `sensitivity_withhold` MAY be added; servers that do not enforce them reject the ticket.
 
 ### Policy Selection Inputs
 

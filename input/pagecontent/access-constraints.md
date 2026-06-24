@@ -31,7 +31,7 @@ Ticket-type profiles declare which constraints their tickets carry and may defin
 
 ### Constraint Template
 
-A constraint definition serves four parties, and it is complete when it answers all four:
+A constraint definition serves four parties; it is complete when it answers all four:
 
 | Section | Serves | It states |
 |---------|--------|-----------|
@@ -40,7 +40,7 @@ A constraint definition serves four parties, and it is complete when it answers 
 | **For the client** | Client | What the client can rely on and plan around, and what it must not assume. |
 | **For the Data Holder** | Data Holder | Exactly what is enforced. Enforcement must be determinate: given the Data Holder's facts, two implementations reach the same answer. The facts may be the Data Holder's own — `data_holder_filter` works this way. Any discretion is stated here with its direction: narrowing release is always allowed; anything that widens release must be named and bounded. |
 
-Each constraint page follows this template, and profiles defining new constraints SHALL cover the same four sections. A definition that skips a section surfaces the gap later as a mismatch between what an authorization screen promised and what a server enforced.
+Each constraint page follows this template, and profiles defining new constraints SHALL cover the same four sections. Skip a section and the gap surfaces later as a mismatch between what an authorization screen promised and what a server enforced.
 
 ### Constraint Algebra
 
@@ -67,7 +67,7 @@ Because constraints are ANDed: a matching Observation from a non-matching Data H
 
 Ticket-type profiles and other implementation guides MAY introduce additional access constraints. A new constraint is a new named member of `access`, defined by covering all four sections of the [constraint template](#constraint-template); constraints introduced by catalog ticket types get definition pages here, so this catalog stays the one place definitions live.
 
-Bare member names are reserved for constraints this specification defines. A constraint defined in another implementation guide uses its canonical URL as the member name — the standard pattern for downstream extension — so independently defined constraints cannot collide and every name resolves to its definition. Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
+Bare member names are reserved for constraints this specification defines. A constraint defined in another implementation guide uses its canonical URL as the member name, the standard pattern for downstream extension, so independently defined constraints cannot collide and every name resolves to its definition. Enforcement may be defined against the Data Holder's own facts — as `data_holder_filter` already is — provided it stays determinate.
 
 Discovery rides on ticket types. A `ticket_type` URI fixes the constraints its tickets require; changing the required set means minting a new URI. Data Holders advertise supported types, so a server that lists a type can enforce everything the type requires. A ticket MAY also carry constraints beyond its type's required set — a sensitivity withholding, for example — with the standard consequence: servers that do not enforce them reject the ticket, and issuers should expect that rejection wherever the extra constraint is unsupported.
 

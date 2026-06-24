@@ -6,17 +6,17 @@
 
 This proposal defines an experimental Permission Ticket profile for communicating sensitivity-category handling, in two pieces that live on opposite sides of the [access constraint border](access-constraints.html):
 
-* **`sensitivity_withhold`** — an access constraint: do not send data in these categories. A limit, so it fails closed: a Data Holder that cannot enforce it rejects the ticket rather than silently letting the authorizing person's expectations fail.
+* **`sensitivity_withhold`** — an access constraint: do not send data in these categories. A limit, so it fails closed: a Data Holder that cannot enforce it rejects the ticket rather than silently letting the authorizing person down.
 * **`sensitivity_release_authorized`** — a top-level profile claim: the issuer attests that these categories are within the authorization scope, subject to Data Holder policy and law. A fact, so it degrades gracefully: a Data Holder that does not recognize it falls back to its own sensitivity gates and releases less.
 
-This profile lives outside the base specification deliberately: its job is to lay out the *shape* of sensitive-data handling ahead of what base APIs can do today. The base kernel only carries what every conforming Data Holder can enforce now; this profile models where sensitive-data management needs to go, so that issuers, EHRs, and trust frameworks can build toward one shape instead of inventing several.
+This profile lives outside the base specification deliberately: it lays out the *shape* of sensitive-data handling ahead of what base APIs can do today. The base kernel carries only what every conforming Data Holder can enforce now; this profile models where sensitive-data management needs to go, so issuers, EHRs, and trust frameworks build toward one shape instead of inventing several.
 
 ### Motivation
 
 Three parties need these rules:
 
 * **The patient, through the issuer, restricting clients.** "Share my record with this app, but not my substance-use history." The patient's withholding choice is captured once, at the issuer, and travels in the ticket to every Data Holder — that is the core permission-ticket pattern applied to the data patients care most about.
-* **The recipient, minimizing its own intake.** A client not prepared to handle a category — and wanting to insulate itself from the special obligations that come with it — can ask that the category never be sent.
+* **The recipient, minimizing its own intake.** A client not prepared to handle a category — and wanting to avoid the special obligations that come with it — can ask that the category never be sent.
 * **The patient, unlocking access.** Today, when API policies filter restricted categories, there is often no field a patient can check to let their own data flow. A release authorization is the signal that could change that: the issuer attests the patient's authorization covers the category, and the Data Holder decides under its own policy and law.
 
 ### Two Directions, Different Properties

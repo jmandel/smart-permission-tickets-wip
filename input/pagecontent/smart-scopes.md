@@ -12,7 +12,7 @@ patient/Condition.rs
 patient/Observation.rs?category=http://terminology.hl7.org/CodeSystem/observation-category|laboratory
 ```
 
-The current ticket types are all single-patient, so their scopes use the `patient/` prefix; a future population-level type could use `system/`. The issuer derives scopes from the authorizing party's sharing decision or from the access the ticket type defines. By omitting a resource type, the issuer keeps an entire record type out of automated release — clinical notes routed through human review, for example.
+The current ticket types are all single-patient, so their scopes use the `patient/` prefix; a future population-level type could use `system/`. The issuer derives scopes from the authorizing party's sharing decision or from the access the ticket type defines. Omitting a resource type keeps an entire record type out of automated release — clinical notes routed through human review, for example.
 
 **For the authorizing party.** Each scope is one kind of record being shared — immunizations, lab results, conditions — optionally narrowed to a category or code. One screen choice, one scope. A scope with no `?` narrowing means all records of that type.
 

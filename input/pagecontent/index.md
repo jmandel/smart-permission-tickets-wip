@@ -5,11 +5,11 @@
 
 ### Introduction
 
-A Permission Ticket is a **signed access ticket**: an issuer-signed JWT that a client presents to a Data Holder's token endpoint via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). It lets a client ask a Data Holder for a local access token without repeating the whole authorization or verification workflow at every Data Holder. The ticket is portable: the same ticket can be presented at any Data Holder within its intended audience, without requiring the issuer to know where the subject has received care.
+A Permission Ticket is a **signed access ticket**: an issuer-signed JWT that a client presents to a Data Holder's token endpoint via [OAuth 2.0 Token Exchange (RFC 8693)](https://www.rfc-editor.org/rfc/rfc8693). It lets a client ask a Data Holder for a local access token without repeating the whole authorization or verification workflow at each one. The ticket is portable: the same ticket can be presented at any Data Holder within its intended audience, without requiring the issuer to know where the subject has received care.
 
-The ticket is built around a **portable kernel**: the kernel carries only the signed fields that a Data Holder plausibly needs to say yes or no to a request. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), and an **access** object holding the ticket's access constraints (what may be released). A ticket type may add top-level profile claims for the facts its use case needs.
+The ticket is built around a **portable kernel**: only the signed fields a Data Holder plausibly needs to say yes or no to a request. Each ticket conveys a **subject** (whose data), an optional **requester** (on whose behalf), and an **access** object holding the ticket's access constraints (what may be released). A ticket type may add top-level profile claims for the facts its use case needs.
 
-**Subject, requester, and ticket type are policy-selection inputs; the `access` object is an enforced limit** (see [Access Constraints](#access-constraints)). Data Holders already maintain internal access policies — for self-access, proxy classes, B2B disclosure, and more. These policy-selection inputs carry enough issuer-verified facts about who is asking, about whom, and why, for the Data Holder to select the correct local policy, even for a requester it has never seen. The ticket selects among the Data Holder's policies; it does not rewrite them. If the Data Holder accepts the ticket, it issues a local access token scoped by the ticket, the client's request and eligibility, the selected ticket type, and the Data Holder's own policies and technical capabilities.
+**Subject, requester, and ticket type are policy-selection inputs; the `access` object is an enforced limit** (see [Access Constraints](#access-constraints)). Data Holders already maintain internal access policies — for self-access, proxy classes, B2B disclosure, and more. These policy-selection inputs carry enough issuer-verified facts — who is asking, about whom, and why — for the Data Holder to select the correct local policy, even for a requester it has never seen. The ticket selects among the Data Holder's policies; it does not rewrite them. If the Data Holder accepts the ticket, it issues a local access token scoped by the ticket, the client's request and eligibility, the selected ticket type, and the Data Holder's own policies and technical capabilities.
 
 When present, `presenter_binding` cryptographically binds the ticket to the presenting client's key and/or trust-framework identity. A Data Holder authenticates the client, verifies the ticket signature against the issuer's published keys, enforces presenter binding if present, and grants access per [Access Calculation](#access-calculation). No user login is required at the Data Holder.
 
@@ -32,7 +32,7 @@ The ticket carries only what a Data Holder needs at redemption time. This table 
 
 #### Resources, References, and Identifiers
 
-When a ticket field names a party or record, three shapes are available, chosen by what the recipient does with it — not by whether an identifier is involved (every shape can carry one):
+When a ticket field names a party or record, three shapes are available, chosen by what the recipient does with it — not by whether an identifier is involved, since every shape can carry one:
 
 - **Resource** (a thin FHIR resource) when the issuer is **asserting attributes the recipient reads and acts on** — matches against, weighs, or branches on. The thing need not already exist at the recipient. So `subject.patient` (demographics to match) and `requester` (identity and authority to weigh) are resources.
 - **Reference** when the field **points at a record the recipient already holds or resolves**, and the recipient — not the ticket — is the source of truth for its content. So `subject.recipient_record` and `claim_linkage.encounter` are references.
@@ -366,7 +366,7 @@ The Data Holder calculates granted access through the **intersection** of:
 4. **Ticket-Type Rules**: Requirements and limits defined by the selected `ticket_type` profile
 5. **Data Holder Policy and Capability**: The Data Holder's local policies and what its systems can technically enforce
 
-The `access` object describes the maximum access the issuer is asking the Data Holder to consider. It is a limit, not a promise: the Data Holder is not required to grant all listed access, and may narrow the grant according to local policy and technical capability.
+The `access` object describes the maximum access the issuer is asking the Data Holder to consider. It is a limit, not a promise: the Data Holder need not grant all listed access, and may narrow the grant according to local policy and technical capability.
 
 If the intersection yields no valid access, return `invalid_scope` error.
 
@@ -386,11 +386,11 @@ Access tokens issued after redemption are ordinary OAuth 2.0 bearer tokens, as i
 
 #### Using Multiple Tickets
 
-A single Permission Ticket confers one set of access constraints that applies uniformly to all Data Holders in its audience. When the authorizing person requires different access constraints for different Data Holders — for example, sharing lab results from one responder but only conditions from another, or using different lifetimes or Data Holder filters — the issuer should mint separate tickets, each with its own `access` block and, optionally, a narrower `aud` or `data_holder_filter`.
+A single Permission Ticket confers one set of access constraints, applied uniformly to all Data Holders in its audience. When the authorizing person requires different access constraints for different Data Holders — for example, sharing lab results from one responder but only conditions from another, or using different lifetimes or Data Holder filters — the issuer should mint separate tickets, each with its own `access` block and, optionally, a narrower `aud` or `data_holder_filter`.
 
 Clients managing multiple tickets present the appropriate ticket in each token exchange request. Since each request carries exactly one `subject_token`, the client selects which ticket to present based on which Data Holder it is connecting to.
 
-This pattern also applies when one set of intended permissions does not fit cleanly into one ticket shape. Rather than modeling heterogeneous authorization inside one ticket, issuing a set of tickets keeps each individual ticket simple and its constraints unambiguous.
+This pattern also applies when one set of intended permissions does not fit cleanly into one ticket shape. Rather than model heterogeneous authorization inside one ticket, issuing a set of tickets keeps each ticket simple and its constraints unambiguous.
 
 ---
 
@@ -410,7 +410,7 @@ Extensions follow the same border. A profile-grown limit is a new access constra
 
 `requester` is an **issuer-attested claim** about the real-world party for whom the grant exists. It is distinct from the presenting software client (the presenter authenticates via `client_assertion` and optional `presenter_binding`).
 
-* Absent for self-access. For self-access, the patient's identity is already represented by `subject.patient`; a separate `requester` would be redundant.
+* Absent for self-access. For self-access, the patient's identity is already in `subject.patient`; a separate `requester` would be redundant.
 * Present for proxy, organizational, clinician, or other non-self use cases.
 * The Data Holder relies on the issuer's attestation; it does **not** independently verify the requester's identity.
 * `requester` plays no part in authentication — the client authenticates separately, and redemption is gated by issuer trust, ticket signature, presenter binding, and audience checks. It does play a part in the access decision: the Data Holder uses requester type, identity, and authority to decide whether to accept the ticket and what to grant.
@@ -418,11 +418,11 @@ Extensions follow the same border. A profile-grown limit is a new access constra
 
 #### Relationship between `presenter_binding` and `requester`
 
-The `requester` and `presenter_binding` will often identify the same organization — the requesting organization is also the one operating the client software. But they do not need to align. Multiple requesters may share a client; an organization may operate a client on behalf of several requesters; or a platform provider may present tickets on behalf of various requesting organizations. The `requester` describes who the grant is for; the presenter binding constrains which software may redeem it.
+The `requester` and `presenter_binding` will often identify the same organization: the requesting organization also operates the client software. But they do not need to align. Multiple requesters may share a client; an organization may operate a client on behalf of several requesters; or a platform provider may present tickets on behalf of various requesting organizations. The `requester` describes who the grant is for; the presenter binding constrains which software may redeem it.
 
 #### Delegation and RelatedPerson.relationship
 
-For delegated access, the `requester` is a `RelatedPerson` carrying **exactly one** relationship coding: the requester's authority — why they are permitted to ask — from a closed value set of existing [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts. Family relationship ("daughter," "spouse") is deliberately not modeled: it is not an authority assertion, and proxy policies turn on the authority type and the patient's age; the requester's `name` covers display.
+For delegated access, the `requester` is a `RelatedPerson` carrying **exactly one** relationship coding: the requester's authority — why they are permitted to ask — from a closed value set of existing [v3-RoleCode](https://terminology.hl7.org/CodeSystem-v3-RoleCode.html) concepts. Family relationship ("daughter," "spouse") is deliberately not modeled: it is not an authority assertion, proxy policies turn on the authority type and the patient's age, and the requester's `name` covers display.
 
 The value set, per-code issuer verification obligations, validity rules, and a worked example are defined by [Patient-Delegated Access](patient-delegated-access.html).
 

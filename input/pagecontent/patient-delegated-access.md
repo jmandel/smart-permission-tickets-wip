@@ -20,7 +20,7 @@ Requester completes identity verification with the issuer → issuer verifies th
 * **Requester:** `RelatedPerson` (required) with exactly one relationship coding: the requester's authority. `requester_identity_evidence` SHOULD.
 * **Presenter binding:** Required.
 
-Both evidence slots apply here because a proper issuer verifies both people: the delegate's identity (they are who they claim) and the patient's identity and wishes (they actually granted this access). Embedding both tokens lets the Data Holder check each independently.
+Both evidence slots apply here because a proper issuer verifies both people: the delegate's identity (they are who they claim to be) and the patient's identity and wishes (they actually granted this access). Embedding both tokens lets the Data Holder check each independently.
 
 ### Constraints
 
