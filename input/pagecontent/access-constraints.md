@@ -4,7 +4,11 @@ This page is the registry of access constraints: the named members of `access`, 
 
 ### Constraint Model
 
-The `access` object holds the ticket's **access constraints**. Each member of `access` is a named constraint with a published definition, and every definition is one page, linked from the table below. (One experimental constraint, `sensitivity_withhold`, is staged in [Proposal 005](proposal-005-sensitive-data-modeling.html) until it graduates.) Other implementation guides MAY define additional constraints, which participate under the same rules. Four rules govern every constraint:
+The `access` object holds the ticket's **access constraints**. Each member of `access` is a named constraint with a published definition, and every definition is one page, linked from the table below. (One experimental constraint, `sensitivity_withhold`, is staged in [Proposal 005](proposal-005-sensitive-data-modeling.html) until it graduates.) Other implementation guides MAY define additional constraints, which participate under the same rules.
+
+Every constraint limits one thing and nothing else — which resource types, which dates, which Data Holders, which records. Leave one out and the ticket simply doesn't limit that thing; no constraint ever opens access up, it only cuts down what would otherwise be shared.
+
+Four rules govern every constraint:
 
 1. **Unrecognized means reject.** A Data Holder SHALL reject a ticket whose `access` contains a member it does not recognize and enforce, with `invalid_grant` and an `error_description` naming the unsupported constraint. There is no issuer opt-in and no capability negotiation: ignoring an access constraint always releases more than the issuer authorized, so unrecognized constraints fail closed.
 2. **Constraints only narrow.** No constraint broadens what another constraint, the requested scopes, the client's eligibility, or the Data Holder's policy would allow. Constraints combine by intersection (see [Constraint Algebra](#constraint-algebra)).
@@ -15,10 +19,10 @@ There is no tiered constraint vocabulary — just this catalog, assembled in dif
 
 | Constraint | Defined by | Summary |
 |-------|------|-------------|
-| [`smart_scopes`](smart-scopes.html) | This specification | **The positive grant for most ticket types** — an array of SMART v2 scope strings naming resource types and interactions, optionally narrowed by SMART's granular search-parameter syntax. (Payer Claims Adjudication grants via `claim_linkage` instead.) |
+| [`smart_scopes`](smart-scopes.html) | This specification | **Bounds which resource types and interactions may be read** — an array of SMART v2 scope strings, optionally narrowed by SMART's granular search-parameter syntax. Most ticket types require it; Payer Claims Adjudication bounds release via `claim_linkage` instead. |
 | [`data_period`](data-period.html) | This specification | One coarse clinical-date window, filtered through designated date search parameters. If disjoint windows are needed, mint separate tickets. |
 | [`data_holder_filter`](data-holder-filter.html) | This specification | Which Data Holders may answer. Each entry is a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`); matching any entry suffices. |
-| [`claim_linkage`](claim-linkage.html) | This specification, for [Payer Claims Adjudication](payer-claims-adjudication.html) | The positive grant for that type: release limited to records the Data Holder associates with the linked encounters (and optionally a referenced claim or prior authorization). |
+| [`claim_linkage`](claim-linkage.html) | This specification, for [Payer Claims Adjudication](payer-claims-adjudication.html) | **Bounds release to** records the Data Holder associates with the linked encounters (and optionally a referenced claim or prior authorization). The required bound for that type. |
 | `sensitivity_withhold` | [Proposal 005](proposal-005-sensitive-data-modeling.html) | Do not release data in the named sensitivity categories. |
 
 Three of these constraints use machinery FHIR servers already have — `smart_scopes` *is* SMART scopes, `data_period` maps to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.
