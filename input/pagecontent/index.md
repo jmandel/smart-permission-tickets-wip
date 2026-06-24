@@ -77,7 +77,7 @@ This specification uses the following role terms consistently:
 * **Subject** — the person whose data the ticket concerns.
 * **Requester** — the real-world party for whom the grant exists, as attested by the issuer.
 * **Authorizing Party** — the person or organization whose sharing decision the ticket encodes: the patient in self-access and delegated access; the organization acting under law, contract, or mandate in B2B ticket types.
-* **Organization** — the organizational identity used in `data_holder_filter.organization`.
+* **Organization** — an organizational identity the ticket names, whether as an `Organization` `requester` or by reference in `data_holder_filter`.
 * **Endpoint** — a technical API surface through which a Data Holder answers.
 * **Trust Framework** or **Network** — a broader participant set used in framework-style audience validation.
 

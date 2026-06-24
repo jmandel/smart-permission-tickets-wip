@@ -109,22 +109,16 @@ Cache-Control: no-store
     {
       "fhir_base_url": "https://fhir.hospital-a.example.org",
       "organization": {
-        "resourceType": "Organization",
-        "name": "Hospital A",
-        "identifier": [
-          { "system": "http://hl7.org/fhir/sid/us-npi", "value": "1111111111" }
-        ]
+        "display": "Hospital A",
+        "identifier": { "system": "http://hl7.org/fhir/sid/us-npi", "value": "1111111111" }
       },
       "ticket_indices": [0]
     },
     {
       "fhir_base_url": "https://fhir.clinic-b.example.org",
       "organization": {
-        "resourceType": "Organization",
-        "name": "Clinic B",
-        "identifier": [
-          { "system": "http://hl7.org/fhir/sid/us-npi", "value": "2222222222" }
-        ]
+        "display": "Clinic B",
+        "identifier": { "system": "http://hl7.org/fhir/sid/us-npi", "value": "2222222222" }
       },
       "ticket_indices": [1]
     }
@@ -142,7 +136,7 @@ Each `EndpointHint` has:
 | Field | Description |
 |---|---|
 | `fhir_base_url` | FHIR base URL of a Data Holder. The client discovers that Data Holder's token endpoint via `${fhir_base_url}/.well-known/smart-configuration`. |
-| `organization` | Optional FHIR `Organization` describing the Data Holder for UI display and matching. |
+| `organization` | Optional reference to the Data Holder's organization — `display` for UI, `identifier` for matching. |
 | `ticket_indices` | Optional array of zero-based indices into `smart_permission_ticket`, indicating which tickets the issuer expects to be redeemable at this endpoint. When absent, the client may try any ticket whose `aud` covers the endpoint. |
 
 Endpoint hints are **advisory**. Final eligibility is determined at redemption time by the Data Holder's own validation (issuer trust, ticket `aud`, `data_holder_filter`, etc.). A client MAY also attempt redemption at endpoints not listed if the ticket's `aud` is a trust-framework identifier that covers them.
