@@ -173,12 +173,9 @@ function buildIndexSnippets(): void {
         { kind: "jurisdiction", address: { state: "NY" } },
         {
           kind: "organization",
-          organization: {
-            resourceType: "Organization",
-            identifier: [
-              { system: "http://hl7.org/fhir/sid/us-npi", value: "123" },
-            ],
-          },
+          organization: [
+            { identifier: { system: "http://hl7.org/fhir/sid/us-npi", value: "123" }, display: "Example Health Network" },
+          ],
         },
       ],
     },

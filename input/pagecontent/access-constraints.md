@@ -15,10 +15,10 @@ There is no tiered constraint vocabulary — just this catalog, assembled in dif
 
 | Constraint | Defined by | Summary |
 |-------|------|-------------|
-| [`smart_scopes`](smart-scopes.html) | This specification | **Present in every ticket** — the positive grant. An array of SMART v2 scope strings naming resource types and interactions, optionally narrowed by SMART's granular search-parameter syntax. |
+| [`smart_scopes`](smart-scopes.html) | This specification | **The positive grant for most ticket types** — an array of SMART v2 scope strings naming resource types and interactions, optionally narrowed by SMART's granular search-parameter syntax. (Payer Claims Adjudication grants via `claim_linkage` instead.) |
 | [`data_period`](data-period.html) | This specification | One coarse clinical-date window, filtered through designated date search parameters. If disjoint windows are needed, mint separate tickets. |
 | [`data_holder_filter`](data-holder-filter.html) | This specification | Which Data Holders may answer. Each entry is a jurisdiction filter (`{ kind: "jurisdiction", address }`) or an organization filter (`{ kind: "organization", organization }`); matching any entry suffices. |
-| [`claim_linkage`](claim-linkage.html) | This specification, for [Payer Claims Adjudication](payer-claims-adjudication.html) | Release limited to records the Data Holder associates with a referenced claim or prior authorization. |
+| [`claim_linkage`](claim-linkage.html) | This specification, for [Payer Claims Adjudication](payer-claims-adjudication.html) | The positive grant for that type: release limited to records the Data Holder associates with the linked encounters (and optionally a referenced claim or prior authorization). |
 | `sensitivity_withhold` | [Proposal 005](proposal-005-sensitive-data-modeling.html) | Do not release data in the named sensitivity categories. |
 
 Three of these constraints use machinery FHIR servers already have — `smart_scopes` *is* SMART scopes, `data_period` maps to standard date search parameters, and `data_holder_filter` to a one-time check of the Data Holder's own identity and jurisdiction.

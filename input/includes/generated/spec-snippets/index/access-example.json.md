@@ -25,15 +25,15 @@
       },
       {
         "kind": "organization",
-        "organization": {
-          "resourceType": "Organization",
-          "identifier": [
-            {
+        "organization": [
+          {
+            "identifier": {
               "system": "http://hl7.org/fhir/sid/us-npi",
               "value": "123"
-            }
-          ]
-        }
+            },
+            "display": "Example Health Network"
+          }
+        ]
       }
     ]
   }

@@ -201,7 +201,7 @@ const uc5_payload: PermissionTicket = {
             birthDate: "1962-03-09",
             name: [{ family: "Okafor", given: ["Daniel"] }]
         },
-        recipient_record: { reference: "Patient/B77421", type: "Patient" }
+        recipient_record: { reference: "https://fhir.provider.example.org/Patient/B77421", type: "Patient" }
     },
     requester: {
         resourceType: "Organization",
@@ -209,20 +209,11 @@ const uc5_payload: PermissionTicket = {
         name: "Example Health Plan"
     },
     access: {
-        smart_scopes: [
-            "patient/Condition.rs",
-            "patient/Observation.rs",
-            "patient/Procedure.rs",
-            "patient/DocumentReference.rs"
-        ],
         claim_linkage: {
-            claim: {
-                resourceType: "Claim",
-                identifier: [{ system: "https://fhir.provider.example.org/claims", value: "CLM-2026-0042" }],
-                status: "active",
-                use: "claim"
-            },
-            encounter: [{ reference: "Encounter/enc-2026-0117" }]
+            // The linked encounters are the positive grant; the Data Holder
+            // releases the records it associates with them. An optional provider
+            // claim reference may also be carried — see claim-linkage.html.
+            encounter: [{ reference: "https://fhir.provider.example.org/Encounter/enc-2026-0117" }]
         }
     }
 };
@@ -252,7 +243,7 @@ const quality_gap_payload: PermissionTicket = {
             birthDate: "1957-11-02",
             name: [{ family: "Tran", given: ["Lien"] }]
         },
-        recipient_record: { reference: "Patient/C10288", type: "Patient" }
+        recipient_record: { reference: "https://fhir.provider.example.org/Patient/C10288", type: "Patient" }
     },
     requester: {
         resourceType: "Organization",

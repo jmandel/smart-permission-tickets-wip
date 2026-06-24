@@ -2,7 +2,7 @@
 
 This page defines one access constraint. The constraint model, template, and algebra are on [Access Constraints](access-constraints.html); the ticket types that draw this constraint are in the [Use Case Catalog](use-case-catalog.html).
 
-**Shape and validity.** Optional. An array of entries, each either `{ kind: "jurisdiction", address }` or `{ kind: "organization", organization }`. The issuer derives entries from the authorizing party's selections or the network the ticket is scoped to.
+**Shape and validity.** Optional. An array of entries, each either `{ kind: "jurisdiction", address }` or `{ kind: "organization", organization }`, where an organization entry's `organization` is itself an array of references. The issuer derives entries from the authorizing party's selections or the network the ticket is scoped to.
 
 **For the authorizing party.** The filter decides which Data Holders may answer, not which records an answering Data Holder returns. A Data Holder that matches the filter typically returns the combined record it holds; see the implementation note below for what a site selection does and does not limit.
 
@@ -30,9 +30,9 @@ Issuers SHOULD use directory or network information (published endpoint networks
 
 ### Organization Filters
 
-* Organization filters positively scope which Data Holders may answer.
-* Matching is by organizational identifier — for example, an NPI carried in `organization.identifier`.
-* A Data Holder may answer if it matches the named organization or is authorized to answer on that organization's behalf.
+* An organization filter's `organization` is an **array of references** to the organizations whose Data Holders may answer. All allowed organization identifiers are flattened into this one array; a Data Holder may answer if it matches **any** entry.
+* Each reference carries an organizational `identifier` — for example an NPI or TIN — and MAY carry a `display`. Matching is by identifier; the display is for logs and screens. An organization known by several identifiers (a TIN plus one or more NPIs, say) contributes one entry per identifier.
+* A Data Holder may answer if it matches a listed organization or is authorized to answer on that organization's behalf.
 * This filter is endpoint-agnostic. If a Data Holder operates multiple technical endpoints, a single organization filter authorizes access through any endpoint by which that organization is authorized to answer and that supports the Permission Ticket grant type.
 * Data Holders that manage integrated records across multiple facilities evaluate this filter at the Data Holder level, not as a resource-by-resource clinical data filter.
 * A Data Holder answering on behalf of a named organization that is served through a broader shared system MAY narrow its response to that organization's records, if its architecture supports the attribution. Narrowing is permitted, not promised: the filter still gates who may answer, and acceptance still typically returns the combined record.

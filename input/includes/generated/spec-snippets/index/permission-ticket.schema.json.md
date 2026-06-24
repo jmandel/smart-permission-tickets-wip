@@ -385,18 +385,15 @@
                         "const": "organization"
                       },
                       "organization": {
-                        "type": "object",
-                        "properties": {
-                          "resourceType": {
-                            "type": "string",
-                            "const": "Organization"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "array",
-                            "items": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "reference": {
+                              "type": "string"
+                            },
+                            "identifier": {
                               "type": "object",
                               "properties": {
                                 "system": {
@@ -434,13 +431,16 @@
                                 }
                               },
                               "additionalProperties": {}
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
-                          }
-                        },
-                        "required": [
-                          "resourceType"
-                        ],
-                        "additionalProperties": {}
+                          },
+                          "additionalProperties": {}
+                        }
                       }
                     },
                     "required": [
@@ -986,18 +986,15 @@
                         "const": "organization"
                       },
                       "organization": {
-                        "type": "object",
-                        "properties": {
-                          "resourceType": {
-                            "type": "string",
-                            "const": "Organization"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "array",
-                            "items": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "reference": {
+                              "type": "string"
+                            },
+                            "identifier": {
                               "type": "object",
                               "properties": {
                                 "system": {
@@ -1035,13 +1032,16 @@
                                 }
                               },
                               "additionalProperties": {}
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
-                          }
-                        },
-                        "required": [
-                          "resourceType"
-                        ],
-                        "additionalProperties": {}
+                          },
+                          "additionalProperties": {}
+                        }
                       }
                     },
                     "required": [
@@ -1519,18 +1519,15 @@
                         "const": "organization"
                       },
                       "organization": {
-                        "type": "object",
-                        "properties": {
-                          "resourceType": {
-                            "type": "string",
-                            "const": "Organization"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "array",
-                            "items": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "reference": {
+                              "type": "string"
+                            },
+                            "identifier": {
                               "type": "object",
                               "properties": {
                                 "system": {
@@ -1568,13 +1565,16 @@
                                 }
                               },
                               "additionalProperties": {}
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
-                          }
-                        },
-                        "required": [
-                          "resourceType"
-                        ],
-                        "additionalProperties": {}
+                          },
+                          "additionalProperties": {}
+                        }
                       }
                     },
                     "required": [
@@ -2080,18 +2080,15 @@
                         "const": "organization"
                       },
                       "organization": {
-                        "type": "object",
-                        "properties": {
-                          "resourceType": {
-                            "type": "string",
-                            "const": "Organization"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "array",
-                            "items": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "reference": {
+                              "type": "string"
+                            },
+                            "identifier": {
                               "type": "object",
                               "properties": {
                                 "system": {
@@ -2129,13 +2126,16 @@
                                 }
                               },
                               "additionalProperties": {}
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
-                          }
-                        },
-                        "required": [
-                          "resourceType"
-                        ],
-                        "additionalProperties": {}
+                          },
+                          "additionalProperties": {}
+                        }
                       }
                     },
                     "required": [
@@ -2648,82 +2648,9 @@
         "access": {
           "type": "object",
           "properties": {
-            "smart_scopes": {
-              "minItems": 1,
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^(patient|user|system)\\/(\\*|[A-Za-z]+)\\.[cruds]+(\\?\\S+)?$"
-              }
-            },
             "claim_linkage": {
               "type": "object",
               "properties": {
-                "claim": {
-                  "type": "object",
-                  "properties": {
-                    "resourceType": {
-                      "type": "string",
-                      "const": "Claim"
-                    },
-                    "identifier": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "system": {
-                            "type": "string"
-                          },
-                          "value": {
-                            "type": "string"
-                          },
-                          "type": {
-                            "type": "object",
-                            "properties": {
-                              "coding": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "system": {
-                                      "type": "string"
-                                    },
-                                    "code": {
-                                      "type": "string"
-                                    },
-                                    "display": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "additionalProperties": {}
-                                }
-                              },
-                              "text": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "additionalProperties": {}
-                      }
-                    },
-                    "status": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "use": {
-                      "type": "string",
-                      "minLength": 1
-                    }
-                  },
-                  "required": [
-                    "resourceType",
-                    "status",
-                    "use"
-                  ],
-                  "additionalProperties": {}
-                },
                 "encounter": {
                   "minItems": 1,
                   "type": "array",
@@ -2781,16 +2708,69 @@
                     },
                     "additionalProperties": {}
                   }
+                },
+                "claim": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string"
+                    },
+                    "identifier": {
+                      "type": "object",
+                      "properties": {
+                        "system": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "object",
+                          "properties": {
+                            "coding": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "system": {
+                                    "type": "string"
+                                  },
+                                  "code": {
+                                    "type": "string"
+                                  },
+                                  "display": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": {}
+                              }
+                            },
+                            "text": {
+                              "type": "string"
+                            }
+                          },
+                          "additionalProperties": {}
+                        }
+                      },
+                      "additionalProperties": {}
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "display": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": {}
                 }
               },
               "required": [
-                "claim"
+                "encounter"
               ],
               "additionalProperties": false
             }
           },
           "required": [
-            "smart_scopes",
             "claim_linkage"
           ],
           "additionalProperties": {
@@ -3255,18 +3235,15 @@
                         "const": "organization"
                       },
                       "organization": {
-                        "type": "object",
-                        "properties": {
-                          "resourceType": {
-                            "type": "string",
-                            "const": "Organization"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "array",
-                            "items": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "reference": {
+                              "type": "string"
+                            },
+                            "identifier": {
                               "type": "object",
                               "properties": {
                                 "system": {
@@ -3304,13 +3281,16 @@
                                 }
                               },
                               "additionalProperties": {}
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
-                          }
-                        },
-                        "required": [
-                          "resourceType"
-                        ],
-                        "additionalProperties": {}
+                          },
+                          "additionalProperties": {}
+                        }
                       }
                     },
                     "required": [
@@ -3879,18 +3859,15 @@
                         "const": "organization"
                       },
                       "organization": {
-                        "type": "object",
-                        "properties": {
-                          "resourceType": {
-                            "type": "string",
-                            "const": "Organization"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "identifier": {
-                            "type": "array",
-                            "items": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "reference": {
+                              "type": "string"
+                            },
+                            "identifier": {
                               "type": "object",
                               "properties": {
                                 "system": {
@@ -3928,13 +3905,16 @@
                                 }
                               },
                               "additionalProperties": {}
+                            },
+                            "type": {
+                              "type": "string"
+                            },
+                            "display": {
+                              "type": "string"
                             }
-                          }
-                        },
-                        "required": [
-                          "resourceType"
-                        ],
-                        "additionalProperties": {}
+                          },
+                          "additionalProperties": {}
+                        }
                       }
                     },
                     "required": [

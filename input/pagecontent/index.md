@@ -30,6 +30,16 @@ The ticket carries only what a Data Holder needs at redemption time. This table 
 | Sensitive-data category rules | Optional profile ([Proposal 005](proposal-005-sensitive-data-modeling.html)), not the base ticket |
 | Full audit trail | Issuer and Data Holder logs, anchored by ticket `jti` |
 
+#### Resources, References, and Identifiers
+
+When a ticket field names a party or record, three shapes are available, chosen by what the recipient does with it — not by whether an identifier is involved (every shape can carry one):
+
+- **Resource** (a thin FHIR resource) when the issuer is **asserting attributes the recipient reads and acts on** — matches against, weighs, or branches on. The thing need not already exist at the recipient. So `subject.patient` (demographics to match) and `requester` (identity and authority to weigh) are resources.
+- **Reference** when the field **points at a record the recipient already holds or resolves**, and the recipient — not the ticket — is the source of truth for its content. So `subject.recipient_record` and `claim_linkage.encounter` are references.
+- **Bare datatype** (`Identifier`, `Address`, `Coding`…) when the field is a **value the recipient matches or interprets**, possibly as a set — so `data_holder_filter` carries an address or a list of organization references, and profile claims like `measure` are codings.
+
+"We need to convey an identifier" never decides this: an identifier rides in all three. The question is whether the recipient consumes issuer-asserted attributes (resource), dereferences a pointer into its own data (reference), or matches a value (datatype).
+
 ### Scope and Non-Goals
 
 **This specification defines:**

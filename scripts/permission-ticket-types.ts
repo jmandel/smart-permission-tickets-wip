@@ -75,7 +75,8 @@ export type JurisdictionFilter = {
 
 export type OrganizationFilter = {
   kind: "organization";
-  organization: fhir4.Organization;
+  // All allowed org-identifiers flattened into one reference array; match any.
+  organization: NonEmptyArray<FHIRReference>;
 };
 
 export type DataHolderFilter = JurisdictionFilter | OrganizationFilter;
@@ -90,12 +91,11 @@ export type AccessGrant = {
 };
 
 export type ClaimLinkage = {
-  claim: fhir4.Claim;
-  encounter?: NonEmptyArray<FHIRReference>;
+  encounter: NonEmptyArray<FHIRReference>;
+  claim?: FHIRReference;
 };
 
 export type PayerClaimsAccess = {
-  smart_scopes: NonEmptyArray<SmartScope>;
   claim_linkage: ClaimLinkage;
   [constraint: string]: unknown;
 };

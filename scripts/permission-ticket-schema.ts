@@ -192,7 +192,11 @@ export const JurisdictionFilterSchema = z.object({
 
 export const OrganizationFilterSchema = z.object({
   kind: z.literal("organization"),
-  organization: OrganizationSchema,
+  // All allowed org-identifiers flattened into one reference array; a Data
+  // Holder may answer if it matches any entry. Each reference carries an
+  // identifier (and optional display) — not a full Organization resource,
+  // since only the identifier is matched.
+  organization: z.array(FHIRReferenceSchema).min(1),
 }).strict();
 
 export const DataHolderFilterSchema = z.discriminatedUnion("kind", [
@@ -215,13 +219,6 @@ const MinimalServiceRequestSchema = z.object({
   intent: NonEmptyStringSchema,
 }).catchall(z.unknown());
 
-const MinimalClaimSchema = z.object({
-  resourceType: z.literal("Claim"),
-  identifier: z.array(FHIRIdentifierSchema).optional(),
-  status: NonEmptyStringSchema,
-  use: NonEmptyStringSchema,
-}).catchall(z.unknown());
-
 const MinimalResearchStudySchema = z.object({
   resourceType: z.literal("ResearchStudy"),
   identifier: z.array(FHIRIdentifierSchema).optional(),
@@ -230,18 +227,23 @@ const MinimalResearchStudySchema = z.object({
 }).catchall(z.unknown());
 
 // Profile-grown access constraint defined by Payer Claims Adjudication: release
-// is limited to records the Data Holder associates with the referenced claim or
-// prior authorization.
+// is limited to records the Data Holder associates with the linked encounters.
+// The encounter array is the load-bearing, always-available linkage (issuer ==
+// Data Holder mints its own Encounter refs). The optional claim is a Reference
+// carrying only the provider's submission-time control number (837 CLM01 / 835
+// CLP01) for re-association — never a payer-assigned ICN/DCN/CCN.
 export const ClaimLinkageSchema = z.object({
-  claim: MinimalClaimSchema,
-  encounter: z.array(FHIRReferenceSchema).min(1).optional(),
+  encounter: z.array(FHIRReferenceSchema).min(1),
+  claim: FHIRReferenceSchema.optional(),
 }).strict();
 
-// Locked constraint set: exactly smart_scopes + claim_linkage. The claim is
-// the type's time anchor, so data_period is prohibited (redundant inside the
-// encounter bounds, contradictory against the current-state floor).
+// Locked constraint set: claim_linkage only. The linked encounters are the
+// positive grant — the Data Holder releases records tied to them. A kind-level
+// scope ceiling would be inert here: the issuer is the Data Holder, and the
+// payer learns the granted scopes at token exchange. data_period is prohibited:
+// the encounters are the time anchor, so any window is redundant or contradicts
+// the current-state floor.
 export const PayerClaimsAccessSchema = z.object({
-  smart_scopes: z.array(SmartScopeSchema).min(1),
   claim_linkage: ClaimLinkageSchema,
 }).catchall(AccessConstraintExtensionSchema);
 

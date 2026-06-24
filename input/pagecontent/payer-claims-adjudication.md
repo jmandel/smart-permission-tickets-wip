@@ -29,10 +29,9 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 Draws from the [constraint catalog](access-constraints.html). The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
 
-* **`smart_scopes`** (required) — the kind-level ceiling: the resource types adjudication needs, likely broader than US Core for some claim types (see the open question below). The record-level limit is `claim_linkage`.
-* **[`claim_linkage`](claim-linkage.html)** (required) — introduced by this profile; valued from the claim or prior authorization being submitted and its encounters.
+* **[`claim_linkage`](claim-linkage.html)** (required) — this profile's positive grant: the encounters the submitted claim or prior authorization covers, optionally re-associated to the submission by the provider's own claim control number. The Data Holder releases the records it associates with those encounters.
 
-The constraint set for this type is exactly these two — it scopes one adjudication, never bulk retrieval; element-specific quality queries are [Payer Quality Gap Queries](payer-quality-gap-queries.html), and chart-scale retrieval is out of scope for both. `data_period` is not part of it, and issuers SHALL NOT include it: the claim is this type's time anchor — event records are bounded by their encounters through the claim association, and the patient-level floor is deliberately current-state — so any `data_period` value is either redundant (inside the encounter bounds) or contradictory (cutting current medications out of the floor). `data_holder_filter` is likewise not part of this type: the audience is the single issuing Data Holder. Cross-cutting constraints defined elsewhere in the catalog, such as `sensitivity_withhold`, MAY be added, with the standard consequence for servers that do not enforce them.
+The constraint set for this type is exactly this one constraint — it scopes one adjudication, never bulk retrieval; element-specific quality queries are [Payer Quality Gap Queries](payer-quality-gap-queries.html), and chart-scale retrieval is out of scope for both. There is no `smart_scopes` ceiling: the linked encounters are the grant, and the Data Holder releases the resource types adjudication needs against them. That set is likely broader than US Core for some claim types — Claim, Coverage, and documentation resources are typical candidates — and which types to release is the Data Holder's release-policy decision, not a scope list in the ticket. `data_period` is not part of this type, and issuers SHALL NOT include it: the encounters are this type's time anchor — event records are bounded by them, and the patient-level floor is deliberately current-state — so any `data_period` value is either redundant (inside the encounter bounds) or contradictory (cutting current medications out of the floor). `data_holder_filter` is likewise not part of this type: the audience is the single issuing Data Holder. Cross-cutting constraints defined elsewhere in the catalog, such as `sensitivity_withhold`, MAY be added, with the standard consequence for servers that do not enforce them.
 
 ### Restricted Data
 
@@ -45,19 +44,14 @@ The constraint set for this type is exactly these two — it scopes one adjudica
 | Input | Ticket field | Selects among |
 |-------|--------------|---------------|
 | Requesting payer | `requester` (Organization identifiers) | Whether this is the linked claim's payer; participation arrangements |
-| Linked claim | `access.claim_linkage.claim` | Which adjudication the request belongs to; whether it is still open |
+| Linked encounters | `access.claim_linkage.encounter` (optionally `.claim`) | Which encounters the request covers; which adjudication it belongs to; whether it is still open |
 
 ### Data Holder Processing
 
 * Verify the ticket signature against this system's own issuing keys — the issuer is the Data Holder.
 * Confirm the redeeming client acts for the requester — by presenter binding when present, or by the client's registration or trust-framework relationship to the named payer.
 * Resolve the subject; `recipient_record` resolves directly, since the issuer assigned it.
-* Enforce `claim_linkage` against the claim's association records; apply restriction flags before release.
-
-### Open Questions
-
-> **Open Question (OQ-PAYER-DATA): Resource types for adjudication.** What does claims review need beyond US Core resource types? Claim, Coverage, and documentation resources are candidates; payer implementers should name the list before this profile advances.
-{: .callout .callout-open-question #oq-payer-data}
+* Enforce `claim_linkage` against the records you associate with the linked encounters; apply restriction flags before release.
 
 ### Example
 

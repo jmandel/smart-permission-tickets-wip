@@ -2,7 +2,7 @@
 
 This page defines one access constraint. The constraint model, template, and algebra are on [Access Constraints](access-constraints.html); the ticket types that draw this constraint are in the [Use Case Catalog](use-case-catalog.html).
 
-**Shape and validity.** Required. An array of one or more [SMART App Launch v2](https://hl7.org/fhir/smart-app-launch/scopes-and-launch-context.html) scope strings, each naming a resource type, the interactions permitted on it, and an optional granular search-parameter narrowing. The grammar, with examples:
+**Shape and validity.** Required wherever it appears — every ticket type except Payer Claims Adjudication, which grants access through [`claim_linkage`](claim-linkage.html) instead. An array of one or more [SMART App Launch v2](https://hl7.org/fhir/smart-app-launch/scopes-and-launch-context.html) scope strings, each naming a resource type, the interactions permitted on it, and an optional granular search-parameter narrowing. The grammar, with examples:
 
 ```
 ( "patient" | "user" | "system" ) "/" ( resourceType | "*" ) "." cruds [ "?" search-params ]

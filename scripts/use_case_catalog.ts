@@ -72,7 +72,7 @@ export const USE_CASE_CATALOG: UseCaseCatalogEntry[] = [
       presenterBinding: "Optional",
       requester: "<code>Organization</code> (required)",
       identityEvidence: "— (requester is an organization)",
-      accessConstraints: "<code>smart_scopes</code>, <code>claim_linkage</code> required",
+      accessConstraints: "<code>claim_linkage</code> required (encounter-anchored)",
     }
   },
   {
