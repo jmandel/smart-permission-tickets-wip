@@ -18,7 +18,7 @@ The ticket authorizes data only for quality measurement of the named measure. Us
 
 A ticket is minted per member and measure, naming the payer as requester and the measure it serves → the payer's system presents the ticket at the provider's endpoint → the provider issues an access token limited to the named elements over the measurement period. One ticket serves one measure; a member's open gaps for the season are several tickets, each with its own purpose and audit trail, not one blurred union.
 
-The payer typically mints the ticket itself, within a trust relationship it already has with the provider — a network, a value-based care contract, or a coverage relationship. The ticket does not establish that relationship; it carries a signed, scoped, single-purpose assertion that the provider can enforce uniformly and log. A provider may instead mint tickets from a payer's gap list; the artifact is identical either way.
+The payer may mint the ticket itself, within a trust relationship it already has with the provider — a network, a value-based care contract, or a coverage relationship. The ticket does not establish that relationship; it carries a signed, scoped, single-purpose assertion that the provider can enforce uniformly and log. A provider may instead mint tickets from a payer's gap list; the artifact is identical either way.
 
 ### Required Claims
 
@@ -57,5 +57,7 @@ This type carries just `smart_scopes` and `data_period`. `claim_linkage` is not 
 {: .callout .callout-open-question #oq-quality-gap}
 
 ### Example
+
+This example shows the provider-minted case — issuer and Data Holder are the same party, so issuer trust and subject resolution are trivial. A payer-minted ticket is identical in shape; what it rests on is the attribution question above.
 
 {% include generated/signed-tickets/payer-quality-gap-ticket.html %}
