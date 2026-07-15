@@ -217,6 +217,8 @@ See the JSON Schema and generated TypeScript definitions below for formal struct
 
 Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. The Data Holder uses `ticket_type` to select validation and access logic.
 
+*Design note (decided):* the ticket is a legible artifact, not an opaque handle the issuer resolves at redemption. An opaque reference works when the issuer and the Data Holder are the same party, but a legible ticket works everywhere: the client can pick the right ticket for a Data Holder and request within it, any Data Holder in the audience can act without a callback to the issuer, and the ticket itself is a signed record of what was authorized. What each party is expected to read from a constraint is part of that constraint's definition ([Access Constraints](access-constraints.html)). The access token, not the ticket, remains the source of truth for what a redemption actually granted.
+
 ### Presenter Binding
 A Permission Ticket MAY bind redemption to a specific client using the `presenter_binding` claim. `presenter_binding` is a discriminated union selected by `method`, with two shapes:
 
