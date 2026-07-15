@@ -223,8 +223,8 @@ const uc5_payload: PermissionTicket = {
 // measure needs, narrowed by code, over the measurement period.
 // Payer-minted: the payer signs as issuer and addresses the provider's
 // endpoint. It identifies the member by demographics and member ID, plus a
-// recipient_record hint carrying the provider's MRN as known from claims —
-// the identifier form of the hint, since the payer holds no resource URL.
+// recipient_record hint carrying the provider's Patient resource URL, as
+// known from prior FHIR exchange with this provider.
 // The hint speeds resolution; demographic verification still applies.
 
 const quality_gap_payload: PermissionTicket = {
@@ -249,7 +249,7 @@ const quality_gap_payload: PermissionTicket = {
             name: [{ family: "Tran", given: ["Lien"] }]
         },
         recipient_record: {
-            identifier: { system: "http://fhir.provider.example.org/mrn", value: "C10288" },
+            reference: "https://fhir.provider.example.org/Patient/C10288",
             type: "Patient"
         }
     },
