@@ -319,6 +319,10 @@ If the ticket issuer verifies the person's identity itself at the required assur
 
 At issuance, before embedding client-obtained evidence, the issuer SHALL verify that the ID token was issued to the same client it authenticated in the issuance ceremony. If the issuer cannot verify that link by exact match or recognized mapping, it SHALL NOT embed the evidence. An issuer that can run its own sign-in MAY embed issuer-obtained evidence instead; an issuer that cannot supply evidence a selected ticket type requires cannot mint that ticket.
 
+**Redisclosure scope.** An embedded ID token travels inside the ticket: every Data Holder where the ticket is presented reads it. That is broader disclosure than the single relying party an identity provider's sign-in ceremony covers. Before embedding evidence, the issuer SHALL confirm the person's authorization covers presenting the embedded token to Data Holders within the ticket's audience — stated at the ceremony where the grant is made. An identity provider whose terms do not permit this redisclosure cannot supply embedded evidence.
+
+*Design note:* keeping disclosure per-party — an opaque reference each Data Holder resolves against the identity provider — was considered and set aside: it requires every Data Holder to hold a client relationship with every evidence issuer, which does not scale across networks. Embedding trades that coupling for one explicit disclosure decision, made where the grant is made.
+
 At redemption, the Data Holder SHALL verify that the ID token was issued either to the ticket issuer or to the presenting client. Profiles MAY allow only one of those choices. This proves the sign-in happened as part of issuing or presenting this ticket, not as part of some unrelated application's sign-in.
 
 The embedded ID token is not issued to the Data Holder. Data Holders SHALL NOT expect their own URL or client identifier in the embedded token's `aud`.
@@ -685,6 +689,7 @@ For clients using the well-known JWKS identity approach, see [Proposal 006](prop
 - When using `presenter_binding`, bind the ticket appropriately with one method (`jkt` or `trust_framework_client`)
 - When the ticket type requires identity evidence, include the applicable `subject_identity_evidence` or `requester_identity_evidence`
 - When embedding client-obtained identity evidence, verify that the embedded ID token was issued to the same client authenticated in the issuance ceremony, either by exact match or recognized mapping; if that link cannot be verified, do not embed the evidence
+- Before embedding identity evidence, confirm the person's authorization covers presenting the embedded token to Data Holders within the ticket's audience
 - Verify the facts it attests (patient identity, requester identity and authority, legal basis, scope appropriateness) before minting, according to the selected ticket type and trust framework
 - If `revocation` is present, publish the status list at the URL specified in tickets
 
