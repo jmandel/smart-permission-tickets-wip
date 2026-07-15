@@ -4,7 +4,7 @@ This page defines one access constraint. The constraint model, template, and alg
 
 Introduced by the [Payer Claims Adjudication](payer-claims-adjudication.html) ticket type, where it is the required bound on release. The linkage is anchored on the encounters the claim covers — always available at submission because the issuer is the Data Holder, minting references into its own records. Enforcement is defined against those records, which confines this constraint to self-issued tickets today.
 
-**Shape and validity.** `encounter` (required) is a non-empty array of references to the encounter records the claim covers, using the issuer's own resource URLs. `claim` (optional) is a single reference that re-associates the ticket with the submission it accompanies; its `identifier` carries the **provider's own submission-time control number** — the X12 837 `CLM01`, echoed back to the provider in the 835 — never a payer-assigned claim number (ICN / DCN / CCN), which does not exist when the ticket is minted.
+**Shape and validity.** `encounter` (required) is a non-empty array of references to the encounter records the claim covers, using the issuer's own resource URLs. `claim` (optional) is a single reference that re-associates the ticket with the submission it accompanies; its `identifier` carries the **provider's own submission-time control number** — the identifier the provider assigned when submitting (in US X12 claims, the 837 `CLM01`, echoed back in the 835) — never a payer-assigned claim number (in the US, ICN / DCN / CCN), which does not exist when the ticket is minted.
 
 ```json
 "claim_linkage": {

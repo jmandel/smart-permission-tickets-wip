@@ -10,7 +10,7 @@ This page defines one Permission Ticket type. The overview of all types is the [
 
 When a payer needs more than the claim itself — medical-necessity review, a request for additional information, post-submission documentation — today's path is document exchange: the payer guesses a document code, the provider assembles and pushes attachments. A ticket attached to the claim replaces that follow-up loop with a scoped read. The provider knows at submission time exactly which patient, which encounters, and which period the claim concerns, so it can mint the grant itself.
 
-Why a per-claim ticket rather than standing network access? A trust framework authenticates the payer; it does not say which records this adjudication may touch. Standing B2B access leaves minimum-necessary to the requester's discretion; the ticket pins release to one submission's encounters and leaves both sides a signed record of exactly what was authorized and why.
+Why a per-claim ticket rather than standing network access? A trust framework authenticates the payer; it does not say which records this adjudication may touch. Standing B2B access leaves minimum-necessary to the requester's discretion; the ticket pins release to one submission's encounters and leaves both sides a signed record of the authorization's bounds and purpose.
 
 The issuer and the Data Holder are the same party. This is the ticket type with the fewest moving parts — one system mints tickets and later accepts them back — and trust validation is correspondingly simple. The signature still matters: the ticket travels through the payer's claims pipeline, and only an authenticated client the provider accepts as acting for the requester can redeem it.
 
