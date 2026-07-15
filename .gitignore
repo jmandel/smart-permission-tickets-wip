@@ -31,5 +31,7 @@ ux/
 
 # Local working materials kept out of git
 calls/
+smart-permission-ticket-calls/
+call-notes-*.md
 ux-variant-*/
 agents/
