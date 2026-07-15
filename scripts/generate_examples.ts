@@ -222,9 +222,10 @@ const uc5_payload: PermissionTicket = {
 // Element-scoped: the ticket authorizes exactly the data elements a quality
 // measure needs, narrowed by code, over the measurement period.
 // Payer-minted: the payer signs as issuer and addresses the provider's
-// endpoint. It identifies the member by demographics and member ID — no
-// recipient_record, because the payer does not hold the provider's record
-// identifier — so the Data Holder resolves the subject by matching.
+// endpoint. It identifies the member by demographics and member ID, plus a
+// recipient_record hint carrying the provider's MRN as known from claims —
+// the identifier form of the hint, since the payer holds no resource URL.
+// The hint speeds resolution; demographic verification still applies.
 
 const quality_gap_payload: PermissionTicket = {
     iss: "https://tickets.payer.example.com",
@@ -246,6 +247,10 @@ const quality_gap_payload: PermissionTicket = {
             identifier: [{ system: "https://payer.example.com/member-id", value: "M4402187" }],
             birthDate: "1957-11-02",
             name: [{ family: "Tran", given: ["Lien"] }]
+        },
+        recipient_record: {
+            identifier: { system: "http://fhir.provider.example.org/mrn", value: "C10288" },
+            type: "Patient"
         }
     },
     requester: {

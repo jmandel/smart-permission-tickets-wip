@@ -22,7 +22,7 @@ The payer mints the ticket itself, within a trust relationship it already has wi
 
 ### Required Claims
 
-* **Subject:** `Patient`, with `subject.recipient_record` SHOULD when the issuer is the Data Holder.
+* **Subject:** `Patient`, with `subject.recipient_record` SHOULD when the issuer knows the member's record identifier at the Data Holder — its own reference when self-issued, or an MRN learned from claims when payer-minted.
 * **Requester:** `Organization` (the payer or value-based care entity), identified well enough to match a coverage or contract relationship.
 * **Profile claim:** `measure` (CodeableConcept, required) — the quality measure the query serves. The requester names the data it needs in `smart_scopes`; `measure` says why, selecting the Data Holder's applicable policy and anchoring the audit and re-association trail.
 * **Presenter binding:** Optional (B2B), as in [claims adjudication](payer-claims-adjudication.html): the Data Holder confirms the redeeming client acts for the requester, whether through binding, registration, or a trust-framework relationship.
@@ -58,6 +58,6 @@ This type carries just `smart_scopes` and `data_period`. `claim_linkage` is not 
 
 ### Example
 
-This example shows the payer-minted case — the flow the CMS criterion names. The payer signs as issuer and addresses the provider's endpoint; the member is identified by demographics and member identifier, with no `recipient_record`, so the Data Holder resolves the subject by matching and checks the attribution relationship against its own records (see Data Holder Processing and the open question above). A provider-minted ticket is identical in shape, with `iss` equal to `aud` and a resolvable `recipient_record`.
+This example shows the payer-minted case — the flow the CMS criterion names. The payer signs as issuer and addresses the provider's endpoint; the member is identified by demographics and member identifier, plus a `recipient_record` hint carrying the provider's MRN as known from claims — the identifier form of the hint, since the payer holds no resource URL. Per the [base rule](index.html#subject-resolution), the hint speeds resolution but never replaces the demographic consistency check. The Data Holder checks the attribution relationship against its own records (see Data Holder Processing and the open question above). A provider-minted ticket is identical in shape, with `iss` equal to `aud`.
 
 {% include generated/signed-tickets/payer-quality-gap-ticket.html %}
