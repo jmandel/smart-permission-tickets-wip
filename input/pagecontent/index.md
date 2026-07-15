@@ -1,6 +1,6 @@
 {% include callouts.html %}
 
-> This is a draft specification developed in the [Argonaut Project](https://confluence.hl7.org/spaces/AP/pages/413255067/SMART+Permission+Tickets). If community experience supports it, the intended destination is HL7 standardization alongside the SMART App Launch family. Open design questions are tracked in the [Open Questions registry](open-questions.html).
+> This is a draft specification developed in the [Argonaut Project](https://confluence.hl7.org/spaces/AP/pages/413255067/SMART+Permission+Tickets). If community experience supports it, the intended destination is HL7 standardization alongside the SMART App Launch family, as a universal-realm specification: where ticket types cite US program requirements (such as CMS Interoperability Framework criteria), those are motivating examples, not requirements of this specification. Open design questions are tracked in the [Open Questions registry](open-questions.html).
 {: .callout .callout-info}
 
 ### Introduction
@@ -146,7 +146,7 @@ Data Holders that support Permission Tickets SHALL advertise this in their `.wel
 
 #### Trust and Client Registration
 
-This specification does not require a global client registry. Every Data Holder authenticates every presenting client — through local registration, well-known keys, UDAP, OpenID Federation, or another trust-framework mechanism it accepts. When the ticket carries `presenter_binding`, the client must also prove it is the specific client allowed to redeem that ticket.
+This specification does not require a global client registry. Every Data Holder authenticates every presenting client — through local registration, well-known keys, UDAP, OpenID Federation, or another trust-framework mechanism it accepts. When the ticket carries `presenter_binding`, the client must also prove it is the specific client allowed to redeem that ticket. This specification does not distinguish human-driven from autonomous clients; whether an AI agent may register and redeem tickets is an admission decision for the trust framework or Data Holder, not a property of the ticket.
 
 Client identity shows up in two places: **registration** (how a Data Holder learns the client's keys) and **ticket binding** (how a ticket limits which client may redeem it). These are related but independent: a manually registered client may be key-bound if the issuer knows its key, or left unbound if the issuer does not know which client will redeem the ticket. The table shows common examples; other trust frameworks fit the same pattern.
 
