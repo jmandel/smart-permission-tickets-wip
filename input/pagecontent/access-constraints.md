@@ -47,12 +47,7 @@ Each constraint page follows this template, and profiles defining new constraint
 
 ### Constraint Algebra
 
-Constraints combine as follows:
-
-- **Across constraints** (AND): returned data must satisfy every constraint present in `access`. An absent constraint imposes no restriction.
-- **Within a `smart_scopes` entry** (AND): a resource must be of the scope's resource type and match any granular search-parameter narrowing the scope carries.
-- **Across `smart_scopes` entries** (OR): a resource matching any single scope is authorized — the standard SMART v2 union of scopes.
-- **Within `data_holder_filter`** (OR): a Data Holder may answer if it matches any listed entry.
+Named constraints combine by intersection: a redemption, and any data released under it, must satisfy every constraint present in `access`. An absent constraint imposes no restriction. Each constraint's own page defines how values within that constraint combine.
 
 ### Example Walkthrough
 

@@ -1,6 +1,6 @@
 {% include callouts.html %}
 
-This page defines one access constraint. The constraint model, template, and algebra are on [Access Constraints](access-constraints.html); the ticket types that draw this constraint are in the [Use Case Catalog](use-case-catalog.html).
+This page defines one access constraint. The constraint model and template are on [Access Constraints](access-constraints.html); the ticket types that draw this constraint are in the [Use Case Catalog](use-case-catalog.html).
 
 **Shape and validity.** Required wherever it appears — every ticket type except Payer Claims Adjudication, which grants access through [`claim_linkage`](claim-linkage.html) instead. An array of one or more [SMART App Launch v2](https://hl7.org/fhir/smart-app-launch/scopes-and-launch-context.html) scope strings, each naming a resource type, the interactions permitted on it, and an optional granular search-parameter narrowing. The grammar, with examples:
 
@@ -22,6 +22,6 @@ The current ticket types are all single-patient, so their scopes use the `patien
 
 ### Notes
 
-`smart_scopes` *is* SMART scopes — there is no separate projection step, and no resource-type or narrowing grain that lives outside the scope string. Multiple scopes for the same resource type combine by union, per the SMART v2 semantics the [constraint algebra](access-constraints.html#constraint-algebra) restates.
+`smart_scopes` *is* SMART scopes — there is no separate projection step, and no resource-type or narrowing grain that lives outside the scope string. The array is a union: an interaction on a resource is within the constraint if any one complete scope entry authorizes it. Within an entry, the resource type, permitted interactions, and any granular search-parameter narrowing all apply together; the query portion retains its SMART granular-scope and FHIR search semantics.
 
 FHIR operations (e.g., `$everything`, `$export`) are not modeled in the base kernel. A future profile may add operation-level permissions when a use case requires them.
