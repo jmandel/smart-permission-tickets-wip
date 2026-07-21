@@ -213,7 +213,7 @@ const uc5_payload: PermissionTicket = {
             // The linked encounters are the positive grant; the Data Holder
             // releases the records it associates with them. An optional provider
             // claim reference may also be carried — see claim-linkage.html.
-            encounter: [{ reference: "https://fhir.provider.example.org/Encounter/enc-2026-0117" }]
+            encounter: [{ reference: "https://fhir.provider.example.org/Encounter/enc-2026-0117", type: "Encounter" }]
         }
     }
 };

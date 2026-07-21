@@ -29,7 +29,7 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 ### Constraints
 
-Draws from the [constraint catalog](access-constraints.html). The authorizing party is the provider organization, disclosing under HIPAA's payment and operations permission — there is no patient authorization ceremony, but the patient's standing restriction rights bind (see Restricted Data).
+Draws from the [constraint catalog](access-constraints.html). The authorizing party is the provider organization, acting under the law, contracts, and disclosure policies that apply to the adjudication — there is no patient authorization ceremony, and the Data Holder's ordinary restrictions still bind (see [Restricted Data](#restricted-data)).
 
 * **[`claim_linkage`](claim-linkage.html)** (required) — this profile's required bound on release: the encounters the submitted claim or prior authorization covers, optionally re-associated to the submission by the provider's own claim control number. The Data Holder releases the records it associates with those encounters.
 
@@ -37,9 +37,8 @@ This type carries only `claim_linkage` — it scopes one adjudication, never bul
 
 ### Restricted Data
 
-* Records restricted from disclosure to the payer are excluded silently. The base rule already covers this — a valid ticket does not override local rules — and the issuer is the Data Holder, which holds its own restriction flags. The leading case is the HIPAA right to restrict ([45 CFR 164.522(a)(1)(vi)](https://www.ecfr.gov/current/title-45/section-164.522)): a provider must honor a patient's request not to disclose to a health plan information about items or services paid out of pocket in full.
-* The payer is told the response may be lawfully incomplete (see the [`claim_linkage`](claim-linkage.html) constraint's "For the client" note). The payer must not treat a filtered response as the complete record.
-* When the patient has authorized disclosure of restricted items to the plan, the ticket says so explicitly: a `sensitivity_release_authorized` claim per [Proposal 005](proposal-005-sensitive-data-modeling.html), using the v3-ActCode `HIPAASelfPay` security label policy code — never a silent widening of the default.
+* The Data Holder applies its ordinary payer-access disclosure policy and restriction flags before releasing any record. A valid ticket defines an authorization ceiling; it does not override those rules. The Data Holder may therefore withhold records that fall within the `claim_linkage` universe. As one US-specific example, [45 CFR 164.522(a)(1)(vi)](https://www.ecfr.gov/current/title-45/section-164.522) requires a covered entity to agree to a requested restriction on disclosure to a health plan when the regulation's conditions for fully self-paid items or services are met.
+* As [the `claim_linkage` constraint's "For the client" note](claim-linkage.html#for-the-client) explains, the response may be lawfully incomplete. The payer must not treat a filtered response as the complete record.
 
 ### Policy Selection Inputs
 

@@ -217,8 +217,6 @@ See the JSON Schema and generated TypeScript definitions below for formal struct
 
 Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. The Data Holder uses `ticket_type` to select validation and access logic.
 
-*Design note (decided):* the ticket is a legible artifact, not an opaque handle the issuer resolves at redemption. An opaque reference works when the issuer and the Data Holder are the same party, but a legible ticket works everywhere: the client can pick the right ticket for a Data Holder and request within it, any Data Holder in the audience can act without a callback to the issuer, and the ticket itself is a signed record of the authorization's bounds and purpose. What each party is expected to read from a constraint is part of that constraint's definition ([Access Constraints](access-constraints.html)). The access token, not the ticket, remains the source of truth for what a redemption actually granted.
-
 ### Presenter Binding
 A Permission Ticket MAY bind redemption to a specific client using the `presenter_binding` claim. `presenter_binding` is a discriminated union selected by `method`, with two shapes:
 
@@ -323,7 +321,8 @@ At issuance, before embedding client-obtained evidence, the issuer SHALL verify 
 
 **Redisclosure scope.** An embedded ID token travels inside the ticket: the client that holds the ticket carries it, and every Data Holder where the ticket is presented reads it. That may be broader disclosure than the single relying party an identity provider's sign-in ceremony covers — the token may end up held by a client that was never its relying party, such as a delegate's app carrying the patient's identity token. Before embedding evidence, the issuer SHALL confirm the person's authorization covers embedding the token in a ticket held by the presenting client and presented to Data Holders within the ticket's audience — stated at the ceremony where the grant is made. This matches how network-mediated individual access already operates — under TEFCA, the IAL2 ID token travels with each Individual Access Services request to every responding node — so identity providers serving these flows already operate under network-scope disclosure; providers whose terms permit only per-relying-party disclosure cannot supply embedded evidence.
 
-*Design note:* keeping disclosure per-party — an opaque reference each Data Holder resolves against the identity provider — was considered and set aside: it requires every Data Holder to hold a client relationship with every evidence issuer, which does not scale across networks. Embedding trades that coupling for one explicit disclosure decision, made where the grant is made.
+> **Design note.** Keeping disclosure per-party — an opaque reference each Data Holder resolves against the identity provider — was considered and set aside: it requires every Data Holder to hold a client relationship with every evidence issuer, which does not scale across networks. Embedding trades that coupling for one explicit disclosure decision, made where the grant is made.
+{: .callout .callout-detail}
 
 At redemption, the Data Holder SHALL verify that the ID token was issued either to the ticket issuer or to the presenting client. Profiles MAY allow only one of those choices. This proves the sign-in happened as part of issuing or presenting this ticket, not as part of some unrelated application's sign-in.
 
@@ -348,7 +347,8 @@ Future versions may define additional identity-evidence token types, such as mob
 
 Identity evidence supplements — it does not replace — the FHIR party representations (see [Subject Resolution](#subject-resolution)). The same rule applies on the requester side: `requester` stays present, and the issuer SHALL keep it consistent with any `requester_identity_evidence`.
 
-*Design note:* evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. The evidence is a JWT verified with standard OIDC processing at the token endpoint, not clinical content; top-level claims are how this specification handles extensions; and sibling slots keep the two evidence claims identical in shape. There is no ambiguity about who the evidence describes, because a ticket names exactly one subject and at most one requester.
+> **Design note.** Evidence lives as a top-level sibling claim rather than as a FHIR extension on the party resource. The evidence is a JWT verified with standard OIDC processing at the token endpoint, not clinical content; top-level claims are how this specification handles extensions; and sibling slots keep the two evidence claims identical in shape. There is no ambiguity about who the evidence describes, because a ticket names exactly one subject and at most one requester.
+{: .callout .callout-detail}
 
 ### Profile Claims
 

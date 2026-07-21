@@ -8,6 +8,9 @@ The `access` object holds the ticket's **access constraints**. Each member of `a
 
 Every constraint limits one thing and nothing else — which resource types, which dates, which Data Holders, which records. Leave one out and the ticket simply doesn't limit that thing; no constraint ever opens access up, it only cuts down what would otherwise be shared.
 
+> **Design note: ticket-borne constraints are legible.** Each constraint present in `access` exposes its values and has published semantics, so the issuer, client, and Data Holder can understand the ticket's authorization ceiling. This does not make every restriction on release visible: the Data Holder may further narrow access under its own policy, client eligibility, and technical capabilities without representing those limits in the ticket.
+{: .callout .callout-detail}
+
 Four rules govern every constraint:
 
 1. **Unrecognized means reject.** A Data Holder SHALL reject a ticket whose `access` contains a member it does not recognize and enforce, with `invalid_grant` and an `error_description` naming the unsupported constraint. There is no issuer opt-in and no capability negotiation: ignoring an access constraint always releases more than the issuer authorized, so unrecognized constraints fail closed.
