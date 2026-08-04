@@ -38,7 +38,7 @@ The signed payload has a small, fixed shape:
 | JWT envelope:  iss  aud  exp  jti  iat  ticket_type           |  signed by issuer
 +---------------------------------------------------------------+
 | subject:       patient (FHIR Patient, may be thin)            |  whose data
-|                recipient_record?   (resolution hint)          |
+|                patient_reference?  (resolution hint)          |
 +---------------------------------------------------------------+
 | requester?     RelatedPerson | Practitioner |                 |  on whose behalf
 |                PractitionerRole | Organization                |  (issuer-attested)

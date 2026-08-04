@@ -35,8 +35,8 @@ The ticket carries only what a Data Holder needs at redemption time. This table 
 When a ticket field names a party or record, three shapes are available, chosen by what the recipient does with it — not by whether an identifier is involved, since every shape can carry one:
 
 - **Resource** (a thin FHIR resource) when the issuer is **asserting attributes the recipient reads and acts on** — matches against, weighs, or branches on. The thing need not already exist at the recipient. So `subject.patient` (demographics to match) and `requester` (identity and authority to weigh) are resources.
-- **Reference** when the field **points at a record the recipient already holds or resolves**, and the recipient — not the ticket — is the source of truth for its content. So `subject.recipient_record` and `claim_linkage.encounter` are references.
-- **Bare datatype** (`Identifier`, `Address`, `Coding`…) when the field is a **value the recipient matches or interprets**, possibly as a set — so `data_holder_filter` carries an address or a list of organization references, and profile claims like `measure` are codings.
+- **Reference** when the field **points at a record the recipient already holds or resolves**, and the recipient — not the ticket — is the source of truth for its content. So `claim_linkage.encounter` is a reference.
+- **Bare datatype** (`Identifier`, `Address`, `Coding`, url…) when the field is a **value the recipient matches or interprets**, possibly as a set — so `data_holder_filter` carries an address or a list of organization references, `subject.patient_reference` is a plain URL, and profile claims like `measure` are codings.
 
 "We need to convey an identifier" never decides this: an identifier rides in all three. The question is whether the recipient consumes issuer-asserted attributes (resource), dereferences a pointer into its own data (reference), or matches a value (datatype).
 
@@ -283,7 +283,7 @@ Every ticket SHALL include `subject.patient`, a FHIR Patient resource carrying t
 
 `subject_identity_evidence` (see [Identity Evidence](#identity-evidence)), when present, supplements `subject.patient` with demographics the Data Holder can verify itself, independently of its trust in the ticket issuer. Ticket-type profiles MAY require it. The issuer SHALL keep `subject.patient` consistent with the verified evidence claims. When evidence is present, the Data Holder SHALL confirm the verified evidence demographics are consistent with `subject.patient` and with the resolved local record, and SHALL reject with `invalid_grant` on material mismatch — otherwise a verified identity for one person could lend false assurance to a request about another.
 
-`subject.recipient_record` may provide a direct-target optimization: a FHIR Reference that can carry a `.reference` (literal resource URL), a `.identifier` (business identifier such as an MRN at the target Data Holder), or both. When `recipient_record` is present, the Data Holder SHOULD use it as a hint for faster resolution, falling back to demographic matching on `subject.patient` if the reference does not resolve. The hint never replaces verification: a record reached via `recipient_record` SHALL be checked for consistency with `subject.patient` demographics (and verified identity evidence, when present) before access is granted — an injected MRN must not short-circuit subject matching.
+`subject.patient_reference` may provide a direct-target optimization: the URL of the subject's Patient resource at the Data Holder, when the issuer knows it (for example from prior FHIR exchange). When present, the Data Holder SHOULD use it as a hint for faster resolution, falling back to demographic matching on `subject.patient` if it does not resolve. The hint never replaces verification: a record reached via `patient_reference` SHALL be checked for consistency with `subject.patient` demographics (and verified identity evidence, when present) before access is granted. Business identifiers such as an MRN at the Data Holder belong in `subject.patient.identifier`, where they participate in ordinary demographic matching rather than short-circuiting it.
 
 If subject resolution yields zero matches, or more than one match, the Data Holder SHALL reject the request with `invalid_grant` and an appropriate `error_description`.
 
@@ -663,7 +663,7 @@ This section defines requirements using RFC 2119 keywords (SHALL, SHOULD, MAY).
 
 **MAY:**
 - Support trust framework audience validation
-- Use `subject.recipient_record` as a hint for faster patient resolution
+- Use `subject.patient_reference` as a hint for faster patient resolution
 
 #### Client Requirements
 

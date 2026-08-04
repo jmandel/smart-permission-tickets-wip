@@ -22,7 +22,7 @@ Provider's system submits a claim (or prior authorization) → mints a ticket na
 
 ### Required Claims
 
-* **Subject:** `Patient`, with `subject.recipient_record` SHOULD — the issuer is the Data Holder, so it knows its own record identifier and the direct-target hint always resolves.
+* **Subject:** `Patient`, with `subject.patient_reference` SHOULD — the issuer is the Data Holder, so it knows its own record URL and the direct-target hint always resolves.
 * **Requester:** `Organization` (the payer), identified well enough for the provider to match it to the claim's payer.
 * **Presenter binding:** Optional (B2B): `aud` plus client authentication provide the trust boundary. `requester` identifies the principal, not necessarily the presenter — a contractor adjudicating on the payer's behalf may redeem with its own registered client when the delegation is tracked through registration or expressed in the trust framework (OpenID Federation can carry it explicitly). See [the base specification](index.html#relationship-between-presenter_binding-and-requester) on this distinction.
 * **Expiration:** `exp` SHOULD cover the payer's documented additional-information window for the linked claim. Sixty days from submission matches the CMS criterion; the operational windows underneath run 45–75 days (Medicare ADR, PERM, commercial record-request periods), so the length is a deployment parameter, not a fixed rule.
@@ -51,7 +51,7 @@ This type carries only `claim_linkage` — it scopes one adjudication, never bul
 
 * Verify the ticket signature against this system's own issuing keys — the issuer is the Data Holder.
 * Confirm the redeeming client acts for the requester — by presenter binding when present, or by the client's registration or trust-framework relationship to the named payer.
-* Resolve the subject; `recipient_record` resolves directly, since the issuer assigned it.
+* Resolve the subject; `patient_reference` resolves directly, since the issuer assigned it.
 * Enforce `claim_linkage` against the records you associate with the linked encounters; apply restriction flags before release.
 
 ### Example

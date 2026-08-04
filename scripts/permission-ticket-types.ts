@@ -28,7 +28,7 @@ export type FHIRAddress = Pick<fhir4.Address, "country" | "state">;
 
 export type Subject = {
   patient: fhir4.Patient;
-  recipient_record?: FHIRReference & { type?: "Patient" };
+  patient_reference?: string;
 };
 
 export type Requester =

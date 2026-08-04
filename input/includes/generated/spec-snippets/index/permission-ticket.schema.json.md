@@ -259,60 +259,9 @@
               ],
               "additionalProperties": {}
             },
-            "recipient_record": {
-              "type": "object",
-              "properties": {
-                "reference": {
-                  "type": "string"
-                },
-                "identifier": {
-                  "type": "object",
-                  "properties": {
-                    "system": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "object",
-                      "properties": {
-                        "coding": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "display": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "text": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": {}
-                    }
-                  },
-                  "additionalProperties": {}
-                },
-                "type": {
-                  "type": "string",
-                  "const": "Patient"
-                },
-                "display": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+            "patient_reference": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -736,60 +685,9 @@
               ],
               "additionalProperties": {}
             },
-            "recipient_record": {
-              "type": "object",
-              "properties": {
-                "reference": {
-                  "type": "string"
-                },
-                "identifier": {
-                  "type": "object",
-                  "properties": {
-                    "system": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "object",
-                      "properties": {
-                        "coding": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "display": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "text": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": {}
-                    }
-                  },
-                  "additionalProperties": {}
-                },
-                "type": {
-                  "type": "string",
-                  "const": "Patient"
-                },
-                "display": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+            "patient_reference": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -1338,60 +1236,9 @@
               ],
               "additionalProperties": {}
             },
-            "recipient_record": {
-              "type": "object",
-              "properties": {
-                "reference": {
-                  "type": "string"
-                },
-                "identifier": {
-                  "type": "object",
-                  "properties": {
-                    "system": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "object",
-                      "properties": {
-                        "coding": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "display": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "text": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": {}
-                    }
-                  },
-                  "additionalProperties": {}
-                },
-                "type": {
-                  "type": "string",
-                  "const": "Patient"
-                },
-                "display": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+            "patient_reference": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -1899,60 +1746,9 @@
               ],
               "additionalProperties": {}
             },
-            "recipient_record": {
-              "type": "object",
-              "properties": {
-                "reference": {
-                  "type": "string"
-                },
-                "identifier": {
-                  "type": "object",
-                  "properties": {
-                    "system": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "object",
-                      "properties": {
-                        "coding": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "display": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "text": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": {}
-                    }
-                  },
-                  "additionalProperties": {}
-                },
-                "type": {
-                  "type": "string",
-                  "const": "Patient"
-                },
-                "display": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+            "patient_reference": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -2526,60 +2322,9 @@
               ],
               "additionalProperties": {}
             },
-            "recipient_record": {
-              "type": "object",
-              "properties": {
-                "reference": {
-                  "type": "string"
-                },
-                "identifier": {
-                  "type": "object",
-                  "properties": {
-                    "system": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "object",
-                      "properties": {
-                        "coding": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "display": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "text": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": {}
-                    }
-                  },
-                  "additionalProperties": {}
-                },
-                "type": {
-                  "type": "string",
-                  "const": "Patient"
-                },
-                "display": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+            "patient_reference": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -3054,60 +2799,9 @@
               ],
               "additionalProperties": {}
             },
-            "recipient_record": {
-              "type": "object",
-              "properties": {
-                "reference": {
-                  "type": "string"
-                },
-                "identifier": {
-                  "type": "object",
-                  "properties": {
-                    "system": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "object",
-                      "properties": {
-                        "coding": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "display": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "text": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": {}
-                    }
-                  },
-                  "additionalProperties": {}
-                },
-                "type": {
-                  "type": "string",
-                  "const": "Patient"
-                },
-                "display": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+            "patient_reference": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -3651,60 +3345,9 @@
               ],
               "additionalProperties": {}
             },
-            "recipient_record": {
-              "type": "object",
-              "properties": {
-                "reference": {
-                  "type": "string"
-                },
-                "identifier": {
-                  "type": "object",
-                  "properties": {
-                    "system": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "object",
-                      "properties": {
-                        "coding": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "display": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "text": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": {}
-                    }
-                  },
-                  "additionalProperties": {}
-                },
-                "type": {
-                  "type": "string",
-                  "const": "Patient"
-                },
-                "display": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+            "patient_reference": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -4305,60 +3948,9 @@
               ],
               "additionalProperties": {}
             },
-            "recipient_record": {
-              "type": "object",
-              "properties": {
-                "reference": {
-                  "type": "string"
-                },
-                "identifier": {
-                  "type": "object",
-                  "properties": {
-                    "system": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "object",
-                      "properties": {
-                        "coding": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "system": {
-                                "type": "string"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "display": {
-                                "type": "string"
-                              }
-                            },
-                            "additionalProperties": {}
-                          }
-                        },
-                        "text": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": {}
-                    }
-                  },
-                  "additionalProperties": {}
-                },
-                "type": {
-                  "type": "string",
-                  "const": "Patient"
-                },
-                "display": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": {}
+            "patient_reference": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [

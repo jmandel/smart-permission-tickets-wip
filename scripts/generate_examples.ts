@@ -201,7 +201,7 @@ const uc5_payload: PermissionTicket = {
             birthDate: "1962-03-09",
             name: [{ family: "Okafor", given: ["Daniel"] }]
         },
-        recipient_record: { reference: "https://fhir.provider.example.org/Patient/B77421", type: "Patient" }
+        patient_reference: "https://fhir.provider.example.org/Patient/B77421"
     },
     requester: {
         resourceType: "Organization",
@@ -223,7 +223,7 @@ const uc5_payload: PermissionTicket = {
 // measure needs, narrowed by code, over the measurement period.
 // Payer-minted: the payer signs as issuer and addresses the provider's
 // endpoint. It identifies the member by demographics and member ID, plus a
-// recipient_record hint carrying the provider's Patient resource URL, as
+// patient_reference hint carrying the provider's Patient resource URL, as
 // known from prior FHIR exchange with this provider.
 // The hint speeds resolution; demographic verification still applies.
 
@@ -248,10 +248,7 @@ const quality_gap_payload: PermissionTicket = {
             birthDate: "1957-11-02",
             name: [{ family: "Tran", given: ["Lien"] }]
         },
-        recipient_record: {
-            reference: "https://fhir.provider.example.org/Patient/C10288",
-            type: "Patient"
-        }
+        patient_reference: "https://fhir.provider.example.org/Patient/C10288"
     },
     requester: {
         resourceType: "Organization",

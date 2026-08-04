@@ -141,9 +141,7 @@ export const RequesterSchema = z.discriminatedUnion("resourceType", [
 
 export const SubjectSchema = z.object({
   patient: PatientSchema,
-  recipient_record: FHIRReferenceSchema.extend({
-    type: z.literal("Patient").optional(),
-  }).optional(),
+  patient_reference: UriSchema.optional(),
 });
 
 export const KeyBindingSchema = z.object({

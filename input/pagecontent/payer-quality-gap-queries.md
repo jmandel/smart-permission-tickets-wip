@@ -22,7 +22,7 @@ The payer mints the ticket itself, within a trust relationship it already has wi
 
 ### Required Claims
 
-* **Subject:** `Patient`, with `subject.recipient_record` SHOULD when the issuer knows the member's record at the Data Holder — its own reference when self-issued, or a reference learned through prior FHIR exchange when payer-minted.
+* **Subject:** `Patient`, with `subject.patient_reference` SHOULD when the issuer knows the member's record URL at the Data Holder — its own when self-issued, or one learned through prior FHIR exchange when payer-minted.
 * **Requester:** `Organization` (the payer or value-based care entity), identified well enough to match a coverage or contract relationship.
 * **Profile claim:** `measure` (CodeableConcept, required) — the quality measure the query serves. The requester names the data it needs in `smart_scopes`; `measure` says why, selecting the Data Holder's applicable policy and anchoring the audit and re-association trail.
 * **Presenter binding:** Optional (B2B), as in [claims adjudication](payer-claims-adjudication.html): the Data Holder confirms the redeeming client acts for the requester, whether through binding, registration, or a trust-framework relationship.
@@ -58,6 +58,6 @@ This type carries just `smart_scopes` and `data_period`. `claim_linkage` is not 
 
 ### Example
 
-This example shows the payer-minted case — the flow the CMS criterion names. The payer signs as issuer and addresses the provider's endpoint; the member is identified by demographics and member identifier, plus a `recipient_record` hint carrying the provider's Patient resource URL, known from prior FHIR exchange with this provider. Per the [base rule](index.html#subject-resolution), the hint speeds resolution but never replaces the demographic consistency check. The Data Holder checks the attribution relationship against its own records (see Data Holder Processing and the open question above). A provider-minted ticket is identical in shape, with `iss` equal to `aud`.
+This example shows the payer-minted case — the flow the CMS criterion names. The payer signs as issuer and addresses the provider's endpoint; the member is identified by demographics and member identifier, plus a `patient_reference` hint carrying the provider's Patient resource URL, known from prior FHIR exchange with this provider. Per the [base rule](index.html#subject-resolution), the hint speeds resolution but never replaces the demographic consistency check. The Data Holder checks the attribution relationship against its own records (see Data Holder Processing and the open question above). A provider-minted ticket is identical in shape, with `iss` equal to `aud`.
 
 {% include generated/signed-tickets/payer-quality-gap-ticket.html %}
