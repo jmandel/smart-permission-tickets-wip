@@ -65,7 +65,7 @@ export type Revocation = {
 };
 
 export type Continuation = {
-  refresh_until: NumericDate;
+  refresh_until: NumericDate | null;
 };
 
 // A single SMART v2 scope string, e.g. "patient/Observation.rs" or

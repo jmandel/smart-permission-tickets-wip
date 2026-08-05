@@ -175,7 +175,7 @@ export const RevocationSchema = z.object({
 }).strict();
 
 export const ContinuationSchema = z.object({
-  refresh_until: z.number().int(),
+  refresh_until: z.number().int().nullable(),
 }).strict();
 
 // A single SMART v2 scope string (SMART App Launch v2 scope grammar), e.g.

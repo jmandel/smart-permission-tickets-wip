@@ -511,7 +511,7 @@ Data Holders advertise which `ticket_type` URIs they support via `smart_permissi
 
 #### Long-Lived Access and Continuation
 
-For access beyond a single session, the baseline is ticket-based: the client re-presents a still-valid ticket, or obtains a fresh one from the issuer. Issuers may mint longer-lived revocable tickets when re-issuance is costly.
+For access beyond a single session, two patterns cover the space: B2B flows use longer-lived revocable tickets, re-presented as needed and minted with extended validity when re-issuance is costly; app flows use a short-lived ticket whose `continuation` claim hands off to an ordinary SMART refresh-token chain.
 
 Data Holders are not required to issue refresh tokens after ticket redemption. Any local continuation credential a Data Holder does issue is bounded by the effective grant computed at redemption, and SHALL NOT remain usable after the ticket's `exp` unless the ticket carries `continuation`.
 
@@ -521,8 +521,9 @@ The optional top-level `continuation` claim lets the issuer extend that bound �
 "continuation": { "refresh_until": 1780160400 }
 ```
 
-- When `continuation` is present, the Data Holder MAY issue refresh tokens derived from successful redemption and honor them until `refresh_until`.
-- A ticket carrying `continuation` SHALL also carry `revocation`, and the issuer SHALL maintain the ticket's revocation status until `refresh_until` — otherwise revoking the ticket could not reach the credentials derived from it.
+- `refresh_until` states how long the authorized relationship is expected to last; `null` means indefinite. In refresh scenarios this — not `exp` — is where the issuer communicates the authorizing person's intent about access duration: `exp` bounds only new redemptions.
+- When `continuation` is present, the Data Holder MAY issue refresh tokens derived from successful redemption. Actual refresh-token lifetimes remain Data Holder policy — shorter or longer than `refresh_until`.
+- A ticket carrying `continuation` SHALL also carry `revocation`, and the issuer SHALL maintain the ticket's revocation status through `refresh_until` (indefinitely when `null`) — otherwise revoking the ticket could not reach the credentials derived from it.
 - Before honoring a derived refresh token, the Data Holder SHALL check the source ticket's revocation status — which requires retaining enough association with the source ticket to perform that check.
 - `continuation` is safe to ignore wholesale: a Data Holder that does not process it simply issues no post-`exp` refresh tokens. A Data Holder that acts on it SHALL enforce all of its members.
 
