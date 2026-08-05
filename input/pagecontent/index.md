@@ -691,7 +691,7 @@ For clients using the well-known JWKS identity approach, see [Proposal 006](prop
 - Request only scopes authorized by held tickets
 - For single-patient ticket types, request SMART v2 CRUDS suffix scopes (for example `patient/Observation.rs`)
 - When using a JWT client assertion, include `jti` in that assertion for replay protection
-- Refresh tickets before expiration for continued access
+- For continued access, refresh tickets before expiration or use derived refresh tokens where the ticket's `continuation` claim permits
 
 #### Issuer Requirements
 
