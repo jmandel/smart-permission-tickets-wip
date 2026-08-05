@@ -528,7 +528,7 @@ The optional top-level `continuation` claim lets the issuer extend that bound â€
 
 #### Revocation
 
-Issuers MAY support revocation of individual tickets before expiration.
+Issuers MAY support revocation of individual tickets. Revocation ends a ticket's use for new redemptions and, for tickets carrying `continuation`, reaches derived refresh tokens until `refresh_until`.
 
 **Status List Pointer**
 
