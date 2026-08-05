@@ -526,8 +526,6 @@ The optional top-level `continuation` claim lets the issuer extend that bound â€
 - Before honoring a derived refresh token after ticket `exp`, the Data Holder SHALL check the source ticket's revocation status â€” which requires retaining enough association with the source ticket to perform that check.
 - `continuation` is safe to ignore wholesale: a Data Holder that does not process it simply issues no post-`exp` refresh tokens. A Data Holder that acts on it SHALL enforce all of its members.
 
-This claim was adopted from [Proposal 004: Continuation Credentials](proposal-004-continuation-credentials.html), which records the motivation and design history.
-
 #### Revocation
 
 Issuers MAY support revocation of individual tickets before expiration.

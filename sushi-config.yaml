@@ -51,8 +51,6 @@ pages:
     title: "Proposal 002: OpenID Federation Issuers"
   proposal-003-smart-launch-issuance.md:
     title: "Proposal 003: SMART Launch Issuance"
-  proposal-004-continuation-credentials.md:
-    title: "Proposal 004: Continuation Credentials"
   proposal-005-sensitive-data-modeling.md:
     title: "Proposal 005: Sensitive Data Profile"
   proposal-006-well-known-client-identity.md:
@@ -78,7 +76,6 @@ menu:
     "001: Authz Code Fallback": proposal-001-authz-code-fallback.html
     "002: OpenID Federation Issuers": proposal-002-oidf-issuers.html
     "003: SMART Launch Issuance": proposal-003-smart-launch-issuance.html
-    "004: Continuation Credentials": proposal-004-continuation-credentials.html
     "005: Sensitive Data Profile": proposal-005-sensitive-data-modeling.html
     "006: Well-Known JWKS Client Identity": proposal-006-well-known-client-identity.html
     "007: Issuer Accountability": proposal-007-issuer-accountability.html
