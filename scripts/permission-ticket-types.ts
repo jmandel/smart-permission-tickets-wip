@@ -64,6 +64,10 @@ export type Revocation = {
   index: number;
 };
 
+export type Continuation = {
+  refresh_until: NumericDate;
+};
+
 // A single SMART v2 scope string, e.g. "patient/Observation.rs" or
 // "patient/Observation.rs?code=http://loinc.org|4548-4".
 export type SmartScope = string;
@@ -118,6 +122,7 @@ export type PermissionTicketBase = {
   subject_identity_evidence?: IdentityEvidence;
   requester_identity_evidence?: IdentityEvidence;
   revocation?: Revocation;
+  continuation?: Continuation;
   subject: Subject;
   requester?: Requester;
   access: AccessGrant;

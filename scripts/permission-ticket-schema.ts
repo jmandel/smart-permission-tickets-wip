@@ -174,6 +174,10 @@ export const RevocationSchema = z.object({
   index: z.number().int().nonnegative(),
 }).strict();
 
+export const ContinuationSchema = z.object({
+  refresh_until: z.number().int(),
+}).strict();
+
 // A single SMART v2 scope string (SMART App Launch v2 scope grammar), e.g.
 // "patient/Observation.rs" or, with granular search-parameter narrowing,
 // "patient/Observation.rs?category=http://terminology.hl7.org/CodeSystem/observation-category|laboratory".
@@ -265,6 +269,7 @@ const TicketBaseSchema = z.object({
   subject_identity_evidence: IdentityEvidenceSchema.optional(),
   requester_identity_evidence: IdentityEvidenceSchema.optional(),
   revocation: RevocationSchema.optional(),
+  continuation: ContinuationSchema.optional(),
   subject: SubjectSchema,
   requester: RequesterSchema.optional(),
   access: AccessGrantSchema,
@@ -363,6 +368,8 @@ export type TrustFrameworkClientBinding = z.infer<typeof TrustFrameworkClientBin
 export type PresenterBinding = z.infer<typeof PresenterBindingSchema>;
 export type EmbeddedIdentityEvidence = z.infer<typeof EmbeddedIdentityEvidenceSchema>;
 export type IdentityEvidence = z.infer<typeof IdentityEvidenceSchema>;
+export type Revocation = z.infer<typeof RevocationSchema>;
+export type Continuation = z.infer<typeof ContinuationSchema>;
 export type Subject = z.infer<typeof SubjectSchema>;
 export type Requester = z.infer<typeof RequesterSchema>;
 export type SmartScope = z.infer<typeof SmartScopeSchema>;

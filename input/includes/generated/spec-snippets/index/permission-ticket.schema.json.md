@@ -165,6 +165,20 @@
           ],
           "additionalProperties": false
         },
+        "continuation": {
+          "type": "object",
+          "properties": {
+            "refresh_until": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "refresh_until"
+          ],
+          "additionalProperties": false
+        },
         "subject": {
           "type": "object",
           "properties": {
@@ -588,6 +602,20 @@
           "required": [
             "url",
             "index"
+          ],
+          "additionalProperties": false
+        },
+        "continuation": {
+          "type": "object",
+          "properties": {
+            "refresh_until": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "refresh_until"
           ],
           "additionalProperties": false
         },
@@ -1142,6 +1170,20 @@
           ],
           "additionalProperties": false
         },
+        "continuation": {
+          "type": "object",
+          "properties": {
+            "refresh_until": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "refresh_until"
+          ],
+          "additionalProperties": false
+        },
         "subject": {
           "type": "object",
           "properties": {
@@ -1649,6 +1691,20 @@
           "required": [
             "url",
             "index"
+          ],
+          "additionalProperties": false
+        },
+        "continuation": {
+          "type": "object",
+          "properties": {
+            "refresh_until": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "refresh_until"
           ],
           "additionalProperties": false
         },
@@ -2228,6 +2284,20 @@
           ],
           "additionalProperties": false
         },
+        "continuation": {
+          "type": "object",
+          "properties": {
+            "refresh_until": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "refresh_until"
+          ],
+          "additionalProperties": false
+        },
         "subject": {
           "type": "object",
           "properties": {
@@ -2702,6 +2772,20 @@
           "required": [
             "url",
             "index"
+          ],
+          "additionalProperties": false
+        },
+        "continuation": {
+          "type": "object",
+          "properties": {
+            "refresh_until": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "refresh_until"
           ],
           "additionalProperties": false
         },
@@ -3248,6 +3332,20 @@
           "required": [
             "url",
             "index"
+          ],
+          "additionalProperties": false
+        },
+        "continuation": {
+          "type": "object",
+          "properties": {
+            "refresh_until": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "refresh_until"
           ],
           "additionalProperties": false
         },
@@ -3851,6 +3949,20 @@
           "required": [
             "url",
             "index"
+          ],
+          "additionalProperties": false
+        },
+        "continuation": {
+          "type": "object",
+          "properties": {
+            "refresh_until": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "refresh_until"
           ],
           "additionalProperties": false
         },

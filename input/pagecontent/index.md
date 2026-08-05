@@ -209,7 +209,7 @@ In all three modes, the Data Holder authenticates the client through its standar
 The Data Holder SHALL NOT rely on any cross-party-stable client identifier inside the Permission Ticket itself. Client identity is established by the `client_assertion` (`iss`/`sub`).
 
 ### Artifact: Ticket Structure
-The ticket payload is a JWT. It carries top-level `subject` and `access`, plus optional `requester`, identity-evidence, `presenter_binding`, and `revocation` claims alongside the standard JWT envelope. `ticket_type` is the sole discriminator for the processing rules: which claims are required, which profile claims the type defines, and which access constraints its tickets use.
+The ticket payload is a JWT. It carries top-level `subject` and `access`, plus optional `requester`, identity-evidence, `presenter_binding`, `revocation`, and `continuation` claims alongside the standard JWT envelope. `ticket_type` is the sole discriminator for the processing rules: which claims are required, which profile claims the type defines, and which access constraints its tickets use.
 
 {% include generated/spec-snippets/index/artifact-ticket.js.md %}
 
@@ -513,7 +513,20 @@ Data Holders advertise which `ticket_type` URIs they support via `smart_permissi
 
 For access beyond a single session, the baseline is ticket-based: the client re-presents a still-valid ticket, or obtains a fresh one from the issuer. Issuers may mint longer-lived revocable tickets when re-issuance is costly.
 
-Data Holders are not required to issue refresh tokens after ticket redemption. Any local continuation credential a Data Holder does issue is bounded by the effective grant computed at redemption. [Proposal 004: Continuation Credentials](proposal-004-continuation-credentials.html) defines draft `continuation` claim semantics for issuer-bounded continuation beyond ticket `exp`.
+Data Holders are not required to issue refresh tokens after ticket redemption. Any local continuation credential a Data Holder does issue is bounded by the effective grant computed at redemption, and SHALL NOT remain usable after the ticket's `exp` unless the ticket carries `continuation`.
+
+The optional top-level `continuation` claim lets the issuer extend that bound — for example, so an established SMART on FHIR refresh-token relationship can outlive a short redemption window:
+
+```json
+"continuation": { "refresh_until": 1780160400 }
+```
+
+- When `continuation` is present, the Data Holder MAY issue refresh tokens derived from successful redemption and honor them until `refresh_until`.
+- A ticket carrying `continuation` SHALL also carry `revocation`, and the issuer SHALL maintain the ticket's revocation status until `refresh_until` — otherwise revoking the ticket could not reach the credentials derived from it.
+- Before honoring a derived refresh token after ticket `exp`, the Data Holder SHALL check the source ticket's revocation status — which requires retaining enough association with the source ticket to perform that check.
+- `continuation` is safe to ignore wholesale: a Data Holder that does not process it simply issues no post-`exp` refresh tokens. A Data Holder that acts on it SHALL enforce all of its members.
+
+This claim was adopted from [Proposal 004: Continuation Credentials](proposal-004-continuation-credentials.html), which records the motivation and design history.
 
 #### Revocation
 
