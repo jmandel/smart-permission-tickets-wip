@@ -523,7 +523,7 @@ The optional top-level `continuation` claim lets the issuer extend that bound �
 
 - When `continuation` is present, the Data Holder MAY issue refresh tokens derived from successful redemption and honor them until `refresh_until`.
 - A ticket carrying `continuation` SHALL also carry `revocation`, and the issuer SHALL maintain the ticket's revocation status until `refresh_until` — otherwise revoking the ticket could not reach the credentials derived from it.
-- Before honoring a derived refresh token after ticket `exp`, the Data Holder SHALL check the source ticket's revocation status — which requires retaining enough association with the source ticket to perform that check.
+- Before honoring a derived refresh token, the Data Holder SHALL check the source ticket's revocation status — which requires retaining enough association with the source ticket to perform that check.
 - `continuation` is safe to ignore wholesale: a Data Holder that does not process it simply issues no post-`exp` refresh tokens. A Data Holder that acts on it SHALL enforce all of its members.
 
 #### Revocation
