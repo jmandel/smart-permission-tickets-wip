@@ -198,10 +198,10 @@ Client authentication and authorization are separated:
 - The **client-authentication artifact** authenticates the client separately from the ticket. In the common JWT-based profiles shown here, the `client_assertion` contains only `iss`, `sub`, `aud`, `jti`, and `exp` — no ticket content.
 - The **`subject_token`** carries the Permission Ticket. It is a separate form parameter, not embedded in the assertion.
 
-The ticket's `presenter_binding` claim determines how tightly the ticket is bound to a specific client. There are three modes:
+The ticket's `presenter_binding` claim — one binding or an array, any one of which the presenter must satisfy — determines how tightly the ticket is bound. There are three modes:
 
 1. **Key-bound** (`presenter_binding.method = "jkt"`): the ticket can only be redeemed by the client whose key matches the bound thumbprint.
-2. **Framework-bound** (`presenter_binding.method = "trust_framework_client"`): the ticket can only be redeemed by a client whose trust-framework-recognized identity matches the bound entity (for example `well-known`, `oidf`, or `udap`).
+2. **Framework-bound** (`presenter_binding.method = "trust_framework_client"`): the ticket can only be redeemed by a client whose trust-framework-recognized identity matches the bound entity (for example `well-known`, `oidf`, or `udap`) — or, when no `entity_uri` is named, by any client recognized in the bound framework.
 3. **No binding** (`presenter_binding` absent): any authenticated client in the ticket's `aud` may redeem it.
 
 In all three modes, the Data Holder authenticates the client through its standard mechanism (e.g., `client_assertion` JWT). The binding claims add constraints on top of that authentication, not in place of it. See [Presenter Binding](#presenter-binding) below for full verification rules.
@@ -218,7 +218,7 @@ See the JSON Schema and generated TypeScript definitions below for formal struct
 Every Permission Ticket SHALL include `ticket_type`. The `ticket_type` identifies the ticket's schema and processing rules. The Data Holder uses `ticket_type` to select validation and access logic.
 
 ### Presenter Binding
-A Permission Ticket MAY bind redemption to a specific client using the `presenter_binding` claim. `presenter_binding` is a discriminated union selected by `method`, with two shapes:
+A Permission Ticket MAY bind redemption using the `presenter_binding` claim: a single binding or an array of bindings, of which the presenting client SHALL satisfy at least one. An array covers a family of related clients (the app developer supplies the set at issuance) or planned key rotation (multiple `jkt` entries). Each binding is a discriminated union selected by `method`, with two shapes:
 
 - **Key binding**:
   ```json
@@ -233,9 +233,10 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
     "method": "trust_framework_client",
     "trust_framework": "<trust framework id>",
     "framework_type": "<udap | well-known | oidf>",
-    "entity_uri": "<client entity URI>"
+    "entity_uri": "<client entity URI, optional>"
   }
   ```
+  When `entity_uri` is absent, the binding is satisfied by any client whose identity is validated under the named trust framework.
 
 **Note on `cnf` (decided).** Standard JWT confirmation uses the `cnf` claim ([RFC 7800](https://www.rfc-editor.org/rfc/rfc7800)). This specification diverges: both binding modes live in one `presenter_binding` discriminated union rather than splitting key binding into `cnf` and framework binding into a custom claim. The key-binding semantics are exactly `cnf.jkt` — the same RFC 7638 thumbprint comparison, so thumbprint code written for `cnf.jkt` is reusable as-is — and only the claim shape differs.
 
@@ -244,10 +245,12 @@ A Permission Ticket MAY bind redemption to a specific client using the `presente
 | Mode | `method` | Verification |
 |------|----------|--------------|
 | **Key-bound** | `"jkt"` | Data Holder computes the JWK Thumbprint ([RFC 7638](https://www.rfc-editor.org/rfc/rfc7638)) of the `client_assertion` signing key and compares it to `presenter_binding.jkt`. Reject on mismatch. |
-| **Framework-bound** | `"trust_framework_client"` | Data Holder confirms the client matches `entity_uri` within the named `trust_framework`. For UDAP: certificate SAN matches `entity_uri`. For well-known: fetch `{entity_uri}/.well-known/jwks.json` and verify `client_assertion`. For OIDF: validate the client's federation material for `entity_uri` under the named trust framework and verify the presented `client_assertion` keys through that federation trust chain. |
+| **Framework-bound** | `"trust_framework_client"` | Data Holder confirms the client matches `entity_uri` within the named `trust_framework` (with `entity_uri` absent, any client validated under that framework matches). For UDAP: certificate SAN matches `entity_uri`. For well-known: fetch `{entity_uri}/.well-known/jwks.json` and verify `client_assertion`. For OIDF: validate the client's federation material for `entity_uri` under the named trust framework and verify the presented `client_assertion` keys through that federation trust chain. |
 | **No binding** | *(absent)* | Any authenticated client in the ticket's `aud` may redeem it, unless the selected `ticket_type` profile defines a stricter interpretation. |
 
 In all modes, the Data Holder authenticates the presenting client through its standard mechanism. Presenter binding adds a constraint on top of that authentication, not in place of it.
+
+When `presenter_binding` is an array, the presenter satisfying any one binding suffices. A Data Holder MAY skip bindings whose `method` it cannot evaluate, provided the presenter satisfies one it can; if it can evaluate none, it SHALL reject.
 
 #### Presenter Binding per Ticket Type
 
@@ -270,7 +273,7 @@ The Data Holder SHALL validate in two layers:
     *   **Verify Trust:** Is this `iss` accepted under the Data Holder's locally configured trust policy *for this ticket type*?
     *   **Verify Envelope:** Confirm `exp` has not passed and `aud` matches this Data Holder (see [Ticket Audience](#ticket-audience-aud-and-effective-eligible-data-holder-set)).
     *   **Check Revocation:** If `revocation` is present, check the ticket's revocation status; if status cannot be determined, reject (see [Revocation](#revocation)).
-    *   **Verify Presenter Binding:** If `presenter_binding` is present, verify it according to `presenter_binding.method`. If the selected ticket type requires binding and it is absent, reject.
+    *   **Verify Presenter Binding:** If `presenter_binding` is present, verify that the presenter satisfies at least one of its bindings, each according to its `method`. If the selected ticket type requires binding and it is absent, reject.
     *   **Verify Identity Evidence:** If `subject_identity_evidence` or `requester_identity_evidence` is present, verify it per [Identity Evidence](#identity-evidence) — signature, evidence-issuer trust, temporal validity, who the embedded ID token was issued to, and demographic consistency with the party in that slot — plus the selected profile's assurance and claim parameters.
     *   **Process Kernel Fields:** Every kernel field present in the ticket must be handled. Enforced fields — including every member of `access` — SHALL be enforced or the ticket rejected; policy-selection fields SHALL be understood well enough to apply the selected ticket type and local policy. See [Field Handling and Extensions](#field-handling-and-extensions).
     *   **Verify Required Claims:** Confirm every claim the selected ticket type requires is present and well-formed (for example, the delegated-access authority coding, or a required constraint such as the payer profile's `claim_linkage`); reject with `invalid_grant` if missing.

@@ -47,56 +47,116 @@
           "minLength": 1
         },
         "presenter_binding": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "jkt"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "jkt"
+                    },
+                    "jkt": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "jkt"
+                  ],
+                  "additionalProperties": false
                 },
-                "jkt": {
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "trust_framework_client"
+                    },
+                    "trust_framework": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "framework_type": {
+                      "type": "string",
+                      "enum": [
+                        "well-known",
+                        "udap",
+                        "oidf"
+                      ]
+                    },
+                    "entity_uri": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "trust_framework",
+                    "framework_type"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "method",
-                "jkt"
-              ],
-              "additionalProperties": false
+              ]
             },
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "trust_framework_client"
-                },
-                "trust_framework": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "framework_type": {
-                  "type": "string",
-                  "enum": [
-                    "well-known",
-                    "udap",
-                    "oidf"
-                  ]
-                },
-                "entity_uri": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "method",
-                "trust_framework",
-                "framework_type",
-                "entity_uri"
-              ],
-              "additionalProperties": false
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "jkt"
+                      },
+                      "jkt": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "jkt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "trust_framework_client"
+                      },
+                      "trust_framework": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "framework_type": {
+                        "type": "string",
+                        "enum": [
+                          "well-known",
+                          "udap",
+                          "oidf"
+                        ]
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "trust_framework",
+                      "framework_type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
             }
           ]
         },
@@ -494,56 +554,116 @@
           "minLength": 1
         },
         "presenter_binding": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "jkt"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "jkt"
+                    },
+                    "jkt": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "jkt"
+                  ],
+                  "additionalProperties": false
                 },
-                "jkt": {
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "trust_framework_client"
+                    },
+                    "trust_framework": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "framework_type": {
+                      "type": "string",
+                      "enum": [
+                        "well-known",
+                        "udap",
+                        "oidf"
+                      ]
+                    },
+                    "entity_uri": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "trust_framework",
+                    "framework_type"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "method",
-                "jkt"
-              ],
-              "additionalProperties": false
+              ]
             },
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "trust_framework_client"
-                },
-                "trust_framework": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "framework_type": {
-                  "type": "string",
-                  "enum": [
-                    "well-known",
-                    "udap",
-                    "oidf"
-                  ]
-                },
-                "entity_uri": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "method",
-                "trust_framework",
-                "framework_type",
-                "entity_uri"
-              ],
-              "additionalProperties": false
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "jkt"
+                      },
+                      "jkt": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "jkt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "trust_framework_client"
+                      },
+                      "trust_framework": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "framework_type": {
+                        "type": "string",
+                        "enum": [
+                          "well-known",
+                          "udap",
+                          "oidf"
+                        ]
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "trust_framework",
+                      "framework_type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
             }
           ]
         },
@@ -1066,56 +1186,116 @@
           "minLength": 1
         },
         "presenter_binding": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "jkt"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "jkt"
+                    },
+                    "jkt": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "jkt"
+                  ],
+                  "additionalProperties": false
                 },
-                "jkt": {
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "trust_framework_client"
+                    },
+                    "trust_framework": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "framework_type": {
+                      "type": "string",
+                      "enum": [
+                        "well-known",
+                        "udap",
+                        "oidf"
+                      ]
+                    },
+                    "entity_uri": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "trust_framework",
+                    "framework_type"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "method",
-                "jkt"
-              ],
-              "additionalProperties": false
+              ]
             },
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "trust_framework_client"
-                },
-                "trust_framework": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "framework_type": {
-                  "type": "string",
-                  "enum": [
-                    "well-known",
-                    "udap",
-                    "oidf"
-                  ]
-                },
-                "entity_uri": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "method",
-                "trust_framework",
-                "framework_type",
-                "entity_uri"
-              ],
-              "additionalProperties": false
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "jkt"
+                      },
+                      "jkt": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "jkt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "trust_framework_client"
+                      },
+                      "trust_framework": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "framework_type": {
+                        "type": "string",
+                        "enum": [
+                          "well-known",
+                          "udap",
+                          "oidf"
+                        ]
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "trust_framework",
+                      "framework_type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
             }
           ]
         },
@@ -1597,56 +1777,116 @@
           "minLength": 1
         },
         "presenter_binding": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "jkt"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "jkt"
+                    },
+                    "jkt": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "jkt"
+                  ],
+                  "additionalProperties": false
                 },
-                "jkt": {
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "trust_framework_client"
+                    },
+                    "trust_framework": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "framework_type": {
+                      "type": "string",
+                      "enum": [
+                        "well-known",
+                        "udap",
+                        "oidf"
+                      ]
+                    },
+                    "entity_uri": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "trust_framework",
+                    "framework_type"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "method",
-                "jkt"
-              ],
-              "additionalProperties": false
+              ]
             },
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "trust_framework_client"
-                },
-                "trust_framework": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "framework_type": {
-                  "type": "string",
-                  "enum": [
-                    "well-known",
-                    "udap",
-                    "oidf"
-                  ]
-                },
-                "entity_uri": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "method",
-                "trust_framework",
-                "framework_type",
-                "entity_uri"
-              ],
-              "additionalProperties": false
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "jkt"
+                      },
+                      "jkt": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "jkt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "trust_framework_client"
+                      },
+                      "trust_framework": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "framework_type": {
+                        "type": "string",
+                        "enum": [
+                          "well-known",
+                          "udap",
+                          "oidf"
+                        ]
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "trust_framework",
+                      "framework_type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
             }
           ]
         },
@@ -2194,56 +2434,116 @@
           "minLength": 1
         },
         "presenter_binding": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "jkt"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "jkt"
+                    },
+                    "jkt": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "jkt"
+                  ],
+                  "additionalProperties": false
                 },
-                "jkt": {
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "trust_framework_client"
+                    },
+                    "trust_framework": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "framework_type": {
+                      "type": "string",
+                      "enum": [
+                        "well-known",
+                        "udap",
+                        "oidf"
+                      ]
+                    },
+                    "entity_uri": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "trust_framework",
+                    "framework_type"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "method",
-                "jkt"
-              ],
-              "additionalProperties": false
+              ]
             },
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "trust_framework_client"
-                },
-                "trust_framework": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "framework_type": {
-                  "type": "string",
-                  "enum": [
-                    "well-known",
-                    "udap",
-                    "oidf"
-                  ]
-                },
-                "entity_uri": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "method",
-                "trust_framework",
-                "framework_type",
-                "entity_uri"
-              ],
-              "additionalProperties": false
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "jkt"
+                      },
+                      "jkt": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "jkt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "trust_framework_client"
+                      },
+                      "trust_framework": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "framework_type": {
+                        "type": "string",
+                        "enum": [
+                          "well-known",
+                          "udap",
+                          "oidf"
+                        ]
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "trust_framework",
+                      "framework_type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
             }
           ]
         },
@@ -2692,56 +2992,116 @@
           "minLength": 1
         },
         "presenter_binding": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "jkt"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "jkt"
+                    },
+                    "jkt": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "jkt"
+                  ],
+                  "additionalProperties": false
                 },
-                "jkt": {
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "trust_framework_client"
+                    },
+                    "trust_framework": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "framework_type": {
+                      "type": "string",
+                      "enum": [
+                        "well-known",
+                        "udap",
+                        "oidf"
+                      ]
+                    },
+                    "entity_uri": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "trust_framework",
+                    "framework_type"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "method",
-                "jkt"
-              ],
-              "additionalProperties": false
+              ]
             },
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "trust_framework_client"
-                },
-                "trust_framework": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "framework_type": {
-                  "type": "string",
-                  "enum": [
-                    "well-known",
-                    "udap",
-                    "oidf"
-                  ]
-                },
-                "entity_uri": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "method",
-                "trust_framework",
-                "framework_type",
-                "entity_uri"
-              ],
-              "additionalProperties": false
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "jkt"
+                      },
+                      "jkt": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "jkt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "trust_framework_client"
+                      },
+                      "trust_framework": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "framework_type": {
+                        "type": "string",
+                        "enum": [
+                          "well-known",
+                          "udap",
+                          "oidf"
+                        ]
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "trust_framework",
+                      "framework_type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
             }
           ]
         },
@@ -3259,56 +3619,116 @@
           "minLength": 1
         },
         "presenter_binding": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "jkt"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "jkt"
+                    },
+                    "jkt": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "jkt"
+                  ],
+                  "additionalProperties": false
                 },
-                "jkt": {
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "trust_framework_client"
+                    },
+                    "trust_framework": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "framework_type": {
+                      "type": "string",
+                      "enum": [
+                        "well-known",
+                        "udap",
+                        "oidf"
+                      ]
+                    },
+                    "entity_uri": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "trust_framework",
+                    "framework_type"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "method",
-                "jkt"
-              ],
-              "additionalProperties": false
+              ]
             },
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "trust_framework_client"
-                },
-                "trust_framework": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "framework_type": {
-                  "type": "string",
-                  "enum": [
-                    "well-known",
-                    "udap",
-                    "oidf"
-                  ]
-                },
-                "entity_uri": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "method",
-                "trust_framework",
-                "framework_type",
-                "entity_uri"
-              ],
-              "additionalProperties": false
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "jkt"
+                      },
+                      "jkt": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "jkt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "trust_framework_client"
+                      },
+                      "trust_framework": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "framework_type": {
+                        "type": "string",
+                        "enum": [
+                          "well-known",
+                          "udap",
+                          "oidf"
+                        ]
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "trust_framework",
+                      "framework_type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
             }
           ]
         },
@@ -3883,56 +4303,116 @@
           "minLength": 1
         },
         "presenter_binding": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "jkt"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "jkt"
+                    },
+                    "jkt": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "jkt"
+                  ],
+                  "additionalProperties": false
                 },
-                "jkt": {
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "trust_framework_client"
+                    },
+                    "trust_framework": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "framework_type": {
+                      "type": "string",
+                      "enum": [
+                        "well-known",
+                        "udap",
+                        "oidf"
+                      ]
+                    },
+                    "entity_uri": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "trust_framework",
+                    "framework_type"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "method",
-                "jkt"
-              ],
-              "additionalProperties": false
+              ]
             },
             {
-              "type": "object",
-              "properties": {
-                "method": {
-                  "type": "string",
-                  "const": "trust_framework_client"
-                },
-                "trust_framework": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "framework_type": {
-                  "type": "string",
-                  "enum": [
-                    "well-known",
-                    "udap",
-                    "oidf"
-                  ]
-                },
-                "entity_uri": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "method",
-                "trust_framework",
-                "framework_type",
-                "entity_uri"
-              ],
-              "additionalProperties": false
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "jkt"
+                      },
+                      "jkt": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "jkt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "trust_framework_client"
+                      },
+                      "trust_framework": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "framework_type": {
+                        "type": "string",
+                        "enum": [
+                          "well-known",
+                          "udap",
+                          "oidf"
+                        ]
+                      },
+                      "entity_uri": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "trust_framework",
+                      "framework_type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
             }
           ]
         },

@@ -153,7 +153,7 @@ export const TrustFrameworkClientBindingSchema = z.object({
   method: z.literal("trust_framework_client"),
   trust_framework: UriSchema,
   framework_type: FrameworkTypeSchema,
-  entity_uri: UriSchema,
+  entity_uri: UriSchema.optional(),
 }).strict();
 
 export const PresenterBindingSchema = z.discriminatedUnion("method", [
@@ -265,7 +265,10 @@ const TicketBaseSchema = z.object({
   exp: z.number().int(),
   iat: z.number().int(),
   jti: NonEmptyStringSchema,
-  presenter_binding: PresenterBindingSchema.optional(),
+  presenter_binding: z.union([
+    PresenterBindingSchema,
+    z.array(PresenterBindingSchema).min(1),
+  ]).optional(),
   subject_identity_evidence: IdentityEvidenceSchema.optional(),
   requester_identity_evidence: IdentityEvidenceSchema.optional(),
   revocation: RevocationSchema.optional(),

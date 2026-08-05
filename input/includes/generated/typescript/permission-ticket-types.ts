@@ -46,7 +46,7 @@ export type TrustFrameworkClientBinding = {
   method: "trust_framework_client";
   trust_framework: Uri;
   framework_type: FrameworkType;
-  entity_uri: Uri;
+  entity_uri?: Uri;
 };
 
 export type PresenterBinding = KeyBinding | TrustFrameworkClientBinding;
@@ -118,7 +118,7 @@ export type PermissionTicketBase = {
   iat: NumericDate;
   jti: string;
   ticket_type: PermissionTicketType;
-  presenter_binding?: PresenterBinding;
+  presenter_binding?: PresenterBinding | PresenterBinding[];
   subject_identity_evidence?: IdentityEvidence;
   requester_identity_evidence?: IdentityEvidence;
   revocation?: Revocation;
