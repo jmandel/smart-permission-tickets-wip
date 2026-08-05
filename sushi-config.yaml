@@ -57,6 +57,8 @@ pages:
     title: "Proposal 006: Well-Known JWKS Client Identity"
   proposal-007-issuer-accountability.md:
     title: "Proposal 007: Issuer Accountability"
+  proposal-008-delegation-statements.md:
+    title: "Proposal 008: Delegation Statements"
 
 menu:
   IG Home: index.html
@@ -79,6 +81,7 @@ menu:
     "005: Sensitive Data Profile": proposal-005-sensitive-data-modeling.html
     "006: Well-Known JWKS Client Identity": proposal-006-well-known-client-identity.html
     "007: Issuer Accountability": proposal-007-issuer-accountability.html
+    "008: Delegation Statements": proposal-008-delegation-statements.html
   Quickstarts:
     "Data Holders": quickstart-data-holder.html
     "Issuers": quickstart-issuer.html
